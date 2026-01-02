@@ -98,6 +98,8 @@ class Search extends AbstractController
 	 */
 	public function action_index()
 	{
+		global $context;
+
 		$subActions = [
 			'search' => [$this, 'action_search'],
 			'results' => [$this, 'action_results'],
@@ -107,6 +109,7 @@ class Search extends AbstractController
 		$action = new Action('modify_features');
 
 		$subAction = $action->initialize($subActions, 'search');
+		$context['sub_action'] = $subAction;
 
 		// Call the right method.
 		$action->dispatch($subAction);

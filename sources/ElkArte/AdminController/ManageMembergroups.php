@@ -56,30 +56,12 @@ class ManageMembergroups extends AbstractController
 		theme()->getTemplates()->load('ManageMembergroups');
 
 		$subActions = [
-			'add' => [
-				'controller' => $this,
-				'function' => 'action_add',
-				'permission' => 'manage_membergroups'],
-			'delete' => [
-				'controller' => $this,
-				'function' => 'action_delete',
-				'permission' => 'manage_membergroups'],
-			'edit' => [
-				'controller' => $this,
-				'function' => 'action_edit',
-				'permission' => 'manage_membergroups'],
-			'index' => [
-				'controller' => $this,
-				'function' => 'action_list',
-				'permission' => 'manage_membergroups'],
-			'members' => [
-				'controller' => Groups::class,
-				'function' => 'action_index',
-				'permission' => 'manage_membergroups'],
-			'settings' => [
-				'controller' => $this,
-				'function' => 'action_groupSettings_display',
-				'permission' => 'admin_forum'],
+			'add' => [$this, 'action_add', 'permission' => 'manage_membergroups'],
+			'delete' => [$this, 'action_delete', 'permission' => 'manage_membergroups'],
+			'edit' => [$this, 'action_edit', 'permission' => 'manage_membergroups'],
+			'index' => [$this, 'action_list', 'permission' => 'manage_membergroups'],
+			'members' => [Groups::class, 'action_index', 'permission' => 'manage_membergroups'],
+			'settings' => [$this, 'action_groupSettings_display', 'permission' => 'admin_forum'],
 		];
 
 		$action = new Action('manage_membergroups');

@@ -42,10 +42,7 @@ class ManageEditor extends AbstractController
 		global $context, $txt;
 
 		$subActions = [
-			'display' => [
-				'controller' => $this,
-				'function' => 'action_editorSettings_display',
-				'permission' => 'admin_forum']
+			'display' => [$this, 'action_editorSettings_display', 'permission' => 'admin_forum']
 		];
 
 		// Set up

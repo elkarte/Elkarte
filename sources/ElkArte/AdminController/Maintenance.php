@@ -81,9 +81,7 @@ class Maintenance extends AbstractController
 
 		// So many things you can do - but frankly, I won't let you - just these!
 		$subActions = [
-			'routine' => [
-				'controller' => $this,
-				'function' => 'action_routine',
+			'routine' => [$this, 'action_routine',
 				'activities' => [
 					'repair' => 'action_repair_display',
 					'recount' => 'action_recount_display',
@@ -91,40 +89,28 @@ class Maintenance extends AbstractController
 					'cleancache' => 'action_cleancache_display',
 				],
 			],
-			'database' => [
-				'controller' => $this,
-				'function' => 'action_database',
+			'database' => [$this, 'action_database',
 				'activities' => [
 					'optimize' => 'action_optimize_display',
 					'backup' => 'action_backup_display',
 					'convertmsgbody' => 'action_convertmsgbody_display',
 				],
 			],
-			'members' => [
-				'controller' => $this,
-				'function' => 'action_members',
+			'members' => [$this, 'action_members',
 				'activities' => [
 					'reattribute' => 'action_reattribute_display',
 					'purgeinactive' => 'action_purgeinactive_display',
 					'recountposts' => 'action_recountposts_display',
 				],
 			],
-			'topics' => [
-				'controller' => $this,
-				'function' => 'action_topics',
+			'topics' => [$this, 'action_topics',
 				'activities' => [
 					'massmove' => 'action_massmove_display',
 					'pruneold' => 'action_pruneold_display',
 				],
 			],
-			'hooks' => [
-				'controller' => $this,
-				'function' => 'action_hooks',
-			],
-			'attachments' => [
-				'controller' => ManageAttachments::class,
-				'function' => 'action_maintenance',
-			],
+			'hooks' => [$this, 'action_hooks'],
+			'attachments' => ['controller' => ManageAttachments::class, 'function' => 'action_maintenance'],
 		];
 
 		// Set up the action handler

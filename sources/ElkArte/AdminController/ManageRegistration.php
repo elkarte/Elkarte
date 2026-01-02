@@ -63,31 +63,11 @@ class ManageRegistration extends AbstractController
 		loadJavascriptFile('register.js');
 
 		$subActions = [
-			'register' => [
-				'controller' => $this,
-				'function' => 'action_register',
-				'permission' => 'moderate_forum',
-			],
-			'agreement' => [
-				'controller' => $this,
-				'function' => 'action_agreement',
-				'permission' => 'admin_forum',
-			],
-			'privacypol' => [
-				'controller' => $this,
-				'function' => 'action_privacypol',
-				'permission' => 'admin_forum',
-			],
-			'reservednames' => [
-				'controller' => $this,
-				'function' => 'action_reservednames',
-				'permission' => 'admin_forum',
-			],
-			'settings' => [
-				'controller' => $this,
-				'function' => 'action_registerSettings_display',
-				'permission' => 'admin_forum',
-			],
+			'register' => [$this, 'action_register', 'permission' => 'moderate_forum'],
+			'agreement' => [$this, 'action_agreement', 'permission' => 'admin_forum'],
+			'privacypol' => [$this, 'action_privacypol', 'permission' => 'admin_forum'],
+			'reservednames' => [$this, 'action_reservednames', 'permission' => 'admin_forum'],
+			'settings' => [$this, 'action_registerSettings_display', 'permission' => 'admin_forum'],
 		];
 
 		// Action controller

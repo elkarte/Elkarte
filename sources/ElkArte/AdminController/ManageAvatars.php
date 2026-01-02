@@ -23,7 +23,7 @@ use ElkArte\SettingsForm\SettingsForm;
 /**
  * This is the avatars administration controller class.
  *
- * - It is doing the job of maintenance and allow display and change of avatar settings.
+ * - It is doing the job of maintenance and allows display and change of avatar settings.
  *
  * @package Avatars
  */
@@ -68,7 +68,7 @@ class ManageAvatars extends AbstractController
 	}
 
 	/**
-	 * This action handler method displays and allows to change avatar settings.
+	 * This action handler method displays and allows changing avatar settings.
 	 *
 	 * - Called by index.php?action=admin;area=manageattachments;sa=avatars.
 	 *

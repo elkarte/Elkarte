@@ -93,6 +93,8 @@ class Mentions extends AbstractController
 	 */
 	public function action_index()
 	{
+		global $context;
+
 		$subActions = [
 			'fetch' => [$this, 'action_fetch'],
 			'list' => [$this, 'action_list'],
@@ -105,6 +107,7 @@ class Mentions extends AbstractController
 		$action = new Action('mentions');
 
 		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
 
 		// Call the right method.
 		$action->dispatch($subAction);

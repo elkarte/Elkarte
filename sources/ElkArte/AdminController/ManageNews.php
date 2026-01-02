@@ -56,26 +56,11 @@ class ManageNews extends AbstractController
 
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = [
-			'editnews' => [
-				'controller' => $this,
-				'function' => 'action_editnews',
-				'permission' => 'edit_news'],
-			'mailingmembers' => [
-				'controller' => $this,
-				'function' => 'action_mailingmembers',
-				'permission' => 'send_mail'],
-			'mailingcompose' => [
-				'controller' => $this,
-				'function' => 'action_mailingcompose',
-				'permission' => 'send_mail'],
-			'mailingsend' => [
-				'controller' => $this,
-				'function' => 'action_mailingsend',
-				'permission' => 'send_mail'],
-			'settings' => [
-				'controller' => $this,
-				'function' => 'action_newsSettings_display',
-				'permission' => 'admin_forum'],
+			'editnews' => [$this, 'action_editnews', 'permission' => 'edit_news'],
+			'mailingmembers' => [$this, 'action_mailingmembers', 'permission' => 'send_mail'],
+			'mailingcompose' => [$this, 'action_mailingcompose', 'permission' => 'send_mail'],
+			'mailingsend' => [$this, 'action_mailingsend', 'permission' => 'send_mail'],
+			'settings' => [$this, 'action_newsSettings_display', 'permission' => 'admin_forum'],
 		];
 
 		// Action control

@@ -60,42 +60,15 @@ class ManageBoards extends AbstractController
 
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = [
-			'board' => [
-				'controller' => $this,
-				'function' => 'action_board',
-				'permission' => 'manage_boards'],
-			'board2' => [
-				'controller' => $this,
-				'function' => 'action_board2',
-				'permission' => 'manage_boards'],
-			'cat' => [
-				'controller' => $this,
-				'function' => 'action_cat',
-				'permission' => 'manage_boards'],
-			'cat2' => [
-				'controller' => $this,
-				'function' => 'action_cat2',
-				'permission' => 'manage_boards'],
-			'main' => [
-				'controller' => $this,
-				'function' => 'action_main',
-				'permission' => 'manage_boards'],
-			'move' => [
-				'controller' => $this,
-				'function' => 'action_main',
-				'permission' => 'manage_boards'],
-			'newcat' => [
-				'controller' => $this,
-				'function' => 'action_cat',
-				'permission' => 'manage_boards'],
-			'newboard' => [
-				'controller' => $this,
-				'function' => 'action_board',
-				'permission' => 'manage_boards'],
-			'settings' => [
-				'controller' => $this,
-				'function' => 'action_boardSettings_display',
-				'permission' => 'admin_forum'],
+			'board' => [$this, 'action_board',  'permission' => 'manage_boards'],
+			'board2' => [$this, 'action_board2', 'permission' => 'manage_boards'],
+			'cat' => [$this, 'action_cat', 'permission' => 'manage_boards'],
+			'cat2' => [$this, 'action_cat2', 'permission' => 'manage_boards'],
+			'main' => [$this, 'action_main', 'permission' => 'manage_boards'],
+			'move' => [$this, 'action_main', 'permission' => 'manage_boards'],
+			'newcat' => [$this, 'action_cat', 'permission' => 'manage_boards'],
+			'newboard' => [$this, 'action_board', 'permission' => 'manage_boards'],
+			'settings' => [$this, 'action_boardSettings_display', 'permission' => 'admin_forum'],
 		];
 
 		// Your way will end here if you don't have permission.
