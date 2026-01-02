@@ -3434,7 +3434,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 /* Emoji and smiley icons in the post */
 .smiley, .emoji {
 	max-height: 2rem;
-	vertical-align: text-bottom;
+	vertical-align: bottom;
 }
 
 .emoji {

@@ -101,7 +101,7 @@ $txt['hide_post_group_desc'] = '(Enabling this will not display a member\'s post
 $txt['theme_options_defaults'] = 'These are the default values for some member specific settings.  Changing these will only affect new members and guests.';
 $txt['theme_options_title'] = 'Change or reset default options';
 
-$txt['themeadmin_title'] = 'Theme Management and Options';
+$txt['themeadmin_title'] = 'Theme Management & Options';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
 $txt['themeadmin_admin_desc'] = 'Themes provide the different \'looks and feels\' of your forum. Theme Management and Options allow you to install new site themes, change the default theme, reset all members to use a certain theme, and choose other settings related to theme selection. Remember to look at the theme settings for your different themes for their individual layout options.';
 $txt['themeadmin_list_desc'] = 'In the Theme Settings area you can view the list of themes that you have installed, change their directory paths and settings, and uninstall them.';

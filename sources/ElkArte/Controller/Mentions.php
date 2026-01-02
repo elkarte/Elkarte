@@ -14,6 +14,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
@@ -34,7 +35,7 @@ class Mentions extends AbstractController
 	/** @var string The type of the mention we are looking at (if empty means all of them) */
 	protected $_type = '';
 
-	/** @var string The url of the display mentions button (all, unread, etc) */
+	/** @var string The url of the display mentions button (all, unread, etc.) */
 	protected $_url_param = '';
 
 	/** @var int Used for pagination, keeps track of the current start point */
@@ -92,15 +93,24 @@ class Mentions extends AbstractController
 	 */
 	public function action_index()
 	{
-		if ($this->_req->getQuery('sa') === 'fetch')
-		{
-			$this->action_fetch();
-		}
-		else
-		{
-			// Default action to execute
-			$this->action_list();
-		}
+		global $context;
+
+		$subActions = [
+			'fetch' => [$this, 'action_fetch'],
+			'list' => [$this, 'action_list'],
+			'results' => [$this, 'action_results'],
+			'markread' => [$this, 'action_markread'],
+			'updatestatus' => [$this, 'action_updatestatus'],
+		];
+
+		// Set up the action control
+		$action = new Action('mentions');
+
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
+		// Call the right method.
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -142,7 +152,7 @@ class Mentions extends AbstractController
 			'lasttimepm' => getLastPMSentTime($this->user->id)
 		];
 
-		// Data to be supplied to Json template, consumed by favicon-notify.js
+		// Data to be supplied to JSON template, consumed by favicon-notify.js
 		if (!empty($modSettings['usernotif_favicon_enable']))
 		{
 			$context['json_data']['mentions'] = (int) $this->user->mentions;
@@ -357,7 +367,7 @@ class Mentions extends AbstractController
 	 * Callback for createList(),
 	 * Returns the number of mentions of $type that a member has
 	 *
-	 * @param bool $all : if true counts all the mentions, otherwise only the unread
+	 * @param bool $all : if true, counts all the mentions, otherwise only the unread
 	 * @param string $type : the type of mention
 	 *
 	 * @return array|int
@@ -421,11 +431,11 @@ class Mentions extends AbstractController
 	 * Callback for createList(),
 	 * Returns the mentions of a give type (like/buddy/etc.) & (unread or all)
 	 *
-	 * @param int $start start list number
-	 * @param int $limit how many to show on a page
-	 * @param string $sort which direction are we showing this
-	 * @param bool $all : if true load all the mentions or type, otherwise only the unread
-	 * @param string $type : the type of mention
+	 * @param int $start Start list number
+	 * @param int $limit How many to show on a page
+	 * @param string $sort The direction are we listing
+	 * @param bool $all : If true, load all the mentions or type, otherwise only the unread
+	 * @param string $type : The type of mention
 	 *
 	 * @event view_mentions
 	 * @return array

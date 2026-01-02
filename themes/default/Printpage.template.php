@@ -85,7 +85,7 @@ function template_print_above()
 			.emoji {
 				max-width: 18px;
 				padding: 0 .13em;
-				vertical-align: text-bottom;
+				vertical-align: bottom;
 			}
 			hr {
 				height: 1px;

@@ -151,7 +151,7 @@ function getQuickAdminTasks()
 		['admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'],
 		['admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'],
 		['manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'],
-		['admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'],
+		['admin_forum', 'themes', 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'],
 		['admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'],
 		['manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'],
 		['moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'],

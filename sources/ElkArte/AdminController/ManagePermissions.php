@@ -67,45 +67,16 @@ class ManagePermissions extends AbstractController
 		Txt::load('ManagePermissions+ManageMembers');
 		theme()->getTemplates()->load('ManagePermissions');
 
-		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = [
-			'board' => [
-				'controller' => $this,
-				'function' => 'action_board',
-				'permission' => 'manage_permissions'],
-			'index' => [
-				'controller' => $this,
-				'function' => 'action_list',
-				'permission' => 'manage_permissions'],
-			'modify' => [
-				'controller' => $this,
-				'function' => 'action_modify',
-				'permission' => 'manage_permissions'],
-			'modify2' => [
-				'controller' => $this,
-				'function' => 'action_modify2',
-				'permission' => 'manage_permissions'],
-			'quick' => [
-				'controller' => $this,
-				'function' => 'action_quick',
-				'permission' => 'manage_permissions'],
-			'quickboard' => [
-				'controller' => $this,
-				'function' => 'action_quickboard',
-				'permission' => 'manage_permissions'],
-			'postmod' => [
-				'controller' => $this,
-				'function' => 'action_postmod',
-				'permission' => 'manage_permissions',
-				'disabled' => !featureEnabled('pm')],
-			'profiles' => [
-				'controller' => $this,
-				'function' => 'action_profiles',
-				'permission' => 'manage_permissions'],
-			'settings' => [
-				'controller' => $this,
-				'function' => 'action_permSettings_display',
-				'permission' => 'admin_forum'],
+			'board' => [$this, 'action_board', 'permission' => 'manage_permissions'],
+			'index' => [$this, 'action_list', 'permission' => 'manage_permissions'],
+			'modify' => [$this, 'action_modify', 'permission' => 'manage_permissions'],
+			'modify2' => [$this, 'action_modify2', 'permission' => 'manage_permissions'],
+			'quick' => [$this, 'action_quick', 'permission' => 'manage_permissions'],
+			'quickboard' => [$this, 'action_quickboard', 'permission' => 'manage_permissions'],
+			'postmod' => [$this, 'action_postmod', 'permission' => 'manage_permissions', 'disabled' => !featureEnabled('pm')],
+			'profiles' => [$this, 'action_profiles', 'permission' => 'manage_permissions'],
+			'settings' => [$this, 'action_permSettings_display', 'permission' => 'admin_forum'],
 		];
 
 		// Action controller

@@ -60,26 +60,11 @@ class ManageMembers extends AbstractController
 		theme()->getTemplates()->load('ManageMembers');
 
 		$subActions = [
-			'all' => [
-				'controller' => $this,
-				'function' => 'action_list',
-				'permission' => 'moderate_forum'],
-			'approve' => [
-				'controller' => $this,
-				'function' => 'action_approve',
-				'permission' => 'moderate_forum'],
-			'browse' => [
-				'controller' => $this,
-				'function' => 'action_browse',
-				'permission' => 'moderate_forum'],
-			'search' => [
-				'controller' => $this,
-				'function' => 'action_search',
-				'permission' => 'moderate_forum'],
-			'query' => [
-				'controller' => $this,
-				'function' => 'action_list',
-				'permission' => 'moderate_forum'],
+			'all' => [$this, 'action_list', 'permission' => 'moderate_forum'],
+			'approve' => [$this, 'action_approve', 'permission' => 'moderate_forum'],
+			'browse' => [$this, 'action_browse', 'permission' => 'moderate_forum'],
+			'search' => [$this, 'action_search', 'permission' => 'moderate_forum'],
+			'query' => [$this, 'action_list', 'permission' => 'moderate_forum'],
 		];
 
 		// Prepare our action control

@@ -41,29 +41,13 @@ class AdminLog extends AbstractController
 
 		// These are the logs they can load.
 		$subActions = [
-			'errorlog' => [
-				'function' => 'action_index',
-				'controller' => ManageErrors::class],
-				'disabled' => empty($modSettings['enableErrorLogging']),
-			'adminlog' => [
-				'function' => 'action_log',
-				'controller' => Modlog::class],
-			'modlog' => [
-				'function' => 'action_log',
-				'controller' => Modlog::class,
-				'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])],
-			'banlog' => [
-				'function' => 'action_log',
-				'controller' => ManageBans::class],
-			'spiderlog' => [
-				'function' => 'action_logs',
-				'controller' => ManageSearchEngines::class],
-			'tasklog' => [
-				'function' => 'action_log',
-				'controller' => ManageScheduledTasks::class],
-			'pruning' => [
-				'controller' => $this,
-				'function' => 'action_pruningSettings_display'],
+			'errorlog' => ['controller' => ManageErrors::class], 'function' => 'action_index', 'disabled' => empty($modSettings['enableErrorLogging']),
+			'adminlog' => ['controller' => Modlog::class, 'function' => 'action_log'],
+			'modlog' => ['controller' => Modlog::class, 'function' => 'action_log', 'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])],
+			'banlog' => ['controller' => ManageBans::class, 'function' => 'action_log'],
+			'spiderlog' => ['controller' => ManageSearchEngines::class, 'function' => 'action_logs', 'disabled' => empty($modSettings['spider_logging_enabled'])],
+			'tasklog' => ['controller' => ManageScheduledTasks::class, 'function' => 'action_log'],
+			'pruning' => [$this, 'action_pruningSettings_display'],
 		];
 
 		// Set up the custom tabs.

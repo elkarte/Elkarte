@@ -19,8 +19,9 @@ $txt['admin_censored_where'] = 'Enter the word to be censored into the left box 
 $txt['admin_censored_desc'] = 'Due to the public nature of forums there may be some words that you wish to prohibit being posted by users of your forum. You can enter any words below that you wish to be censored whenever used by a member.<br />Clear a box to remove that word from the censor.';
 $txt['admin_reserved_names'] = 'Reserved Names';
 $txt['admin_template_edit'] = 'Edit your forum template';
-$txt['admin_modifications'] = 'Add-on Settings';
-$txt['admin_security_moderation'] = 'Security and Moderation';
+$txt['admin_modifications'] = 'Add-ons';
+$txt['admin_modifications_settings'] = 'Add-on Settings';
+$txt['admin_security_moderation'] = 'Security Settings';
 $txt['admin_server_settings'] = 'Server Settings';
 $txt['admin_reserved_set'] = 'Set reserved names';
 $txt['admin_reserved_line'] = 'One reserved word per line.';
@@ -90,7 +91,7 @@ $txt['zero_to_disable'] = '(0 to disable)';
 $txt['zero_for_none'] = '(0 to allow none)';
 
 $txt['admin_backup_fail'] = 'Failed to make backup of Settings.php - make sure Settings_bak.php exists and is writable.';
-$txt['modSettings_info'] = 'Settings for General features, Karma, Signatures, Likes and much more that control how this forum operates.';
+$txt['modSettings_info'] = 'Settings for General features, personal messages, web applications and much more that control how this forum operates.';
 $txt['database_server'] = 'Database Server';
 $txt['database_user'] = 'Database User';
 $txt['database_password'] = 'Database Password';
@@ -107,7 +108,7 @@ $txt['errors_do_recount'] = 'All errors have been fixed and a salvage area has b
 $txt['errors_recount_now'] = 'Recount Statistics';
 $txt['errors_fixing'] = 'Fixing forum errors';
 $txt['errors_fixed'] = 'All errors fixed. Please check on any categories, boards, or topics created to decide what to do with them.';
-$txt['attachments_avatars'] = 'Attachments and Avatars';
+$txt['attachments_avatars'] = 'Attachments & Avatars';
 $txt['attachments_desc'] = 'From here you can administer the attached files on your system. You can delete attachments by size and by date from your system. Statistics on attachments are also displayed below.';
 $txt['attachment_stats'] = 'File attachment statistics';
 $txt['attachment_integrity_check'] = 'Attachment integrity check';
@@ -148,13 +149,13 @@ $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
 $txt['viewmembers_online'] = 'Last Online';
 
-$txt['smileys_manage'] = 'Emoji and Message Icons';
+$txt['smileys_manage'] = 'Emoji & Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
 
 $txt['editor_manage'] = 'Editor & BBC settings';
 $txt['editor_manage_info'] = 'Add, remove, and edit options for the editor, including bulletin board codes (BBC).';
 
-$txt['package_info'] = 'Install, download and upload Modification packages; check File Permissions and FTP settings.';
+$txt['package_info'] = 'Install, download and upload add-on packages to extend the forum.';
 $txt['theme_admin'] = 'Theme Management';
 $txt['theme_admin_info'] = 'Install new themes, select themes that are available for your users and set or reset theme options.';
 $txt['registration_center'] = 'Registration';
@@ -564,7 +565,7 @@ $txt['attach_repair_wrong_folder'] = '%1$d attachments are in the wrong director
 $txt['attach_repair_missing_extension'] = '%1$d attachments do not have the proper extension and may be in the wrong directory';
 $txt['attach_repair_files_without_attachment'] = '%1$d files do not have a corresponding entry in the database. (These will be deleted)';
 
-$txt['news_title'] = 'News and Newsletters';
+$txt['news_title'] = 'News & Newsletters';
 $txt['news_settings_desc'] = 'Here you can change the settings and permissions related to news and newsletters.';
 $txt['news_mailing_desc'] = 'From this menu you can send messages to all users who\'ve registered and entered their email addresses. You may edit the distribution list, or send messages to all. Useful for important update/news information.';
 $txt['news_error_no_news'] = 'Nothing to preview';
@@ -592,8 +593,8 @@ $txt['update_available'] = 'Update Available';
 $txt['update_message'] = 'You\'re using an outdated version of ElkArte, which contains some bugs which have since been fixed.
 	It is recommended that you <a href="#" id="update-link">update your forum</a> to the latest version as soon as possible. It only takes a minute!';
 
-$txt['manageposts'] = 'Posts and Topics';
-$txt['manageposts_title'] = 'Manage Posts and Topics';
+$txt['manageposts'] = 'Posts & Topics';
+$txt['manageposts_title'] = 'Manage Posts & Topics';
 $txt['manageposts_description'] = 'Here you can manage all settings related to topics and posts.';
 
 $txt['manageposts_seconds'] = 'seconds';
@@ -700,8 +701,8 @@ $txt['not_done_reason'] = 'To avoid overloading your server, the process has bee
 $txt['not_done_continue'] = 'Continue';
 
 $txt['general_settings'] = 'General';
-$txt['database_paths_settings'] = 'Database and Paths';
-$txt['cookies_sessions_settings'] = 'Cookies and Sessions';
+$txt['database_paths_settings'] = 'Database & Paths';
+$txt['cookies_sessions_settings'] = 'Cookies & Sessions';
 $txt['caching_settings'] = 'Caching';
 $txt['loadavg'] = 'Server Load';
 $txt['loadavg_settings'] = 'Load Management';
@@ -751,14 +752,16 @@ $txt['admin_search_results_none'] = 'No results found.';
 $txt['admin_search_section_sections'] = 'Section';
 $txt['admin_search_section_settings'] = 'Setting';
 
-$txt['core_settings_title'] = 'Core Features';
+$txt['core_settings_title'] = 'Optional Core Features';
 $txt['core_settings_desc'] = 'This page allows you to turn on or off optional features of your forum.';
+$txt['core_settings'] = 'Core Settings';
+
 $txt['mods_cat_features'] = 'General';
 $txt['mods_cat_security_general'] = 'General';
 $txt['antispam_title'] = 'Anti-Spam';
 $txt['badbehavior_title'] = 'Bad Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
-$txt['mods_cat_layout'] = 'Layout';
+$txt['mods_cat_layout'] = 'Display & Layout';
 $txt['karma'] = 'Karma';
 $txt['pwa'] = 'PWA';
 $txt['moderation_settings_short'] = 'Moderation';
@@ -850,3 +853,8 @@ $txt['MessageIndex_Controller'] = 'Content of a board';
 $txt['message_index_frontpage'] = 'Select the board to show on the front page:';
 $txt['Recent_Controller'] = 'Recent posts';
 $txt['recent_frontpage'] = 'Number of messages to show:';
+
+// New admin menu items
+$txt['communication_title'] = 'Communications';
+$txt['admin_system_moderation'] = 'System';
+$txt['moderation_warning_short'] = 'Warning System';

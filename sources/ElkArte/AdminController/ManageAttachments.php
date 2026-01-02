@@ -101,9 +101,7 @@ class ManageAttachments extends AbstractController
 		// All the things we can do with attachments
 		$subActions = [
 			'attachments' => [$this, 'action_attachSettings_display'],
-			'avatars' => [
-				'controller' => ManageAvatars::class,
-				'function' => 'action_index'],
+			'avatars' => ['controller' => ManageAvatars::class, 'function' => 'action_index'],
 			'attachpaths' => [$this, 'action_attachpaths'],
 			'browse' => [$this, 'action_browse'],
 			'byAge' => [$this, 'action_byAge'],
@@ -1688,7 +1686,7 @@ class ManageAttachments extends AbstractController
 
 				// Finally, where do they need to go?
 				$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-				$attachmentDirectory->automanage_attachments_check_directory(true);
+				$attachmentDirectory->automanageCheckDirectory(true);
 				$new_dir = $attachmentDirectory->currentDirectoryId();
 			}
 			// Or to a specified directory

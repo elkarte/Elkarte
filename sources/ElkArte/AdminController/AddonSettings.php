@@ -24,11 +24,11 @@ use ElkArte\Languages\Txt;
  *
  * What it does:
  *
- *  - Some addons will define their own areas, but for simple cases,
+ *  - Some addons will define their own areas. However, for simple cases,
  * when you have only a setting or two, this area will allow you
- * to hook into it seamlessly, and your additions will be sent
+ * to hook into it seamlessly. Your additions will be sent
  * to admin search and otherwise benefit from admin areas security,
- * checks and display.
+ * checks, and display.
  *
  * @package AddonSettings
  */

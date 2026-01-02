@@ -8,7 +8,7 @@
  */
 
 let emojis = [
-	{name: 'undefined', key: '1f600'},
+	{name: 'undefined', key: '00000'},
 	{name: 'grinning', key: '1f600'},
 	{name: 'smile', key: '1f604'},
 	{name: 'thumbsup', key: '1f44d'},

@@ -47,14 +47,10 @@ class ManagePosts extends AbstractController
 		global $context, $txt;
 
 		$subActions = [
-			'posts' => [
-				$this, 'action_postSettings_display', 'permission' => 'admin_forum'],
-			'censor' => [
-				$this, 'action_censor', 'permission' => 'admin_forum'],
-			'topics' => [
-				'function' => 'action_index',
-				'controller' => ManageTopics::class,
-				'permission' => 'admin_forum'],
+			'posts' => [$this, 'action_postSettings_display', 'permission' => 'admin_forum'],
+			'censor' => [$this, 'action_censor', 'permission' => 'admin_forum'],
+			'topics' => ['controller' => ManageTopics::class, 'function' => 'action_index', 'permission' => 'admin_forum'],
+			'sig' => ['controller' => ManageSignature::class, 'function' => 'action_index', 'permission' => 'admin_forum'],
 		];
 
 		// Good old action handle
@@ -81,6 +77,9 @@ class ManagePosts extends AbstractController
 					],
 					'topics' => [
 						'description' => $txt['manageposts_topic_settings_description'],
+					],
+					'sig' => [
+						'description' => $txt['signature_settings_desc'],
 					],
 				]]
 		);

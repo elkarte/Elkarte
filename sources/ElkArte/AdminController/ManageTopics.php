@@ -33,10 +33,7 @@ class ManageTopics extends AbstractController
 		global $context, $txt;
 
 		$subActions = [
-			'display' => [
-				'controller' => $this,
-				'function' => 'action_topicSettings_display',
-				'permission' => 'admin_forum']
+			'display' => [$this, 'action_topicSettings_display', 'permission' => 'admin_forum']
 		];
 
 		// Control for an action, why not!

@@ -248,7 +248,7 @@ $txt['signature_max_image_height'] = 'Maximum height of signature images (pixels
 $txt['signature_max_font_size'] = 'Maximum font size allowed in signatures (pixels)';
 $txt['signature_bbc'] = 'Enabled BBC tags';
 
-$txt['pwa_settings'] = 'PWA Settings';
+$txt['pwa_settings'] = 'Web App';
 $txt['pwa_settings_desc'] = 'PWA (Progressive Web App) when configured allows your users to install your site as a web app on their device. <a class="linkbutton" href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">Read More</a>.  When this is enabled it will create a manifest.json file for the site using the below settings.  Note the description will be your site slogan (if any) and name will be your forum name.';
 $txt['pwa_enabled'] = 'Enable progressive web app support';
 $txt['pwa_disabled'] = 'PWA requires that the server be using SSL (HTTPS)';

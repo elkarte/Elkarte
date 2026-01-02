@@ -54,26 +54,11 @@ class ManagePaid extends AbstractController
 		theme()->getTemplates()->load('ManagePaid');
 
 		$subActions = [
-			'modify' => [
-				'controller' => $this,
-				'function' => 'action_modify',
-				'permission' => 'admin_forum'],
-			'modifyuser' => [
-				'controller' => $this,
-				'function' => 'action_modifyuser',
-				'permission' => 'admin_forum'],
-			'settings' => [
-				'controller' => $this,
-				'function' => 'action_paidSettings_display',
-				'permission' => 'admin_forum'],
-			'view' => [
-				'controller' => $this,
-				'function' => 'action_view',
-				'permission' => 'admin_forum'],
-			'viewsub' => [
-				'controller' => $this,
-				'function' => 'action_viewsub',
-				'permission' => 'admin_forum'],
+			'modify' => [$this, 'action_modify', 'permission' => 'admin_forum'],
+			'modifyuser' => [$this, 'action_modifyuser', 'permission' => 'admin_forum'],
+			'settings' => [$this, 'action_paidSettings_display', 'permission' => 'admin_forum'],
+			'view' => [$this, 'action_view', 'permission' => 'admin_forum'],
+			'viewsub' => [$this, 'action_viewsub', 'permission' => 'admin_forum'],
 		];
 
 		// Some actions
