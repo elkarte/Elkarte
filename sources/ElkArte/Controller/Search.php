@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
@@ -51,14 +52,14 @@ class Search extends AbstractController
 	/**
 	 * Called before any other action method in this class.
 	 *
-	 * - If coming from the quick reply allows to route to the proper action
-	 * - if needed (for example external search engine or members search
+	 * - If coming from the quick reply allows routeing to the proper action
+	 * - If needed (for example, external search engine or members search
 	 */
 	public function pre_dispatch()
 	{
 		global $modSettings;
 
-		// Coming from quick search box and going to some custom place?
+		// Coming from a quick search box and going to some custom place?
 		$search_selection = $this->_req->getRequest('search_selection', 'trim');
 		$search = $this->_req->getRequest('search', 'trim');
 
@@ -91,14 +92,26 @@ class Search extends AbstractController
 	/**
 	 * Intended entry point for this class.
 	 *
-	 * - The default action for no sub-action is... present the search screen
+	 * - The default action for no sub-action is... present on the search screen
 	 *
 	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
+		global $context, $txt, $settings;
+
+		$subActions = [
+			'search' => [$this, 'action_search'],
+			'results' => [$this, 'action_results'],
+		];
+
+		// Set up the action control
+		$action = new Action('modify_features');
+
+		$subAction = $action->initialize($subActions, 'search');
+
 		// Call the right method.
-		$this->action_search();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -356,7 +369,7 @@ class Search extends AbstractController
 		{
 			theme()->getTemplates()->load('Search');
 		}
-		// If we're doing XML we need to use the results template regardless really.
+		// If we're doing XML, we need to use the results template regardless really.
 		else
 		{
 			$context['sub_template'] = 'results';
@@ -388,7 +401,7 @@ class Search extends AbstractController
 		}
 
 		// Build the search array
-		// $modSettings ['search_simple_fulltext'] is an hidden setting that will
+		// $modSettings ['search_simple_fulltext'] is a hidden setting that will
 		// do fulltext searching in the most basic way.
 		$searchArray = $this->_search->getSearchArray();
 
@@ -531,7 +544,7 @@ class Search extends AbstractController
 			// Get the messages out for the callback - select enough that it can be made to look just like Display.
 			$messages_request = $this->_search->loadMessagesRequest($msg_list, count($context['topics']));
 
-			// If there are no results that means the things in the cache got deleted, so pretend we have no topics anymore.
+			// If there are no results, that means the things in the cache got deleted, so pretend we have no topics anymore.
 			if ($this->_search->noMessages($messages_request))
 			{
 				$context['topics'] = [];
@@ -540,7 +553,7 @@ class Search extends AbstractController
 			$this->_prepareParticipants(!empty($modSettings['enableParticipation']), (int) $this->user->id);
 		}
 
-		// Now that we know how many results to expect we can start calculating the page numbers.
+		// Now that we know how many results to expect, we can start calculating the page numbers.
 		$start = $this->_req->getRequest('start', 'intval', 0);
 		$context['page_index'] = constructPageIndex('{scripturl}?action=search;sa=results;' . $context['session_var'] . '=' . $context['session_id'] . ';params=' . $context['params'], $start, $this->_search->getNumResults(), $modSettings['search_results_per_page']);
 
@@ -623,7 +636,7 @@ class Search extends AbstractController
 	 */
 	protected function _prepareParticipants($participationEnabled, $user_id): void
 	{
-		// If we want to know who participated in what then load this now.
+		// If we want to know who participated in what, then load this now.
 		if ($participationEnabled === true && $user_id !== 0)
 		{
 			$this->_participants = $this->_search->getParticipants();
