@@ -19,7 +19,6 @@ namespace ElkArte\AdminController;
 use DateTimeZone;
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use ElkArte\MetadataIntegrate;
@@ -69,7 +68,7 @@ class ManageFeatures extends AbstractController
 		];
 
 		// Set up the action control
-		$action = new Action('modify_features', $this->_req, $this->_events);
+		$action = new Action('modify_features');
 
 		// By default, do the basic settings, call integrate_sa_modify_features
 		$subAction = $action->initialize($subActions, 'basic');
