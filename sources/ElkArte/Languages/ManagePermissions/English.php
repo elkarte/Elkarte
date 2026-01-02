@@ -115,7 +115,7 @@ $txt['permissionname_admin_forum'] = 'Administrate forum and database';
 $txt['permissionhelp_admin_forum'] = 'This permission allows a user to:<ul class="normallist"><li>change forum, database and theme settings</li><li>manage packages</li><li>use the forum and database maintenance tools</li><li>view the error and mod logs</li></ul> Use this permission with caution, as it is very powerful.';
 $txt['permissionname_manage_boards'] = 'Manage boards and categories';
 $txt['permissionhelp_manage_boards'] = 'This permission allows creation, editing and removal of boards and categories.';
-$txt['permissionname_manage_attachments'] = 'Manage attachments and avatars';
+$txt['permissionname_manage_attachments'] = 'Manage attachments & avatars';
 $txt['permissionhelp_manage_attachments'] = 'This permission allows access to the attachment center, where all forum attachments and avatars are listed and can be removed.';
 $txt['permissionname_manage_smileys'] = 'Manage smileys and message icons';
 $txt['permissionhelp_manage_smileys'] = 'This allows access to the smiley center. In the smiley center you can add, edit and remove smileys and smiley sets. If you\'ve enabled customized message icons you are also able to add and edit message icons with this permission.';
