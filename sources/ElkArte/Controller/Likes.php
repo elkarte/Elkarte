@@ -15,6 +15,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
@@ -771,8 +772,14 @@ class Likes extends AbstractController
 	{
 		global $txt;
 
+		$data = null;
+
 		// Let's get the statistics!
-		$data = dbMostLikedMessage();
+		if (Cache::instance()->getVar($data, 'likestats_message:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		{
+			$data = dbMostLikedMessage();
+			Cache::instance()->put('likestats_message:' . md5($this->user->query_wanna_see_board), $data, 1800);
+		}
 
 		// Set the response
 		if (!empty($data))
@@ -800,7 +807,13 @@ class Likes extends AbstractController
 	{
 		global $txt;
 
-		$data = dbMostLikedTopic();
+		$data = null;
+
+		if (Cache::instance()->getVar($data, 'likestats_topic:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		{
+			$data = dbMostLikedTopic();
+			Cache::instance()->put('likestats_topic:' . md5($this->user->query_wanna_see_board), $data, 1800);
+		}
 
 		if (!empty($data))
 		{
@@ -822,7 +835,13 @@ class Likes extends AbstractController
 	{
 		global $txt;
 
-		$data = dbMostLikedBoard();
+		$data = null;
+
+		if (Cache::instance()->getVar($data, 'likestats_board:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		{
+			$data = dbMostLikedBoard();
+			Cache::instance()->put('likestats_board:' . md5($this->user->query_wanna_see_board), $data, 1800);
+		}
 
 		if (!empty($data))
 		{
@@ -844,7 +863,13 @@ class Likes extends AbstractController
 	{
 		global $txt;
 
-		$data = dbMostLikesReceivedUser();
+		$data = null;
+
+		if (Cache::instance()->getVar($data, 'likestats_most_received:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		{
+			$data = dbMostLikesReceivedUser();
+			Cache::instance()->put('likestats_most_received:' . md5($this->user->query_wanna_see_board), $data, 1800);
+		}
 
 		if (!empty($data))
 		{
@@ -867,7 +892,13 @@ class Likes extends AbstractController
 	{
 		global $txt;
 
-		$data = dbMostLikesGivenUser();
+		$data = null;
+
+		if (Cache::instance()->getVar($data, 'likestats_most_given:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		{
+			$data = dbMostLikesGivenUser();
+			Cache::instance()->put('likestats_most_given:' . md5($this->user->query_wanna_see_board), $data, 1800);
+		}
 
 		if (!empty($data))
 		{
