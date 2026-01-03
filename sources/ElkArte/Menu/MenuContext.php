@@ -357,7 +357,7 @@ class MenuContext
 		{
 			$current_action = 'pm';
 		}
-		elseif ($context['current_action'] === 'theme')
+		elseif ($context['current_action'] === 'themes')
 		{
 
 			$sa = HttpReq::instance()->getRequest('sa', 'trim', '');

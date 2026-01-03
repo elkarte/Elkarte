@@ -534,7 +534,7 @@ class ProfileOptions extends AbstractController
 	 * What it does:
 	 *
 	 * - Uses the Themes template. (pick sub template.)
-	 * - Accessed with ?action=admin;area=theme;sa=pick.
+	 * - Accessed with ?action=admin;area=themes;sa=pick.
 	 * - Allows previewing of the theme and variants
 	 */
 	public function action_pick(): void
@@ -593,7 +593,7 @@ class ProfileOptions extends AbstractController
 				$_SESSION['id_variant'] = 0;
 			}
 
-			redirectexit('action=profile;area=theme');
+			redirectexit('action=profile;area=themes');
 		}
 
 		$context['current_member'] = $this->_memID;

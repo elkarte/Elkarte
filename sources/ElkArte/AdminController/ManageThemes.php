@@ -15,8 +15,6 @@
  * @version 2.0 Beta 1
  *
  *
- * @todo Update this for the new package manager?
- *
  * Creating and distributing theme packages:
  * There isn't that much required to package and distribute your own themes...
  * Do the following:
@@ -87,7 +85,7 @@ class ManageThemes extends AbstractController
 	 * - It loads both the Themes and Settings language files.
 	 * - Checks the session by GET or POST to verify the data.
 	 * - Requires the user to not be a guest.
-	 * - Accessed via ?action=admin;area=theme.
+	 * - Accessed via ?action=admin;area=themes.
 	 *
 	 * @see AbstractController::action_index()
 	 */
@@ -248,7 +246,7 @@ class ManageThemes extends AbstractController
 
 			updateThemeOptions($setValues);
 
-			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=admin;area=themes;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		theme()->getTemplates()->load('ManageThemes');
@@ -296,7 +294,7 @@ class ManageThemes extends AbstractController
 	 * - Loads the Admin language file.
 	 * - Calls action_admin() if no theme is specified. (the theme center.)
 	 * - Requires admin_forum permission.
-	 * - Accessed with ?action=admin;area=theme;sa=list&th=xx.
+	 * - Accessed with ?action=admin;area=themes;sa=list&th=xx.
 	 *
 	 * @event integrate_init_theme
 	 */
@@ -311,7 +309,7 @@ class ManageThemes extends AbstractController
 		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
 		if (empty($theme))
 		{
-			redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		// The theme's ID is needed
@@ -425,7 +423,7 @@ class ManageThemes extends AbstractController
 			Cache::instance()->remove('theme_settings-1');
 			updateSettings(['settings_updated' => time()]);
 
-			redirectexit('action=admin;area=theme;sa=list;th=' . $theme . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=admin;area=themes;sa=list;th=' . $theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		$context['sub_template'] = 'set_settings';
@@ -510,7 +508,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * - Sets the settings theme_allow, theme_guests, and knownThemes.
 	 * - Requires the admin_forum permission.
-	 * - Accessed with ?action=admin;area=theme;sa=admin.
+	 * - Accessed with ?action=admin;area=themes;sa=admin.
 	 *
 	 * @uses Themes template
 	 * @uses Admin language file
@@ -558,7 +556,7 @@ class ManageThemes extends AbstractController
 				updateMemberData(null, ['id_theme' => (int) $this->_req->post->theme_reset]);
 			}
 
-			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=admin');
+			redirectexit('action=admin;area=themes;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=admin');
 		}
 		// If we aren't submitting - that is, if we are about to...
 		else
@@ -596,7 +594,7 @@ class ManageThemes extends AbstractController
 	/**
 	 * Administrative global settings.
 	 *
-	 * - Accessed by ?action=admin;area=theme;sa=reset;
+	 * - Accessed by ?action=admin;area=themes;sa=reset;
 	 *
 	 * @uses sub template set_options, template file Settings
 	 * @uses template file ManageThemes
@@ -685,7 +683,7 @@ class ManageThemes extends AbstractController
 			Cache::instance()->remove('theme_settings-' . $theme);
 			Cache::instance()->remove('theme_settings-1');
 
-			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
+			redirectexit('action=admin;area=themes;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
 
 		// Changing the current options for all members using this theme
@@ -747,7 +745,7 @@ class ManageThemes extends AbstractController
 				}
 			}
 
-			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
+			redirectexit('action=admin;area=themes;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
 
 		// Remove all members options and use the defaults
@@ -758,7 +756,7 @@ class ManageThemes extends AbstractController
 
 			removeThemeOptions($theme, 'members');
 
-			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
+			redirectexit('action=admin;area=themes;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
 
 		$old_id = $settings['theme_id'];
@@ -844,7 +842,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * - Removes an installed theme.
 	 * - Requires an administrator.
-	 * - Accessed with ?action=admin;area=theme;sa=remove.
+	 * - Accessed with ?action=admin;area=themes;sa=remove.
 	 * - Does not remove files
 	 */
 	public function action_remove(): void
@@ -881,7 +879,7 @@ class ManageThemes extends AbstractController
 			updateSettings(['knownThemes' => $known]);
 		}
 
-		redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=admin;area=themes;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	/**
@@ -914,7 +912,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * - Removes an installed theme.
 	 * - Requires an administrator.
-	 * - Accessed with ?action=admin;area=theme;sa=remove;api
+	 * - Accessed with ?action=admin;area=themes;sa=remove;api
 	 */
 	public function action_remove_api(): void
 	{
@@ -1006,7 +1004,7 @@ class ManageThemes extends AbstractController
 	 *
 	 * - Can edit everyone's (u = 0) or guests' (u = -1).
 	 * - Uses the Themes template. (pick sub template.)
-	 * - Accessed with ?action=admin;area=theme;sa=pick.
+	 * - Accessed with ?action=admin;area=themes;sa=pick.
 	 *
 	 * @uses Profile language text
 	 * @uses ManageThemes template
@@ -1080,14 +1078,14 @@ class ManageThemes extends AbstractController
 					deleteVariants($themePicked);
 				}
 
-				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
+				redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
 			// Change the default/guest theme.
 			elseif ($u === -1)
 			{
 				updateSettings(['theme_guests' => $themePicked]);
 
-				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
+				redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
 		}
 
@@ -1133,7 +1131,7 @@ class ManageThemes extends AbstractController
 	 * - Puts themes in $boardurl/themes.
 	 * - Assumes the gzip has a root directory in it. (i.e., default.)
 	 * - Requires admin_forum.
-	 * - Accessed with ?action=admin;area=theme;sa=install.
+	 * - Accessed with ?action=admin;area=themes;sa=install.
 	 *
 	 * @uses ManageThemes template
 	 */
@@ -1295,10 +1293,10 @@ class ManageThemes extends AbstractController
 
 			updateSettings(['knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, [',,' => ','])]);
 
-			redirectexit('action=admin;area=theme;sa=install;theme_id=' . $id_theme . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=admin;area=themes;sa=install;theme_id=' . $id_theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 
 		return null;
 	}

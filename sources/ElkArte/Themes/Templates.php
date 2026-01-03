@@ -255,7 +255,7 @@ class Templates
 				}
 
 				$context['security_controls_files']['errors']['theme_dir'] =
-					'<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => 1, '{session_data}']) . '">' . $txt['theme_dir_wrong'] . '</a>';
+					'<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'themes', 'sa' => 'list', 'th' => 1, '{session_data}']) . '">' . $txt['theme_dir_wrong'] . '</a>';
 			}
 
 			$this->load($template_name);
