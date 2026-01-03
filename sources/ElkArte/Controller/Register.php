@@ -95,7 +95,7 @@ class Register extends AbstractController
 			'agreement' => [$this, 'action_agreement'],
 		];
 
-		// Setup the action handler
+		// Set up the action handler
 		$action = new Action('register');
 		$subAction = $action->initialize($subActions, 'register');
 
@@ -177,7 +177,7 @@ class Register extends AbstractController
 			{
 				$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
 
-				// Are they saying they're under age, while under age registration is disabled?
+				// Are they saying they're underage, while underage registration is disabled?
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
 					throw new Exception('Login.under_age_registration_prohibited', false, [$modSettings['coppaAge']]);
@@ -329,13 +329,13 @@ class Register extends AbstractController
 			redirectexit('action=register');
 		}
 
-		// If we don't require an agreement, we need a extra check for coppa.
+		// If we don't require an agreement, we need an extra check for coppa.
 		if (empty($modSettings['requireAgreement']) && !empty($modSettings['coppaAge']))
 		{
 			$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
 		}
 
-		// Are they under age, and under age users are banned?
+		// Are they underage, and underage users are banned?
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
 			throw new Exception('Login.under_age_registration_prohibited', false, [$modSettings['coppaAge']]);
@@ -357,7 +357,7 @@ class Register extends AbstractController
 		// Maybe the filled in our hidden honey pot form field like a good bot would
 		if (!empty($this->_req->getPost('reason_for_joining_hp', 'trim', '')))
 		{
-			// Its not missing, it just should not be there
+			// It's not missing, it just should not be there
 			Txt::load('Login');
 			$reg_errors->addError('error_missing_information');
 		}
@@ -410,7 +410,7 @@ class Register extends AbstractController
 			$has_real_name = false;
 		}
 
-		// Handle a string as a birth date...
+		// Handle a string as a birthdate...
 		if ($this->_req->getPost('birthdate', 'trim', '') !== '')
 		{
 			$this->_req->post->birthdate = Util::strftime('%Y-%m-%d', strtotime($this->_req->post->birthdate));
@@ -508,7 +508,7 @@ class Register extends AbstractController
 			}
 		}
 
-		// Lets check for other errors before trying to register the member.
+		// Let's check for other errors before trying to register the member.
 		if ($reg_errors->hasErrors())
 		{
 			$this->_req->post->step = 2;
@@ -528,7 +528,7 @@ class Register extends AbstractController
 		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions);
 
-		// If there are "important" errors and you are not an admin: log the first error
+		// If there are "important" errors, and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && $this->user->is_admin === false)
 		{
@@ -567,7 +567,7 @@ class Register extends AbstractController
 			makeCustomFieldChanges($memberID, 'register');
 		}
 
-		// If COPPA has been selected then things get complicated, setup the template.
+		// If COPPA has been selected then things get complicated, set up the template.
 		if (!empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']))
 		{
 			redirectexit('action=about;sa=coppa;member=' . $memberID);
@@ -621,8 +621,8 @@ class Register extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Classifies variables as possible string, int, float or bool
-	 * - Casts all posted data to the proper type (string, float, etc)
+	 * - Classifies variables as possible string, int, float, or bool
+	 * - Casts all posted data to the proper type (string, float, etc.)
 	 * - Drops fields that we specially exclude during registration
 	 *
 	 * @param bool $has_real_name - if true adds 'real_name' as well
@@ -681,7 +681,7 @@ class Register extends AbstractController
 				$exclude_fields = array_merge($exclude_fields, ['website_url', 'website_title']);
 			}
 
-			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
+			// We used to accept signature on registration, but it's being abused by spammers these days, so no more.
 			$exclude_fields[] = 'signature';
 		}
 		else
@@ -838,7 +838,7 @@ class Register extends AbstractController
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		// Logged in users should not bother to activate their accounts
+		// Logged-in users should not bother to activate their accounts
 		if (!empty($this->user->id))
 		{
 			redirectexit();
@@ -1119,7 +1119,7 @@ class Register extends AbstractController
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
 
-		// Under age restrictions?
+		// Underage restrictions?
 		if ($context['show_coppa'])
 		{
 			$context['skip_coppa'] = false;

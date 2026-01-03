@@ -52,7 +52,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function removeAll(int $userId = null): void
 	{
-		$prefix = $userId === null ? $this->getTplName('', '')[0] : $this->getTplName($userId, '');
+		$prefix = $userId === null ? $this->getTplName('')[0] : $this->getTplName($userId);
 
 		foreach ($this->data as $attachID => $attachment)
 		{
@@ -158,7 +158,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function filesExist(int $userId): bool
 	{
-		$prefix = $this->getTplName($userId, '');
+		$prefix = $this->getTplName($userId);
 		/** @var TemporaryAttachment $attachment */
 		foreach ($this->data as $attachID => $attachment)
 		{
@@ -186,7 +186,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function removeExcept(array $keep, int $userId): void
 	{
-		$prefix = $this->getTplName($userId, '');
+		$prefix = $this->getTplName($userId);
 
 		foreach ($this->data as $attachID => $attachment)
 		{
@@ -211,7 +211,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function getFileNames(int $userId): mixed
 	{
-		$prefix = $this->getTplName($userId, '');
+		$prefix = $this->getTplName($userId);
 
 		foreach ($this->data as $attachID => $attachment)
 		{

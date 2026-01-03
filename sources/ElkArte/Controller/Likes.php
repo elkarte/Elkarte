@@ -36,7 +36,7 @@ class Likes extends AbstractController
 	protected $_id_liked;
 
 	/**
-	 * Entry point function for likes, permission checks, just makes sure its on
+	 * Entry point function for likes, permission checks, just makes sure it's on
 	 */
 	public function pre_dispatch()
 	{
@@ -50,7 +50,7 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * Default action method, if a specific methods was not
+	 * Default action method, if a specific method was not
 	 * directly called already. Simply forwards to likepost.
 	 *
 	 * @see AbstractController::action_index
@@ -100,7 +100,7 @@ class Likes extends AbstractController
 	/**
 	 * Actually perform the "like" operation.
 	 *
-	 * Fills $_likes_response that can be used by likeResponse() in order to
+	 * Fills $_likes_response that can be used by likeResponse() to
 	 * return a JSON response
 	 *
 	 * @param string $sign '+' or '-'
@@ -128,7 +128,7 @@ class Likes extends AbstractController
 				// Like it
 				$likeResult = likePost($this->user->id, $liked_message, $sign);
 
-				// Lets add in a mention to the member that just had their post liked/unliked
+				// Let's add in a mention to the member that just had their post liked/unliked
 				if (($likeResult === true) && !empty($modSettings['mentions_enabled']))
 				{
 					$notifier = Notifications::instance();
@@ -214,7 +214,7 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * When liking / unliking via ajax, clears the templates and returns a json
+	 * When liking / unliking via ajax, clears the templates and returns a JSON
 	 * response to the page
 	 */
 	private function likeResponse(): void
@@ -245,7 +245,7 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * Un liking a post via ajax
+	 * Unliking a post via ajax
 	 *
 	 * Calls the standard unlike method and then the api return method
 	 */
@@ -424,7 +424,7 @@ class Likes extends AbstractController
 	 */
 	public function list_loadLikesReceived($start, $items_per_page, $sort, $memberID): array
 	{
-		// Get a list of all posts (of a members) that have been liked
+		// Get a list of all posts (of a member) that have been liked
 		return likesPostsReceived($start, $items_per_page, $sort, $memberID);
 	}
 
@@ -564,7 +564,7 @@ class Likes extends AbstractController
 	/**
 	 * Function to return an array of users that liked a particular message.
 	 *
-	 * - Used in profile so a user can see the full list of members, vs the
+	 * - Used in profile, so a user can see the full list of members, vs. the
 	 * truncated (optional) one shown in message display
 	 * - Accessed by ?action=likes;sa=showWhoLiked;msg=x
 	 */
@@ -644,7 +644,7 @@ class Likes extends AbstractController
 	 */
 	public function list_loadPostLikers($start, $items_per_page, $sort, $messageID): array
 	{
-		// Get a list of this posts likers
+		// Get a list of these posts likers
 		return postLikers($start, $items_per_page, $sort, $messageID);
 	}
 
@@ -771,7 +771,7 @@ class Likes extends AbstractController
 	{
 		global $txt;
 
-		// Lets get the statistics!
+		// Let's get the statistics!
 		$data = dbMostLikedMessage();
 
 		// Set the response

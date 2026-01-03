@@ -308,7 +308,7 @@ class Unread extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Figure out what action to do .. Thinking, Thinking, OK unread
+		// Figure out what action to do ... Thinking, Thinking, OK unread
 		$this->action_unread();
 	}
 
@@ -491,7 +491,7 @@ class Unread extends AbstractController
 	 * Build the recent button array.
 	 *
 	 * @param string $topics_to_mark - An array of topic ids properly formatted
-	 *               into a string to use in an URL
+	 *               into a string to use in a URL
 	 *
 	 * @return array
 	 */

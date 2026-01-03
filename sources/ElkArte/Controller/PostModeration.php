@@ -215,7 +215,7 @@ class PostModeration extends AbstractController
 				}
 			}
 
-			// If we have anything left we can actually do the approving (etc).
+			// If we have anything left we can actually do the approving (etc.).
 			if (!empty($toAction))
 			{
 				if ($curAction === 'approve')
@@ -513,7 +513,7 @@ class PostModeration extends AbstractController
 	}
 
 	/**
-	 * Approve or un-approve a post just the one or a topic if its the first post
+	 * Approve or un-approve a post just the one or a topic if it's the first post
 	 */
 	public function action_approve(): void
 	{

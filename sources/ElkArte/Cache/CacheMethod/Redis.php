@@ -130,7 +130,7 @@ class Redis extends AbstractCacheMethod
 	}
 
 	/**
-	 * Add redis server.  Currently, does not support RedisArray / RedisCluster
+	 * Add redis server.  Currently, it does not support RedisArray / RedisCluster
 	 *
 	 * @return bool True if there are servers in the daemon, false if not.
 	 */

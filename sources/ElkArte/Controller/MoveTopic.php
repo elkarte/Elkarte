@@ -61,7 +61,7 @@ class MoveTopic extends AbstractController
 	}
 
 	/**
-	 * This function allows to move a topic
+	 * This function allows moving a topic
 	 *
 	 * What it does:
 	 *
@@ -76,7 +76,7 @@ class MoveTopic extends AbstractController
 	{
 		global $context;
 
-		// Lets make sure they can access the topic being moved and have permissions to move it
+		// Let's make sure they can access the topic being moved and have permissions to move it
 		$this->_check_access();
 
 		// Get a list of boards this moderator can move to.
@@ -115,7 +115,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * - Checks that a topic is supplied
 	 * - Validates the topic information can be loaded
-	 * - If the topic is not approved yet, must have approve permissions to move it
+	 * - If the topic is not approved yet, must have 'approve' permissions to move it
 	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 */
 	private function _check_access(): void
@@ -127,7 +127,7 @@ class MoveTopic extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		// Retrieve the basic topic information for whats being moved
+		// Retrieve the basic topic information for what's being moved
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$this->_topic_info = getTopicInfo($this->_topic, 'message');
 
@@ -207,7 +207,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - It is called on the submit of action_movetopic.
+	 * - It is called on the submitting of action_movetopic.
 	 * - This function logs that topics have been moved in the moderation log.
 	 * - Upon successful completion redirects to message index.
 	 * - Accessed via ?action=movetopic2.
@@ -279,7 +279,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * - Checks that a topic is supplied
 	 * - Validates the move location
-	 * - Checks redirection details if its a redirection is to be posted
+	 * - Checks redirection details if it's a redirection is to be posted
 	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 *
 	 * @return bool
@@ -300,7 +300,7 @@ class MoveTopic extends AbstractController
 			throw new Exception('movetopic_no_reason', false);
 		}
 
-		// You have to tell us were you are moving to
+		// You have to tell us where you are moving to
 		if (!$this->_req->hasPost('toboard'))
 		{
 			throw new Exception('movetopic_no_board', false);
@@ -320,7 +320,7 @@ class MoveTopic extends AbstractController
 		// Get the basic details on this topic (again)
 		$this->_topic_info = getTopicInfo($this->_topic);
 
-		// Not approved then you need approval permissions to move it as well
+		// Not approved, then you need approval permissions to move it as well
 		if (!$this->_topic_info['approved'])
 		{
 			isAllowedTo('approve_posts');
@@ -366,7 +366,7 @@ class MoveTopic extends AbstractController
 				$custom_subject = Util::substr($custom_subject, 0, 100);
 			}
 
-			// If it's still valid move onwards and upwards.
+			// If it's still valid, move onwards and upwards.
 			if ($custom_subject !== '')
 			{
 				$this->_board_info['subject_new'] = $custom_subject;
@@ -395,7 +395,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - If leaving a moved "where did it go" topic, validates the needed inputs
+	 * - If leaving a moved "where did it go" topic, validates the inputs
 	 * - Posts a new topic in the originating board of the topic to be moved.
 	 */
 	private function _post_redirect(): void
@@ -425,7 +425,7 @@ class MoveTopic extends AbstractController
 			// Auto remove this MOVED redirection topic in the future?
 			$redirect_expires = empty($this->_req->post->redirect_expires) ? 0 : (int) $this->_req->post->redirect_expires;
 
-			// Redirect to the MOVED topic from topic list?
+			// Redirect to the MOVED topic from a topic list?
 			$redirect_topic = isset($this->_req->post->redirect_topic) ? $this->_topic : 0;
 
 			// And remember the last expiry period too.
@@ -460,7 +460,7 @@ class MoveTopic extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Checks if a topic is being moved to/from a board that does/does'nt count posts.
+	 * - Checks if a topic is being moved to/from a board that does/doesn't count posts.
 	 */
 	private function _count_update(): void
 	{
@@ -479,7 +479,7 @@ class MoveTopic extends AbstractController
 				{
 					updateMemberData($id_member, ['posts' => 'posts - ' . $posts]);
 				}
-				// The reverse: from didn't, to did.
+				// The reverse: from didn't, to do.
 				else
 				{
 					updateMemberData($id_member, ['posts' => 'posts + ' . $posts]);

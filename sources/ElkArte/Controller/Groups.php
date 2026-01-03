@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file currently just shows group info, and allows certain privileged
+ * This file currently just shows group info and allows certain privileged
  * members to add/remove members.
  *
  * @package   ElkArte Forum
@@ -34,7 +34,7 @@ class Groups extends AbstractController
 	 * Set up templates and pre-requisites for any request processed by this class.
 	 *
 	 * - Called automagically before any action_() call.
-	 * - It handles permission checks, and puts the moderation bar on as required.
+	 * - It handles permission checks and puts the moderation bar on as required.
 	 */
 	public function pre_dispatch()
 	{
@@ -233,7 +233,7 @@ class Groups extends AbstractController
 	}
 
 	/**
-	 * Display members of a group, and allow adding of members to a group.
+	 * Display members of a group and allow adding of members to a group.
 	 *
 	 * What it does:
 	 *
@@ -241,7 +241,7 @@ class Groups extends AbstractController
 	 * - It shows a list of members that are part of a given membergroup.
 	 * - It is called by ?action=moderate;area=viewgroups;sa=members;group=x
 	 * - It requires the manage_membergroups permission.
-	 * - It allows to add and remove members from the selected membergroup.
+	 * - It allows adding and remove members from the selected membergroup.
 	 * - It allows sorting on several columns.
 	 * - It redirects to itself.
 	 *
@@ -306,7 +306,7 @@ class Groups extends AbstractController
 			$context['group']['can_moderate'] = true;
 		}
 
-		// If this group is hidden then it can only "exist" if the user can moderate it!
+		// If this group is hidden, then it can only "exist" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
 		{
 			throw new Exception('membergroup_does_not_exist', false);
@@ -323,7 +323,7 @@ class Groups extends AbstractController
 			$context['group']['assignable'] = 0;
 		}
 
-		// Removing member from group?
+		// Removing member from a group?
 		if (isset($this->_req->post->remove)
 			&& !empty($this->_req->post->rem)
 			&& is_array($this->_req->post->rem)
@@ -375,7 +375,7 @@ class Groups extends AbstractController
 				}
 			}
 
-			// Construct the query elements, first for adds by name
+			// Construct the query elements, first for adding by name
 			if (!empty($member_ids))
 			{
 				$member_query[] = ['or' => 'member_ids'];
@@ -408,7 +408,7 @@ class Groups extends AbstractController
 			'posts' => 'posts',
 		];
 
-		// They didn't pick one, or tried a wrong one, so default to by name..
+		// They didn't pick one, or tried a wrong one, so default to by name.
 		$requested_sort = $this->_req->getQuery('sort', 'trim|strval');
 		if ($requested_sort === null || !isset($sort_methods[$requested_sort]))
 		{
@@ -513,7 +513,7 @@ class Groups extends AbstractController
 			// Clean the values.
 			$this->_req->post->groupr = array_map('intval', $this->_req->post->groupr);
 
-			// If we are giving a reason (And why shouldn't we?), then we don't actually do much.
+			// If we are giving a reason (And why shouldn't we?), then we don't do much.
 			if ($this->_req->post->req_action === 'reason')
 			{
 				// Different sub template...
@@ -536,7 +536,7 @@ class Groups extends AbstractController
 				require_once(SUBSDIR . '/Members.subs.php');
 				$concerned = getConcernedMembers($this->_req->post->groupr, $where, $this->_req->post->req_action === 'approve');
 
-				// Cleanup old group requests..
+				// Cleanup old group requests.
 				deleteGroupRequests($this->_req->post->groupr);
 
 				// Ensure everyone who is online gets their changes right away.

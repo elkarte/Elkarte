@@ -231,7 +231,7 @@ class Who extends AbstractController
 		require_once(SUBSDIR . '/Who.subs.php');
 		$url_data = determineActions($url_data);
 
-		// Setup the breadcrumbs and page title (do it down here because the language files are now loaded..)
+		// Set up the breadcrumbs and page title (do it down here because the language files are now loaded.)
 		$context['page_title'] = $txt['who_title'];
 		$context['breadcrumbs'][] = [
 			'url' => getUrl('action', ['action' => 'who']),

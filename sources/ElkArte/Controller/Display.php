@@ -1034,7 +1034,7 @@ class Display extends AbstractController
 	}
 
 	/**
-	 * If we are in a topic and don't have permission to approve it, then duck out now.
+	 * If we are on a topic and don't have permission to approve it, then duck out now.
 	 * This is an abuse of the method, but it's easier that way.
 	 *
 	 * @param string $action the function name of the current action

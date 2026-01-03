@@ -124,7 +124,7 @@ class ModerateAttachments extends AbstractController
 		// We approved or removed, either way we reset those numbers
 		Cache::instance()->remove('num_menu_errors');
 
-		// Return to the topic....
+		// Return to the topic...
 		redirectexit($redirect);
 	}
 }

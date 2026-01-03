@@ -112,7 +112,7 @@ abstract class AbstractDomParser
 	}
 
 	/**
-	 * Returns just the body of a HTML document such that we are not dealing with head
+	 * Returns just the body of an HTML document such that we are not dealing with head
 	 * and any above head markup.  multipart/mixed may have multiple sections that we concatenate
 	 *
 	 * @param $text

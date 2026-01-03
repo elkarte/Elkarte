@@ -82,6 +82,7 @@ $txt['time_pm'] = 'pm';
 $txt['main_menu'] = 'Main Menu';
 $txt['home'] = 'Home';
 $txt['community'] = 'Community';
+$txt['forum'] = 'Forum';
 
 // Sub menu labels
 $txt['help'] = 'Help';
@@ -94,9 +95,9 @@ $txt['recent_topics'] = 'Recent Topics';
 $txt['admin'] = 'Admin';
 // Sub menu labels
 $txt['errlog'] = 'Error Log';
-$txt['package'] = 'Package Manager';
+$txt['package'] = 'Add-on Manager';
 $txt['edit_permissions'] = 'Permissions';
-$txt['modSettings_title'] = 'Features and Options';
+$txt['modSettings_title'] = 'Features & Options';
 $txt['pwa_label'] = 'Web Application';
 
 $txt['moderate'] = 'Moderate';
@@ -118,7 +119,7 @@ $txt['account_short'] = 'My Account';
 $txt['profile'] = 'Profile';
 $txt['mydrafts'] = 'My Drafts';
 $txt['summary'] = 'Summary';
-$txt['theme'] = 'Look and Layout';
+$txt['theme'] = 'Look & Layout';
 $txt['account'] = 'Account Settings';
 $txt['forumprofile'] = 'Forum Profile';
 
@@ -921,7 +922,7 @@ $txt['admin_warning_title'] = 'Warning';
 
 $txt['via'] = 'via';
 
-$txt['like_post_stats'] = 'Like stats';
+$txt['like_post_stats'] = 'Like Stats';
 
 $txt['otp_token'] = 'One-time Password';
 $txt['otp_enabled'] = 'Enable two factor authentication';

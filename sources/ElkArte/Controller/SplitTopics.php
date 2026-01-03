@@ -23,7 +23,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 
 /**
- * Allows to take a topic and split at a point or select individual messages to
+ * Allows taking a topic and split at a point or select individual messages to
  * split to a new topic.
  *
  * - Requires the split_any permission
@@ -127,7 +127,7 @@ class SplitTopics extends AbstractController
 			throw new Exception('cant_find_messages');
 		}
 
-		// If not approved validate they can approve it.
+		// If not approved validate, they can approve it.
 		if ($modSettings['postmod_active'] && !$messageInfo['topic_approved'])
 		{
 			isAllowedTo('approve_posts');
@@ -139,7 +139,7 @@ class SplitTopics extends AbstractController
 			$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['topic_approved'] ? 0 : 1);
 		}
 
-		// If they can more it as well, allow the template to give them a move to board list
+		// If they can move it as well, allow the template to give them a move to the board list
 		$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
 
 		// Check if there is more than one message in the topic.  (there should be.)
@@ -203,7 +203,7 @@ class SplitTopics extends AbstractController
 	 *
 	 * - Is accessed with ?action=splittopics;sa=selectTopics.
 	 * - Uses 'select' sub template of the SplitTopics template or (for
-	 * XMLhttp) the 'split' sub template of the Xml template.
+	 * XMLhttp) the 'split' sub template of the XML template.
 	 * - Supports XMLhttp for adding/removing a message to the selection.
 	 * - Uses a session variable to store the selected topics.
 	 * - Shows two independent page indexes for both the selected and
@@ -219,7 +219,7 @@ class SplitTopics extends AbstractController
 		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = empty($this->_req->post->move_to_board) ? 0 : (int) $this->_req->post->move_to_board;
 
-		// Haven't selected anything have we?
+		// Haven't selected anything, have we?
 		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic];
 
 		// This is a special case for split topics from quick-moderation checkboxes
@@ -255,13 +255,13 @@ class SplitTopics extends AbstractController
 		// Using the "select" sub template.
 		$context['sub_template'] = $this->getApi() ? 'split' : 'select';
 
-		// All of the js for topic split selection is needed
+		// All the JS for topic split selection
 		if (!$this->getApi())
 		{
 			loadJavascriptFile('topic.js');
 		}
 
-		// Are we using a custom messages per page?
+		// Are we using a custom message per page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 
 		// Get the message ID's from before the move.
@@ -292,7 +292,7 @@ class SplitTopics extends AbstractController
 			}
 		}
 
-		// (De)select a message..
+		// (De)select a message.
 		if (!empty($this->_req->query->move))
 		{
 			$_id_msg = $this->_req->getQuery('msg', 'intval');
@@ -422,7 +422,7 @@ class SplitTopics extends AbstractController
 		// Set the form options in to session
 		$this->_set_session_values();
 
-		// Cant post an empty redirect topic
+		// Can't post an empty redirect topic
 		if (!empty($_SESSION['messageRedirect']) && empty($_SESSION['reason']))
 		{
 			$this->_unset_session_values();

@@ -1547,7 +1547,7 @@ class Post extends AbstractController
 
 		Txt::load('Post');
 
-		// Where we going if we need to?
+		// Where are we going if we need to?
 		$context['post_box_name'] = $_GET['pb'] ?? '';
 
 		$row = quoteMessageInfo((int) $_REQUEST['quote'], isset($_REQUEST['modify']));

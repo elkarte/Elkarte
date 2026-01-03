@@ -187,7 +187,7 @@ class Draft extends Post
 	{
 		checkSession(empty($this->_req->post) ? 'get' : '');
 
-		// Lets see what we have been sent, one or many to delete
+		// Let's see what we have been sent, one or many to delete
 		$toDelete = [];
 		if ($this->_req->hasQuery('delete'))
 		{
@@ -347,7 +347,7 @@ class Draft extends Post
 			];
 			$recipient_ids = (empty($row['to_list'])) ? [] : Util::unserialize($row['to_list']);
 
-			// Get nice names to show the user, the id's are not that great to see!
+			// Get nice names to show the user, the ids are not that great to see!
 			if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
 			{
 				$recipient_ids['to'] = array_map('intval', $recipient_ids['to']);

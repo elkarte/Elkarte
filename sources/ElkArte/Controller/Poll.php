@@ -126,7 +126,7 @@ class Poll extends AbstractController
 			throw new Exception('poll_error', false);
 		}
 
-		// Otherwise if they can change their vote yet they haven't sent any options... remove their vote and redirect.
+		// Otherwise if they can change their vote, yet they haven't sent any options... remove their vote and redirect.
 		if (!empty($row['change_vote']) && $this->user->is_guest === false && empty($this->_req->post->options))
 		{
 			checkSession('request');
@@ -209,7 +209,7 @@ class Poll extends AbstractController
 	 * What it does:
 	 *
 	 * - Must be called with a topic specified in the URL.
-	 * - An admin always has over riding permission to lock a poll.
+	 * - An admin always has overriding permission to lock a poll.
 	 * - If not an admin must have poll_lock_any permission, otherwise must
 	 * be poll starter with poll_lock_own permission.
 	 * - Upon successful completion of action will direct user back to topic.
@@ -223,7 +223,7 @@ class Poll extends AbstractController
 
 		checkSession('get');
 
-		// Get the poll starter, ID, and whether or not it is locked.
+		// Get the poll starter, ID, and whether it is locked.
 		$poll = pollInfoForTopic($topic);
 
 		// If the user _can_ modify the poll....
@@ -270,7 +270,7 @@ class Poll extends AbstractController
 	 * What it does:
 	 *
 	 * - Must be called with a topic specified in the URL.
-	 * - The user must have poll_edit_any/poll_add_any permission for the relevant action. Otherwise
+	 * - The user must have poll_edit_any/poll_add_any permission for the relevant action. Otherwise,
 	 * they must be poll starter with poll_edit_own permission for editing, or be topic starter
 	 * with poll_add_any permission for adding.
 	 * - In the case of an error, this function will redirect back to action_editpoll and
@@ -751,7 +751,7 @@ class Poll extends AbstractController
 			// New poll?
 			else
 			{
-				// Setup the default poll options.
+				// Set up the default poll options.
 				$context['poll'] = [
 					'id' => 0,
 					'question' => '',

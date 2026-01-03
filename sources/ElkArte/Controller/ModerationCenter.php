@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Moderation Center, provides at a glance view of moderation items to the team
+ * Moderation Center provides at a glance view of moderation items to the team
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -266,7 +266,7 @@ class ModerationCenter extends AbstractController
 			'disable_url_session_check' => true,
 		];
 
-		// Setup the menu
+		// Set up the menu
 		$mod_include_data = (new Menu())
 			->addMenuData($moderation_areas)
 			->addOptions($menuOptions)
@@ -285,7 +285,7 @@ class ModerationCenter extends AbstractController
 			'description' => sprintf($txt['mc_description'], $context['user']['name'], getUrl('action', ['action' => 'moderate', 'area' => 'settings']))
 		]);
 
-		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
+		// What a pleasant shortcut - even tho we're not *really* on the admin screen, who cares...
 		$context['admin_area'] = $mod_include_data['current_area'];
 
 		// Build the link tree.
@@ -311,7 +311,7 @@ class ModerationCenter extends AbstractController
 			];
 		}
 
-		// Finally, store this, so that if we're called from the class, it can use it.
+		// Finally, store this so that if we're called from the class, it can use it.
 		$this->_mod_include_data = $mod_include_data;
 	}
 
@@ -394,7 +394,7 @@ class ModerationCenter extends AbstractController
 	{
 		global $txt, $context;
 
-		// What notice have they asked to view
+		// What notice have they asked to view?
 		$id_notice = $this->_req->getQuery('nid', 'intval', 0);
 		$notice = moderatorNotice($id_notice);
 
@@ -615,7 +615,7 @@ class ModerationCenter extends AbstractController
 	/**
 	 * Get details about the moderation report
 	 *
-	 * - report is specified in the url param report.
+	 * - Report is specified in the url param report.
 	 */
 	public function action_modReport(): void
 	{
@@ -645,8 +645,8 @@ class ModerationCenter extends AbstractController
 			throw new Exception('mc_no_modreport_found');
 		}
 
-		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
-		// If they are adding a comment then... add a comment.
+		// Woohoo we found a report, and they can see it!  Bad news is we have more work to do
+		// If they are adding a comment, then... add a comment.
 		if (isset($this->_req->post->add_comment) && !empty($this->_req->post->mod_comment))
 		{
 			checkSession();
@@ -836,7 +836,7 @@ class ModerationCenter extends AbstractController
 			$context[$context['moderation_menu_name']]['current_subsection'] = 'closed';
 		}
 
-		// Finally we are done :P
+		// Finally, we are done :P
 		theme()->getTemplates()->load('ModerationCenter');
 		if ($context['admin_area'] === 'pm_reports')
 		{
@@ -920,12 +920,12 @@ class ModerationCenter extends AbstractController
 			checkSession();
 			validateToken('mod-set');
 
-			/* Current format of mod_prefs is:
+			/* The current format of mod_prefs is:
 				x|ABCD|yyy
 
 				WHERE:
-					x = Show report count on forum header.
-					ABCD = Block indexes to show on moderation main page.
+					x = Show report count on the forum header.
+					ABCD = Block indexes to show on the moderation main page.
 					yyy = Integer with the following bit status:
 						- yyy & 1 = Always notify on reports.
 						- yyy & 2 = Notify on reports for moderators only.
@@ -1009,7 +1009,7 @@ class ModerationCenter extends AbstractController
 		{
 			checkSession($this->_req->hasQuery('delete') ? 'get' : 'post');
 
-			// Clicked on remove or using checkboxes to multi delete
+			// Clicked on remove or using checkboxes to multi-delete
 			$toDelete = [];
 			if ($this->_req->hasQuery('delete'))
 			{
@@ -1024,7 +1024,7 @@ class ModerationCenter extends AbstractController
 			{
 				$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
-				// If they don't have permission we'll let it error - either way no chance of a security slip here!
+				// If they don't have permission, we'll let it error - either way no chance of a security slip here!
 				foreach ($toDelete as $did)
 				{
 					$remover->removeMessage($did);
@@ -1181,7 +1181,7 @@ class ModerationCenter extends AbstractController
 			],
 		];
 
-		// If this is being viewed by posts we actually change the columns to call a template each time.
+		// If this is being viewed by posts, we actually change the columns to call a template each time.
 		if ($context['view_posts'])
 		{
 			$listOptions['columns'] = [
@@ -1255,7 +1255,7 @@ class ModerationCenter extends AbstractController
 	/**
 	 * Callback for createList() for watched users
 	 *
-	 * - returns count
+	 * - Returns count
 	 *
 	 * @uses watchedUserCount()
 	 */
@@ -1267,13 +1267,13 @@ class ModerationCenter extends AbstractController
 	}
 
 	/**
-	 * Simply put, look at the warning log!
+	 * Look at the warning log!
 	 */
 	public function action_viewWarningLog(): void
 	{
 		global $modSettings, $context, $txt;
 
-		// Setup context as always.
+		// Set up context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
@@ -1292,7 +1292,7 @@ class ModerationCenter extends AbstractController
 			'recipient' => ['sql' => 'recipient_name', 'label' => $txt['mc_warnings_recipient']],
 		];
 
-		// Setup the allowed quick search type
+		// Set up the allowed quick search type
 		$reqSort = $this->_req->getQuery('sort', 'trim|strval');
 		$context['order'] = ($reqSort !== null && isset($searchTypes[$reqSort])) ? $reqSort : 'member';
 
@@ -1320,7 +1320,7 @@ class ModerationCenter extends AbstractController
 			'type' => $search_params_type,
 		];
 
-		// Setup the search context.
+		// Set up the search context.
 		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(json_encode($search_params));
 		$context['search'] = [
 			'string' => $search_params['string'],
@@ -1512,7 +1512,7 @@ class ModerationCenter extends AbstractController
 			removeWarningTemplate($this->_req->post->deltpl);
 		}
 
-		// Setup context as always.
+		// Set up context as always.
 		$context['page_title'] = $txt['mc_warning_templates_title'];
 
 		// This is all the information required for a watched user listing.
@@ -1636,7 +1636,7 @@ class ModerationCenter extends AbstractController
 			'can_edit_personal' => true,
 		];
 
-		// If it's an edit load it.
+		// If it's an edit, load it.
 		if ($context['is_edit'])
 		{
 			modLoadTemplate($context['id_template']);
@@ -1651,7 +1651,7 @@ class ModerationCenter extends AbstractController
 			// To check the BBC is pretty good...
 			require_once(SUBSDIR . '/Post.subs.php');
 
-			// Bit of cleaning!
+			// A bit of cleaning!
 			$template_body = trim($this->_req->post->template_body);
 			$template_title = trim($this->_req->post->template_title);
 
@@ -1676,12 +1676,12 @@ class ModerationCenter extends AbstractController
 					// Simple update...
 					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template']);
 
-					// If it wasn't visible and now is they've effectively added it.
+					// If it wasn't visible and now is, they've effectively added it.
 					if ($context['template_data']['personal'] && !$recipient_id)
 					{
 						logAction('add_warn_template', ['template' => $template_title]);
 					}
-					// Conversely if they made it personal it's a delete.
+					// Conversely, if they made it personal, delete.
 					elseif (!$context['template_data']['personal'] && $recipient_id)
 					{
 						logAction('delete_warn_template', ['template' => $template_title]);
@@ -1755,7 +1755,7 @@ class ModerationCenter extends AbstractController
 	}
 
 	/**
-	 * Entry point for viewing warning related stuff.
+	 * Entry point for viewing warning-related stuff.
 	 */
 	public function action_viewWarnings(): void
 	{
@@ -1771,7 +1771,7 @@ class ModerationCenter extends AbstractController
 			'templates' => [$this, 'action_viewWarningTemplates', 'permission' => 'issue_warning'],
 		];
 
-		// Setup the admin tabs.
+		// Set up the admin tabs.
 		$context[$context['moderation_menu_name']]['object']->prepareTabData([
 			'title' => $txt['mc_warnings'],
 			'description' => $txt['mc_warnings_description'],
@@ -1845,7 +1845,7 @@ class ModerationCenter extends AbstractController
 
 	/**
 	 * Shows a list of items requiring moderation action
-	 * Includes post, topic, attachment, group, member and PBE values with links to each
+	 * Includes post, topic, attachment, group, member, and PBE values with links to each
 	 */
 	public function block_actionRequired(): string
 	{
@@ -1891,7 +1891,7 @@ class ModerationCenter extends AbstractController
 			// Make sure they actually entered something.
 			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])
 			{
-				// Insert it into the database then!
+				// Insert it into the database!
 				addModeratorNote($this->user->id, $this->user->name, $new_note);
 
 				// Clear the cache.

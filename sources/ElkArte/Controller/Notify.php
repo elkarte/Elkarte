@@ -94,7 +94,7 @@ class Notify extends AbstractController
 			throw new Exception('not_a_topic', false);
 		}
 
-		// What do we do?  Better ask if they didn't say..
+		// What do we do?  Better ask if they didn't say.
 		if (!$this->_req->hasQuery('sa'))
 		{
 			// Load the template, but only if it is needed.
@@ -457,7 +457,7 @@ class Notify extends AbstractController
 	/**
 	 * Accessed via the unsubscribe link provided in site emails. This will then
 	 * unsubscribe the user from a board or a topic (depending on the link) without them
-	 * having to login.
+	 * having to log in.
 	 */
 	public function action_unsubscribe(): bool
 	{
