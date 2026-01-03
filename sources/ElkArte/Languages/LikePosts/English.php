@@ -5,9 +5,9 @@ global $txt;
 
 // Like posts stats strings
 $txt['like_posts_stats_desc'] = 'Statistics related to liked posts and topics';
-$txt['like_post_tab_mlm'] = 'Most liked messages';
-$txt['like_post_tab_mlt'] = 'Most liked topics';
-$txt['like_post_tab_mlb'] = 'Most liked board';
+$txt['like_post_tab_mlm'] = 'Popular messages';
+$txt['like_post_tab_mlt'] = 'Popular topics';
+$txt['like_post_tab_mlb'] = 'Most liked boards';
 $txt['like_post_tab_mlmember'] = 'Most Liked Members';
 $txt['like_post_tab_mlgmember'] = 'Most Like Giving Members';
 $txt['like_post_generic_heading1'] = 'like(s)';

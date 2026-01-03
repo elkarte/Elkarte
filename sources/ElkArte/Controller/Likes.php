@@ -775,10 +775,10 @@ class Likes extends AbstractController
 		$data = null;
 
 		// Let's get the statistics!
-		if (Cache::instance()->getVar($data, 'likestats_message:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		if (Cache::instance()->getVar($data, 'likestats_message:' . md5($this->user->query_wanna_see_board), 900) === false)
 		{
 			$data = dbMostLikedMessage();
-			Cache::instance()->put('likestats_message:' . md5($this->user->query_wanna_see_board), $data, 1800);
+			Cache::instance()->put('likestats_message:' . md5($this->user->query_wanna_see_board), $data, 900);
 		}
 
 		// Set the response
@@ -809,10 +809,10 @@ class Likes extends AbstractController
 
 		$data = null;
 
-		if (Cache::instance()->getVar($data, 'likestats_topic:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		if (Cache::instance()->getVar($data, 'likestats_topic:' . md5($this->user->query_wanna_see_board), 900) === false)
 		{
 			$data = dbMostLikedTopic();
-			Cache::instance()->put('likestats_topic:' . md5($this->user->query_wanna_see_board), $data, 1800);
+			Cache::instance()->put('likestats_topic:' . md5($this->user->query_wanna_see_board), $data, 900);
 		}
 
 		if (!empty($data))
@@ -837,10 +837,10 @@ class Likes extends AbstractController
 
 		$data = null;
 
-		if (Cache::instance()->getVar($data, 'likestats_board:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		if (Cache::instance()->getVar($data, 'likestats_board:' . md5($this->user->query_wanna_see_board), 3600) === false)
 		{
 			$data = dbMostLikedBoard();
-			Cache::instance()->put('likestats_board:' . md5($this->user->query_wanna_see_board), $data, 1800);
+			Cache::instance()->put('likestats_board:' . md5($this->user->query_wanna_see_board), $data, 3600);
 		}
 
 		if (!empty($data))
@@ -865,10 +865,10 @@ class Likes extends AbstractController
 
 		$data = null;
 
-		if (Cache::instance()->getVar($data, 'likestats_most_received:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		if (Cache::instance()->getVar($data, 'likestats_most_received:' . md5($this->user->query_wanna_see_board), 900) === false)
 		{
 			$data = dbMostLikesReceivedUser();
-			Cache::instance()->put('likestats_most_received:' . md5($this->user->query_wanna_see_board), $data, 1800);
+			Cache::instance()->put('likestats_most_received:' . md5($this->user->query_wanna_see_board), $data, 900);
 		}
 
 		if (!empty($data))
@@ -894,10 +894,10 @@ class Likes extends AbstractController
 
 		$data = null;
 
-		if (Cache::instance()->getVar($data, 'likestats_most_given:' . md5($this->user->query_wanna_see_board), 1800) === false)
+		if (Cache::instance()->getVar($data, 'likestats_most_given:' . md5($this->user->query_wanna_see_board), 900) === false)
 		{
 			$data = dbMostLikesGivenUser();
-			Cache::instance()->put('likestats_most_given:' . md5($this->user->query_wanna_see_board), $data, 1800);
+			Cache::instance()->put('likestats_most_given:' . md5($this->user->query_wanna_see_board), $data, 900);
 		}
 
 		if (!empty($data))

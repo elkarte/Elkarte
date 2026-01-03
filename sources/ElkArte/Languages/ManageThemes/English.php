@@ -82,6 +82,7 @@ $txt['who_display_viewing_off'] = 'Don\'t show';
 $txt['who_display_viewing_numbers'] = 'Show only numbers';
 $txt['who_display_viewing_names'] = 'Show member names';
 $txt['show_stats_index'] = 'Show statistics on board index.';
+$txt['show_likestats'] = 'Show like statistics on board index.';
 $txt['latest_members'] = 'Show latest member on board index.';
 $txt['last_modification'] = 'Show last modification date on modified posts.';
 $txt['user_avatars'] = 'Show user avatars in message view.';

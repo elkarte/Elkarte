@@ -845,16 +845,20 @@ function sort_by_relevance($a, $b)
 /**
  * Function to get most liked board
  *
+ * @param int $limit the number of top-liked boards to fetch
+ *
+ * @return array
  * @package Likes
  */
-function dbMostLikedBoard()
+function dbMostLikedBoard($limit = 3)
 {
 	global $txt;
 
 	$db = database();
 
 	// Most liked board
-	$request = $db->query('', '
+	$mostLikedBoards = [];
+	$db->fetchQuery('
 		SELECT
 		 	b.id_board, b.name, b.num_topics, b.num_posts,
 			tc.topics_liked, tc.msgs_liked, tc.like_count
@@ -873,25 +877,28 @@ function dbMostLikedBoard()
 				ORDER BY like_count DESC
 				LIMIT {int:limit}
 			) AS tc ON (tc.id_board = b.id_board)
+		ORDER BY tc.like_count DESC
 		LIMIT {int:limit}',
 		[
-			'limit' => 1
+			'limit' => $limit
 		]
-	);
-	$mostLikedBoard = $request->fetch_assoc();
-	$request->free_result();
+	)->fetch_callback(
+		function ($row) use (&$mostLikedBoards) {
+			$mostLikedTopic = dbMostLikedTopic($row['id_board'], 1);
+			$row['topic_data'] = $mostLikedTopic[0]['msg_data'] ?? [];
 
-	if (empty($mostLikedBoard['id_board']))
+			$mostLikedBoards[] = $row;
+		}
+	);
+
+	if (empty($mostLikedBoards))
 	{
 		return [
 			'noDataMessage' => $txt['like_post_error_no_data']
 		];
 	}
 
-	$mostLikedTopic = dbMostLikedTopic($mostLikedBoard['id_board']);
-	$mostLikedBoard['topic_data'] = $mostLikedTopic[0]['msg_data'];
-
-	return $mostLikedBoard;
+	return $mostLikedBoards;
 }
 
 /**
