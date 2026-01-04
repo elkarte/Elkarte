@@ -173,14 +173,14 @@ class CoreFeatures extends AbstractController
 			],
 			// k = karma.
 			'k' => [
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karma', '{session_data}']),
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'karma', '{session_data}']),
 				'settings' => [
 					'karmaMode' => 2,
 				],
 			],
 			// l = likes.
 			'l' => [
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'likes', '{session_data}']),
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'likes', '{session_data}']),
 				'settings' => [
 					'likes_enabled' => 1,
 				],
@@ -248,7 +248,7 @@ class CoreFeatures extends AbstractController
 			],
 			// w = warning.
 			'w' => [
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'sa' => 'moderation']),
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managewarnings']),
 				'setting_callback' => static function ($value) {
 					global $modSettings;
 

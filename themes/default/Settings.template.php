@@ -228,6 +228,10 @@ function template_settings()
 			'label' => $txt['show_stats_index'],
 		],
 		[
+			'id' => 'show_likestats_index',
+			'label' => $txt['show_likestats'],
+		],
+		[
 			'id' => 'show_latest_member',
 			'label' => $txt['latest_members'],
 		],

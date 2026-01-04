@@ -652,7 +652,7 @@ class PackageServers extends AbstractController
 		{
 			$this->fileFunc->delete($destination);
 			Txt::load('Errors');
-			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'admin', '{session_data}', 'hash' => '#theme_install']), $txt[$context['package']]);
+			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', getUrl('admin', ['action' => 'admin', 'area' => 'themes', 'sa' => 'admin', '{session_data}', 'hash' => '#theme_install']), $txt[$context['package']]);
 			throw new Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		try

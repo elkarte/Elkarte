@@ -165,13 +165,13 @@ function loadDefaultMenuButtons()
 	$buttons = [
 		'home' => [
 			'title' => $txt['community'],
-			'href' => getUrl('home', []),
+			'href' => getUrl('action', []),
 			'data-icon' => 'i-home',
 			'show' => true,
 			'sub_buttons' => [
-				'help' => [
-					'title' => $txt['help'],
-					'href' => 'https://github.com/elkarte/Elkarte/wiki/User-Home',
+				'recent' => [
+					'title' => $txt['recent_posts'],
+					'href' => getUrl('action', ['action' => 'recent']),
 					'show' => true,
 				],
 				'search' => [
@@ -179,30 +179,25 @@ function loadDefaultMenuButtons()
 					'href' => getUrl('action', ['action' => 'search']),
 					'show' => $context['allow_search'],
 				],
-				'calendar' => [
-					'title' => $txt['calendar'],
-					'href' => getUrl('action', ['action' => 'calendar']),
-					'show' => $context['allow_calendar'],
-				],
 				'memberlist' => [
 					'title' => $txt['members_title'],
 					'href' => getUrl('action', ['action' => 'memberlist']),
 					'show' => $context['allow_memberlist'],
 				],
-				'recent' => [
-					'title' => $txt['recent_posts'],
-					'href' => getUrl('action', ['action' => 'recent']),
-					'show' => true,
-				],
-				'like_stats' => [
-					'title' => $txt['like_post_stats'],
-					'href' => getUrl('action', ['action' => 'likes', 'sa' => 'likestats']),
-					'show' => !empty($modSettings['likes_enabled']) && allowedTo('like_posts_stats'),
+				'calendar' => [
+					'title' => $txt['calendar'],
+					'href' => getUrl('action', ['action' => 'calendar']),
+					'show' => featureEnabled('cd') && $context['allow_calendar'],
 				],
 				'contact' => [
 					'title' => $txt['contact'],
 					'href' => getUrl('action', ['action' => 'about', 'sa' => 'contact']),
 					'show' => User::$info->is_guest && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
+				],
+				'help' => [
+					'title' => $txt['help'],
+					'href' => 'https://github.com/elkarte/Elkarte/wiki/User-Home',
+					'show' => true,
 				],
 			],
 		]
@@ -233,11 +228,6 @@ function loadDefaultMenuButtons()
 					'title' => $txt['package'],
 					'href' => $scripturl . '?action=admin;area=packages',
 					'show' => allowedTo('admin_forum'),
-				],
-				'permissions' => [
-					'title' => $txt['edit_permissions'],
-					'href' => $scripturl . '?action=admin;area=permissions',
-					'show' => allowedTo('manage_permissions'),
 				],
 				'errorlog' => [
 					'title' => $txt['errlog'],
@@ -350,7 +340,7 @@ function loadDefaultMenuButtons()
 				],
 				'theme' => [
 					'title' => $txt['theme'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => User::$info->id, 'name' => User::$info->name]),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'themes', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => allowedTo(['profile_extra_any', 'profile_extra_own', 'profile_extra_any']),
 				],
 				'logout' => [

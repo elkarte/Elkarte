@@ -57,7 +57,7 @@ class Jslocale extends AbstractController
 	}
 
 	/**
-	 * Creates the javascript code for localization of the editor (SCEditor)
+	 * Creates the JavaScript code for localization of the editor (SCEditor)
 	 */
 	public function action_sceditor(): void
 	{
@@ -105,14 +105,14 @@ class Jslocale extends AbstractController
 
 		theme()->getLayers()->removeAll();
 
-		// Lets make sure we aren't going to output anything nasty.
+		// Let's make sure we aren't going to output anything nasty.
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		return $txteditor;
 	}
 
 	/**
-	 * Takes care of echo'ing the javascript file stored in $this->_file_data
+	 * Takes care of echo'ing the JavaScript file stored in $this->_file_data
 	 */
 	private function _sendFile(): void
 	{

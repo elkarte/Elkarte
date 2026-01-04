@@ -17,7 +17,7 @@ use ElkArte\AbstractController;
 use ElkArte\Mail\QueueMail;
 
 /**
- * This controllers action handlers are automatically called.
+ * The controllers action handlers are automatically called.
  * It handles execution of scheduled tasks, mail queue scheduling included.
  */
 class ScheduledTasks extends AbstractController

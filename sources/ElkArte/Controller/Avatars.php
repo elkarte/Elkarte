@@ -352,8 +352,8 @@ class Avatars
 			}
 		}
 
-		// To be here, the image is either under the size limit, or over with "CSS to resize" option.
-		// Either way try to save as is.  This is the only path to keep an animated gif
+		// To be here, the image is either under the size limit or over with "CSS to resize" option.
+		// Either way try to save as is.  This is the only path to keep an animated GIF
 		if (!$this->_saveUploadedAvatar($image))
 		{
 			return false;
@@ -388,7 +388,7 @@ class Avatars
 			IMAGETYPE_WEBP => 'webp'
 		];
 
-		// We only support a subset of image types, after all, it's only an avatar
+		// We only support a subset of image types; after all, it's only an avatar
 		$sizes = $image->getImageDimensions();
 		$extension = $valid_avatar_extensions[$sizes[2]] ?? '';
 		if (empty($extension))
@@ -411,7 +411,7 @@ class Avatars
 			$image->autoRotate();
 		}
 
-		// Since GD does not work with animated gif, we have some ugliness
+		// Since GD does not work with animated GIF, we have some ugliness
 		if ($extension === 'gif' && $image->getManipulator() === 'GD')
 		{
 			$success = rename($_FILES['attachment']['tmp_name'], $destinationPath);

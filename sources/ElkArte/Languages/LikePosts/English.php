@@ -5,9 +5,9 @@ global $txt;
 
 // Like posts stats strings
 $txt['like_posts_stats_desc'] = 'Statistics related to liked posts and topics';
-$txt['like_post_tab_mlm'] = 'Most liked messages';
-$txt['like_post_tab_mlt'] = 'Most liked topics';
-$txt['like_post_tab_mlb'] = 'Most liked board';
+$txt['like_post_tab_mlm'] = 'Popular messages';
+$txt['like_post_tab_mlt'] = 'Popular topics';
+$txt['like_post_tab_mlb'] = 'Most liked boards';
 $txt['like_post_tab_mlmember'] = 'Most Liked Members';
 $txt['like_post_tab_mlgmember'] = 'Most Like Giving Members';
 $txt['like_post_generic_heading1'] = 'like(s)';
@@ -19,7 +19,7 @@ $txt['like_post_hide'] = 'Hide';
 $txt['like_post_users_who_liked'] = '%1% users liked this post';
 
 // For topic
-$txt['like_post_most_popular_topic_heading1'] = 'has received a total of (%1%) like(s).';
+$txt['like_post_most_popular_topic_heading1'] = 'has received a total of %1% like(s) from %2% member(s).';
 $txt['like_post_most_popular_topic_sub_heading1'] = 'The topic contains (%1%) liked posts.  %2% some of the liked posts from it.';
 
 // For board

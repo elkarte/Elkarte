@@ -89,7 +89,7 @@ class Auth extends AbstractController
 		theme()->getTemplates()->load('Login');
 		$context['sub_template'] = 'login';
 
-		// Get the template ready.... not really much else to do.
+		// Get the template ready... not really much else to do.
 		$context['page_title'] = $txt['login'];
 		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
 		$context['default_username'] = &$_REQUEST['u'];
@@ -112,7 +112,7 @@ class Auth extends AbstractController
 			unset($_SESSION['login_url']);
 		}
 
-		// Create a one time token.
+		// Create a one-time token.
 		createToken('login');
 	}
 
@@ -122,7 +122,7 @@ class Auth extends AbstractController
 	 * What it does:
 	 *
 	 * - Checks credentials and checks that login was successful.
-	 * - It employs protection against a specific IP or user trying to brute force
+	 * - It uses protection against a specific IP or user trying to brute force
 	 *   a login to an account.
 	 * - Upgrades password encryption on login, if necessary.
 	 * - After successful login, redirects you to $_SESSION['login_url'].
@@ -137,7 +137,7 @@ class Auth extends AbstractController
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		// Beyond this point you are assumed to be a guest trying to login.
+		// Beyond this point you are assumed to be a guest trying to log in.
 		if (empty(User::$info->is_guest))
 		{
 			redirectexit();
@@ -199,7 +199,7 @@ class Auth extends AbstractController
 			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
 		}
 
-		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
+		// Can't use a password > 64 characters sorry, too long and only good for a DoS attack
 		if (isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64)
 		{
 			$context['login_errors'] = [$txt['improper_password']];
@@ -207,7 +207,7 @@ class Auth extends AbstractController
 			return false;
 		}
 
-		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
+		// Hmm... maybe 'admin' will log in with no password. Uhh... NO!
 		if (!isset($_POST['passwrd']) || $_POST['passwrd'] === '')
 		{
 			$context['login_errors'] = [$txt['no_password']];
@@ -264,7 +264,7 @@ class Auth extends AbstractController
 				return false;
 			}
 
-			// OTP already used? Sorry, but this is a ONE TIME password..
+			// OTP already used? Sorry, but this is a ONE TIME password.
 			if ($user_setting['otp_used'] === $_POST['otp_token'])
 			{
 				$context['login_errors'] = [$txt['otp_used']];
@@ -290,7 +290,7 @@ class Auth extends AbstractController
 		// Bad password!  Thought you could fool the database?!
 		if (!$valid_password)
 		{
-			// Let's be cautious, no hacking please. thanx.
+			// Let's be cautious, no hacking, please. thanx.
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
 
 			// Maybe we were too hasty... let's try some other authentication methods.
@@ -332,7 +332,7 @@ class Auth extends AbstractController
 			// Let's be sure they weren't a little hacker.
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood'], true);
 
-			// If we got here then we can reset the flood counter.
+			// If we got here, then we can reset the flood counter.
 			updateMemberData($user_setting['id_member'], ['passwd_flood' => '']);
 		}
 
@@ -362,7 +362,7 @@ class Auth extends AbstractController
 	 * What it does:
 	 *
 	 * - Used when a board is converted to see if the user credentials and a 3rd
-	 * party hash satisfy whats in the db passwd field
+	 * party hash satisfy what's in the db passwd field
 	 *
 	 * @param string $posted_password
 	 * @param string $member_name
@@ -375,7 +375,7 @@ class Auth extends AbstractController
 	{
 		global $modSettings;
 
-		// What kind of data are we dealing with
+		// What kind of data are we dealing with?
 		$pw_strlen = strlen($passwrd);
 
 		// Start off with none, that's safe
@@ -427,14 +427,14 @@ class Auth extends AbstractController
 			// vBulletin 3 style hashing?  Let's welcome them with open arms \o/.
 			$other_passwords[] = md5(md5($posted_password) . stripslashes($password_salt));
 
-			// Hmm.. p'raps it's Invision 2 style?
+			// Hmm... p'raps it's Invision 2 style?
 			$other_passwords[] = md5(md5($password_salt) . md5($posted_password));
 
 			// Some common md5 ones.
 			$other_passwords[] = md5($password_salt . $posted_password);
 			$other_passwords[] = md5($posted_password . $password_salt);
 		}
-		// The hash is 40 characters, lets try some SHA-1 style auth
+		// The hash is 40 characters, let's try some SHA-1 style auth
 		elseif ($pw_strlen === 40)
 		{
 			// Maybe they are using a hash from before our password upgrade
@@ -463,7 +463,7 @@ class Auth extends AbstractController
 				}
 			}
 		}
-		// SHA-256 will be 64 characters long, lets check some of these possibilities
+		// SHA-256 will be 64 characters long, let's check some of these possibilities
 		elseif ($pw_strlen === 64)
 		{
 			// PHP-Fusion7
@@ -494,7 +494,7 @@ class Auth extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	 * - It requires that the session hash is sent as well, to prevent automatic logouts by images or JavaScript.
 	 * - It redirects back to $_SESSION['logout_url'], if it exists.
 	 * - It is accessed via ?action=logout;session_var=...
 	 *
@@ -517,7 +517,7 @@ class Auth extends AbstractController
 			$_SESSION['ftp_connection'] = null;
 		}
 
-		// It won't be first login anymore.
+		// It won't be the first login anymore.
 		unset($_SESSION['first_login']);
 
 		// Just ensure they aren't a guest!
@@ -625,7 +625,7 @@ class Auth extends AbstractController
 			->header('Status', '503 Service Temporarily Unavailable')
 			->header('Retry-After', '3600');
 
-		// Basic template stuff..
+		// Basic template stuff.
 		$context['sub_template'] = 'maintenance';
 		$context['title'] = &$mtitle;
 		$context['description'] = un_htmlspecialchars($mmessage);
@@ -633,7 +633,7 @@ class Auth extends AbstractController
 	}
 
 	/**
-	 * Double check the cookie.
+	 * Double-check the cookie.
 	 */
 	public function action_check(): void
 	{
@@ -741,7 +741,7 @@ function checkActivation()
  * This function performs the logging in.
  *
  * What it does:
- *  - It sets the cookie, it call hooks, updates runtime settings for the user.
+ *  - It sets the cookie, it calls hooks, updates runtime settings for the user.
  *
  * @param UserSettingsLoader $user
  *
@@ -772,10 +772,10 @@ function doLogin(UserSettingsLoader $user)
 	// Are you banned?
 	is_not_banned(true);
 
-	// Don't stick the language or theme after this point.
+	// Don't stick to the language or theme after this point.
 	unset($_SESSION['language'], $_SESSION['theme']);
 
-	// We want to know if this is first login
+	// We want to know if this is the first login
 	if (User::$info->isFirstLogin())
 	{
 		$_SESSION['first_login'] = true;
@@ -792,18 +792,18 @@ function doLogin(UserSettingsLoader $user)
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData(User::$info->id, ['last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip()]);
 
-	// Get rid of the online entry for that old guest....
+	// Get rid of the online entry for that old guest...
 	require_once(SUBSDIR . '/Logging.subs.php');
 	deleteOnline('ip' . User::$info->ip);
 	$_SESSION['log_time'] = 0;
 
-	// Log this entry, only if we have it enabled.
+	// Log this entry only if we have it enabled.
 	if (!empty($modSettings['loginHistoryDays']))
 	{
 		logLoginHistory(User::$info->id, User::$info->ip, User::$info->ip2);
 	}
 
-	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
+	// Just log you back out if it's in maintenance mode, and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
 	{
 		redirectexit('action=auth;sa=check;member=' . User::$info->id);
@@ -830,7 +830,7 @@ function md5_hmac($data, $key)
 }
 
 /**
- * Custom encryption for phpBB3 based passwords.
+ * Custom encryption for phpBB3-based passwords.
  *
  * @param string $passwd
  * @param string $passwd_hash

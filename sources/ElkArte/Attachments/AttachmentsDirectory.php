@@ -487,7 +487,7 @@ class AttachmentsDirectory
 
 		try
 		{
-			$result = $fileFunctions->createDirectory($uploadDirectory, true);
+			$result = $fileFunctions->createDirectory($uploadDirectory);
 		}
 		catch (Exception $exception)
 		{

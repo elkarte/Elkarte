@@ -330,6 +330,73 @@ function template_ic_show_stats()
 }
 
 /**
+ * Show popular liked topics, boards, and messages
+ */
+function template_ic_show_likestats()
+{
+	global $context, $txt;
+
+	echo '
+			<li class="basic_row">
+				<h3 class="ic_section_header">
+					<a href="', getUrl('action', ['action' => 'likes', 'sa' => 'likestats']), '">
+						<i class="icon i-thumbup"></i>', $txt['like_post_stats'], '
+					</a>
+				</h3>';
+
+	if (!empty($context['likestats']['topics']) && empty($context['likestats']['topics']['noDataMessage']))
+	{
+		echo '
+				<p class="inline">
+					<span class="event">', $txt['like_post_tab_mlt'], ':</span> ';
+
+		$topics = [];
+		foreach ($context['likestats']['topics'] as $topic)
+		{
+			$topics[] = '<a href="' . getUrl('topic', ['topic' => $topic['id_topic'], 'subject' => $topic['msg_data'][0]['subject']]) . '">' . $topic['msg_data'][0]['subject'] . '</a> (' . $topic['like_count'] . ')';
+		}
+
+		echo implode(', ', $topics), '
+				</p>';
+	}
+
+	if (!empty($context['likestats']['messages']) && empty($context['likestats']['messages']['noDataMessage']))
+	{
+		echo '
+				<p class="inline">
+					<span class="event">', $txt['like_post_tab_mlm'], ':</span> ';
+
+		$messages = [];
+		foreach ($context['likestats']['messages'] as $msg)
+		{
+			$messages[] = '<a href="' . getUrl('topic', ['topic' => $msg['id_topic'], 'subject' => $msg['subject'], 'start' => 'msg' . $msg['id_msg']]) . '#msg' . $msg['id_msg'] . '">' . $msg['subject'] . '</a> (' . $msg['like_count'] . ')';
+		}
+
+		echo implode(', ', $messages), '
+				</p>';
+	}
+
+	if (!empty($context['likestats']['boards']) && empty($context['likestats']['boards']['noDataMessage']))
+	{
+		echo '
+				<p class="inline">
+					<span class="event">', $txt['like_post_tab_mlb'], ':</span> ';
+
+		$boards = [];
+		foreach ($context['likestats']['boards'] as $board)
+		{
+			$boards[] = '<a href="' . getUrl('board', ['board' => $board['id_board'], 'name' => $board['name']]) . '">' . $board['name'] . '</a> (' . $board['like_count'] . ')';
+		}
+
+		echo implode(', ', $boards), '
+				</p>';
+	}
+
+	echo '
+			</li>';
+}
+
+/**
  * Show the online users in the info center
  */
 function template_ic_show_users()

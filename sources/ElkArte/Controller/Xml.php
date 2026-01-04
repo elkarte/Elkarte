@@ -488,7 +488,7 @@ class Xml extends AbstractController
 				}
 			}
 		}
-		// Failed validation, extra work for you I'm afraid
+		// Failed validation, extra work for you, I'm afraid
 		else
 		{
 			if ($validation_session !== true)

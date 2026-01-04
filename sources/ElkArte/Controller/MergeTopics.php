@@ -33,10 +33,10 @@ class MergeTopics extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - delegates to the other functions (based on the URL parameter sa).
-	 * - loads the MergeTopics template.
-	 * - requires the merge_any permission.
-	 * - is accessed with ?action=mergetopics.
+	 * - Delegates to the other functions (based on the URL parameter sa).
+	 * - Loads the MergeTopics template.
+	 * - Requires the merge_any permission.
+	 * - Is accessed with ?action=mergetopics.
 	 *
 	 * @see AbstractController::action_index
 	 */
@@ -62,20 +62,20 @@ class MergeTopics extends AbstractController
 	}
 
 	/**
-	 * Allows to pick a topic to merge the current topic with.
+	 * Allows picking a topic to merge the current topic with.
 	 *
 	 * What it does:
 	 *
-	 * - is accessed with ?action=mergetopics;sa=index
-	 * - default sub action for ?action=mergetopics.
-	 * - uses 'merge' sub template of the MergeTopics template.
-	 * - allows to set a different target board.
+	 * - Is accessed with ?action=mergetopics;sa=index
+	 * - Default sub action for ?action=mergetopics.
+	 * - Uses 'merge' sub template of the MergeTopics template.
+	 * - Allows setting a different target board.
 	 */
 	public function action_mergeIndex(): void
 	{
 		global $txt, $board, $context, $modSettings;
 
-		// If we don't know where you are from we know where you go
+		// If we don't know where you are from, we know where you go
 		$from = $this->_req->getQuery('from', 'intval');
 		if (!isset($from))
 		{
@@ -113,7 +113,7 @@ class MergeTopics extends AbstractController
 			throw new Exception('no_board');
 		}
 
-		// Tell the template a few things..
+		// Tell the template a few things.
 		$context['origin_topic'] = $from;
 		$context['origin_subject'] = $topic_info['subject'];
 		$context['origin_js_subject'] = addcslashes(addslashes($topic_info['subject']), '/');
@@ -127,7 +127,7 @@ class MergeTopics extends AbstractController
 			throw new Exception('cannot_merge_any', 'user');
 		}
 
-		// Get a list of boards they can navigate to to merge.
+		// Get a list of boards they can navigate to merge.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boardListOptions = [
 			'not_redirection' => true
@@ -165,16 +165,16 @@ class MergeTopics extends AbstractController
 	 * Set merge options and do the actual merge of two or more topics.
 	 *
 	 * The merge options screen:
-	 * - shows topics to be merged and allows to set some merge options.
-	 * - is accessed by ?action=mergetopics;sa=options and can also internally be called by action_quickmod().
-	 * - uses 'merge_extra_options' sub template of the MergeTopics template.
+	 * - Shows topics to be merged and allows setting some merge options.
+	 * - Is accessed by ?action=mergetopics;sa=options and can also internally be called by action_quickmod().
+	 * - Uses 'merge_extra_options' sub template of the MergeTopics template.
 	 *
 	 * The actual merge:
-	 * - is accessed with ?action=mergetopics;sa=execute.
-	 * - updates the statistics to reflect the merge.
-	 * - logs the action in the moderation log.
-	 * - sends a notification is sent to all users monitoring this topic.
-	 * - redirects to ?action=mergetopics;sa=done.
+	 * - Is accessed with ?action=mergetopics;sa=execute.
+	 * - Updates the statistics to reflect the merge.
+	 * - Logs the action in the moderation log.
+	 * - Sends a notification is sent to all users monitoring this topic.
+	 * - Redirects to ?action=mergetopics;sa=done.
 	 *
 	 * @param int[] $topics = array() of topic ids
 	 *
@@ -218,7 +218,7 @@ class MergeTopics extends AbstractController
 		// Send the topics to the TopicsMerge class
 		$merger = new TopicsMerge($topics);
 
-		// If we didn't get any topics then they've been messing with unapproved stuff.
+		// If we didn't get any topics, then they've been messing with unapproved stuff.
 		if ($merger->hasErrors())
 		{
 			$error = $merger->firstError();
@@ -238,7 +238,7 @@ class MergeTopics extends AbstractController
 			throw new Exception('cannot_merge_any', 'user');
 		}
 
-		// Make sure they can see all boards....
+		// Make sure they can see all boards...
 		$query_boards = ['boards' => $merger->boards];
 
 		if (!in_array(0, $allowedto_merge_boards))
@@ -308,7 +308,7 @@ class MergeTopics extends AbstractController
 			throw new Exception($error[0], $error[1]);
 		}
 
-		// Send them to the all done page.
+		// Send them to the "all done" page.
 		redirectexit('action=mergetopics;sa=done;to=' . $result[0] . ';targetboard=' . $result[1]);
 
 		return true;
@@ -317,8 +317,8 @@ class MergeTopics extends AbstractController
 	/**
 	 * Shows a 'merge completed' screen.
 	 *
-	 * - is accessed with ?action=mergetopics;sa=done.
-	 * - uses 'merge_done' sub template of the MergeTopics template.
+	 * - Is accessed with ?action=mergetopics;sa=done.
+	 * - Uses 'merge_done' sub template of the MergeTopics template.
 	 */
 	public function action_mergeDone(): void
 	{

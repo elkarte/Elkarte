@@ -37,7 +37,7 @@ class ManageDraftsModule extends AbstractController
 	public static function addCoreFeature(array &$core_features): void
 	{
 		$core_features['dr'] = [
-			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managedrafts', '{session_data}']),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'sa' => 'drafts', '{session_data}']),
 			'settings' => [
 				'drafts_enabled' => 1,
 				'drafts_post_enabled' => 2,
@@ -246,16 +246,16 @@ class ManageDraftsModule extends AbstractController
 			call_integration_hook('integrate_save_drafts_settings');
 
 			// Protect them from themselves.
-			$this->_req->post->drafts_autosave_frequency = min((int) $this->_req->post->drafts_autosave_frequency, 30);
+			$this->_req->post->drafts_autosave_frequency = max((int) $this->_req->post->drafts_autosave_frequency, 30);
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			redirectexit('action=admin;area=managedrafts');
+			redirectexit('action=admin;area=postsettings;sa=drafts');
 		}
 
 		// Some JavaScript to enable / disable the frequency input box
 		theme()->addInlineJavascript('
-			var autosave = document.getElementById(\'drafts_autosave_enabled\');
+			let autosave = document.getElementById(\'drafts_autosave_enabled\');
 
 			createEventListener(autosave);
 			autosave.addEventListener(\'change\', toggle);
@@ -263,13 +263,13 @@ class ManageDraftsModule extends AbstractController
 
 			function toggle()
 			{
-				var select_elem = document.getElementById(\'drafts_autosave_frequency\');
+				let select_elem = document.getElementById(\'drafts_autosave_frequency\');
 
 				select_elem.disabled = !autosave.checked;
 			}', true);
 
 		// Final settings...
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managedrafts', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'sa' => 'drafts', 'save']);
 		$context['settings_title'] = $txt['managedrafts_settings'];
 
 		// Prepare the settings...

@@ -279,7 +279,8 @@ function template_credits()
 	}
 	echo '
 							</div>
-						</div>';
+						</div>
+					</div>';
 
 	// This makes all the support information available to the support script...
 	echo '

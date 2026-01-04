@@ -77,10 +77,10 @@ class ManageKarma extends AbstractController
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			redirectexit('action=admin;area=featuresettings;sa=karma');
+			redirectexit('action=admin;area=karma');
 		}
 
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karma', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'karma', 'save']);
 		$context['settings_title'] = $txt['karma'];
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['modSettings_title'];

@@ -99,7 +99,7 @@ class SettingsFormTest extends TestCase
 		$this->assertContains('value', $context['config_vars'][$this->configVars[5][1]]['data'][0]);
 		$this->assertCount(2, $context['config_vars'][$this->configVars[6][1]]['data']);
 		$this->assertContains('value1', $context['config_vars'][$this->configVars[6][1]]['data'][0]);
-		$this->assertCount(36, $context['config_vars'][$this->configVars[9][1]]['data']);
+		$this->assertCount(38, $context['config_vars'][$this->configVars[9][1]]['data']);
 		$this->assertContains(array('tag' => 'b', 'show_help' => false), $context['config_vars'][$this->configVars[9][1]]['data']);
 		$context['config_vars'][$this->configVars[6][1]]['name'] = str_replace('[]', '', $context['config_vars'][$this->configVars[6][1]]['name']);
 		foreach ($this->configVars as $configVar)

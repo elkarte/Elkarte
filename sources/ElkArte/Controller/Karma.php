@@ -37,7 +37,7 @@ class Karma extends AbstractController
 
 	/**
 	 * Default entry point, in case action methods are not directly
-	 * called. Simply forward to applaud.
+	 * called. Forward to applaud.
 	 *
 	 * @see AbstractController::action_index
 	 */
@@ -52,10 +52,10 @@ class Karma extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - It redirects back to the referrer afterward, whether by javascript or the passed parameters.
+	 * - It redirects back to the referrer afterward, whether by JavaScript or the passed parameters.
 	 * - Requires the karma_edit permission, and that the user isn't a guest.
 	 * - It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
-	 * - It is accessed via ?action=karma, sa=smite or sa=applaud.
+	 * - It is accessed via ?action=karma, sa=smite, or sa=applaud.
 	 */
 	public function action_applaud(): void
 	{
@@ -97,7 +97,6 @@ class Karma extends AbstractController
 		require_once(SUBSDIR . '/Karma.subs.php');
 
 		// If you don't have enough posts, tough luck.
-		// @todo Should this be dropped in favor of post group permissions?
 		// Should this apply to the member you are smiting/applauding?
 		if ($this->user->is_admin === false && $this->user->posts < $modSettings['karmaMinPosts'])
 		{
@@ -105,12 +104,12 @@ class Karma extends AbstractController
 		}
 
 		// And you can't modify your own, punk! (use the profile if you need to.)
-		if (empty($id_target) || $id_target == $this->user->id)
+		if (empty($id_target) || $id_target === $this->user->id)
 		{
 			throw new Exception('cant_change_own_karma', false);
 		}
 
-		// Delete any older items from the log so we can get the go ahead or not
+		// Delete any older items from the log so we can get the go-ahead or not
 		clearKarma($modSettings['karmaWaitTime']);
 		if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
 		{
@@ -141,7 +140,7 @@ class Karma extends AbstractController
 		}
 		else
 		{
-			// If you are gonna try to repeat.... don't allow it.
+			// If you are gonna try to repeat... don't allow it.
 			if ($action === $dir)
 			{
 				throw new Exception('karma_wait_time', false, [$modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])]);
@@ -159,7 +158,7 @@ class Karma extends AbstractController
 	{
 		global $context, $topic;
 
-		// Figure out where to go back to.... the topic?
+		// Figure out where to go back to... the topic?
 		if (!empty($topic))
 		{
 			$start = $this->_req->getRequest('start', 'intval', 0);

@@ -61,7 +61,7 @@ class Cache
 	{
 		$this->_options = $options;
 
-		// Default to file-based, so we can slow everything down :P
+		// Default to filebased, so we can slow everything down :P
 		if (empty($accelerator))
 		{
 			$accelerator = 'filebased';

@@ -66,7 +66,7 @@ class Attachment extends AbstractController
 		{
 			$sa = $this->_req->getQuery('sa', 'trim', '');
 
-			// We will need to respond with Json
+			// We will need to respond with JSON
 			return $sa === 'ulattach' || $sa === 'rmattach' || $sa === 'ulasync';
 		}
 
@@ -97,7 +97,7 @@ class Attachment extends AbstractController
 			'rmattach' => [$this, 'action_rmattach'],
 		];
 
-		// Setup the action handler
+		// Set up the action handler
 		$action = new Action('attachments');
 		$subAction = $action->initialize($subActions, 'dlattach');
 
@@ -118,7 +118,7 @@ class Attachment extends AbstractController
 	{
 		global $context;
 
-		// Going to send back Json
+		// Going to send back JSON
 		setJsonTemplate();
 
 		// Final request, rebuild the file and do standard upload checks
@@ -195,7 +195,7 @@ class Attachment extends AbstractController
 	 *  - Passed the form data with session vars
 	 *  - Responds back with errors or file data
 	 *
-	 * @param bool $strict True if attachment processing should use move_uploaded_file, rename otherwise. Default is true.
+	 * @param bool $strict True, if attachment processing should use move_uploaded_file, rename it otherwise. Default is true.
 	 *
 	 * @return bool|null False if the session is invalid or an error occurred, void otherwise.
 	 */
@@ -238,7 +238,7 @@ class Attachment extends AbstractController
 			{
 				$errors = $attach_errors->prepareErrors();
 
-				// Bad news for you, the attachments did not process, lets tell them why
+				// Bad news for you, the attachments did not process, let's tell them why
 				foreach ($errors as $error)
 				{
 					$resp_data[] = $error;
@@ -246,7 +246,7 @@ class Attachment extends AbstractController
 
 				$context['json_data'] = ['result' => false, 'data' => $resp_data];
 			}
-			// No errors, lets get the details of what we have for our response back to the upload dialog
+			// No errors, let's get the details of what we have for our response back to the upload dialog
 			else
 			{
 				$tmp_attachments = new TemporaryAttachmentsList();
@@ -290,7 +290,7 @@ class Attachment extends AbstractController
 	{
 		global $context, $txt;
 
-		// Prepare the template so we can respond with json
+		// Prepare the template so we can respond with JSON
 		setJsonTemplate();
 
 		// Make sure the session is valid
@@ -359,12 +359,12 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Downloads an attachment or avatar, and increments the download count.
+	 * Downloads an attachment or avatar and increments the download count.
 	 *
 	 * What it does:
 	 *
 	 * - It requires the view_attachments permission. (not for avatars!)
-	 * - It disables the session parser, and clears any previous output.
+	 * - It disables the session parser and clears any previous output.
 	 * - It is accessed via the query string ?action=dlattach.
 	 * - Views to attachments and avatars do not increase hits and are not logged
 	 *   in the "Who's Online" log.
@@ -547,12 +547,12 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Generates a language image based on text for display, outputs that image and exits
+	 * Generates a language image based on text for display, outputs that image, and exits
 	 *
 	 * @param null|string $text if null will use default attachment not found string
-	 * @param int $width If set, defines the width of the image, text font size will be scaled to fit
+	 * @param int $width If set, defines the width of the image; text font size will be scaled to fit
 	 * @param int $height If set, defines the height of the image
-	 * @param bool $split If true will break text strings so all words are separated by newlines
+	 * @param bool $split If true will break text strings so newlines separate all words
 	 * @throws Exception
 	 */
 	public function action_text_to_image($text = null, $width = 200, $height = 75, $split = false): void
@@ -582,7 +582,7 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * If the mime type benefits from compression e.g. text/xyz and gzencode is
+	 * If the mime type benefits from compression e.g., text/xyz and gzencode is
 	 * available and the user agent accepts gzip, then return true, else false
 	 *
 	 * @param string $mime_type
@@ -592,7 +592,7 @@ class Attachment extends AbstractController
 	{
 		global $modSettings;
 
-		// Not compressible, or not supported / requested by client
+		// Not compressible or not supported / requested by client
 		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
 			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || !str_contains($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')))
 		{
@@ -674,7 +674,7 @@ class Attachment extends AbstractController
 		// Different browsers like different standards...
 		$headers->setAttachmentFileParams($mime_type, $real_filename, $disposition);
 
-		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
+		// If this has an "image extension" - but isn't an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache)
 		{
 			$headers
@@ -692,8 +692,8 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Sends the requested file to the user.  If the file is compressible e.g.
-	 * has a mine type of text/??? may compress the file prior to sending.
+	 * Sends the requested file to the user.  If the file is compressible e.g.,
+	 * has a mine type of text/??? May compress the file prior to sending.
 	 *
 	 * @param string $filename
 	 * @param string $mime_type

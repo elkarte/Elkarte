@@ -208,7 +208,7 @@ class Topic extends AbstractController
 			redirectexit();
 		}
 
-		// Its not enabled, give them the boot
+		// Its isn't enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
 		{
 			$this->_req->clearValue('action', 'query');

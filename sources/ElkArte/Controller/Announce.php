@@ -26,7 +26,7 @@ use ElkArte\Languages\Txt;
 class Announce extends AbstractController
 {
 	/**
-	 * Set up the context for the announce topic function (action=announce).
+	 * Set up the context for the announcement topic function (action=announce).
 	 * This function is called before the flow is redirected to action_selectgroup() or action_send().
 	 *
 	 * What it does:
@@ -69,7 +69,7 @@ class Announce extends AbstractController
 	}
 
 	/**
-	 * Allow a user to chose the membergroups to send the announcement to.
+	 * Allow a user to choose the membergroups to send the announcement to.
 	 *
 	 * What it does:
 	 *
@@ -114,7 +114,7 @@ class Announce extends AbstractController
 	 * - Splits the members to be sent a topic announcement into chunks.
 	 * - Composes notification messages in all languages needed.
 	 * - Does the actual sending of the topic announcements in chunks.
-	 * - Calculates a rough estimate of the percentage items sent.
+	 * - Calculates an estimate of the percentage items sent.
 	 * - Accessed by action=announce;sa=send
 	 *
 	 * @uses announcement template announcement_send sub template
@@ -133,7 +133,7 @@ class Announce extends AbstractController
 			? explode(',', (string) $this->_req->getPost('membergroups', 'trim|strval', ''))
 			: (array) $this->_req->getPost('who', null, []);
 
-		// Check that at least one membergroup was selected (set from announce sub template)
+		// Check that at least one membergroup was selected (set from announcement sub template)
 		if (empty($_who))
 		{
 			throw new Exception('no_membergroup_selected');
@@ -149,11 +149,11 @@ class Announce extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($topic, 'message');
 
-		// Prepare a plain text (markdown) body for email use, does the censoring as well
+		// Prepare a plain text (Markdown) body for email use, does the censoring as well
 		require_once(SUBSDIR . '/Maillist.subs.php');
 		pbe_prepare_text($topic_info['body'], $topic_info['subject']);
 
-		// We need this in order to be able send emails.
+		// We need this to be able to send emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');
 
@@ -175,7 +175,7 @@ class Announce extends AbstractController
 
 		$data = retrieveMemberData($conditions);
 
-		// All members have received a mail. Go to the next screen.
+		// All members have received mail. Go to the next screen.
 		if (empty($data) || $data['member_count'] === 0)
 		{
 			logAction('announce_topic', ['topic' => $topic], 'user');

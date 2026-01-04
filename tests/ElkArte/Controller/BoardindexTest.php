@@ -11,6 +11,7 @@ namespace ElkArte\Controller;
 
 use ElkArte;
 use ElkArte\EventManager;
+use ElkArte\User;
 use tests\ElkArteCommonSetupTest;
 
 class BoardIndexTest extends ElkArteCommonSetupTest
@@ -37,6 +38,7 @@ class BoardIndexTest extends ElkArteCommonSetupTest
 
 		// Get the controller
 		$controller = new BoardIndex(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_index();
 
 		// Check

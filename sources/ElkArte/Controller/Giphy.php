@@ -52,7 +52,7 @@ class Giphy extends AbstractController
 	}
 
 	/**
-	 * Index action, based on the SA sends control to the right method.
+	 * Index action, based on the SA, sends control to the right method.
 	 *
 	 * @return void
 	 */

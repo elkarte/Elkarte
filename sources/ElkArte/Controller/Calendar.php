@@ -249,7 +249,7 @@ class Calendar extends AbstractController
 
 		if ($event->isNew())
 		{
-			// Get list of boards that can be posted in.
+			// Get a list of boards that can be posted in.
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
 			{
@@ -346,7 +346,7 @@ class Calendar extends AbstractController
 	/**
 	 *
 	 * What it does:
-	 *  - require_once modules of the controller (not addons because these are always all require'd by the dispatcher),
+	 *  - Require_once modules of the controller (not addons because these are always all required by the dispatcher),
 	 *  - Creates the event manager and registers addons and modules,
 	 *  - Instantiate the controller
 	 *  - Runs pre_dispatch

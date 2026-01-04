@@ -76,7 +76,7 @@ class RemoveTopic extends AbstractController
 		// This file needs to be included for sendNotifications().
 		require_once(SUBSDIR . '/Notification.subs.php');
 
-		// Check if its been recycled
+		// Check if it's been recycled
 		removeDeleteConcurrence();
 
 		$this->_topic_info = getTopicInfo($topic, 'message');
@@ -158,7 +158,7 @@ class RemoveTopic extends AbstractController
 			$topic = $this->_req->getQuery('topic', 'intval', 0);
 		}
 
-		// Trying to mess around are we?
+		// Trying to mess around, are we?
 		if (empty($_msg))
 		{
 			redirectexit();
@@ -311,7 +311,7 @@ class RemoveTopic extends AbstractController
 			throw new Exception('restore_not_found', false, ['<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>']);
 		}
 
-		// Lets send them back somewhere that may make sense
+		// Let's send them back somewhere that may make sense
 		if (isset($actioned_messages) && count($actioned_messages) === 1 && empty($topics_to_restore))
 		{
 			redirectexit('topic=' . array_key_first($actioned_messages));

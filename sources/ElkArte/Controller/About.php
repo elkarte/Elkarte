@@ -35,14 +35,14 @@ class About extends AbstractController
 	 */
 	public function action_index(): void
 	{
-		// Add an subaction array to act accordingly
+		// Add a subaction array to act accordingly
 		$subActions = [
 			'credits' => [$this, 'action_credits'],
 			'contact' => [$this, 'action_contact'],
 			'coppa' => [$this, 'action_coppa'],
 		];
 
-		// Setup the action handler
+		// Set up the action handler
 		$action = new Action();
 		$subAction = $action->initialize($subActions, 'credits');
 
@@ -172,7 +172,7 @@ class About extends AbstractController
 		$member_id = $this->_req->getQuery('member', 'intval', 0);
 		$member = getBasicMemberData($member_id, ['authentication' => true]);
 
-		// If doesn't exist or not pending coppa
+		// If it doesn't exist or not pending coppa
 		if (empty($member) || (int) $member['is_activated'] !== self::STATUS_AWAITING_COPPA)
 		{
 			throw new Exception('no_access', false);

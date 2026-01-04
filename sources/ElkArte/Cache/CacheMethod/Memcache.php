@@ -116,7 +116,7 @@ class Memcache extends AbstractCacheMethod
 	protected function setOptions($server, $port): void
 	{
 		// host, port, timeout, retry_interval, status
-		$this->obj->setServerParams($server, $port, 1, 5, true);
+		$this->obj->setServerParams($server, $port, 1, 5);
 	}
 
 	/**

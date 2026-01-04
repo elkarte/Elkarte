@@ -82,7 +82,7 @@ class ManageFeatures extends AbstractController
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => 'modSettings_title',
 			'help' => 'featuresettings',
-			'description' => sprintf($txt['modSettings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id'], '{session_data}'])),
+			'description' => sprintf($txt['modSettings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'themes', 'sa' => 'list', 'th' => $settings['theme_id'], '{session_data}'])),
 			// All valid $subActions will be added, here you just specify any special tab data
 			'tabs' => [
 				'mention' => ['description' => $txt['mentions_settings_desc'],],

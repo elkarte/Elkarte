@@ -437,7 +437,7 @@
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: nFormat.format(point.like_count)}) +
+						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: nFormat.format(point.like_count), 2: nFormat.format(point.distinct_likers)}) +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="topic_toggle">&nbsp' +
 						'           <span id="topic_toggle_img_' + index + '" class="chevricon i-chevron-up" title=""></span>' +
@@ -494,11 +494,11 @@
 				hideSpinnerOverlay();
 			},
 
-			// The single most liked board, like ever
+			// The most liked board(s)
 			showBoardStats = function(response) {
 				let data = tabsVisitedCurrentSession[currentUrlFrag],
-					boardUrl = elk_prepareScriptUrl(elk_scripturl) + 'board=' + data.id_board,
-					like_post_board_data = document.querySelector('.like_post_board_data');
+					like_post_board_data = document.querySelector('.like_post_board_data'),
+					htmlContent = '';
 
 				const nFormat = new Intl.NumberFormat();
 
@@ -506,37 +506,41 @@
 				like_post_board_data.innerHTML = '';
 				like_post_board_data.style.display = 'none';
 
-				// First a bit about the board
-				let htmlContent = '' +
-					'<div class="content forumposts">' +
-					'	<p>' +
-					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + nFormat.format(data.like_count) + ' ' + txtStrings.genricHeading1 +
-					'   </p>' +
-					'   <p>' +
-					txtStrings.mostPopularBoardSubHeading1 + ' ' + nFormat.format(data.num_topics) + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + nFormat.format(data.topics_liked) + ' ' + txtStrings.mostPopularBoardSubHeading3 +
-					'   </p>' +
-					'   <p>' +
-					txtStrings.mostPopularBoardSubHeading4 + ' ' + nFormat.format(data.num_posts) + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + nFormat.format(data.msgs_liked) + ' ' + txtStrings.mostPopularBoardSubHeading6 +
-					'   </p>' +
-					'</div>';
+				data.forEach((board) => {
+					let boardUrl = elk_prepareScriptUrl(elk_scripturl) + 'board=' + board.id_board;
 
-				// And show some topics from it
-				data.topic_data.forEach((data_topic) => {
-					let topicUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + data_topic.id_topic;
-
+					// First a bit about the board
 					htmlContent += '' +
-						'<div class="content forumposts">' +
-						'	<div class="topic_details">' +
-						'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data_topic.member.avatar) + '"/>' +
-						'       <h5 class="like_stats_likers">' +
-						'           <a href="' + data_topic.member.href + '">' +
-						data_topic.member.name +
-						'           </a> : ' + txtStrings.postedAt + ' ' + data_topic.html_time +
-						'       </h5>' +
-						'   </div>' +
-						'   <div class="messageContent">' + data_topic.body + '</div>' +
-						'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
+						'<div class="infobox">' +
+						'	<p>' +
+						'       <a class="largetext" href="' + boardUrl + '">' + board.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + nFormat.format(board.like_count) + ' ' + txtStrings.genricHeading1 +
+						'   </p>' +
+						'   <p>' +
+						txtStrings.mostPopularBoardSubHeading1 + ' ' + nFormat.format(board.num_topics) + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + nFormat.format(board.topics_liked) + ' ' + txtStrings.mostPopularBoardSubHeading3 +
+						'   </p>' +
+						'   <p>' +
+						txtStrings.mostPopularBoardSubHeading4 + ' ' + nFormat.format(board.num_posts) + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + nFormat.format(board.msgs_liked) + ' ' + txtStrings.mostPopularBoardSubHeading6 +
+						'   </p>' +
 						'</div>';
+
+					// And show some topics from it
+					board.topic_data.forEach((data_topic) => {
+						let topicUrl = elk_prepareScriptUrl(elk_scripturl) + 'topic=' + data_topic.id_topic;
+
+						htmlContent += '' +
+							'<div class="content forumposts">' +
+							'	<div class="topic_details">' +
+							'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data_topic.member.avatar) + '"/>' +
+							'       <h5 class="like_stats_likers">' +
+							'           <a href="' + data_topic.member.href + '">' +
+							data_topic.member.name +
+							'           </a> : ' + txtStrings.postedAt + ' ' + data_topic.html_time +
+							'       </h5>' +
+							'   </div>' +
+							'   <div class="messageContent">' + data_topic.body + '</div>' +
+							'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
+							'</div>';
+					});
 				});
 
 				// Load and show
