@@ -2660,7 +2660,6 @@ class InstallInstructions_install_2_0
 				array('signature_repetition_guests', '2'),
 				array('attachment_autorotate', '1'),
 				array('attachment_inline_enabled', '1'),
-				array('likes_enabled', '1'),
 				array('show_DisplayNameOnRegistration', '1'),
 				array('metadata_enabled', '1'),
 				array('pm_posts_verification', '1'),
@@ -2673,15 +2672,12 @@ class InstallInstructions_install_2_0
 				array('usernotif_favicon_enable', '1'),
 				array('displayMemberNames', '1'),
 				array('url_format', 'semantic'),
-				array('httponlyCookies', '1'),
 				array('loginHistoryDays', '31'),
 				array('badbehavior_accept_header', '1'),
 				array('badbehavior_httpbl_threat', '25'),
 				array('badbehavior_httpbl_maxage', '30'),
 				array('drafts_autosave_frequency', '30'),
 				array('drafts_keep_days', '90'),
-				array('likeWaitCount', '10'),
-				array('likeWaitTime', '1'),
 				array('maillist_key_active', '21'),
 				array('maillist_leftover_remove', 'To: |Re: |Sent: |Subject: |Date: |From:'),
 				array('maillist_newtopic_needsapproval', '1'),
@@ -2689,7 +2685,6 @@ class InstallInstructions_install_2_0
 				array('maillist_sig_keys', 'best|regard|thank'),
 				array('pbe_no_mod_notices', '1'),
 				array('show_spider_online', '0'),
-
 			),
 			array('variable')
 		);
