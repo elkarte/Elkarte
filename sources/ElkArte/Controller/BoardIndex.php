@@ -148,47 +148,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		if (!empty($settings['show_likestats_index']) && !empty($modSettings['likes_enabled']) && allowedTo('like_posts_stats'))
 		{
-			require_once(SUBSDIR . '/Likes.subs.php');
-			Txt::load('LikePosts');
-
-			$context['likestats'] = [
-				'topics' => [],
-				'boards' => [],
-				'messages' => [],
-			];
-
-			if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . md5($this->user->query_wanna_see_board), 1800) === false)
-			{
-				$context['likestats']['topics'] = dbMostLikedTopic(null, 5);
-				Cache::instance()->put('ic_likestats_topic:' . md5($this->user->query_wanna_see_board), $context['likestats']['topics'], 1800);
-			}
-
-			if (Cache::instance()->getVar($context['likestats']['boards'], 'ic_likestats_board:' . md5($this->user->query_wanna_see_board), 1800) === false)
-			{
-				$context['likestats']['boards'] = dbMostLikedBoard(3);
-				Cache::instance()->put('ic_likestats_board:' . md5($this->user->query_wanna_see_board), $context['likestats']['boards'], 1800);
-			}
-
-			if (Cache::instance()->getVar($context['likestats']['messages'], 'ic_likestats_message:' . md5($this->user->query_wanna_see_board), 1800) === false)
-			{
-				$context['likestats']['messages'] = dbMostLikedMessage(5);
-				Cache::instance()->put('ic_likestats_message:' . md5($this->user->query_wanna_see_board), $context['likestats']['messages'], 1800);
-			}
-
-			$context['likestats']['show'] = false;
-			foreach (['topics', 'boards', 'messages'] as $key)
-			{
-				if (!empty($context['likestats'][$key]) && empty($context['likestats'][$key]['noDataMessage']))
-				{
-					$context['likestats']['show'] = true;
-					break;
-				}
-			}
-
-			if ($context['likestats']['show'])
-			{
-				$context['info_center_callbacks'][] = 'show_likestats';
-			}
+			$this->getLikeStatsContext();
 		}
 
 		if (!empty($settings['show_stats_index']))
@@ -204,7 +164,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 			'txt_mark_as_read_confirm' => $txt['mark_as_read_confirm']
 		], true);
 
-		// Mark read button
+		// the "Mark read" button
 		$context['mark_read_button'] = [
 			'markread' => [
 				'text' => 'mark_as_read',
@@ -250,5 +210,63 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		// And go back to the board index.
 		$this->action_boardindex();
+	}
+
+	/**
+	 * Retrieves and prepares like statistics data for topics, boards, and messages,
+	 * and configures the context for display in the information center.
+	 *
+	 * The method populates the provided context with like statistics retrieved
+	 * from the cache or database and determines whether the like statistics
+	 * should be shown in the information center.
+	 *
+	 */
+	public function getLikeStatsContext()
+	{
+		global $context;
+
+		require_once(SUBSDIR . '/Likes.subs.php');
+		Txt::load('LikePosts');
+
+		$context['likestats'] = [
+			'topics' => [],
+			'boards' => [],
+			'messages' => [],
+		];
+
+		$key = md5($this->user->query_wanna_see_board ?? '');
+
+		if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . $key, 1800) === false)
+		{
+			$context['likestats']['topics'] = dbMostLikedTopic(null, 5);
+			Cache::instance()->put('ic_likestats_topic:' . $key, $context['likestats']['topics'], 1800);
+		}
+
+		if (Cache::instance()->getVar($context['likestats']['boards'], 'ic_likestats_board:' . $key, 1800) === false)
+		{
+			$context['likestats']['boards'] = dbMostLikedBoard(3);
+			Cache::instance()->put('ic_likestats_board:' . $key, $context['likestats']['boards'], 1800);
+		}
+
+		if (Cache::instance()->getVar($context['likestats']['messages'], 'ic_likestats_message:' . $key, 1800) === false)
+		{
+			$context['likestats']['messages'] = dbMostLikedMessage(5);
+			Cache::instance()->put('ic_likestats_message:' . $key, $context['likestats']['messages'], 1800);
+		}
+
+		$context['likestats']['show'] = false;
+		foreach (['topics', 'boards', 'messages'] as $key)
+		{
+			if (!empty($context['likestats'][$key]) && empty($context['likestats'][$key]['noDataMessage']))
+			{
+				$context['likestats']['show'] = true;
+				break;
+			}
+		}
+
+		if ($context['likestats']['show'])
+		{
+			$context['info_center_callbacks'][] = 'show_likestats';
+		}
 	}
 }

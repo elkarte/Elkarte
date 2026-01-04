@@ -19,7 +19,7 @@ $txt['like_post_hide'] = 'Hide';
 $txt['like_post_users_who_liked'] = '%1% users liked this post';
 
 // For topic
-$txt['like_post_most_popular_topic_heading1'] = 'has received a total of (%1%) like(s).';
+$txt['like_post_most_popular_topic_heading1'] = 'has received a total of %1% like(s) from %2% member(s).';
 $txt['like_post_most_popular_topic_sub_heading1'] = 'The topic contains (%1%) liked posts.  %2% some of the liked posts from it.';
 
 // For board
