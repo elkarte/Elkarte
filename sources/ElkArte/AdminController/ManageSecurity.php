@@ -46,7 +46,6 @@ class ManageSecurity extends AbstractController
 		$subActions = [
 			'general' => [$this, 'action_securitySettings_display', 'permission' => 'admin_forum'],
 			'spam' => [$this, 'action_spamSettings_display', 'permission' => 'admin_forum'],
-			'moderation' => [$this, 'action_moderationSettings_display', 'enabled' => featureEnabled('w'), 'permission' => 'admin_forum'],
 		];
 
 		// Action control
@@ -155,90 +154,6 @@ class ManageSecurity extends AbstractController
 	}
 
 	/**
-	 * Allows displaying and eventually change the moderation settings of the forum.
-	 *
-	 * - Uses the moderation settings form.
-	 *
-	 * @event integrate_save_moderation_settings
-	 */
-	public function action_moderationSettings_display(): void
-	{
-		global $txt, $context, $modSettings;
-
-		// Initialize the form
-		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_moderationSettings();
-		$settingsForm->setConfigVars($config_vars);
-
-		// Saving?
-		if ($this->_req->hasQuery('save'))
-		{
-			checkSession();
-
-			// Make sure these don't have an effect.
-			if ($modSettings['warning_settings'][0] != 1)
-			{
-				$this->_req->post->warning_watch = 0;
-				$this->_req->post->warning_moderate = 0;
-				$this->_req->post->warning_mute = 0;
-			}
-			else
-			{
-				$this->_req->post->warning_watch = min($this->_req->post->warning_watch, 100);
-				$this->_req->post->warning_moderate = $modSettings['postmod_active'] ? min($this->_req->post->warning_moderate, 100) : 0;
-				$this->_req->post->warning_mute = min($this->_req->post->warning_mute, 100);
-			}
-
-			// Fix the warning setting array!
-			$this->_req->post->warning_settings = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
-			$config_vars[] = ['text', 'warning_settings'];
-			unset($config_vars['rem1'], $config_vars['rem2']);
-
-			call_integration_hook('integrate_save_moderation_settings');
-
-			$settingsForm->setConfigVars($config_vars);
-			$settingsForm->setConfigValues((array) $this->_req->post);
-			$settingsForm->save();
-			redirectexit('action=admin;area=securitysettings;sa=moderation');
-		}
-
-		// We actually store lots of these together - for efficiency.
-		[$modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']] = explode(',', $modSettings['warning_settings']);
-
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'save', 'sa' => 'moderation']);
-		$context['settings_title'] = $txt['moderation_warning_short'];
-		$context['settings_message'] = $txt['warning_enable'];
-
-		$settingsForm->prepare();
-	}
-
-	/**
-	 * Moderation settings.
-	 *
-	 * @event integrate_modify_moderation_settings add new moderation settings
-	 */
-	private function _moderationSettings()
-	{
-		global $txt;
-
-		$config_vars = [
-			// Warning system?
-			['int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'watch_enable'],
-			'moderate' => ['int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note'], 'help' => 'moderate_enable'],
-			['int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note'], 'help' => 'mute_enable'],
-			'rem1' => ['int', 'user_limit', 'subtext' => $txt['setting_user_limit_note'], 'help' => 'perday_limit'],
-			'rem2' => ['int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']],
-			['select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], [$txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all']]],
-		];
-
-		call_integration_hook('integrate_modify_moderation_settings', [&$config_vars]);
-
-		return $config_vars;
-	}
-
-	/**
 	 * Handles admin security spam settings.
 	 *
 	 * - Displays a page with settings and eventually allows the admin to change them.
@@ -261,18 +176,13 @@ class ManageSecurity extends AbstractController
 		{
 			checkSession();
 
-			// Fix PM settings.
-			$this->_req->post->pm_spam_settings = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
-
 			// Guest requiring verification!
 			if (empty($this->_req->post->posts_require_captcha) && !empty($this->_req->post->guests_require_captcha))
 			{
 				$this->_req->post->posts_require_captcha = -1;
 			}
 
-			unset($config_vars['pm1'], $config_vars['pm2'], $config_vars['pm3'], $config_vars['guest_verify']);
-
-			$config_vars[] = ['text', 'pm_spam_settings'];
+			unset($config_vars['guest_verify']);
 
 			call_integration_hook('integrate_save_spam_settings');
 
@@ -282,9 +192,6 @@ class ManageSecurity extends AbstractController
 			Cache::instance()->remove('verificationQuestionIds');
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
-
-		// Add in PM spam settings on the fly
-		[$modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']] = explode(',', $modSettings['pm_spam_settings']);
 
 		// And the same for guests requiring verification.
 		$modSettings['guests_require_captcha'] = !empty($modSettings['posts_require_captcha']);
@@ -318,11 +225,6 @@ class ManageSecurity extends AbstractController
 			'guest_verify' => ['check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']],
 			['int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => "if (this.value > 0){ document.getElementById('guests_require_captcha').checked = true; document.getElementById('guests_require_captcha').disabled = true;} else {document.getElementById('guests_require_captcha').disabled = false;}"],
 			['check', 'guests_report_require_captcha'],
-			// PM Settings
-			['title', 'antispam_PM'],
-			'pm1' => ['int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']],
-			'pm2' => ['int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']],
-			'pm3' => ['int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']],
 		];
 
 		// Cannot use moderation if post-moderation is not enabled.
@@ -335,21 +237,6 @@ class ManageSecurity extends AbstractController
 		call_integration_hook('integrate_spam_settings', [&$config_vars]);
 
 		return $config_vars;
-	}
-
-	/**
-	 * Public method to return moderation settings, used for admin search
-	 */
-	public function moderationSettings_search()
-	{
-		global $modSettings;
-
-		if (empty($modSettings['warning_enable']))
-		{
-			return ['check', 'dummy_enable'];
-		}
-
-		return $this->_moderationSettings();
 	}
 
 	/**
