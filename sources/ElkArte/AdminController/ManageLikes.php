@@ -77,10 +77,10 @@ class ManageLikes extends AbstractController
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			redirectexit('action=admin;area=featuresettings;sa=likes');
+			redirectexit('action=admin;area=likes');
 		}
 
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'likes', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'likes', 'save']);
 		$context['settings_title'] = $txt['likes'];
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['modSettings_title'];

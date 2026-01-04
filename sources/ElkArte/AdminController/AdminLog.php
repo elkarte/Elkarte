@@ -41,7 +41,7 @@ class AdminLog extends AbstractController
 
 		// These are the logs they can load.
 		$subActions = [
-			'errorlog' => ['controller' => ManageErrors::class], 'function' => 'action_index', 'disabled' => empty($modSettings['enableErrorLogging']),
+			'errorlog' => ['controller' => ManageErrors::class, 'function' => 'action_index', 'disabled' => empty($modSettings['enableErrorLogging'])],
 			'adminlog' => ['controller' => Modlog::class, 'function' => 'action_log'],
 			'modlog' => ['controller' => Modlog::class, 'function' => 'action_log', 'disabled' => !featureEnabled('ml') || empty($modSettings['modlog_enabled'])],
 			'banlog' => ['controller' => ManageBans::class, 'function' => 'action_log'],

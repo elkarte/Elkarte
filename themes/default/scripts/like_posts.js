@@ -437,7 +437,7 @@
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: nFormat.format(point.like_count)}) +
+						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: nFormat.format(point.like_count), 2: nFormat.format(point.distinct_likers)}) +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="topic_toggle">&nbsp' +
 						'           <span id="topic_toggle_img_' + index + '" class="chevricon i-chevron-up" title=""></span>' +

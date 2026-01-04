@@ -56,8 +56,6 @@ class Admin extends AbstractModule
 			$txt['managedrafts_settings'],
 			'enabled' => featureEnabled('dr'),
 		];
-
-		uksort($admin_areas['forum']['areas']['postsettings']['subsections'], 'strnatcasecmp');
 	}
 
 	/**
