@@ -11,7 +11,7 @@
 /** global: elk_session_id, elk_session_var, elk_scripturl */
 
 /**
- * This javascript searches the message for video links and replaces them
+ * This JavaScript searches the message for video links and replaces them
  * with a clickable preview thumbnail of the video.  Once the image is clicked
  * the video is embedded in to the page to play.
  *
@@ -188,7 +188,7 @@
 
 		// Get a TikTok video thumbnail and embed data
 		imgHandlers.getTikTokEmbed = function(eURL, callback) {
-			fetchDocument(eURL, ttResponse, 'json', false);
+			fetchDocument(eURL, ttResponse, 'json');
 
 			function ttResponse (data)
 			{
@@ -332,11 +332,15 @@
 				return;
 			}
 
-			let embedURL = '//www.tiktok.com/oembed?url=https://www.tiktok.com/@' + videoID[1] + '/video/' + videoID[2],
+			let videoURL = 'https://www.tiktok.com/@' + videoID[1] + '/video/' + videoID[2],
+				embedURL = elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=videoembed;api=json;site=tiktok;videoid=' + videoURL + ';' + elk_session_var + '=' + elk_session_id,
 				tag;
 
 			imgHandlers.getTikTokEmbed(embedURL, function(data) {
-				$(a).parent().next().find('img').attr('src', data.thumbnail_url);
+				if (typeof data.thumbnail_url !== 'undefined')
+				{
+					$(a).parent().next().find('img').attr('src', data.thumbnail_url);
+				}
 				a.embedURL = data.html;
 			});
 
@@ -444,6 +448,12 @@
 			let tag = link,
 				text = tag.innerText || tag.textContent || '';
 
+			// Already processed?
+			if (tag.classList.contains('elk_video_processed'))
+			{
+				return;
+			}
+
 			// Ignore in sentences
 			if (tag.previousSibling && tag.previousSibling.nodeName === '#text' && tag.previousSibling.nodeValue !== ' ')
 			{
@@ -486,6 +496,7 @@
 				args = handler(m[2], tag, provider_class);
 				if (args)
 				{
+					tag.classList.add('elk_video_processed');
 					embedded_count++;
 					$(tag).wrap('<div class="elk_video_container ' + (typeof args[2] !== 'undefined' ? args[2] : '') + '">');
 					$(tag).wrap('<div class="elk_video_header">').text(args[0]).after(showhideBtn.clone(true));
@@ -494,7 +505,7 @@
 			}
 		});
 
-		// If we have embeded videos, add the lazy load code and events
+		// If we have embedded videos, add the lazy load code and events
 		if (embedded_count > 0)
 		{
 			scrollEmbed();
