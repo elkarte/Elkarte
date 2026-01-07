@@ -1812,10 +1812,6 @@ a.bbc_link {
 	padding: 0;
 }
 
-.breadcrumb > .crumb > a {
-	padding: 0.8rem 0;
-}
-
 /* No arrow after the last link */
 .breadcrumb .crumb:last-child::after {
 	content: none;
