@@ -65,8 +65,13 @@ final class ParserWrapper
 
 	/**
 	 * ParserWrapper constructor.
+	 *
+	 * `public` allows creating a fresh instance of the parser wrapper when needed, this
+	 * avoids reliance on the singleton for sensitive contexts / where addons need to grab their
+	 * own instance of the parser.  BUT 99.9% of the time you should be using the
+	 * singleton ParserWrapper::instance()
 	 */
-	private function __construct()
+	public function __construct()
 	{
 
 	}
