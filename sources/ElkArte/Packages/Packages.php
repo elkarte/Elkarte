@@ -111,14 +111,8 @@ class Packages extends AbstractController
 			'flush' => [$this, 'action_flush'],
 			'examine' => [$this, 'action_examine'],
 			'showoperations' => [$this, 'action_showoperations'],
-			// The following two belong to PackageServers,
-			// for UI's sake moved here at least temporarily
-			'servers' => [
-				'controller' => PackageServers::class,
-				'function' => 'action_list'],
-			'upload' => [
-				'controller' => PackageServers::class,
-				'function' => 'action_upload'],
+			'servers' => ['controller' => PackageServers::class, 'function' => 'action_list'],
+			'upload' => ['controller' => PackageServers::class,	'function' => 'action_upload'],
 		];
 
 		// Set up action/subaction stuff.
@@ -1420,7 +1414,7 @@ class Packages extends AbstractController
 		}
 		elseif ($checkEmulate)
 		{
-			if (($checkEmulate === 0 || $checkEmulate === FORUM_VERSION) && isset($_SESSION['version_emulate']))
+			if (($checkEmulate === FORUM_VERSION) && isset($_SESSION['version_emulate']))
 			{
 				unset($_SESSION['version_emulate']);
 			}

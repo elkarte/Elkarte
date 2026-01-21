@@ -436,6 +436,7 @@ function availableThemes($current_theme, $current_member)
 	// Needed to trick ThemeLoader, so we can get variant names
 	HttpReq::instance()->post->th = true;
 
+	$old_theme_instance = $context['theme_instance'] ?? null;
 	foreach ($available_themes as $id_theme => $theme_data)
 	{
 		// Don't try to load the forum or board default theme's data... it doesn't have any!
@@ -511,6 +512,7 @@ function availableThemes($current_theme, $current_member)
 	}
 
 	// Then return it.
+	$context['theme_instance'] = $old_theme_instance;
 	new ThemeLoader($current_theme, true);
 
 	return [$available_themes, $guest_theme];

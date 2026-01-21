@@ -447,25 +447,29 @@ abstract class Theme
 			loadJavascriptFile('elk_jquery_embed.js', ['defer' => true]);
 
 			$this->addInlineJavascript('
-				const oEmbedtext = ({
-					embed_limit : ' . (empty($modSettings['video_embed_limit']) ? 25 : $modSettings['video_embed_limit']) . ',
-					preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
-					ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
-					hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
-					youtube : ' . JavaScriptEscape($txt['youtube']) . ',
-					vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
-					dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . ',
-					tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
-					twitter : ' . JavaScriptEscape($txt['twitter']) . ',
-					facebook : ' . JavaScriptEscape($txt['facebook']) . ',
-					instagram : ' . JavaScriptEscape($txt['instagram']) . ',
-				});
-				document.addEventListener("DOMContentLoaded", () => {
-					if ($.isFunction($.fn.linkifyvideo))
-					{
-						$().linkifyvideo(oEmbedtext);
-					}
-				});', true);
+				if (typeof oEmbedtext === "undefined") {
+					var oEmbedtext = ({
+						embed_limit : ' . (empty($modSettings['video_embed_limit']) ? 25 : $modSettings['video_embed_limit']) . ',
+						preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
+						ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
+						hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
+						youtube : ' . JavaScriptEscape($txt['youtube']) . ',
+						vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
+						dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . ',
+						tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
+						twitter : ' . JavaScriptEscape($txt['twitter']) . ',
+						facebook : ' . JavaScriptEscape($txt['facebook']) . ',
+						instagram : ' . JavaScriptEscape($txt['instagram']) . ',
+					});
+
+					document.addEventListener("DOMContentLoaded", () => {
+						if ($.isFunction($.fn.linkifyvideo))
+						{
+							$().linkifyvideo(oEmbedtext);
+						}
+					});
+				}
+			', true);
 		}
 	}
 
@@ -602,22 +606,24 @@ abstract class Theme
 		{
 			loadJavascriptFile('elk_relativeTime.js', ['defer' => true]);
 			$this->addInlineJavascript('
-				const oRttime = ({
-					referenceTime : ' . forum_time() * 1000 . ',
-					now : ' . JavaScriptEscape($txt['rt_now']) . ',
-					minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
-					minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
-					hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
-					hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
-					day : ' . JavaScriptEscape($txt['rt_day']) . ',
-					days : ' . JavaScriptEscape($txt['rt_days']) . ',
-					week : ' . JavaScriptEscape($txt['rt_week']) . ',
-					weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
-					month : ' . JavaScriptEscape($txt['rt_month']) . ',
-					months : ' . JavaScriptEscape($txt['rt_months']) . ',
-					year : ' . JavaScriptEscape($txt['rt_year']) . ',
-					years : ' . JavaScriptEscape($txt['rt_years']) . ',
-				});
+				if (typeof oRttime === "undefined") {
+					var oRttime = ({
+						referenceTime : ' . forum_time() * 1000 . ',
+						now : ' . JavaScriptEscape($txt['rt_now']) . ',
+						minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
+						minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
+						hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
+						hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
+						day : ' . JavaScriptEscape($txt['rt_day']) . ',
+						days : ' . JavaScriptEscape($txt['rt_days']) . ',
+						week : ' . JavaScriptEscape($txt['rt_week']) . ',
+						weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
+						month : ' . JavaScriptEscape($txt['rt_month']) . ',
+						months : ' . JavaScriptEscape($txt['rt_months']) . ',
+						year : ' . JavaScriptEscape($txt['rt_year']) . ',
+						years : ' . JavaScriptEscape($txt['rt_years']) . ',
+					});
+				}
 				document.addEventListener("DOMContentLoaded", () => {updateRelativeTime();});', true);
 
 			$context['using_relative_time'] = true;

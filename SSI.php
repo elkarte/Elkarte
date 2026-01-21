@@ -33,34 +33,22 @@ use ElkArte\User;
  */
 $ssi_on_error_method = false;
 
-/**
- * Don't do john didley if the forum's been shut down completely.
- */
+/** Don't do john didley if the forum's been shut down completely. */
 // $ssi_maintenance_off = false;
 
-/**
- * Define a theme for SSI (integer)
- */
+/** Define a theme for SSI (integer) */
 // $ssi_theme = 0;
 
-/**
- * An array of layers to use.
- */
+/** An array of layers to use. */
 // $ssi_layers = array();
 
-/**
- * Gzip output? (because it must be boolean and true, this can't be hacked.)
- */
+/** Gzip output? (because it must be boolean and true, this can't be hacked.) */
 // $ssi_gzip = false;
 
-/**
- * Should we ban from SSI as well?
- */
+/** Should we ban from SSI as well? */
 // $ssi_ban = false;
 
-/**
- * Do we allow guests in here?
- */
+/** Do we allow guests in here? */
 // $ssi_guest_access = false;
 
 // We are in ElkArte, but from the side-entrance.

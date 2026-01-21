@@ -931,14 +931,27 @@ class Xml extends AbstractController
 			$videoID = 0;
 		}
 
-		// Right now only one site, but a fetch based on site is the idea
+		// A fetch based on site
 		if (!empty($videoID) && !empty($site))
 		{
 			require_once(SUBSDIR . '/Package.subs.php');
-			$data = fetch_web_data('https://api.x.com/1.1/statuses/oembed.json?id=' . $videoID);
-			if ($data !== false)
+			$url = '';
+			if ($site === 'twitter')
 			{
-				$context['json_data'] = trim($data);
+				$url = 'https://api.x.com/1.1/statuses/oembed.json?id=' . $videoID;
+			}
+			elseif ($site === 'tiktok')
+			{
+				$url = 'https://www.tiktok.com/oembed?url=' . $videoID;
+			}
+
+			if (!empty($url))
+			{
+				$data = fetch_web_data($url);
+				if ($data !== false)
+				{
+					$context['json_data'] = trim($data);
+				}
 			}
 		}
 	}

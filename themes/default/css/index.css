@@ -1780,7 +1780,7 @@ a.bbc_link {
 	outline: none;
 }
 
-.breadcumb .crumb a {
+.breadcrumb .crumb > a {
 	display: block;
 	overflow: hidden;
 }
@@ -1810,10 +1810,6 @@ a.bbc_link {
 .breadcrumb > .crumb > a > i {
 	margin: 0;
 	padding: 0;
-}
-
-.breadcrumb > .crumb > a {
-	padding: 0.8rem 0;
 }
 
 /* No arrow after the last link */
