@@ -213,11 +213,11 @@ function loadEditorPlugins($editor_context)
 		$neededCSS[] = 'sceditor.giphy.css';
 	}
 
-	if (!empty($modSettings['enableTenor']))
+	if (!empty($modSettings['enableKlipy']))
 	{
-		$plugins[] = 'tenor';
-		$neededJS[] = 'editor/tenor.plugin.js';
-		$neededCSS[] = 'sceditor.tenor.css';
+		$plugins[] = 'klipy';
+		$neededJS[] = 'editor/klipy.plugin.js';
+		$neededCSS[] = 'sceditor.klipy.css';
 	}
 
 	if (!empty($neededJS))
@@ -391,7 +391,7 @@ function loadToolbarDefaults()
 	$bbc_tags['row1'] = [
 		['bold', 'italic', 'underline', 'strike'],
 		['left', 'center', 'right', 'pre'],
-		['image', 'link', 'giphy', 'tenor'],
+		['image', 'link', 'giphy', 'klipy'],
 		['bulletlist', 'orderedlist'],
 		['source', 'expand'],
 	];

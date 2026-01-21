@@ -114,7 +114,7 @@ class Admin extends AbstractController
 	 */
 	private function loadMenu(): array
 	{
-		global $txt, $context, $modSettings, $settings;
+		global $txt, $context, $modSettings;
 
 		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');

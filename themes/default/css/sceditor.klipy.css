@@ -8,11 +8,11 @@
  * https://www.elkarte.net
  * © ElkArte Forum contributors
  *
- * The CSS for the tenor dropdown in the editor
+ * The CSS for the klipy dropdown in the editor
  *
  */
 
-#tenor_results {
+#klipy_results {
     width: 475px;
     margin: 6px auto;
     min-height: 30px;
@@ -22,55 +22,55 @@
     max-width: calc(100% - 10px)
 }
 
-#tenor_search {
+#klipy_search {
     width: 100%;
 }
 
-#tenor_attribution_mark {
-    background: url(../images/tenor.png) no-repeat 50% 50% transparent;
-    height: 22px;
-    scale: 0.6;
+#klipy_attribution_mark {
+    background: url(../images/klipy.svg) no-repeat 50% 50% transparent;
+    height: 24px;
+    margin-bottom: 0.2rem;
 }
 
-.sceditor-tenor {
+.sceditor-klipy {
     background: #EFEFEF;
 }
 
-.sceditor-button-tenor div {
+.sceditor-button-klipy div {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-grid-3x3-gap-fill' viewBox='0 0 16 16'%3E%3Cpath d='M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V2zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2z'/%3E%3C/svg%3E");
 }
 
-.tenor-imagelist {
+.klipy-imagelist {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     grid-gap: 5px;
 }
 
-.tenor-item {
+.klipy-item {
     position: relative;
     cursor: pointer;
 }
 
-.tenor-item::before {
+.klipy-item::before {
     content: "";
     padding-bottom: 100%;
     display: inline-block;
     vertical-align: top;
 }
 
-.tenor-cover {
+.klipy-cover {
     position: absolute;
     width: 100%;
     height: 100%;
 }
 
-.tenor-cover img {
+.klipy-cover img {
     object-fit: cover;
     width: 100%;
     height: 100%;
 }
 
-#tenor-overlay {
+#klipy-overlay {
     position: absolute;
     left: 0;
     top: 0;

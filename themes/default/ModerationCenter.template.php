@@ -688,8 +688,9 @@ function template_warn_template()
 		    let button = document.getElementById("preview_button");
 		    if (button) 
 			{
-		        button.addEventListener("click", function() {
-		            return ajax_getTemplatePreview();
+		        button.addEventListener("click", function(event) {
+		            event.preventDefault();
+		            ajax_getTemplatePreview();
 		        });
 		    }
 		});

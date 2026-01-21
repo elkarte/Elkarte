@@ -404,8 +404,9 @@ function template_edit_censored()
 	</div>
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
-		    document.getElementById("preview_button").addEventListener("click", function() {
-		        return ajax_getCensorPreview();
+		    document.getElementById("preview_button").addEventListener("click", function(event) {
+		        event.preventDefault();
+		        ajax_getCensorPreview();
 		    });
 		});
 	</script>';
