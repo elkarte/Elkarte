@@ -918,8 +918,8 @@ strong, .bbc_strong {
 	padding: .8rem .4rem;
 }
 
-/* tenor & giphy images */
-img.bbc_img[src*="tenor.com"], img.bbc_img[src*="giphy.com"] {
+/* klipy & giphy images */
+img.bbc_img[src*="klipy.com"], img.bbc_img[src*="giphy.com"] {
 	max-width: 100%;
 	max-height: 25rem;
 }

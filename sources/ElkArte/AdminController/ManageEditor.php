@@ -144,10 +144,10 @@ class ManageEditor extends AbstractController
 			['select', 'giphyRating', ['g' => 'G', 'pg' => 'PG', 'pg13' => 'PG13', 'r' => 'R']],
 			['text', 'giphyLanguage', 5, 'subtext' => $txt['giphyLanguageURL']],
 			'',
-			['check', 'enableTenor'],
-			['text', 'tenorApiKey', 40, 'subtext' => $txt['tenorApiURL']],
-			['select', 'tenorRating', ['off' => 'off', 'low' => 'low', 'medium' => 'medium', 'high' => 'high']],
-			['text', 'tenorLanguage', 5, 'subtext' => $txt['tenorLanguageURL']],
+			['check', 'enableKlipy'],
+			['text', 'klipyApiKey', 40, 'subtext' => $txt['klipyApiURL']],
+			['select', 'klipyRating', ['off' => 'off', 'low' => 'low', 'medium' => 'medium', 'high' => 'high']],
+			['text', 'klipyLanguage', 5, 'subtext' => $txt['klipyLanguageURL']],
 		];
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

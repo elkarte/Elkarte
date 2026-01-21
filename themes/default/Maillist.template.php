@@ -316,9 +316,10 @@ function template_bounce_template()
 		</div>
 	</form>
 	<script>
-		$(function() {
-			$("#preview_button").on("click", function() {
-				return ajax_getEmailTemplatePreview();
+		document.addEventListener("DOMContentLoaded", function() {
+			document.getElementById("preview_button").addEventListener("click", function(event) {
+				event.preventDefault();
+				ajax_getEmailTemplatePreview();
 			});
 		});
 	</script>';

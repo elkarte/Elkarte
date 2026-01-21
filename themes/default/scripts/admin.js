@@ -1704,16 +1704,18 @@ function ajax_getEmailTemplatePreview ()
  */
 function ajax_getCensorPreview ()
 {
-	fetch(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=postsettings;sa=censor;api=json', {
+	let formValue = {'censortest': document.getElementById('censortest').value},
+		postString = serialize(formValue) + "&" + elk_session_var + "=" + elk_session_id,
+		url = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=postsettings;sa=censor;api=json;'
+
+		fetch(url, {
 		method: 'POST',
+		body: postString,
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Accept': 'application/json'
-		},
-		body: serialize({
-			censortest: document.getElementById('censortest').value
-		})
+		}
 	})
 		.then(response => {
 			if (!response.ok)

@@ -1947,14 +1947,20 @@ function setJsonTemplate()
 {
 	global $context;
 
-	$template_layers = $GLOBALS['context']['theme_instance']->getLayers();
+	$template_layers = theme()->getLayers();
 	$template_layers->removeAll();
-	$GLOBALS['context']['theme_instance']->getTemplates()->load('Json');
-	$context['sub_template'] = 'send_json';
+	theme()->getTemplates()->load('Json');
 
+	$context['sub_template'] = 'send_json';
 	$context['json_data'] = null;
 }
 
+/**
+ * Updates the PWA cache stale value to trigger a cache flush if needed.
+ *
+ * @param bool $refresh Determines whether to force a refresh of the PWA cache stale token.
+ * @return void
+ */
 function setPWACacheStale($refresh = false)
 {
 	global $modSettings;
