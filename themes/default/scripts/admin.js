@@ -1706,7 +1706,7 @@ function ajax_getCensorPreview ()
 {
 	let formValue = {'censortest': document.getElementById('censortest').value},
 		postString = serialize(formValue) + "&" + elk_session_var + "=" + elk_session_id,
-		url = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=postsettings;sa=censor;api=json;'
+		url = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=postsettings;sa=censor;api=json;';
 
 		fetch(url, {
 		method: 'POST',
