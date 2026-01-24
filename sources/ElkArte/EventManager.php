@@ -24,7 +24,7 @@ use ElkArte\Helper\HttpReq;
  * - You can create a core feature
  *     - Add a file ADMINDIR/ManageMymoduleModule.php containing a static class of addCoreFeature.
  *     - Or add a file in the ADDONSDIR as MyAddonIntegrate.php containing a static class of addCoreFeature.
- *     - Or add a file in the ADDONSDIR as *.integrate.php) containing a static class of addCoreFeature
+ *     - Or add a file in the ADDONSDIR as *.integrate.php containing a static class of addCoreFeature
  *     - The file and class will be auto discovered and called.
  * - Place your module files in ElkArte/Modules as a directory like
  *     - /Mymodule/Display.php and /Mymodule/Post.php
@@ -98,7 +98,7 @@ class EventManager
 			$class_name = $class[0];
 			$method_name = $class[1];
 			$deps = $event[2] ?? [];
-			$dependencies = null;
+			$dependencies = [];
 
 			if (!class_exists($class_name))
 			{

@@ -115,7 +115,7 @@ interface QueryInterface
 	 * @param array $keys The key columns to be used for conflicts or duplicates.
 	 * @param bool $disable_trans Whether to disable transactions during insertion.
 	 *
-	 * @return object The result of the insertion query, including details about the operation.
+	 * @return AbstractResult The result of the insertion query, including details about the operation.
 	 */
 	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
 
@@ -128,7 +128,7 @@ interface QueryInterface
 	 * @param array $keys An array of unique keys used to determine if a row should be replaced or inserted.
 	 * @param bool $disable_trans Optional. Whether to disable transactions for the operation. Default is false.
 	 *
-	 * @return bool True on success, false on failure.
+	 * @return AbstractResult True on success, false on failure.
 	 */
 	public function replace($table, $columns, $data, $keys, $disable_trans = false);
 

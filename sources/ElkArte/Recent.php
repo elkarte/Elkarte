@@ -147,7 +147,6 @@ class Recent
 		while (!$done)
 		{
 			// Find the 10 most recent messages they can *view*.
-			// @todo SLOW This query is really slow still, probably?
 			$request = $this->_db->fetchQuery('
 				SELECT 
 					m.id_msg

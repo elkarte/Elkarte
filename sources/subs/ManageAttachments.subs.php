@@ -1019,7 +1019,7 @@ function validateAttachments($attachments, $approve_query)
  *
  * @param int $attachment
  *
- * @return int
+ * @return array
  */
 function attachmentBelongsTo($attachment)
 {

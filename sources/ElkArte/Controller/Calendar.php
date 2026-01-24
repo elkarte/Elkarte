@@ -90,7 +90,7 @@ class Calendar extends AbstractController
 			$context['robot_no_index'] = true;
 		}
 
-		// Get the current day of month...
+		// Get the current day of the month...
 		require_once(SUBSDIR . '/Calendar.subs.php');
 		$today = getTodayInfo();
 

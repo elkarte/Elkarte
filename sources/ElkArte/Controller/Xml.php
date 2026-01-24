@@ -60,7 +60,7 @@ class Xml extends AbstractController
 			'videoembed' => ['controller' => $this, 'function' => 'action_videoembed'],
 		];
 
-		// Easy adding of xml sub actions with integrate_sa_xmlhttp
+		// Easy adding of XML sub actions with integrate_sa_xmlhttp
 		$action = new Action('xmlhttp');
 		$subAction = $action->initialize($subActions);
 
@@ -172,7 +172,7 @@ class Xml extends AbstractController
 		$tokens = [];
 		$feature_title = '';
 
-		// You have to be allowed to do this of course
+		// You have to be allowed to do this, of course
 		$validation = validateSession();
 		if ($validation === true)
 		{
@@ -319,19 +319,7 @@ class Xml extends AbstractController
 				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
-
-		// New generic token for use
-		createToken('admin-sort');
-		$tokens = [
-			[
-				'value' => $context['admin-sort_token'],
-				'attributes' => ['type' => 'token'],
-			],
-			[
-				'value' => $context['admin-sort_token_var'],
-				'attributes' => ['type' => 'token_var'],
-			],
-		];
+		$tokens = $this->getTokens();
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
@@ -503,17 +491,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort');
-		$tokens = [
-			[
-				'value' => $context['admin-sort_token'],
-				'attributes' => ['type' => 'token'],
-			],
-			[
-				'value' => $context['admin-sort_token_var'],
-				'attributes' => ['type' => 'token_var'],
-			],
-		];
+		$tokens = $this->getTokens();
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
@@ -652,7 +630,7 @@ class Xml extends AbstractController
 							}
 						}
 
-						// Clear the cache, its stale now
+						// Clear the cache, it's stale now
 						Cache::instance()->remove('parsing_smileys');
 						Cache::instance()->remove('posting_smileys');
 						$order[] = ['value' => $txt['smileys_moved_done']];
@@ -679,17 +657,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort');
-		$tokens = [
-			[
-				'value' => $context['admin-sort_token'],
-				'attributes' => ['type' => 'token'],
-			],
-			[
-				'value' => $context['admin-sort_token_var'],
-				'attributes' => ['type' => 'token_var'],
-			],
-		];
+		$tokens = $this->getTokens();
 
 		// Return the response, whatever it is
 		$context['sub_template'] = 'generic_xml';
@@ -778,17 +746,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort');
-		$tokens = [
-			[
-				'value' => $context['admin-sort_token'],
-				'attributes' => ['type' => 'token'],
-			],
-			[
-				'value' => $context['admin-sort_token_var'],
-				'attributes' => ['type' => 'token_var'],
-			],
-		];
+		$tokens = $this->getTokens();
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
@@ -820,7 +778,7 @@ class Xml extends AbstractController
 		$errors = [];
 		$order = [];
 
-		// Seems these will be needed
+		// These will be needed
 		Txt::load('Errors');
 		Txt::load('ManageSmileys');
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
@@ -879,17 +837,7 @@ class Xml extends AbstractController
 		}
 
 		// New generic token for use
-		createToken('admin-sort');
-		$tokens = [
-			[
-				'value' => $context['admin-sort_token'],
-				'attributes' => ['type' => 'token'],
-			],
-			[
-				'value' => $context['admin-sort_token_var'],
-				'attributes' => ['type' => 'token_var'],
-			],
-		];
+		$tokens = $this->getTokens();
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
@@ -954,5 +902,26 @@ class Xml extends AbstractController
 				}
 			}
 		}
+	}
+
+	/**
+	 * New generic token for use
+	 * @return array[]
+	 */
+	public function getTokens(): array
+	{
+		global $context;
+
+		createToken('admin-sort');
+		return [
+			[
+				'value' => $context['admin-sort_token'],
+				'attributes' => ['type' => 'token'],
+			],
+			[
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 	}
 }

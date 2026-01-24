@@ -55,7 +55,7 @@ class Help extends AbstractController
 	}
 
 	/**
-	 * Show boxes with more detailed help on items, when the user clicks on their help icon.
+	 * Show boxes with more detailed help on items when the user clicks on their help icon.
 	 *
 	 * What it does
 	 * - It handles both administrative or user help.
@@ -85,7 +85,7 @@ class Help extends AbstractController
 		// Load the admin help language file and template.
 		Txt::load('Help');
 
-		// Load permission specific help
+		// Load permission-specific help
 		if (str_starts_with($help_str, 'permissionhelp'))
 		{
 			Txt::load('ManagePermissions');
@@ -127,8 +127,8 @@ class Help extends AbstractController
 			}
 		}
 
-		// Link to the forum URL, and include session id.
-		if (preg_match('~%(\d+\$)?s\?~', $context['help_text'], $match))
+		// Link to the forum URL and include session id.
+		if (preg_match('~%(\d+\$)?s\?~', $context['help_text']))
 		{
 			$context['help_text'] = sprintf($context['help_text'], getUrl('boardindex', []), $context['session_id'], $context['session_var']);
 		}

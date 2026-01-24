@@ -37,9 +37,9 @@ class Topic extends AbstractController
 	{
 		global $topic;
 
-		// Call the right method, if it is not done yet.
+		// Call the right method if it is not done yet.
 		//
-		// This is done by the dispatcher, so lets leave it alone...
+		// This is done by the dispatcher, so let's leave it alone...
 		// We don't want to assume what it means if the user doesn't
 		// send us a ?sa=, do we? (lock topics out of nowhere?)
 		// Unless... we can printpage()
@@ -135,7 +135,7 @@ class Topic extends AbstractController
 	}
 
 	/**
-	 * Sticky a topic.
+	 * Sticky topic.
 	 *
 	 * Can't be done by topic starters - that would be annoying!
 	 *
@@ -188,7 +188,7 @@ class Topic extends AbstractController
 	}
 
 	/**
-	 * Format a topic to be printer friendly.
+	 * Format a topic to be printer-friendly.
 	 *
 	 * What id does:
 	 * - Must be called with a topic specified.
@@ -208,7 +208,7 @@ class Topic extends AbstractController
 			redirectexit();
 		}
 
-		// Its isn't enabled, give them the boot
+		// It isn't enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
 		{
 			$this->_req->clearValue('action', 'query');
@@ -232,7 +232,7 @@ class Topic extends AbstractController
 
 		$context['user']['started'] = $this->user->id == $topicinfo['id_member'] && $this->user->is_guest === false;
 
-		// Whatever happens don't index this.
+		// Whatever happens, don't index this.
 		$context['robot_no_index'] = true;
 
 		// @todo this code is almost the same as the one in Display.controller.php

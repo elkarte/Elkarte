@@ -249,7 +249,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			];
 		}
 
-		// Find the number of posts in these category's, exclude the recycle board.
+		// Find the number of posts in these categories, exclude the recycle board.
 		$boards_posts = boardsPosts([], $categories, false, false);
 		$this->_total_posts = (int) array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
@@ -360,7 +360,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		// Load in the likes for this group of messages
 		if (!empty($modSettings['likes_enabled']))
 		{
-			// Just the message id please
+			// Just the message id, please
 			$messages = array_column($messages, 'id');
 
 			require_once(SUBSDIR . '/Likes.subs.php');

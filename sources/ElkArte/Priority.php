@@ -228,8 +228,8 @@ class Priority
 							}
 						}
 
-						unset($references[$entity], $val);
-						$all_entities[$entity] = $priority_threshold;
+						unset($val, $references[(string) $entity]);
+						$all_entities[(string) $entity] = $priority_threshold;
 					}
 				}
 			}

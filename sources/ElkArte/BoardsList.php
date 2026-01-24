@@ -127,8 +127,6 @@ class BoardsList
 	 */
 	public function getBoards(): array
 	{
-		global $txt, $modSettings;
-
 		// Fetch and sort the boards' data.
 		$result_boards = $this->_fetchBoardsData();
 		$bbc_parser = ParserWrapper::instance();

@@ -219,7 +219,7 @@ class MetadataIntegrate
 	 */
 	public function getPostSchema(): array
 	{
-		global $context, $boardurl, $mbname, $board_info;
+		global $context, $mbname, $board_info;
 
 		$smd = [];
 

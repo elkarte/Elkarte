@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Database\AbstractResult;
 use ElkArte\Debug;
 use ElkArte\Helper\Censor;
 use ElkArte\Helper\ConstructPageIndex;
@@ -24,6 +25,7 @@ use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Loader;
+use ElkArte\Menu\MenuContext;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Request;
 use ElkArte\Search\Search;
@@ -197,7 +199,7 @@ function comma_format($number, $override_decimal_count = false)
 	if ($decimal_separator === null)
 	{
 		// Not set for whatever reason?
-		if (empty($txt['number_format']) || preg_match('~^1([^\d]*)?234([^\d]*)(0*?)$~', $txt['number_format'], $matches) !== 1)
+		if (empty($txt['number_format']) || preg_match('~^1(\D*)?234(\D*)(0*?)$~', $txt['number_format'], $matches) !== 1)
 		{
 			return $number;
 		}
@@ -477,7 +479,7 @@ function utcTime($timestamp, $userAdjust = false)
  *
  * @return int seconds since the unix epoch
  */
-function forum_time($use_user_offset = true, $timestamp = null)
+function forum_time($use_user_offset = true, $timestamp = null): int
 {
 	global $modSettings;
 
@@ -497,7 +499,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
  * Removes special entities from strings.  Compatibility...
  *
  * - Faster than html_entity_decode
- * - Removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
+ * - Removes the base entities (&amp; &quot; &#039; &lt; and &gt;.) from text with htmlspecialchars_decode
  * - Additionally, converts &nbsp with str_replace
  *
  * @param string $string The string to apply htmlspecialchars_decode
@@ -578,7 +580,7 @@ function pc_next_permutation($p, $size)
  *
  * - Makes sure the browser doesn't come back and repost the form data.
  * - Should be used whenever anything is posted.
- * - Diverts final execution to obExit() which means a end to processing and sending of final output
+ * - Diverts final execution to obExit() which means an end to processing and sending of final output
  *
  * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
@@ -813,12 +815,12 @@ function setupThemeContext($forceload = false)
 function memoryReturnBytes($val)
 {
 	// Treat blank values as 0
-	$val = is_bool($val) || empty($val) ? 0 : trim($val);
+	$val = is_bool($val) || empty($val) ? '0' : trim($val);
 
 	// Separate the number from the designator, if any
-	preg_match('~(\d+)(.*)~', $val, $val);
-	$num = (int) $val[1];
-	$last = strtolower(substr($val[2] ?? '', 0, 1));
+	preg_match('~(\d+)(.*)~', $val, $matches);
+	$num = (int) $matches[1];
+	$last = strtolower(substr($matches[2] ?? '', 0, 1));
 
 	// Convert to bytes
 	switch ($last)
@@ -892,7 +894,7 @@ function template_javascript()
  */
 function template_css()
 {
-	theme()->themecss->template_css();
+	theme()->themeCss()->template_css();
 }
 
 /**
@@ -1034,7 +1036,7 @@ function host_from_ip($ip)
 				updateSettings(['host_to_dis' => 1]);
 			}
 			// Maybe it found something, after all?
-			elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) === 1)
+			elseif (preg_match('~\s(\S+?)\.\s~', $test, $match) === 1)
 			{
 				$host = $match[1];
 			}
@@ -1049,7 +1051,7 @@ function host_from_ip($ip)
 			{
 				$host = '';
 			}
-			elseif (preg_match('~(?:Name:|Name =)\s+([^\s]+)~i', $test, $match) === 1)
+			elseif (preg_match('~(?:Name:|Name =)\s+(\S+)~i', $test, $match) === 1)
 			{
 				$host = $match[1];
 			}
@@ -1165,7 +1167,7 @@ function getBlocklist()
  */
 function setupMenuContext()
 {
-	return theme()->setupMenuContext();
+	(new MenuContext())->setupMenuContext();
 }
 
 /**
@@ -1371,8 +1373,8 @@ function entity_fix__callback($matches)
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
 
-	// We don't allow control characters, characters out of range, byte markers, etc
-	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
+	// We don't allow control characters, characters out of range, byte markers, etc.
+	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
 	{
 		return '';
 	}
@@ -1410,11 +1412,11 @@ function prepareSearchEngines()
  * - It is used by the controller callbacks from the template, such as
  * posts in topic display page, posts search results page, or personal messages.
  *
- * @param resource $messages_request holds a query result
+ * @param AbstractResult $messages_request holds a query result
  * @param bool $reset
  *
- * @return int|bool
- * @throws Exception
+ * @return bool
+ * @deprecate since 2.0
  */
 function currentContext($messages_request, $reset = false)
 {
@@ -2250,7 +2252,7 @@ function expandIPv6($addr, $strict_check = true)
 	$converted[$addr] = $result;
 
 	// Quick check to make sure the length is as expected.
-	if (!$strict_check || strlen($result) == 39)
+	if (!$strict_check || strlen($result) === 39)
 	{
 		return $result;
 	}

@@ -84,6 +84,10 @@ class ValuesContainer implements \ArrayAccess
 	 * Returns the value of the specified key in the internal data array if it exists,
 	 * otherwise, returns the first argument passed to the method, or null if no arguments were provided.
 	 *
+	 * Note: Calling an undefined method that doesn't exist in $data will return null.
+	 * This can lead to polymorphic-like behavior where a method call either executes a real method
+	 * or retrieves data.
+	 *
 	 * @param string $key The name of the key to retrieve from the internal data array.
 	 * @param array $args Optional arguments that can be passed to the method.
 	 * @return mixed|null The value of the specified key in the internal data array, the first argument passed to the method, or null if no arguments were provided.

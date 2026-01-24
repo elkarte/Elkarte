@@ -404,7 +404,7 @@ class Emoji extends AbstractModel
 	 *
 	 * @return Emoji|null
 	 */
-	public static function instance(): ?Emoji
+	public static function instance(): ?self
 	{
 		if (self::$instance === null)
 		{

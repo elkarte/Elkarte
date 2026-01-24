@@ -65,7 +65,7 @@ class Suggest extends AbstractController
 			'member' => ['class' => SuggestMember::class, 'function' => 'member'],
 		];
 
-		// Allow integration a way to register their own type
+		// Allow integrations a way to register their own type
 		call_integration_hook('integrate_autosuggest', [&$searchTypes]);
 
 		// Good old session check

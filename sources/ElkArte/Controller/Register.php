@@ -33,7 +33,7 @@ use ElkArte\Profile\ProfileOptions;
 use ElkArte\Request;
 
 /**
- * It registers new members, and it allows the administrator moderate member registration
+ * It registers new members, and it allows the administrator to moderate member registration
  */
 class Register extends AbstractController
 {
@@ -134,7 +134,7 @@ class Register extends AbstractController
 			redirectexit('action=about;sa=contact');
 		}
 
-		// If we have language support enabled then they need to be loaded
+		// If we have language support enabled, then they need to be loaded
 		if ($this->_load_language_support())
 		{
 			redirectexit('action=register');
@@ -241,7 +241,7 @@ class Register extends AbstractController
 			}
 		}
 
-		// If we have language support enabled then they need to be loaded
+		// If we have language support enabled, then they need to be loaded
 		$this->_load_language_support();
 
 		// Any custom or standard profile fields we want filled in during registration?
@@ -341,7 +341,7 @@ class Register extends AbstractController
 			throw new Exception('Login.under_age_registration_prohibited', false, [$modSettings['coppaAge']]);
 		}
 
-		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
+		// Check the time gate for miscreants. First, make sure they came from somewhere that actually set it up.
 		if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
 		{
 			redirectexit('action=register');
@@ -354,7 +354,7 @@ class Register extends AbstractController
 			$reg_errors->addError('too_quickly');
 		}
 
-		// Maybe the filled in our hidden honey pot form field like a good bot would
+		// Maybe they filled in our hidden honey pot form field like a good bot would
 		if (!empty($this->_req->getPost('reason_for_joining_hp', 'trim', '')))
 		{
 			// It's not missing, it just should not be there
@@ -456,7 +456,6 @@ class Register extends AbstractController
 			'send_welcome_email' => !empty($modSettings['send_welcomeEmail']),
 			'require' => !empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']) ? 'coppa' : (empty($modSettings['registration_method']) ? 'nothing' : ($modSettings['registration_method'] == 1 ? 'activation' : 'approval')),
 			'extra_register_vars' => $this->_extra_vars($has_real_name),
-			'theme_vars' => [],
 		];
 
 		// Registration options are always default options...
@@ -513,7 +512,7 @@ class Register extends AbstractController
 		{
 			$this->_req->post->step = 2;
 
-			// If they've filled in some details but made an error then they need less time to finish
+			// If they've filled in some details but made an error, then they need less time to finish
 			$_SESSION['register']['limit'] = 4;
 
 			$this->action_register();
@@ -532,13 +531,11 @@ class Register extends AbstractController
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && $this->user->is_admin === false)
 		{
-			foreach ($reg_errors->prepareErrors(1) as $error)
-			{
-				throw new Exception($error, 'general');
-			}
+			$errors = $reg_errors->prepareErrors(1);
+			throw new Exception(reset($errors), 'general');
 		}
 
-		// Was there actually an error of some kind dear boy?
+		// Was there actually an error of some kind, dear boy?
 		if ($reg_errors->hasErrors())
 		{
 			$this->_req->post->step = 2;
@@ -567,7 +564,7 @@ class Register extends AbstractController
 			makeCustomFieldChanges($memberID, 'register');
 		}
 
-		// If COPPA has been selected then things get complicated, set up the template.
+		// If COPPA has been selected, then things get complicated, set up the template.
 		if (!empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']))
 		{
 			redirectexit('action=about;sa=coppa;member=' . $memberID);
@@ -798,7 +795,7 @@ class Register extends AbstractController
 		// Or any standard ones?
 		if (!empty($modSettings['registration_fields']))
 		{
-			// Setup some important context.
+			// Set up some important context.
 			Txt::load('Profile');
 			theme()->getTemplates()->load('Profile');
 
@@ -823,13 +820,13 @@ class Register extends AbstractController
 	}
 
 	/**
-	 * Verify the activation code, and activate the user if correct.
+	 * Verify the activation code and activate the user if correct.
 	 *
 	 * What it does:
 	 *
 	 * - Accessed by ?action=register;sa=activate
 	 * - Processes activation code requests
-	 * - Checks if the user is already activate and if so does nothing
+	 * - Checks if the user is already activated and if so does nothing
 	 * - Prevents a user from using an existing email
 	 */
 	public function action_activate(): void
@@ -856,7 +853,7 @@ class Register extends AbstractController
 				throw new Exception('no_access', false);
 			}
 
-			// Otherwise its simply invalid
+			// Otherwise it's simply invalid
 			$context['member_id'] = 0;
 			$context['sub_template'] = 'resend';
 			$context['page_title'] = $txt['invalid_activation_resend'];
@@ -886,7 +883,7 @@ class Register extends AbstractController
 			return;
 		}
 
-		// Change their email address if not active 0 or awaiting reactivation 2? ( they probably tried a fake one first :P )
+		// Change their email address if not active 0 or awaiting reactivation 2? (they probably tried a fake one first :P)
 		$email_change = $this->_activate_change_email();
 
 		// Resend the password, but only if the account wasn't activated yet (0 or 2)
@@ -898,7 +895,7 @@ class Register extends AbstractController
 			return;
 		}
 
-		// Validation complete - update the database!
+		// Validation completed - update the database!
 		require_once(SUBSDIR . '/Members.subs.php');
 		approveMembers(['members' => [$this->_row['id_member']], 'activated_status' => $this->_row['is_activated']]);
 
@@ -927,7 +924,7 @@ class Register extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Requires the user enter the id/password for the account
+	 * - Requires the user to enter the id/password for the account
 	 * - The account must not be active 0 or awaiting reactivation 2
 	 */
 	private function _activate_change_email(): bool
@@ -1055,7 +1052,7 @@ class Register extends AbstractController
 	/**
 	 * See if a username already exists.
 	 *
-	 * - Used by registration template via xml request
+	 * - Used by registration template via XML request
 	 */
 	public function action_registerCheckUsername(): void
 	{

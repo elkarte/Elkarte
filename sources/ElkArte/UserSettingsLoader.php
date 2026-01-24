@@ -42,7 +42,7 @@ class UserSettingsLoader
 	/** @var string The member_name field from the db */
 	protected $username = '';
 
-	/** @var ValuesContainerReadOnly The settings data */
+	/** @var ValuesContainer The settings data */
 	protected $settings;
 
 	/** @var ValuesContainer The into data */
@@ -60,11 +60,11 @@ class UserSettingsLoader
 	}
 
 	/**
-	 * Returns the user settings
+	 * Returns the user settings container.
 	 *
-	 * @return ValuesContainerReadOnly
+	 * @return UserSettings
 	 */
-	public function getSettings(): ValuesContainerReadOnly
+	public function getSettings(): ValuesContainer
 	{
 		return $this->settings;
 	}
@@ -441,9 +441,9 @@ class UserSettingsLoader
 		return array_merge([
 			'url' => $this->settings->avatar(''),
 			'filename' => $this->settings->getEmpty('filename', ''),
-			'custom_dir' => $this->settings['attachment_type'] == 1,
+			'custom_dir' => (int) $this->settings['attachment_type'] === 1,
 			'id_attach' => (int) $this->settings->id_attach
-		], determineAvatar($this->settings));
+		], determineAvatar($this->settings->toArray()));
 	}
 
 	/**

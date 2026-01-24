@@ -175,7 +175,7 @@ class Unread extends AbstractController
 	}
 
 	/**
-	 * Finds out the boards the user want.
+	 * Finds out the boards the user wants.
 	 */
 	private function _wanted_boards(): void
 	{
@@ -197,7 +197,7 @@ class Unread extends AbstractController
 			}
 
 			// The easiest thing is to just get all the boards they can see,
-			// but since we've specified the top of tree we ignore some of them
+			// but since we've specified the top of a tree, we ignore some of them
 			$this->_boards = addChildBoards($this->_boards);
 
 			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%d';
