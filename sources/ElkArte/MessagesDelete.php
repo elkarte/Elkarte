@@ -66,7 +66,6 @@ class MessagesDelete
 		$msgs = [];
 		foreach ($msgs_id as $msg)
 		{
-			$msg = (int) $msg;
 			if (!empty($msg))
 			{
 				$msgs[] = $msg;
@@ -480,7 +479,6 @@ class MessagesDelete
 	{
 		foreach ($topics_id as $topic)
 		{
-			$topic = (int) $topic;
 			if (!empty($topic))
 			{
 				$this->_topics_to_restore[] = $topic;

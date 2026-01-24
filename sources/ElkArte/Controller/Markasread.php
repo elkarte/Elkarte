@@ -18,7 +18,7 @@ use ElkArte\Action;
 use ElkArte\Languages\Txt;
 
 /**
- * This class handles a part of the actions to mark boards, topics, or replies,
+ * This class handles a part of the actions to mark boards, topics, or replies
  * as read/unread.
  */
 class Markasread extends AbstractController
@@ -181,7 +181,6 @@ class Markasread extends AbstractController
 
 		// No need to output anything, just return to the button
 		obExit(false);
-		return null;
 	}
 
 	/**
@@ -226,8 +225,7 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		redirectexit($redirectAction);
-		return null;
+		return redirectexit($redirectAction);
 	}
 
 	/**
@@ -290,7 +288,7 @@ class Markasread extends AbstractController
 			{
 				$earlyMsg = 0;
 			}
-			// If they want to mark the whole thing read, same.
+			// If they want to mark the whole thing, read, same.
 			elseif ($topic_msg_id <= $topicinfo['id_first_msg'])
 			{
 				$earlyMsg = 0;
@@ -301,7 +299,7 @@ class Markasread extends AbstractController
 				$earlyMsg = previousMessage($topic_msg_id, $topic);
 			}
 		}
-		// Marking read from first page?  That's the whole topic.
+		// Marking read from the first page?  That's the whole topic.
 		elseif ($this->_req->query->start == 0)
 		{
 			$earlyMsg = 0;
@@ -328,6 +326,7 @@ class Markasread extends AbstractController
 	 *
 	 * - Accessed by action=markasread;sa=board;board=1.0;session
 	 * - Subactions: sa=topic, sa=all, sa=unreadreplies, sa=board
+	 * - the returns on redirects are for the testbed
 	 */
 	public function action_markasread(): ?string
 	{
@@ -370,8 +369,7 @@ class Markasread extends AbstractController
 				return '';
 			}
 
-			redirectexit();
-			return null;
+			return redirectexit();
 		}
 
 		// Mark boards as read.
@@ -393,8 +391,7 @@ class Markasread extends AbstractController
 
 		if (empty($board_info['parent']) && !$this->api)
 		{
-			redirectexit();
-			return null;
+			return redirectexit();
 		}
 
 		if ($this->api)
@@ -402,8 +399,7 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		redirectexit('board=' . $board_info['parent'] . '.0');
-		return null;
+		return redirectexit('board=' . $board_info['parent'] . '.0');
 	}
 
 	/**
@@ -466,7 +462,6 @@ class Markasread extends AbstractController
 			return '';
 		}
 
-		redirectexit($redirectAction);
-		return null;
+		return redirectexit($redirectAction);
 	}
 }

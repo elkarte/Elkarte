@@ -24,7 +24,7 @@ use ElkArte\Http\Headers;
  *
  * - It writes all the database to standard output.
  * - It uses gzip compression if compress is set in the URL/post-data.
- * - It may time out, and mess up badly if you were relying on it. :P
+ * - It may time out and mess up badly if you were relying on it. :P
  * - The data dumped depends on whether "struct" and "data" are passed.
  * - It is called from ManageMaintenance.controller.php.
  */

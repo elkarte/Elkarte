@@ -126,7 +126,7 @@ class PostModeration extends AbstractController
 			$toAction = array_map('intval', $this->_req->post->item);
 		}
 
-		// What are we actually doing.
+		// What are we actually doing?
 		if ($this->_req->hasQuery('approve') || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
 		{
 			$curAction = 'approve';
@@ -147,7 +147,7 @@ class PostModeration extends AbstractController
 			// Handy shortcut.
 			$any_array = $curAction === 'approve' ? $approve_boards : $delete_any_boards;
 
-			// Now for each message work out whether it's actually a topic, and what board it's on.
+			// Now for each message work out whether it's actually a topic and what board it's on.
 			$request = loadMessageDetails(
 				['m.id_board', 't.id_topic', 't.id_first_msg', 't.id_member_started'],
 				[
@@ -168,7 +168,7 @@ class PostModeration extends AbstractController
 			$details = [];
 			foreach ($request as $row)
 			{
-				// If it's not within what our view is ignore it...
+				// If it's not within what our view is, ignore it...
 				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] !== 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] !== 'replies'))
 				{
 					continue;
@@ -176,7 +176,7 @@ class PostModeration extends AbstractController
 
 				$can_add = false;
 
-				// If we're approving this is simple.
+				// If we're approving, this is simple.
 				if ($curAction === 'approve' && ($any_array == [0] || in_array($row['id_board'], $any_array)))
 				{
 					$can_add = true;
@@ -215,7 +215,7 @@ class PostModeration extends AbstractController
 				}
 			}
 
-			// If we have anything left we can actually do the approving (etc.).
+			// If we have anything left, we can actually do the approving (etc.).
 			if (!empty($toAction))
 			{
 				if ($curAction === 'approve')
@@ -249,10 +249,10 @@ class PostModeration extends AbstractController
 		]);
 
 		// Update the tabs with the correct number of actions to account for brd filtering
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' [' . $context['total_unapproved_posts'] . ']';
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] . ' [' . $context['total_unapproved_topics'] . ']';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] .= ' [' . $context['total_unapproved_posts'] . ']';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] .= ' [' . $context['total_unapproved_topics'] . ']';
 
-		// If we are filtering some boards out then make sure to send that along with the links.
+		// If we are filtering some boards out, then make sure to send that along with the links.
 		if ($_brd !== null)
 		{
 			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['add_params'] = ';brd=' . $_brd;
@@ -532,7 +532,7 @@ class PostModeration extends AbstractController
 
 		$message_info = basicMessageInfo($current_msg, false, true);
 
-		// If it's the first in a topic then the whole topic gets approved!
+		// If it's the first in a topic, then the whole topic gets approved!
 		if ($message_info['id_first_msg'] == $current_msg)
 		{
 			approveTopics($topic, !$message_info['approved'], $message_info['id_member_started'] != $this->user->id);

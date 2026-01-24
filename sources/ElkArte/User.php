@@ -29,7 +29,7 @@ class User
 	/** @var ValuesContainerReadOnly Contains the data read from the db. Read-only by means of ValuesContainerReadOnly */
 	public static $settings;
 
-	/** @var UserSettings The user object */
+	/** @var UserSettingsLoader The user object */
 	protected static $instance;
 
 	/** @var int The user id */

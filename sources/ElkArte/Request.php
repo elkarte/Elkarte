@@ -203,7 +203,7 @@ final class Request
 	 *
 	 * @return Request
 	 */
-	public static function instance(): Request
+	public static function instance(): self
 	{
 		if (self::$_instance === null)
 		{

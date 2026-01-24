@@ -78,10 +78,9 @@ class UserSettings extends ValuesContainerReadOnly
 	/**
 	 * Returns the true activation status of an account
 	 *
-	 * @param bool $strip_ban
 	 * @return int
 	 */
-	public function getActivationStatus($strip_ban = true): int
+	public function getActivationStatus(): int
 	{
 		return (int) ($this->is_activated > UserSettingsLoader::BAN_OFFSET ? $this->is_activated - UserSettingsLoader::BAN_OFFSET : $this->is_activated);
 	}

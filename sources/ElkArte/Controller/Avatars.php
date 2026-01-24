@@ -30,7 +30,7 @@ use ElkArte\Languages\Txt;
  *
  * - Handles the downloading of an avatar
  * - Handles the uploading of avatars
- * - Process avatar changes external, gravatar, uploaded, server supplied, etc
+ * - Process avatar changes external, gravatar, uploaded, server supplied, etc.
  */
 class Avatars
 {
@@ -200,7 +200,7 @@ class Avatars
 	{
 		global $profile_vars;
 
-		// Gravatar is where its at
+		// Gravatar is where it's at
 		$profile_vars['avatar'] = 'gravatar';
 
 		return $this->_resetAvatarData(true);
@@ -273,7 +273,7 @@ class Avatars
 			return true;
 		}
 
-		// Fresh upload, lets move it with a temp name, for a downloaded external this step has
+		// Fresh upload, let's move it with a temp name, for a downloaded external this step has
 		// already been completed.
 		if (!$this->_getDownloadedExternalAvatar())
 		{
@@ -290,7 +290,7 @@ class Avatars
 			return false;
 		}
 
-		// Do any security checks now, although a re-encode could occur in subsequent steps
+		// Do any security checks now; although a re-encode could occur in later steps,
 		// it is simpler and cleaner to do it now.
 		// It's bad. Last chance, maybe we can re-encode it?
 		if (!$image->checkImageContents() && (empty($modSettings['avatar_reencode']) || (!$image->reEncodeImage())))
@@ -342,7 +342,6 @@ class Avatars
 			if ($modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 			{
 				// Attempt to resize and save it
-				unset($image);
 				if (!saveAvatar($_FILES['attachment']['tmp_name'], $this->memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 				{
 					return false;
@@ -352,7 +351,7 @@ class Avatars
 			}
 		}
 
-		// To be here, the image is either under the size limit or over with "CSS to resize" option.
+		// To be here, the image is either under the size limit or over with the "CSS to resize" option.
 		// Either way try to save as is.  This is the only path to keep an animated GIF
 		if (!$this->_saveUploadedAvatar($image))
 		{
@@ -424,9 +423,6 @@ class Avatars
 			$file_size = $image->getFilesize();
 			$sizes = $image->getImageDimensions();
 		}
-
-		// Done with this now
-		unset($image);
 
 		if ($success)
 		{

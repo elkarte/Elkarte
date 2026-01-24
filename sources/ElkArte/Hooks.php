@@ -584,7 +584,7 @@ final class Hooks
 	 *
 	 * @return Hooks An instance of the class.
 	 */
-	public static function instance($db = null, $debug = null, $paths = null): Hooks
+	public static function instance($db = null, $debug = null, $paths = null): self
 	{
 		if (self::$_instance === null)
 		{

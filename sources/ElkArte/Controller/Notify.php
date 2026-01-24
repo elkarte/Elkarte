@@ -44,16 +44,16 @@ class Notify extends AbstractController
 	 */
 	public function action_index()
 	{
-		// The number of choices is boggling, ok there are just 2
+		// The number of choices is mind-boggling; ok, there are just 2
 		$subActions = [
 			'notify' => [$this, 'action_notify'],
 			'unsubscribe' => [$this, 'action_unsubscribe'],
 		];
 
-		// We like action, so lets get ready for some
+		// We like action, so let's get ready for some
 		$action = new Action('notify');
 
-		// Get the subAction, or just go to action_notify
+		// Get the subAction or just go to action_notify
 		$subAction = $action->initialize($subActions, 'notify');
 
 		// forward to our respective method.
@@ -68,7 +68,7 @@ class Notify extends AbstractController
 	 * - Must be called with a topic specified in the URL.
 	 * - The sub-action can be 'on', 'off', or nothing for what to do.
 	 * - Requires the mark_any_notify permission.
-	 * - Upon successful completion of action will direct user back to topic.
+	 * - Upon successful completion will direct the user back to the topic.
 	 * - Accessed via ?action=notify.
 	 *
 	 * @uses Notify.template, main sub-template
@@ -119,8 +119,6 @@ class Notify extends AbstractController
 		// Send them back to the topic.
 		$start = $this->_req->getQuery('start', 'intval', 0);
 		redirectexit('topic=' . $topic . '.' . $start);
-
-		return true;
 	}
 
 	/**
@@ -131,7 +129,7 @@ class Notify extends AbstractController
 		global $topic;
 
 		// Attempt to turn notifications on/off.
-		$isOn = $enable !== null ? $enable : ($this->_req->getQuery('sa', 'trim|strval', '') === 'on');
+		$isOn = $enable ?? ($this->_req->getQuery('sa', 'trim|strval', '') === 'on');
 		setTopicNotification($memID ?? $this->user->id, $topic, $isOn);
 	}
 
@@ -260,8 +258,6 @@ class Notify extends AbstractController
 		// Back to the board!
 		$start = $this->_req->getQuery('start', 'intval', 0);
 		redirectexit('board=' . $board . '.' . $start);
-
-		return null;
 	}
 
 	/**
@@ -351,7 +347,7 @@ class Notify extends AbstractController
 	 * - Must be called with a topic specified in the URL.
 	 * - The sub-action can be 'on', 'off', or nothing for what to do.
 	 * - Requires the mark_any_notify permission.
-	 * - Upon successful completion of action will direct user back to topic.
+	 * - Upon successful completion of the action will direct the user back to the topic.
 	 * - Accessed via ?action=unwatchtopic.
 	 */
 	public function action_unwatchtopic(): void
@@ -404,7 +400,7 @@ class Notify extends AbstractController
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
-		// Sorry guests just can't do this
+		// Sorry, guests just can't do this
 		if ($this->user->is_guest)
 		{
 			Txt::load('Errors');
@@ -545,7 +541,7 @@ class Notify extends AbstractController
 	}
 
 	/**
-	 * Validates a supplied token and extracts the needed bits
+	 * Validates a supplied token and extracts the necessary bits
 	 *
 	 * What it does:
 	 *  - Checks token conforms to a known pattern

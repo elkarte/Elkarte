@@ -26,6 +26,7 @@ use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use ElkArte\Request;
 use ElkArte\User;
+use ElkArte\UserSettings;
 use ElkArte\UserSettingsLoader;
 
 /**
@@ -240,6 +241,7 @@ class Auth extends AbstractController
 		$user = new UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($member_found === false ? 0 : $member_found['id_member'], true, '');
 
+		/** @var UserSettings $user_setting */
 		$user_setting = $user->getSettings();
 
 		// User using 2FA for login? Let's validate the token...

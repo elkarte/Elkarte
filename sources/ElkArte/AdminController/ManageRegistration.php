@@ -170,10 +170,8 @@ class ManageRegistration extends AbstractController
 			// If there are "important" errors, and you are not an admin: log the first error
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$this->user->is_admin ? 1 : null;
-			foreach ($reg_errors->prepareErrors($error_severity) as $error)
-			{
-				throw new Exception($error, $error_severity === null ? false : 'general');
-			}
+			$errors = $reg_errors->prepareErrors($error_severity);
+			throw new Exception(reset($errors), $error_severity === null ? false : 'general');
 
 			if (!empty($memberID))
 			{

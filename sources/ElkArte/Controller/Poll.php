@@ -70,7 +70,7 @@ class Poll extends AbstractController
 			throw new Exception('poll_error', false);
 		}
 
-		// If this is a guest can they vote?
+		// If this is a guest, can they vote?
 		if ($this->user->is_guest)
 		{
 			// Guest voting disabled?
@@ -178,7 +178,7 @@ class Poll extends AbstractController
 		addVote($inserts);
 		increaseVoteCounter($row['id_poll'], $pollOptions);
 
-		// If it's a guest don't let them vote again.
+		// If it's a guest, don't let them vote again.
 		if ($this->user->is_guest && $pollOptions !== [])
 		{
 			// Time is stored in case the poll is reset later, plus what they voted for.
@@ -226,7 +226,7 @@ class Poll extends AbstractController
 		// Get the poll starter, ID, and whether it is locked.
 		$poll = pollInfoForTopic($topic);
 
-		// If the user _can_ modify the poll....
+		// If the user _can_ modify the poll...
 		if (!allowedTo('poll_lock_any'))
 		{
 			isAllowedTo('poll_lock_' . ($this->user->id == $poll['id_member_started'] ? 'own' : 'any'));
@@ -265,7 +265,7 @@ class Poll extends AbstractController
 	}
 
 	/**
-	 * Update the settings for a poll, or add a new one.
+	 * Update the settings for a poll or add a new one.
 	 *
 	 * What it does:
 	 *
@@ -275,7 +275,7 @@ class Poll extends AbstractController
 	 * with poll_add_any permission for adding.
 	 * - In the case of an error, this function will redirect back to action_editpoll and
 	 * display the relevant error message.
-	 * - Upon successful completion of action will direct user back to topic.
+	 * - Upon successful completion of the action, it will direct user back to topic.
 	 * - Accessed via ?action=editpoll2.
 	 */
 	public function action_editpoll2(): void
@@ -334,7 +334,7 @@ class Poll extends AbstractController
 		$optionCount = 0;
 		$idCount = 0;
 
-		// Ensure the user is leaving a valid amount of options - there must be at least two.
+		// Ensure the user is leaving a valid number of options - there must be at least two.
 		foreach ($this->_req->post->options as $k => $option)
 		{
 			if (trim($option) !== '')
@@ -389,7 +389,7 @@ class Poll extends AbstractController
 			}
 		}
 
-		// Ensure that the number options allowed makes sense, and the expiration date is valid.
+		// Ensure that the number of options allowed makes sense, and the expiration date is valid.
 		if (!$isEdit || allowedTo('moderate_board'))
 		{
 			$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
@@ -526,7 +526,7 @@ class Poll extends AbstractController
 	{
 		global $txt, $context, $topic, $board;
 
-		// No topic, means you can't edit the poll
+		// No topic means you can't edit the poll
 		if (empty($topic))
 		{
 			throw new Exception('no_access', false);
@@ -558,7 +558,7 @@ class Poll extends AbstractController
 			throw new Exception('poll_already_exists');
 		}
 
-		// Otherwise, if we're editing it, it does exist I assume?
+		// Otherwise, if we're editing it, it does exist, I assume?
 		if ($context['is_edit'] && empty($pollinfo['id_poll']))
 		{
 			throw new Exception('poll_not_found');
@@ -800,7 +800,7 @@ class Poll extends AbstractController
 	 * - Must be called with a topic specified in the URL.
 	 * - Requires poll_remove_any permission, unless it's the poll starter
 	 * with poll_remove_own permission.
-	 * - Upon successful completion of action will direct user back to topic.
+	 * - Upon successful completion of the action, it will direct the user back to the topic.
 	 * - Accessed via ?action=poll;sa=remove.
 	 */
 	public function action_remove(): void
@@ -841,7 +841,7 @@ class Poll extends AbstractController
 		// Remove the poll!
 		removePoll($pollID);
 
-		// Finally set the topic poll ID back to 0!
+		// Finally, set the topic poll ID back to 0!
 		associatedPoll($topic, 0);
 
 		// A mod might have logged this (social network?), so let them remove, it too
@@ -852,7 +852,7 @@ class Poll extends AbstractController
 	}
 
 	/**
-	 * The only reason of this function is to build the poll UI and send it back in an XML form
+	 * The only reason for this function is to build the poll UI and send it back in an XML form
 	 */
 	public function action_interface(): void
 	{

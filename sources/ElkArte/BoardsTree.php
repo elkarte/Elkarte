@@ -104,7 +104,7 @@ class BoardsTree
 			{
 				$row['id_board'] = (int) $row['id_board'];
 				$row['child_level'] = (int) $row['child_level'];
-				if ($row['child_level'] !== $curLevel)
+				if ($row['child_level'] !== ($curLevel ?? 0))
 				{
 					$prevBoard = 0;
 				}
@@ -127,7 +127,7 @@ class BoardsTree
 					'override_theme' => $row['override_theme'],
 					'profile' => $row['id_profile'],
 					'redirect' => $row['redirect'],
-					'prev_board' => $prevBoard
+					'prev_board' => $prevBoard ?? 0
 				];
 				$prevBoard = $row['id_board'];
 				$last_board_order = $row['board_order'];

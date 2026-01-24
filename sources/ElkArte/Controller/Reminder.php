@@ -23,7 +23,7 @@ use ElkArte\Languages\Txt;
 use ElkArte\Profile\Profile;
 
 /**
- * Handles sending out reminders, and checking the secret answer and question.
+ * Handles sending out reminders and checking the secret answer and question.
  */
 class Reminder extends AbstractController
 {
@@ -90,7 +90,7 @@ class Reminder extends AbstractController
 		}
 
 		// You must enter a username/email address.
-		if (empty($where) || (!empty($where_params) && count(array_filter($where_params, fn($val) => $val !== null)) === 0))
+		if (empty($where) || (!empty($where_params) && count(array_filter($where_params, static fn($val) => $val !== null)) === 0))
 		{
 			throw new Exception('username_no_exist', false);
 		}
@@ -126,10 +126,10 @@ class Reminder extends AbstractController
 			throw new Exception($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
 		}
 
-		// If they have no secret question then they can only get emailed the item, or they are requesting the email, send them an email.
+		// If they have no secret question, then they can only get emailed the item, or they are requesting the email, send them an email.
 		if (empty($member['secret_question']) || ($this->_req->getPost('reminder_type') === 'email'))
 		{
-			// Randomly generate a new password, with only alpha numeric characters that is a max length of 14 chars.
+			// Randomly generate a new password, with only alphanumeric characters that is a max length of 14 chars.
 			$password = generateValidationCode(14);
 			require_once(SUBSDIR . '/Mail.subs.php');
 			$replacements = [
@@ -157,7 +157,7 @@ class Reminder extends AbstractController
 			return secretAnswerInput();
 		}
 
-		// No we're here setup the context for template number 2!
+		// No, we're here to set up the context for template number 2!
 		createToken('remind');
 		$context['sub_template'] = 'reminder_pick';
 		$context['current_member'] = [
@@ -193,7 +193,7 @@ class Reminder extends AbstractController
 			'memID' => $this->_req->getQuery('u', 'intval', -1)
 		];
 
-		// Some extra js is needed
+		// Some extra JavaScript is needed
 		loadJavascriptFile('register.js');
 
 		// Tokens!
@@ -379,7 +379,7 @@ function secretAnswerInput()
 
 	checkSession();
 
-	// Strings for the register auto javascript clever stuffy wuffy.
+	// Strings for the register auto JavaScript clever stuffy wuffy.
 	Txt::load('Login');
 
 	// Check they entered something...

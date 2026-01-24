@@ -131,7 +131,7 @@ class Stats extends AbstractController
 	}
 
 	/**
-	 * Sanitize and validate the year / month for expand / collapse stats
+	 * Sanitize and validate the year / month for the expand / collapse stats
 	 *
 	 * @return array of year and month from expand / collapse link
 	 */
@@ -192,7 +192,7 @@ class Stats extends AbstractController
 			'total_posts' => comma_format($modSettings['totalMessages']),
 			'total_topics' => comma_format($modSettings['totalTopics']),
 			'total_cats' => comma_format(numCategories()),
-			// How many users are online now.
+			// How many users are online now?
 			'users_online' => comma_format(onlineCount()),
 			'most_online' => [
 				'number' => comma_format($modSettings['mostOnline']),
@@ -213,7 +213,7 @@ class Stats extends AbstractController
 			'average_members' => comma_format(round($averages['registers'] / $total_days_up, 2)),
 			'average_posts' => comma_format(round($averages['posts'] / $total_days_up, 2)),
 			'average_topics' => comma_format(round($averages['topics'] / $total_days_up, 2)),
-			// Statistics such as number of boards, categories, etc.
+			// Statistics such as the number of boards, categories, etc.
 			'total_boards' => comma_format(countBoards('all', ['include_redirects' => false])),
 			'latest_member' => &$context['common_stats']['latest_member'],
 			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
@@ -276,7 +276,7 @@ class Stats extends AbstractController
 			// This gets rid of the filesort on the query ;).
 			krsort($context['yearly'][$year]['months']);
 
-			// Yearly stats, topics, posts, members, etc
+			// Yearly stats, topics, posts, members, etc.
 			$context['yearly'][$year]['new_topics'] = comma_format($data['new_topics']);
 			$context['yearly'][$year]['new_posts'] = comma_format($data['new_posts']);
 			$context['yearly'][$year]['new_members'] = comma_format($data['new_members']);

@@ -493,10 +493,8 @@ function resetPassword($memID, $username = null)
 		// If there are "important" errors, and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
-		foreach ($errors->prepareErrors($error_severity) as $error)
-		{
-			throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
-		}
+		$prepared_errors = $errors->prepareErrors($error_severity);
+		throw new \ElkArte\Exceptions\Exception(reset($prepared_errors), $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, ['member_name' => $user, 'passwd' => $db_hash]);

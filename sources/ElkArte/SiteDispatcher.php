@@ -385,7 +385,7 @@ class SiteDispatcher
 				&& is_subclass_of($this->_controller_name, AbstractController::class))
 			{
 				// Calling a sa directly on an abstract class? This should be dispatched by the
-				// class itself ($action->dispatch($subAction) to ensure permissions
+				// class itself e.g., $action->dispatch($subAction) to ensure permissions
 				// etc. are checked.
 				$this->_function_name = 'action_index';
 				return true;

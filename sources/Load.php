@@ -1370,9 +1370,9 @@ function determineAvatar($profile)
 		];
 	}
 	// no custom avatar found yet, maybe a default avatar?
-	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
+	elseif (!empty($modSettings['avatar_default']) && empty($profile['filename']))
 	{
-		// $settings not initialized? We can't do anything further.
+		// $settings aren't initialized? We can't do anything further.
 		if (!empty($settings))
 		{
 			if (!empty($modSettings['avatar_gravatar_enabled']) && !empty($modSettings['gravatar_as_default'])

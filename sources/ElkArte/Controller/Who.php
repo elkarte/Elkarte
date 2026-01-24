@@ -24,8 +24,8 @@ use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 
 /**
- * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home
- * tonight If you can get up and walk away"
+ * I woke up in a Soho doorway. A policeman knew my name He said, "You can go sleep at home
+ * tonight If you can get up and walk away."
  */
 class Who extends AbstractController
 {
@@ -134,7 +134,7 @@ class Who extends AbstractController
 			$conditions[] = '(COALESCE(mem.show_online, 1) = 1)';
 		}
 
-		// Fallback to top filter? Prefer a local variable instead of mutating the request.
+		// Fallback to the top filter? Prefer a local variable instead of mutating the request.
 		$show_local = null;
 		if ($this->_req->hasPost('submit_top'))
 		{
@@ -142,7 +142,7 @@ class Who extends AbstractController
 		}
 
 		// Does the user wish to apply a filter?
-		$show_param = $show_local !== null ? $show_local : $this->_req->getPost('show', 'trim|strval');
+		$show_param = $show_local ?? $this->_req->getPost('show', 'trim|strval');
 		if ($show_param !== null && isset($show_methods[$show_param]))
 		{
 			$context['show_by'] = $_SESSION['who_online_filter'] = $show_param;

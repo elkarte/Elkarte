@@ -401,22 +401,24 @@ function is_not_banned($forceCheck = false)
 
 		$db->fetchQuery('
 			SELECT 
-				bi.id_ban, bg.reason
+				bi.id_ban, bg.reason, COALESCE(bg.expire_time, 0) AS expire_time
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
 			WHERE bi.id_ban IN ({array_int:ban_list})
 				AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})
 				AND bg.cannot_access = {int:cannot_access}
-			LIMIT ' . count($bans),
+			LIMIT {int:limit}',
 			[
 				'cannot_access' => 1,
 				'ban_list' => $bans,
 				'current_time' => time(),
+				'limit' => count($bans),
 			]
 		)->fetch_callback(
 			static function ($row) {
 				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
 				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
+				$_SESSION['ban']['expire_time'] = $row['expire_time'];
 			}
 		);
 
@@ -598,7 +600,7 @@ function banPermissions()
 			$context['open_pm_reports'] = $_SESSION['rc']['pm_reports'];
 		}
 	}
-	elseif ($_SESSION['mc']['bq'] != '0=1')
+	elseif ($_SESSION['mc']['bq'] !== '0=1')
 	{
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		recountOpenReports(true, allowedTo('admin_forum'));
@@ -861,7 +863,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
-		$sprintf = [Util::htmlspecialchars($referrer_url)];
+		$sprintf = [Util::htmlspecialchars($referrer_url ?? '')];
 	}
 
 	// Everything is ok, return an empty string.
@@ -1484,7 +1486,7 @@ function spamProtection($error_type, $fatal = true)
 	);
 
 	// If affected is 0 or 2, it was there already.
-	if ($request->affected_rows() != 1)
+	if ($request->affected_rows() !== 1)
 	{
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)

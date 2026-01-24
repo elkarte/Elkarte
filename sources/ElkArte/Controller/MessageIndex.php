@@ -24,7 +24,6 @@ use ElkArte\EventManager;
 use ElkArte\FrontpageInterface;
 use ElkArte\Helper\DataValidator;
 use ElkArte\MembersList;
-use ElkArte\Themes\TemplateLayers;
 use ElkArte\TopicUtil;
 use ElkArte\User;
 
