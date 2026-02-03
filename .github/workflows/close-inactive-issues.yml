@@ -1,0 +1,27 @@
+name: Close Inactive Issues
+
+on:
+  schedule:
+    # Runs every day at 3:00 UTC — adjust if you want
+    - cron: "0 3 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          # Number of days of inactivity before labeling stale
+          days-before-stale: 30
+          # Number of days after stale label before closing
+          days-before-close: 7
+
+          # Customize comments (optional)
+          stale-issue-message: "This issue has been inactive for 30 days with no activity. It will be closed automatically if no further activity occurs."
+          close-issue-message: "Closing this issue due to inactivity. Feel free to reopen if needed."
+
+          # Only process issues (optional)
+          only-issue-types: "issues"
+          
+          # Dont close these
+          exempt-issue-labels: "bug,security,important,enhancement"
