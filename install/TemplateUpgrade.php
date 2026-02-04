@@ -702,7 +702,7 @@ function template_upgrade_options()
 				<table class="step_table">
 					<tr>
 						<td class="grid4">
-							<input type="checkbox" name="backup" id="backup" value="1"', $db_type !== 'mysql' && $db_type !== 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
+							<input type="checkbox" name="backup" id="backup" value="1"', $db_type !== 'mysql' && $db_type !== 'mysqli' && $db_type !== 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
 						<td>
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
@@ -798,7 +798,7 @@ function template_backup_database()
 	// Continue please!
 	$upcontext['continue'] = $support_js ? 2 : 1;
 
-	// If javascript allows we want to do this using XML.
+	// If JavaScript allows, we want to do this using XML.
 	if ($support_js)
 	{
 		echo '
@@ -1293,7 +1293,7 @@ function template_upgrade_complete()
 		<script>
 			function doTheDelete(theCheck)
 			{
-				let theImage = document.getElementById ? document.getElementById("delete_upgrader") : document.all.delete_upgrader;
+				let theImage = document.getElementById("delete_upgrader");
 
 				theImage.src = "', $upgradeurl, '?delete=1&ts_" + (new Date().getTime());
 				theCheck.disabled = true;
@@ -1304,7 +1304,7 @@ function template_upgrade_complete()
 
 	echo '
 		<br />
-		If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/index.php">look to us for assistance</a>.<br />
+		If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/community/index.php">look to us for assistance</a>.<br />
 		<br />
 		Best of luck,<br />
 		ElkArte';

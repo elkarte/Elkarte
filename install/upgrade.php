@@ -226,7 +226,7 @@ if (!isset($settings['default_theme_dir']))
 	$settings['default_theme_dir'] = $modSettings['theme_dir'];
 }
 
-$upcontext['page_title'] = 'Upgrading Your ElkArte Install!';
+$upcontext['page_title'] = 'Upgrading Your ElkArte Forum Software!';
 $upcontext['right_to_left'] = $txt['lang_rtl'] ?? false;
 
 // Have we got log data - if so, use it (It will be clean!)
@@ -1065,12 +1065,12 @@ function action_backupDatabase()
 	}
 
 	// Some useful stuff here.
-	$db = load_database();
+	$db_dump = db_dump();
 
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db_name = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], ['`' => '']) : false;
-	$tables = $db->db_list_tables($db_name, $filter);
+	$tables = $db_dump->list_tables($db_name, $filter);
 
 	$table_names = [];
 	foreach ($tables as $table)
@@ -1113,7 +1113,7 @@ function action_backupDatabase()
 
 			backupTable($table_names[$substep]);
 
-			// If this is XML to keep it nice for the user, do one table at a time anyway!
+			// If this is XML, to keep it nice for the user, do one table at a time anyway!
 			if (isset($_GET['xml']))
 			{
 				return upgradeExit();
@@ -1143,8 +1143,8 @@ function backupTable($table)
 {
 	global $is_debug, $db_prefix;
 
-	$db = load_database();
-	$db->db_backup_table($table, 'backup_' . $table);
+	$db = db_dump();
+	$db->backup_table($table, 'backup_' . $table);
 }
 
 /**
@@ -1250,7 +1250,7 @@ function action_databaseChanges()
 	{
 		$upcontext['changes_complete'] = true;
 
-		return false;
+		return true;
 	}
 
 	return false;
@@ -1276,19 +1276,20 @@ function action_deleteUpgrade()
 	$upcontext['sub_template'] = 'upgrade_complete';
 	$upcontext['page_title'] = 'Upgrade Complete';
 
-	$endl = '<br />' . "\n";
-
 	$changes = [
 		'language' => "'" . (str_ends_with($language, '.lng') ? substr($language, 0, -4) : $language) . "'",
 		'db_error_send' => '1',
-		'upgradeData' => '#remove#'
+		'upgradeData' => '#remove#',
+		'db_show_debug' => '0',
+		'url_type' => 'standard',
+		'install_time' => time(),
 	];
 
 	// Are we in maintenance mode?
 	if (isset($upcontext['user']['main']))
 	{
 		$upcontext['removed_maintenance'] = true;
-		$changes['maintenance'] = $upcontext['user']['main'];
+		$changes['maintenance'] = 1;
 	}
 	// Otherwise if somehow we are in 2 let's go to 1.
 	elseif (!empty($maintenance) && $maintenance == 2)
