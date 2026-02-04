@@ -12,10 +12,14 @@
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\Helper\SiteCombiner;
+use ElkArte\Helper\Util;
 use ElkArte\User;
 
-require(__DIR__ . '/installcore.php');
+require_once(__DIR__ . '/installcore.php');
+require_once(__DIR__ . '/CommonCode.php');
 
 // General options for the script.
 $timeLimitThreshold = 3;
@@ -26,7 +30,7 @@ $upgradeurl = $_SERVER['PHP_SELF'];
 $disable_security = false;
 
 // How long, in seconds, must admin be inactive to allow someone else to run?
-$upcontext['inactive_timeout'] = 15;
+$upcontext['inactive_timeout'] = 30;
 
 // This bunch of indexes necessary in the template and are set a bit too late
 $upcontext['current_item_num'] = 0;
@@ -35,18 +39,14 @@ $upcontext['current_debug_item_num'] = 0;
 $upcontext['current_debug_item_name'] = '';
 
 // All the steps in detail.
-// Number,Name,Function,Progress Weight.
+// Number, Name, Function, Progress Weight.
 $upcontext['steps'] = [
 	0 => [1, 'Login', 'action_welcomeLogin', 0],
 	1 => [2, 'Upgrade Options', 'action_upgradeOptions', 5],
 	2 => [3, 'Backup', 'action_backupDatabase', 15],
 	3 => [4, 'Database Changes', 'action_databaseChanges', 65],
-	4 => [5, 'Database Changes', 'action_deleteOldFiles', 15],
-	5 => [6, 'Delete Upgrade', 'action_deleteUpgrade', 0],
+	4 => [5, 'Delete Upgrade', 'action_deleteUpgrade', 0],
 ];
-
-// Just to remember which one has files in it.
-$upcontext['database_step'] = 3;
 
 @set_time_limit(600);
 @ini_set('mysql.connect_timeout', -1);
@@ -74,7 +74,7 @@ require_once(__DIR__ . '/LegacyCode.php');
 require_once(__DIR__ . '/ToRefactorCode.php');
 require_once(__DIR__ . '/TemplateUpgrade.php');
 
-// Prevent access to the upgrader when a installed completion lock exists
+// Prevent access to the upgrader when an installed completion lock exists
 if (file_exists(dirname(__DIR__) . '/installed.lock'))
 {
 	@header('Content-Type: text/html; charset=UTF-8');
@@ -95,6 +95,7 @@ if (PHP_SAPI === 'cli' && empty($_SERVER['REMOTE_ADDR']))
 
 // Load Settings now just because we can, globals should indicate what we want.
 global $db_type, $sourcedir, $boarddir, $boardurl, $cachedir, $language, $maintenance;
+
 require_once(TMP_BOARDDIR . '/Settings.php');
 $db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
 
@@ -115,7 +116,7 @@ if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 }
 
-// This may be an SMF install we are upgrading
+// This may be an SMF installation we are upgrading
 if (!file_exists($sourcedir . '/controllers'))
 {
 	$sourcedir = str_replace('/Sources', '/sources', $sourcedir);
@@ -245,14 +246,14 @@ if (!isset($settings['default_theme_dir']))
 	$settings['default_theme_dir'] = $modSettings['theme_dir'];
 }
 
-$upcontext['is_large_forum'] = (empty($modSettings['elkVersion']) || $modSettings['elkVersion'] <= '1.0') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 $upcontext['page_title'] = 'Upgrading Your ElkArte Install!';
 $upcontext['right_to_left'] = $txt['lang_rtl'] ?? false;
 
-// Have we got log data - if so use it (It will be clean!)
+// Have we got log data - if so, use it (It will be clean!)
 if (isset($_GET['data']))
 {
-	$upcontext['upgrade_status'] = unserialize(base64_decode($_GET['data']), ['allowed_classes' => false]);
+	global $is_debug, $support_js, $upcontext;
+	$upcontext['upgrade_status'] = json_decode(base64_decode($_GET['data']), true);
 	$upcontext['current_step'] = $upcontext['upgrade_status']['curstep'];
 	$upcontext['language'] = ucfirst(strtolower($upcontext['upgrade_status']['lang']));
 	$upcontext['rid'] = $upcontext['upgrade_status']['rid'];
@@ -272,7 +273,6 @@ else
 	$upcontext['rid'] = mt_rand(0, 5000);
 	$upcontext['upgrade_status'] = [
 		'curstep' => 0,
-		// memo: .lng files were used by YaBB SE
 		'lang' => isset($_GET['lang']) ? basename($language, '.lng') : 'English',
 		'rid' => $upcontext['rid'],
 		'pass' => 0,
@@ -282,7 +282,7 @@ else
 	$upcontext['language'] = ucfirst(strtolower($upcontext['upgrade_status']['lang']));
 }
 
-// If this isn't the first stage see whether they are logging in and resuming.
+// If this isn't the first stage, see whether they are logging in and resuming.
 if ($upcontext['current_step'] !== 0 || !empty($upcontext['user']['step']))
 {
 	checkLogin();
@@ -293,13 +293,13 @@ if ($command_line)
 	cmdStep0();
 }
 
-// Don't error if we're using xml.
+// Don't error if we're using XML.
 if (isset($_GET['xml']))
 {
 	$upcontext['return_error'] = true;
 }
 
-// Loop through all the steps doing each one as required.
+// Loop through all the steps, doing each one as required.
 $upcontext['overall_percent'] = 0;
 foreach ($upcontext['steps'] as $num => $step)
 {
@@ -318,7 +318,7 @@ foreach ($upcontext['steps'] as $num => $step)
 			break;
 		}
 
-		// Call the step, and if it returns false that means pause!
+		// Call the step, and if it returns false, that means pause!
 		if (function_exists($step[2]) && $step[2]() === false)
 		{
 			break;
@@ -350,7 +350,7 @@ function upgradeExit($fallThrough = false)
 		$upcontext['user']['step'] = $upcontext['current_step'];
 		$upcontext['user']['substep'] = $_GET['substep'];
 		$upcontext['user']['updated'] = time();
-		$upgradeData = base64_encode(serialize($upcontext['user']));
+		$upgradeData = base64_encode(json_encode($upcontext['user']));
 		copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 		changeSettings(['upgradeData' => "'" . $upgradeData . "'"]);
 		updateLastError();
@@ -368,7 +368,7 @@ function upgradeExit($fallThrough = false)
 	// We usually dump our templates out.
 	if (!$fallThrough)
 	{
-		// This should not happen my dear... HELP ME DEVELOPERS!!
+		// This should not happen, my dear... HELP ME DEVELOPERS!!
 		if (!empty($command_line))
 		{
 			if (function_exists('debug_print_backtrace'))
@@ -385,7 +385,7 @@ function upgradeExit($fallThrough = false)
 		{
 			header('Content-Type: text/xml; charset=UTF-8');
 
-			// Sadly we need to retain the $_GET data thanks to the old upgrade scripts.
+			// Sadly, we need to retain the $_GET data thanks to the old upgrade scripts.
 			$upcontext['get_data'] = [];
 			foreach ($_GET as $k => $v)
 			{
@@ -413,7 +413,7 @@ function upgradeExit($fallThrough = false)
 		if (isset($upcontext['sub_template']))
 		{
 			$upcontext['upgrade_status']['curstep'] = $upcontext['current_step'];
-			$upcontext['form_url'] = $upgradeurl . '?step=' . $upcontext['current_step'] . '&amp;substep=' . $_GET['substep'] . '&amp;data=' . base64_encode(serialize($upcontext['upgrade_status']));
+			$upcontext['form_url'] = $upgradeurl . '?step=' . $upcontext['current_step'] . '&amp;substep=' . $_GET['substep'] . '&amp;data=' . base64_encode(json_encode($upcontext['upgrade_status']));
 
 			// Custom stuff to pass back?
 			if (!empty($upcontext['query_string']))
@@ -465,7 +465,7 @@ function redirectLocation($location, $addForm = true)
 	if ($addForm)
 	{
 		$upcontext['upgrade_status']['curstep'] = $upcontext['current_step'];
-		$location = $upgradeurl . '?step=' . $upcontext['current_step'] . '&substep=' . $_GET['substep'] . '&data=' . base64_encode(serialize($upcontext['upgrade_status'])) . $location;
+		$location = $upgradeurl . '?step=' . $upcontext['current_step'] . '&substep=' . $_GET['substep'] . '&data=' . base64_encode(json_encode($upcontext['upgrade_status'])) . $location;
 	}
 
 	while (ob_get_level() > 0)
@@ -579,7 +579,7 @@ function loadEssentialData()
 }
 
 /**
- * Prepare for the install, set up which set we are on, etc
+ * Prepare for the installation, set up which set we are on, etc.
  */
 function initialize_inputs()
 {
@@ -622,11 +622,11 @@ function initialize_inputs()
 
 /**
  * Step 0
- * Let's welcome them in and ask them to login!
+ * Let's welcome them in and ask them to log in!
  * Preforms several checks to make sure the appropriate files are available to do the updates
  * Validates php and db versions meet the minimum requirements
  * Validates the credentials supplied have db alter privileges
- * Checks that needed files/directories are writable
+ * Checks that necessary files/directories are writable
  */
 function action_welcomeLogin()
 {
@@ -636,7 +636,7 @@ function action_welcomeLogin()
 
 	$upcontext['sub_template'] = 'welcome_message';
 
-	// Check for some key files - one template, one language, and a new and an old source file.
+	// Check for some key files
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/ElkArte/Database/' . ucfirst(strtolower($db_type)) . '/Connection.php')
@@ -674,7 +674,7 @@ function action_welcomeLogin()
 	// just like teachers don't tell which problems they are spot checking, that's dumb.
 	if (!$check)
 	{
-		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
+		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all the files included in the package, including the themes, sources, and other directories.');
 	}
 
 	if (!db_version_check())
@@ -685,7 +685,7 @@ function action_welcomeLogin()
 	// Do they have ALTER privileges?
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) == false)
 	{
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 	}
@@ -788,71 +788,33 @@ function checkLogin()
 	// Login checks require hard database work :P
 	$db = load_database();
 
-	// Are we trying to login?
+	// Are we trying to log in?
 	if (isset($_POST['contbutt']) && (!empty($_POST['user']) || $disable_security))
 	{
-		// If we've disabled security pick a suitable name!
+		// If we've disabled security, pick a suitable name!
 		if (empty($_POST['user']))
 		{
 			$_POST['user'] = 'Administrator';
 		}
 
-		// Before SMF 2.0 these column names were different!
-		$oldDB = false;
-		if (empty($db_type) || $db_type === 'mysql')
-		{
-			$db->skip_next_error();
-			$request = $db->query('', '
-				SHOW COLUMNS
-				FROM {db_prefix}members
-				LIKE {string:member_name}',
-				[
-					'member_name' => 'memberName',
-				]
-			);
-			if ($request->num_rows() !== 0)
-			{
-				$oldDB = true;
-			}
-
-			$request->free_result();
-		}
-
 		// Get what we believe to be their details.
 		if (!$disable_security)
 		{
-			$db->skip_next_error();
-			if ($oldDB)
-			{
-				$request = $db->query('', '
-					SELECT 
-						id_member, memberName AS member_name, passwd, id_group,
-						additionalGroups AS additional_groups, lngfile
-					FROM {db_prefix}members
-					WHERE memberName = {string:member_name}',
-					[
-						'member_name' => $_POST['user'],
-					]
-				);
-			}
-			else
-			{
-				$request = $db->query('', '
-					SELECT 
-						id_member, member_name, passwd, id_group, additional_groups, lngfile
-					FROM {db_prefix}members
-					WHERE member_name = {string:member_name}',
-					[
-						'member_name' => $_POST['user'],
-					]
-				);
-			}
+			$request = $db->query('', '
+				SELECT 
+					id_member, member_name, passwd, id_group, additional_groups, lngfile
+				FROM {db_prefix}members
+				WHERE member_name = {string:member_name}',
+				[
+					'member_name' => $_POST['user'],
+				]
+			);
 
 			if ($request->num_rows() !== 0)
 			{
 				[$id_member, $name, $password, $id_group, $addGroups, $user_language] = $request->fetch_row();
 
-				// These will come in handy, if you want to login
+				// These will come in handy if you want to log in
 				require_once(SOURCEDIR . '/Security.php');
 				require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -864,42 +826,18 @@ function checkLogin()
 				}
 
 				// Figure out if the password is using our encryption - if what they typed is right.
-				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) === 64)
-				{
-					validateToken('login');
+				// validateLoginPassword will convert this to an SHA-256 pw and check it
+				$sha_passwd = $_POST['passwrd'];
+				$valid_password = validateLoginPassword($sha_passwd, $password, $_POST['user']);
 
-					$valid_password = validateLoginPassword($_REQUEST['hash_passwrd'], $password);
-
-					// Challenge passed.
-					if ($valid_password)
-					{
-						$sha_passwd = $_REQUEST['hash_passwrd'];
-						$valid_password = true;
-					}
-					// Needs upgrading if the db string is an actual 40 hexchar SHA-1
-					elseif (preg_match('/^[0-9a-f]{40}$/i', $password))
-					{
-						// Might Need to update so we will need to ask for the password again.
-						$upcontext['disable_login_hashing'] = true;
-						$upcontext['login_hash_error'] = true;
-					}
-				}
-				// Maybe a plain text password was used this time
-				else
-				{
-					// validateLoginPassword will convert this to a SHA-256 pw and check it
-					$sha_passwd = $_POST['passwrd'];
-					$valid_password = validateLoginPassword($sha_passwd, $password, $_POST['user']);
-				}
-
-				// Password still not working?
+				// Is the password still not working?
 				if ($valid_password === false && !empty($_POST['passwrd']))
 				{
 					// SHA-1 from SMF?
 					$sha_passwd = sha1(Util::strtolower($_POST['user']) . $_POST['passwrd']);
 					$valid_password = $sha_passwd === $password;
 
-					// Lets upgrade this to our new password
+					// Let's upgrade this to our new password
 					if ($valid_password)
 					{
 						$password = validateLoginPassword($_POST['passwrd'], '', $_POST['user'], true);
@@ -922,7 +860,7 @@ function checkLogin()
 
 		$upcontext['username'] = $_POST['user'];
 
-		// Track whether javascript works!
+		// Track whether JavaScript works!
 		if (!empty($_POST['js_works']))
 		{
 			$upcontext['upgrade_status']['js'] = 1;
@@ -947,9 +885,6 @@ function checkLogin()
 			if ($md5pass !== $password)
 			{
 				$upcontext['password_failed'] = true;
-
-				// Disable the hashing this time.
-				$upcontext['disable_login_hashing'] = true;
 			}
 		}
 
@@ -1021,7 +956,7 @@ function checkLogin()
 				}
 			}
 
-			// If we're resuming set the step and substep to be correct.
+			// If we're resuming, set the step and substep to be correct.
 			if (isset($_POST['cont']))
 			{
 				$upcontext['current_step'] = $upcontext['user']['step'];
@@ -1045,7 +980,7 @@ function action_upgradeOptions()
 	$upcontext['sub_template'] = 'upgrade_options';
 	$upcontext['page_title'] = 'Upgrade Options';
 
-	// If we've not submitted then we're done.
+	// If we've not submitted, then we're done.
 	if (empty($_POST['upcont']))
 	{
 		return false;
@@ -1054,7 +989,7 @@ function action_upgradeOptions()
 	// Get hold of our db
 	$db = load_database();
 
-	// No one opts in so why collect incomplete stats
+	// No one opts in, so why collect incomplete stats
 	$db->skip_next_error();
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
@@ -1064,7 +999,7 @@ function action_upgradeOptions()
 		]
 	);
 
-	// Cleanup all the hooks (we are upgrading, so better have everything cleaned up)
+	// Clean up all the hooks (we are upgrading, so better have everything cleaned up)
 	$db->skip_next_error();
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
@@ -1085,7 +1020,7 @@ function action_upgradeOptions()
 
 	$changes = [];
 
-	// If we're overriding the language follow it through.
+	// If we're overriding the language, follow it through.
 	if (isset($_GET['lang']) && file_exists(BOARDDIR . '/sources/ElkArte/Languages/Index/' . ucfirst(strtolower($_GET['lang'])) . '.php'))
 	{
 		$changes['language'] = "'" . $_GET['lang'] . "'";
@@ -1117,7 +1052,7 @@ function action_upgradeOptions()
 		echo ' * Updating Settings.php...';
 	}
 
-	// Backup the current one first.
+	// Back up the current one first.
 	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 	// Fix some old paths.
@@ -1157,13 +1092,13 @@ function action_upgradeOptions()
 		$is_debug = true;
 	}
 
-	// If we're not backing up then jump past that step.
+	// If we're not backing up, then jump past that step.
 	if (empty($_POST['backup']))
 	{
 		$upcontext['current_step']++;
 	}
 
-	// If we've got here then let's proceed to the next step!
+	// If we've got here, then let's proceed to the next step!
 	return true;
 }
 
@@ -1222,7 +1157,7 @@ function action_backupDatabase()
 		echo 'Backing Up Tables.';
 	}
 
-	// If we don't support javascript we backup here.
+	// If we don't support JavaScript, we backup here.
 	if (!$support_js || isset($_GET['xml']))
 	{
 		// Backup each table!
@@ -1237,7 +1172,7 @@ function action_backupDatabase()
 
 			backupTable($table_names[$substep]);
 
-			// If this is XML to keep it nice for the user do one table at a time anyway!
+			// If this is XML to keep it nice for the user, do one table at a time anyway!
 			if (isset($_GET['xml']))
 			{
 				return upgradeExit();
@@ -1348,8 +1283,8 @@ function action_databaseChanges()
 			continue;
 		}
 
-		// @todo Do we actually need to do this still?
-		if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) <= 0))
+		if (file_exists(__DIR__ . '/' . $file[0])
+			&& (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) <= 0))
 		{
 			$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
 			if ($nextFile)
@@ -1365,7 +1300,7 @@ function action_databaseChanges()
 				$modSettings['elkVersion'] = $file[2];
 			}
 
-			// If this is XML we only do this stuff once.
+			// If this is XML, we only do this stuff once.
 			if (isset($_GET['xml']))
 			{
 				// Flag to move on to the next.
@@ -1403,7 +1338,7 @@ function action_databaseChanges()
 			return action_deleteUpgrade();
 		}
 
-		return true;
+		return false;
 	}
 
 	return false;
@@ -1414,11 +1349,11 @@ function action_databaseChanges()
  * Finalizes the upgrade
  * Updates maintenance mode to what it was before the upgrade started
  * Updates settings.php, sometimes even correctly
- * Flushes the cache so there is a clean start
+ * Flushes the cache, so there is a clean start
  */
 function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $user_info, $maintenance, $modSettings;
+	global $command_line, $language, $upcontext, $user_info, $maintenance, $boardurl;
 
 	// Now it's nice to have some basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -1462,7 +1397,15 @@ function action_deleteUpgrade()
 	changeSettings($changes);
 
 	// Clean any old cache files away.
-	clean_cache();
+	Cache::instance()->clean();
+	$CACHEDIR_temp = defined('CACHEDIR') ? CACHEDIR : BOARDDIR . '/cache';
+	if (!defined('CACHE_STALE'))
+	{
+		define('CACHE_STALE', '?R200');
+	}
+	$combiner = new SiteCombiner($CACHEDIR_temp, $boardurl . '/cache');
+	$combiner->removeCssHives();
+	$combiner->removeJsHives();
 
 	// Create a bootstrap completion lock to prevent accidental upgrader/installer exposure post-upgrade.
 	$lock_file = dirname(__DIR__) . '/installed.lock';
@@ -1512,11 +1455,47 @@ function action_deleteUpgrade()
 	// Drop old check for MySQL 5.0.50 and 5.0.51 bug.
 	removeSettings('db_mysql_group_by_fix');
 
-	// Set jquery to auto, if it's not already set
-	if (!isset($modSettings['jquery_source']))
-	{
-		updateSettings(['jquery_source' => 'auto']);
-	}
+	// Set jquery to auto, and theme to default.
+	updateSettings(['jquery_source' => 'auto', 'theme_guests' => '1', 'theme_allow' => '1', 'knownThemes' => '1']);
+
+	// Custom themes may cause errors, so we set everyone to the default theme.
+	$db = load_database();
+	$db->query('', '
+		UPDATE {db_prefix}members
+		SET id_theme = {int:default_theme}',
+		[
+			'default_theme' => 0,
+		]
+	);
+
+	$db->query('', '
+		UPDATE {db_prefix}boards
+		SET id_theme = {int:default_theme}',
+		[
+			'default_theme' => 0,
+		]
+	);
+
+	// Lastly, reset the default theme paths.
+	$db->query('', '
+		UPDATE {db_prefix}themes
+		SET value = CASE 
+			WHEN variable = {string:theme_url} THEN {string:theme_url_val}
+			WHEN variable = {string:theme_dir} THEN {string:theme_dir_val}
+			WHEN variable = {string:images_url} THEN {string:images_url_val}
+		END
+		WHERE id_theme = {int:id_theme}
+			AND variable IN ({string:theme_url}, {string:theme_dir}, {string:images_url})',
+		[
+			'id_theme' => 1,
+			'theme_url' => 'theme_url',
+			'theme_dir' => 'theme_dir',
+			'images_url' => 'images_url',
+			'theme_url_val' => $boardurl . '/themes/default',
+			'theme_dir_val' => BOARDDIR . '/themes/default',
+			'images_url_val' => $boardurl . '/themes/default/images',
+		]
+	);
 
 	if ($command_line)
 	{
@@ -1555,11 +1534,9 @@ function changeSettings($config_vars)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
 	}
 
-	$save_vars = [];
-	foreach ($config_vars as $key => $var)
-	{
-		$save_vars[$key] = trim($var, "'");
-	}
+	$save_vars = array_map(static function ($var) {
+		return trim($var, "'");
+	}, $config_vars);
 
 	saveFileSettings($save_vars, $settingsArray);
 }
@@ -1591,7 +1568,7 @@ function getMemberGroups()
 		]
 	);
 
-	if ($request === false)
+	if ($request == false)
 	{
 		$db->skip_next_error();
 		$request = $db->query('', '
@@ -1632,8 +1609,7 @@ function fixRelativePath($path)
  */
 function parse_sql($filename)
 {
-	global $db_prefix, $boardurl, $command_line, $file_steps, $step_progress;
-	global $upcontext, $support_js, $is_debug;
+	global $db_prefix, $boardurl, $command_line, $file_steps, $step_progress, $upcontext, $support_js, $is_debug;
 
 	$replaces = [
 		'{$db_prefix}' => $db_prefix,
@@ -1669,7 +1645,7 @@ function parse_sql($filename)
 	$upcontext['current_debug_item_num'] = 0;
 	$upcontext['current_debug_item_name'] = '';
 
-	// This array keeps a record of what we've done in case javascript is dead...
+	// This array keeps a record of what we've done in case JavaScript is dead...
 	$upcontext['actioned_items'] = [];
 
 	$done_something = false;
@@ -1725,7 +1701,7 @@ function parse_sql($filename)
 			{
 				$done_something = true;
 
-				// nextSubstep calls upgradeExit that terminates the execution if necessary.
+				// the nextSubstep calls upgradeExit that terminates the execution if necessary.
 				nextSubstep(++$substep);
 			}
 			else
@@ -1743,7 +1719,7 @@ function parse_sql($filename)
 			}
 		}
 
-		// If this is xml based, and we're just getting the item name then that's grand.
+		// If this is XML based, and we're just getting the item name, then that's grand.
 		if ($support_js && !isset($_GET['xml']) && $upcontext['current_debug_item_name'] !== '' && $do_current)
 		{
 			restore_error_handler();
@@ -1830,7 +1806,7 @@ function nextSubstep($substep)
 		$upcontext['substep_progress'] = round($upcontext['substep_progress'], 1);
 	}
 
-	// If this is XML we just exit right away!
+	// If this is XML, we just exit right away!
 	if (isset($_GET['xml']))
 	{
 		return upgradeExit();
@@ -1875,7 +1851,7 @@ function nextSubstep($substep)
  * Preforms several checks to make sure the appropriate files are available to do the updates
  * Validates php and db versions meet the minimum requirements
  * Validates the credentials supplied have db alter privileges
- * Checks that needed files/directories are writable
+ * Checks that necessary files/directories are writable
  */
 function cmdStep0()
 {
@@ -1943,7 +1919,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) == false)
 	{
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 	}
@@ -1997,7 +1973,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		fclose($fp);
 	}
 
-	// Make sure themes is writable.
+	// Make sure themes are writable.
 	if (!is_writable($modSettings['theme_dir']))
 	{
 		@chmod($modSettings['theme_dir'], 0777);
@@ -2008,7 +1984,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		print_error('Error: Unable to obtain write access to "themes".');
 	}
 
-	// Make sure cache directory exists and is writable!
+	// Make sure the cache directory exists and is writable!
 	$CACHEDIR_temp = defined('CACHEDIR') ? CACHEDIR : BOARDDIR . '/cache';
 	if (!file_exists($CACHEDIR_temp)
 		&& !mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
@@ -2199,7 +2175,8 @@ function discoverCollation()
 
 	$db_collation = '';
 
-	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
+	// If we're on MySQL supporting collations, then let's find out what the members table uses and put it in
+	// a global var - to allow the upgrade script to match collations!
 	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
 	{
 		$db = load_database();
