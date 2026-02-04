@@ -156,7 +156,7 @@ class TestDatabase extends TestCase
 			'boards' => 1,
 			'calendar_holidays' => 98,
 			'categories' => 1,
-			'custom_fields' => 8,
+			'custom_fields' => 7,
 			'membergroups' => 8,
 			'message_icons' => 13,
 			'messages' => 1,

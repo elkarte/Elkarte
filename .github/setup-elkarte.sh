@@ -28,6 +28,7 @@ composer install --no-interaction
 if [[ "$WEBSERVER" != "none" ]]
 then
 	composer remove phpunit/phpunit phpunit/phpunit-selenium --dev
+	composer config audit.ignore PKSA-z3gr-8qht-p93v
 	composer require phpunit/phpunit:9.3.11 phpunit/phpunit-selenium:9.0.1 --dev --update-with-all-dependencies --ignore-platform-reqs
 fi
 
