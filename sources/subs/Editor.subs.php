@@ -459,7 +459,7 @@ function loadEditorSmileys($editorOptions)
 			$smileys = $temp;
 		}
 
-		// The smiley popup may take advantage of Jquery UI ....
+		// The smiley popup may take advantage of Jquery UI
 		if (!empty($smileys['popup']))
 		{
 			$modSettings['jquery_include_ui'] = true;
