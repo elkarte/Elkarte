@@ -184,7 +184,7 @@
 	--gradient_bar_background: #333333; /* Lighter compliment color when needed */
 	--status_bar_border: #A9CCD1; /* Status bar in attachment upload progress */
 	--status_bar_background: #232323; /* Status bar in attachment upload progress */
-	--progress_bar_blue: #0000FF; /* Blue progress bar, as in maintenance */
+	--progress_bar_primary: #0000FF; /* Blue progress bar, as in maintenance */
 
 	/* Calendar Items */
 	--birthday: #B73DE8; /* Birthday color on calendar */
@@ -1967,7 +1967,7 @@ ul.cf_icons {
 
 .progress_bar > .blue_percent {
 	color: var(--contrast_text);
-	background: var(--progress_bar_blue);
+	background: var(--progress_bar_primary);
 }
 
 /* -------------------------------------------------------

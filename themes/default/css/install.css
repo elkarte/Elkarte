@@ -150,7 +150,7 @@ h1.forumtitle {
 }
 
 #step_progress {
-	background: var(--progress_bar_blue);
+	background: var(--progress_bar_primary);
 }
 
 #substep_progress {
