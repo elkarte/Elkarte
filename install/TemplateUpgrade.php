@@ -793,7 +793,7 @@ function template_backup_database()
 					Current Table: &quot;<span id="current_table">', $upcontext['cur_table_name'], '</span>&quot;
 				</h3>
 				<br />
-				<span id="commess" class="', $upcontext['cur_table_num'] == $upcontext['table_count'] ? '' : 'hide', ';">Backup Complete! Click Continue to Proceed.</span>';
+				<span id="commess" class="', ($upcontext['cur_table_num'] == $upcontext['table_count'] ? '' : 'hide'), '">Backup Complete! Click Continue to Proceed.</span>';
 
 	// Continue please!
 	$upcontext['continue'] = $support_js ? 2 : 1;

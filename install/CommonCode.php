@@ -246,7 +246,8 @@ function saveFileSettings($config_vars, $settingsArray)
 		// Update as requested
 		foreach ($config_vars as $var => $val)
 		{
-			if (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) === 0)
+			if (isset($settingsArray[$i]) &&
+				strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) === 0)
 			{
 				if ($val === '#remove#')
 				{

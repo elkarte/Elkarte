@@ -1279,10 +1279,10 @@ function action_deleteUpgrade()
 	$changes = [
 		'language' => "'" . (str_ends_with($language, '.lng') ? substr($language, 0, -4) : $language) . "'",
 		'db_error_send' => '1',
-		'upgradeData' => '#remove#',
 		'db_show_debug' => '0',
-		'url_type' => 'standard',
+		'url_format' => 'standard',
 		'install_time' => time(),
+		'upgradeData' => '#remove#',
 	];
 
 	// Are we in maintenance mode?
