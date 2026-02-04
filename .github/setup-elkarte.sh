@@ -21,7 +21,7 @@ fi
 
 # Phpunit and support
 # composer config --file=composer2.json && composer install --no-interaction --quiet
-composer install --no-interaction --quiet
+composer install --no-interaction
 
 # phpunit-selenium is compatible with phpunit 9.3.x, past that it runs all methods not just test methods
 # This combination allows tests to run, but code coverage fails unless we use our version of RemoteCoverage.php
