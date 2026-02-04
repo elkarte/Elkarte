@@ -279,6 +279,10 @@ class Table extends AbstractTable
 				'tinytext' => 'character varying',
 				'mediumtext' => 'text',
 				'largetext' => 'text',
+				'inet' => 'inet',
+				'time' => 'time without time zone',
+				'datetime' => 'timestamp without time zone',
+				'timestamp' => 'timestamp without time zone',
 			];
 		}
 		else
@@ -287,6 +291,10 @@ class Table extends AbstractTable
 				'character varying' => 'varchar',
 				'character' => 'char',
 				'integer' => 'int',
+				'inet' => 'inet',
+				'time without time zone' => 'time',
+				'timestamp without time zone' => 'datetime',
+				'numeric' => 'decimal',
 			];
 		}
 
@@ -622,7 +630,7 @@ class Table extends AbstractTable
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$request = $this->_db->fetchQuery('
-			VACUUM ANALYZE {raw:table}',
+			VACUUM FULL ANALYZE {raw:table}',
 			[
 				'table' => $table,
 			]
