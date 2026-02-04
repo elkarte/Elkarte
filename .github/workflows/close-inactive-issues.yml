@@ -19,9 +19,6 @@ jobs:
           # Customize comments (optional)
           stale-issue-message: "This issue has been inactive for 30 days with no activity. It will be closed automatically if no further activity occurs."
           close-issue-message: "Closing this issue due to inactivity. Feel free to reopen if needed."
-
-          # Only process issues (optional)
-          only-issue-types: "issues"
-          
+      
           # Dont close these
           exempt-issue-labels: "bug,security,important,enhancement"
