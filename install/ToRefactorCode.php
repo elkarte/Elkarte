@@ -17,9 +17,9 @@
  *
  * @param string $change
  * @param int $substep
- * @param boolean $is_test
+ * @param bool $is_test
  *
- * @return boolean
+ * @return bool
  */
 function protected_alter($change, $substep, $is_test = false)
 {
