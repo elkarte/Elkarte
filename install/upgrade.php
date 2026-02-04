@@ -53,18 +53,6 @@ $upcontext['steps'] = [
 @ini_set('default_socket_timeout', 900);
 @ini_set('memory_limit', '256M');
 
-// Clean the upgrade path if this is from the client.
-if (PHP_SAPI === 'cli' && !empty($_SERVER['argv']) && empty($_SERVER['REMOTE_ADDR']))
-{
-	for ($i = 1; $i < $_SERVER['argc']; $i++)
-	{
-		if (preg_match('~^--path=(.+)$~', $_SERVER['argv'][$i], $match) === 1)
-		{
-			$upgrade_path = str_ends_with($match[1], '/') ? substr($match[1], 0, -1) : $match[1];
-		}
-	}
-}
-
 define('TMP_BOARDDIR', $upgrade_path);
 
 // Call in our support staff
@@ -83,14 +71,6 @@ if (file_exists(dirname(__DIR__) . '/installed.lock'))
 	echo '<p>The upgrader is disabled because a install completion lock was found. If you need to run the upgrader, remove the file <code>installed.lock</code> from the forum root.</p>';
 	echo '</body></html>';
 	die;
-}
-
-// Are we from the client?
-$command_line = false;
-if (PHP_SAPI === 'cli' && empty($_SERVER['REMOTE_ADDR']))
-{
-	$command_line = true;
-	$disable_security = 1;
 }
 
 // Load Settings now just because we can, globals should indicate what we want.
@@ -288,11 +268,6 @@ if ($upcontext['current_step'] !== 0 || !empty($upcontext['user']['step']))
 	checkLogin();
 }
 
-if ($command_line)
-{
-	cmdStep0();
-}
-
 // Don't error if we're using XML.
 if (isset($_GET['xml']))
 {
@@ -342,7 +317,7 @@ upgradeExit();
  */
 function upgradeExit($fallThrough = false)
 {
-	global $upcontext, $upgradeurl, $command_line;
+	global $upcontext, $upgradeurl;
 
 	// Save where we are...
 	if (!empty($upcontext['current_step']) && !empty($upcontext['user']['id']))
@@ -368,19 +343,6 @@ function upgradeExit($fallThrough = false)
 	// We usually dump our templates out.
 	if (!$fallThrough)
 	{
-		// This should not happen, my dear... HELP ME DEVELOPERS!!
-		if (!empty($command_line))
-		{
-			if (function_exists('debug_print_backtrace'))
-			{
-				debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-			}
-
-			echo "\n" . 'Error: Unexpected call to use the ' . ($upcontext['sub_template'] ?? '') . " template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they've made a doh!; they'll get you up and running again.";
-			flush();
-			die();
-		}
-
 		if (isset($_GET['xml']))
 		{
 			header('Content-Type: text/xml; charset=UTF-8');
@@ -453,13 +415,7 @@ function upgradeExit($fallThrough = false)
  */
 function redirectLocation($location, $addForm = true)
 {
-	global $upgradeurl, $upcontext, $command_line;
-
-	// Command line users can't be redirected.
-	if ($command_line)
-	{
-		upgradeExit(true);
-	}
+	global $upgradeurl, $upcontext;
 
 	// Are we providing the core info?
 	if ($addForm)
@@ -975,7 +931,7 @@ function checkLogin()
  */
 function action_upgradeOptions()
 {
-	global $command_line, $is_debug, $maintenance, $upcontext, $db_type;
+	global $is_debug, $maintenance, $upcontext, $db_type;
 
 	$upcontext['sub_template'] = 'upgrade_options';
 	$upcontext['page_title'] = 'Upgrade Options';
@@ -1047,11 +1003,6 @@ function action_upgradeOptions()
 		}
 	}
 
-	if ($command_line)
-	{
-		echo ' * Updating Settings.php...';
-	}
-
 	// Back up the current one first.
 	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
@@ -1080,11 +1031,6 @@ function action_upgradeOptions()
 	// Update Settings.php with the new settings.
 	changeSettings($changes);
 
-	if ($command_line)
-	{
-		echo ' Successful.' . "\n";
-	}
-
 	// Are we doing debug?
 	if (isset($_POST['debug']))
 	{
@@ -1107,7 +1053,7 @@ function action_upgradeOptions()
  */
 function action_backupDatabase()
 {
-	global $upcontext, $db_prefix, $command_line, $is_debug, $support_js, $file_steps;
+	global $upcontext, $db_prefix, $is_debug, $support_js, $file_steps;
 
 	$upcontext['sub_template'] = isset($_GET['xml']) ? 'backup_xml' : 'backup_database';
 	$upcontext['page_title'] = 'Backup Database';
@@ -1152,11 +1098,6 @@ function action_backupDatabase()
 		}
 	}
 
-	if ($command_line)
-	{
-		echo 'Backing Up Tables.';
-	}
-
 	// If we don't support JavaScript, we backup here.
 	if (!$support_js || isset($_GET['xml']))
 	{
@@ -1177,12 +1118,6 @@ function action_backupDatabase()
 			{
 				return upgradeExit();
 			}
-		}
-
-		if ($is_debug && $command_line)
-		{
-			echo "\n" . " Successful.'" . "\n";
-			flush();
 		}
 
 		$upcontext['step_progress'] = 100;
@@ -1206,27 +1141,10 @@ function action_backupDatabase()
  */
 function backupTable($table)
 {
-	global $is_debug, $command_line, $db_prefix;
-
-	if ($is_debug && $command_line)
-	{
-		echo "\n" . ' +++ Backing up \"' . str_replace($db_prefix, '', $table) . '"...';
-		flush();
-	}
+	global $is_debug, $db_prefix;
 
 	$db = load_database();
 	$db->db_backup_table($table, 'backup_' . $table);
-	if (!$is_debug)
-	{
-		return;
-	}
-
-	if (!$command_line)
-	{
-		return;
-	}
-
-	echo ' done.';
 }
 
 /**
@@ -1234,7 +1152,7 @@ function backupTable($table)
  */
 function action_databaseChanges()
 {
-	global $modSettings, $command_line, $upcontext, $support_js;
+	global $modSettings, $upcontext, $support_js;
 
 	$db = load_database();
 
@@ -1332,12 +1250,6 @@ function action_databaseChanges()
 	{
 		$upcontext['changes_complete'] = true;
 
-		// If this is the command line we can't do anymore.
-		if ($command_line)
-		{
-			return action_deleteUpgrade();
-		}
-
 		return false;
 	}
 
@@ -1353,10 +1265,10 @@ function action_databaseChanges()
  */
 function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $user_info, $maintenance, $boardurl;
+	global $language, $upcontext, $user_info, $maintenance, $boardurl;
 
 	// Now it's nice to have some basic source files.
-	if (!isset($_GET['ssi']) && !$command_line)
+	if (!isset($_GET['ssi']))
 	{
 		redirectLocation('&ssi=1');
 	}
@@ -1364,7 +1276,7 @@ function action_deleteUpgrade()
 	$upcontext['sub_template'] = 'upgrade_complete';
 	$upcontext['page_title'] = 'Upgrade Complete';
 
-	$endl = $command_line ? "\n" : '<br />' . "\n";
+	$endl = '<br />' . "\n";
 
 	$changes = [
 		'language' => "'" . (str_ends_with($language, '.lng') ? substr($language, 0, -4) : $language) . "'",
@@ -1375,11 +1287,6 @@ function action_deleteUpgrade()
 	// Are we in maintenance mode?
 	if (isset($upcontext['user']['main']))
 	{
-		if ($command_line)
-		{
-			echo ' * ';
-		}
-
 		$upcontext['removed_maintenance'] = true;
 		$changes['maintenance'] = $upcontext['user']['main'];
 	}
@@ -1414,14 +1321,7 @@ function action_deleteUpgrade()
 	if (!$lock_written)
 	{
 		$warn = 'Unable to create installed.lock at ' . htmlspecialchars($lock_file) . '. Please create this file manually with contents like: ' . htmlspecialchars(str_replace("\n", ' | ', $lock_contents));
-		if ($command_line)
-		{
-			echo $warn, $endl;
-		}
-		else
-		{
-			$upcontext['warning'] = empty($upcontext['warning']) ? $warn : ($upcontext['warning'] . '<br />' . $warn);
-		}
+		$upcontext['warning'] = empty($upcontext['warning']) ? $warn : ($upcontext['warning'] . '<br />' . $warn);
 	}
 
 	// Can we delete the file?
@@ -1436,7 +1336,7 @@ function action_deleteUpgrade()
 	// We need to log in the database
 	$db = load_database();
 
-	// Log the action manually, so CLI still works.
+	// Log the action manually.
 	$db->insert('',
 		'{db_prefix}log_actions',
 		[
@@ -1444,7 +1344,7 @@ function action_deleteUpgrade()
 			'id_board' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'extra' => 'string-65534',
 		],
 		[
-			time(), 3, $user_info['id'], $command_line ? '127.0.0.1' : $user_info['ip'], 'upgrade',
+			time(), 3, $user_info['id'], $user_info['ip'], 'upgrade',
 			0, 0, 0, serialize(['version' => CURRENT_VERSION, 'member' => $user_info['id']]),
 		],
 		['id_action']
@@ -1496,14 +1396,6 @@ function action_deleteUpgrade()
 			'images_url_val' => $boardurl . '/themes/default/images',
 		]
 	);
-
-	if ($command_line)
-	{
-		echo $endl;
-		echo 'Upgrade Complete!', $endl;
-		echo 'Please delete this file as soon as possible for security reasons.', $endl;
-		exit;
-	}
 
 	// Make sure it says we're done.
 	$upcontext['overall_percent'] = 100;
@@ -1609,7 +1501,7 @@ function fixRelativePath($path)
  */
 function parse_sql($filename)
 {
-	global $db_prefix, $boardurl, $command_line, $file_steps, $step_progress, $upcontext, $support_js, $is_debug;
+	global $db_prefix, $boardurl, $file_steps, $step_progress, $upcontext, $support_js, $is_debug;
 
 	$replaces = [
 		'{$db_prefix}' => $db_prefix,
@@ -1625,7 +1517,7 @@ function parse_sql($filename)
 	// Make our own error handler.
 	set_error_handler('sql_error_handler');
 
-	$endl = $command_line ? "\n" : '<br />' . "\n";
+	$endl = '<br />' . "\n";
 	require_once($filename);
 
 	$class_name = 'UpgradeInstructions_' . str_replace('-', '_', basename($filename, '.php'));
@@ -1655,7 +1547,7 @@ function parse_sql($filename)
 		$do_current = $substep >= $_GET['substep'];
 
 		// Always flush.  Flush, flush, flush.  Flush, flush, flush, flush!  FLUSH!
-		if ($is_debug && !$support_js && $command_line)
+		if ($is_debug && !$support_js)
 		{
 			flush();
 		}
@@ -1667,10 +1559,6 @@ function parse_sql($filename)
 		if ($do_current)
 		{
 			$upcontext['actioned_items'][] = $title;
-			if ($command_line)
-			{
-				echo ' * ';
-			}
 		}
 
 		// Each method returns an array of actions
@@ -1689,11 +1577,6 @@ function parse_sql($filename)
 				return $upcontext['current_debug_item_num'] >= $upcontext['debug_items'];
 			}
 
-			if ($command_line)
-			{
-				echo ' +++ ' . $upcontext['current_debug_item_name'];
-			}
-
 			$action['function']();
 
 			// Small step - only if we're actually doing stuff.
@@ -1709,11 +1592,7 @@ function parse_sql($filename)
 				$substep++;
 			}
 
-			if ($command_line)
-			{
-				echo ' done.' . $endl;
-			}
-			elseif ($is_debug)
+			if ($is_debug)
 			{
 				$upcontext['actioned_items'][] = $upcontext['current_debug_item_name'];
 			}
@@ -1727,24 +1606,12 @@ function parse_sql($filename)
 			return false;
 		}
 
-		if (!$support_js && $do_current && $_GET['substep'] != 0 && $command_line)
-		{
-			echo ' Successful.', $endl;
-			flush();
-		}
-
 		// Clean up by cleaning any step info.
 		$step_progress = [];
 	}
 
 	// Put back the error handler.
 	restore_error_handler();
-
-	if ($command_line)
-	{
-		echo ' Successful.' . "\n";
-		flush();
-	}
 
 	$_GET['substep'] = 0;
 
@@ -1758,23 +1625,12 @@ function parse_sql($filename)
  */
 function nextSubstep($substep)
 {
-	global $start_time, $timeLimitThreshold, $command_line, $custom_warning;
+	global $start_time, $timeLimitThreshold, $custom_warning;
 	global $step_progress, $is_debug, $upcontext;
 
 	if ($_GET['substep'] < $substep)
 	{
 		$_GET['substep'] = $substep;
-	}
-
-	if ($command_line)
-	{
-		if (time() - $start_time > 1 && empty($is_debug))
-		{
-			echo '.';
-			$start_time = time();
-		}
-
-		return;
 	}
 
 	@set_time_limit(300);
@@ -1845,220 +1701,6 @@ function nextSubstep($substep)
 	upgradeExit();
 }
 
-/**
- * Step 0 if running from the CLI
- *
- * Preforms several checks to make sure the appropriate files are available to do the updates
- * Validates php and db versions meet the minimum requirements
- * Validates the credentials supplied have db alter privileges
- * Checks that necessary files/directories are writable
- */
-function cmdStep0()
-{
-	global $modSettings, $start_time, $databases, $db_type, $upcontext, $is_debug;
-
-	$start_time = time();
-
-	@ob_end_clean();
-	ob_implicit_flush();
-	@set_time_limit(600);
-
-	if (!isset($_SERVER['argv']))
-	{
-		$_SERVER['argv'] = [];
-	}
-
-	$_GET['maint'] = 1;
-
-	foreach ($_SERVER['argv'] as $i => $arg)
-	{
-		if (preg_match('~^--language=(.+)$~', $arg, $match) != 0)
-		{
-			$_GET['lang'] = $match[1];
-		}
-		elseif (preg_match('~^--path=(.+)$~', $arg) != 0)
-		{
-			continue;
-		}
-		elseif ($arg === '--no-maintenance')
-		{
-			$_GET['maint'] = 0;
-		}
-		elseif ($arg === '--debug')
-		{
-			$is_debug = true;
-		}
-		elseif ($arg === '--backup')
-		{
-			$_POST['backup'] = 1;
-		}
-		elseif ($arg === '--template' && ((file_exists(BOARDDIR . '/template.php') || file_exists(BOARDDIR . '/template.html')) && !file_exists($modSettings['theme_dir'] . '/converted')))
-		{
-			$_GET['conv'] = 1;
-		}
-		elseif ($i != 0)
-		{
-			echo 'ElkArte Command-line Upgrader
-Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
-
-	--language=LANG         Reset the forum\'s language to LANG.
-	--no-maintenance        Don\'t put the forum into maintenance mode.
-	--debug                 Output debugging information.
-	--backup                Create backups of tables with "backup_" prefix.';
-			echo "\n";
-			exit;
-		}
-	}
-
-	if (!db_version_check())
-	{
-		print_error('Error: ' . $databases[$db_type]['name'] . ' ' . $databases[$db_type]['version'] . ' does not match minimum requirements.', true);
-	}
-
-	$db = load_database();
-
-	$db->skip_next_error();
-	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', []) == false)
-	{
-		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
-	}
-
-	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
-		&& @file_exists(SOURCEDIR . '/QueryString.php')
-		&& @file_exists(SOURCEDIR . '/ManageBoards.controller.php');
-	if (!$check && !isset($modSettings['elkVersion']))
-	{
-		print_error('Error: Some files are missing or out-of-date.', true);
-	}
-
-	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
-	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
-	if (empty($match[1]) || $match[1] !== CURRENT_VERSION)
-	{
-		print_error('Error: Some files have not yet been updated properly.');
-	}
-
-	// Make sure Settings.php is writable.
-	if (!is_writable(BOARDDIR . '/Settings.php'))
-	{
-		@chmod(BOARDDIR . '/Settings.php', 0777);
-	}
-
-	if (!is_writable(BOARDDIR . '/Settings.php'))
-	{
-		print_error('Error: Unable to obtain write access to "Settings.php".', true);
-	}
-
-	// Make sure Settings.php is writable.
-	if (!is_writable(BOARDDIR . '/Settings_bak.php'))
-	{
-		@chmod(BOARDDIR . '/Settings_bak.php', 0777);
-	}
-
-	if (!is_writable(BOARDDIR . '/Settings_bak.php'))
-	{
-		print_error('Error: Unable to obtain write access to "Settings_bak.php".');
-	}
-
-	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
-	{
-		print_error('Error: Unable to obtain write access to "agreement.txt".');
-	}
-	elseif (isset($modSettings['agreement']))
-	{
-		$fp = fopen(BOARDDIR . '/agreement.txt', 'wb');
-		fwrite($fp, $modSettings['agreement']);
-		fclose($fp);
-	}
-
-	// Make sure themes are writable.
-	if (!is_writable($modSettings['theme_dir']))
-	{
-		@chmod($modSettings['theme_dir'], 0777);
-	}
-
-	if (!isset($modSettings['elkVersion']) && !is_writable($modSettings['theme_dir']))
-	{
-		print_error('Error: Unable to obtain write access to "themes".');
-	}
-
-	// Make sure the cache directory exists and is writable!
-	$CACHEDIR_temp = defined('CACHEDIR') ? CACHEDIR : BOARDDIR . '/cache';
-	if (!file_exists($CACHEDIR_temp)
-		&& !mkdir($CACHEDIR_temp) && !is_dir($CACHEDIR_temp))
-	{
-		return throw_error(sprintf('The cache directory "%s" could not be created.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.', $CACHEDIR_temp));
-	}
-
-	if (!is_writable($CACHEDIR_temp))
-	{
-		@chmod($CACHEDIR_temp, 0777);
-	}
-
-	if (!is_writable($CACHEDIR_temp))
-	{
-		print_error('Error: Unable to obtain write access to "cache".', true);
-	}
-
-	if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Index/' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
-	{
-		print_error('Error: Unable to find language files!', true);
-	}
-	else
-	{
-		$temp = substr(@implode('', @file(BOARDDIR . '/sources/ElkArte/Languages/Index/' . $upcontext['language'] . '.php')), 0, 4096);
-		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
-
-		if (empty($match[1]) || $match[1] !== CURRENT_LANG_VERSION)
-		{
-			print_error('Error: Language files out of date.', true);
-		}
-
-		if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
-		{
-			print_error('Error: Install language is missing for selected language.', true);
-		}
-
-		// Otherwise include it!
-		require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
-	}
-
-	// Make sure we skip the HTML for login.
-	$_POST['upcont'] = true;
-	$upcontext['current_step'] = 1;
-}
-
-/**
- * Displays an error on standard out for cli viewing, optionally ends execution
- *
- * @param string $message
- * @param bool $fatal
- */
-function print_error($message, $fatal = false)
-{
-	static $fp = null;
-
-	if ($fp === null)
-	{
-		$fp = fopen('php://stderr', 'wb');
-	}
-
-	fwrite($fp, $message . "\n");
-
-	if ($fatal)
-	{
-		exit;
-	}
-}
-
-/**
- * Displays and error using the error template
- *
- * @param string $message
- * @param bool $fatal
- */
 function throw_error($message, $fatal = false)
 {
 	global $upcontext;
