@@ -87,6 +87,7 @@ $txt['default_nerd_smiley'] = 'Nerd';
 $txt['default_clumsy_smiley'] = 'Clumsy';
 $txt['default_clown_smiley'] = 'Clown';
 $txt['default_wild_smiley'] = 'Zany';
+$txt['default_party_smiley'] = 'Party';
 $txt['default_shh_smiley'] = 'Quiet';
 $txt['default_vomit_smiley'] = 'Vomit';
 $txt['default_troll_smiley'] = 'Troll';
@@ -105,8 +106,7 @@ $txt['install_settings_url'] = 'Forum URL';
 $txt['install_settings_url_info'] = 'This is the URL to your forum <strong>without the trailing \'/\'!</strong>.<br />In most cases, you can leave the default value in this box alone – it is usually right.';
 $txt['install_settings_compress'] = 'Gzip Output';
 $txt['install_settings_compress_title'] = 'Compress output to save bandwidth.';
-// In this string, you can translate the word "PASS" to change what it says when the test passes.
-$txt['install_settings_compress_info'] = 'This function does not work properly on all servers, but can save you a lot of bandwidth.<br /><a href="install.php?obgz=1&amp;pass_string=PASS" onclick="return reqWin(this.href, 200, 60);" target="_blank">Click here to test it</a>. (it should just say "PASS".)';
+$txt['install_settings_compress_info'] = 'Most web servers compress output automatically. Enable this option only if your server does not already provide compression, as double compression may cause issues.';
 $txt['install_settings_dbsession'] = 'Database Sessions';
 $txt['install_settings_dbsession_title'] = 'Use the database for sessions instead of using files.';
 $txt['install_settings_dbsession_info1'] = 'This feature is almost always for the best, as it makes sessions more dependable.';
