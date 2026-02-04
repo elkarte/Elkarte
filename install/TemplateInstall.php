@@ -105,7 +105,7 @@ function template_install_below()
 	if (!empty($incontext['continue']) || !empty($incontext['retry']))
 	{
 		echo '
-						<div class="clear righttext">';
+						<div class="submitbutton">';
 
 		if (!empty($incontext['continue']))
 		{
@@ -506,7 +506,7 @@ function template_forum_settings()
 			<tr>
 				<td class="textbox">', $txt['install_settings_compress'], ':</td>
 				<td>
-					<input type="checkbox" name="compress" id="compress_check" checked="checked" class="input_check" /> <label for="compress_check">', $txt['install_settings_compress_title'], '</label><br />
+					<input type="checkbox" name="compress" id="compress_check" class="input_check" /> <label for="compress_check">', $txt['install_settings_compress_title'], '</label><br />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_compress_info'], '</div>
 				</td>
 			</tr>

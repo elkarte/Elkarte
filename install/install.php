@@ -70,13 +70,6 @@ function initialize_inputs()
 		define('TMP_BOARDDIR', dirname(__DIR__));
 	}
 
-	// This is the test for support of compression
-	if (isset($_GET['obgz']))
-	{
-		require(__DIR__ . '/test_compression.php');
-		die;
-	}
-
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
 	{
