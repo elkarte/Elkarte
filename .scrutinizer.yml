@@ -1,9 +1,0 @@
-build:
-  nodes:
-    analysis:
-      environment:
-        php: 8.1.20
-      tests:
-        override:
-          - php-scrutinizer-run
-          - js-scrutinizer-run
