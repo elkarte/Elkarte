@@ -562,7 +562,7 @@ class ManageCustomProfile extends AbstractController
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = Util::substr(strtr($this->_req->post->field_name, [' ' => '']), 0, 6);
+				$colname = Util::substr(strtr($this->_req->post->field_name, [' ' => '']), 0, 12);
 				preg_match('~([\w_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -573,8 +573,8 @@ class ManageCustomProfile extends AbstractController
 				}
 				else
 				{
-					$colname = 'cust_' . mt_rand(1, 999999);
-					$initial_colname = 'cust_' . mt_rand(1, 999999);
+					$colname = 'cust_' . mt_rand(1, 9999999999);
+					$initial_colname = 'cust_' . mt_rand(1, 9999999999);
 				}
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);

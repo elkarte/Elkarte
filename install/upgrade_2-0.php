@@ -642,7 +642,7 @@ class UpgradeInstructions_upgrade_2_0
 						$codes[$row['code']] = $row['code'];
 					}
 
-					// Add any that are missing, to minimize admin trauma, they are added to the popup, unordered
+					// Add any that are missing; to minimize admin trauma, they are added to the popup, unordered
 					foreach ($emojiSmile as $entry)
 					{
 						if (isset($codes[$entry[0]]))
@@ -653,12 +653,15 @@ class UpgradeInstructions_upgrade_2_0
 						$inserts[] = $entry;
 					}
 
-					$this->db->insert('ignore',
-						'{db_prefix}smileys',
-						array('code' => 'string', 'filename' => 'string', 'description' => 'string', 'smiley_order' => 'int', 'hidden' => 'int'),
-						$inserts,
-						array('id_smiley')
-					);
+					if (!empty($inserts))
+					{
+						$this->db->insert('ignore',
+							'{db_prefix}smileys',
+							array('code' => 'string', 'filename' => 'string', 'description' => 'string', 'smiley_order' => 'int', 'hidden' => 'int'),
+							$inserts,
+							array('id_smiley')
+						);
+					}
 				}
 			),
 			array(
@@ -675,7 +678,7 @@ class UpgradeInstructions_upgrade_2_0
 		return 'Updating misc data ...';
 	}
 
-	public function migrate_misc_session_settings()
+	public function migrate_misc_settings()
 	{
 		return array(
 			array(
@@ -684,11 +687,16 @@ class UpgradeInstructions_upgrade_2_0
 					removeSettings(
 						array('visual_verification_type', 'visual_verification_num_chars')
 					);
+					updateSettings(array(
+						'pwa_small_icon' => '{BOARDDIR}/themes/default/images/logos/icon_pwa_small.png',
+						'pwa_large_icon' => '{BOARDDIR}/themes/default/images/logos/icon_pwa_large.png',
+						'apple_touch_icon' => '{BOARDDIR}/themes/default/images/logos/apple-touch-icon.png',
+						'url_format', 'standard',
+					));
 				}
 			)
 		);
 	}
-
 
 	public function migrate_packageserver_settings_title()
 	{
@@ -726,7 +734,6 @@ class UpgradeInstructions_upgrade_2_0
 			array(
 				'debug_title' => 'Changing combine and minimize to minimize only...',
 				'function' => static function () {
-					theme()->cleanHives();
 					// If they are using the option, change it to use minimize only
 					if (!empty($modSettings['combine_css_js']))
 					{
@@ -850,6 +857,30 @@ class UpgradeInstructions_upgrade_2_0
 						),
 						array(),
 						'ignore'
+					);
+				}
+			)
+		);
+	}
+
+	public function custom_field_title()
+	{
+		return 'More space for custom field col_name...';
+	}
+
+	public function custom_field()
+	{
+		return array(
+			array(
+				'debug_title' => 'Altering col_name column to varchar(18)...',
+				'function' => function () {
+					$this->table->change_column('{db_prefix}custom_fields',
+						'col_name',
+						array(
+							'type' => 'varchar',
+							'size' => 18,
+							'default' => ''
+						)
 					);
 				}
 			)

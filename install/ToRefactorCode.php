@@ -17,9 +17,9 @@
  *
  * @param string $change
  * @param int $substep
- * @param boolean $is_test
+ * @param bool $is_test
  *
- * @return boolean
+ * @return bool
  */
 function protected_alter($change, $substep, $is_test = false)
 {
@@ -162,7 +162,7 @@ function protected_alter($change, $substep, $is_test = false)
  */
 function upgrade_query($string, $unbuffered = false)
 {
-	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line;
+	global $db_connection, $db_server, $db_user, $db_passwd, $db_type;
 	global $upcontext, $upgradeurl, $modSettings, $db_name;
 
 	// Retrieve our database
@@ -281,12 +281,6 @@ function upgrade_query($string, $unbuffered = false)
 	if ($query_string !== '')
 	{
 		$query_string = '?' . substr($query_string, 1);
-	}
-
-	if ($command_line)
-	{
-		echo 'Unsuccessful!  Database error message:', "\n", $db_error_message, "\n";
-		die;
 	}
 
 	// Bit of a bodge - do we want the error?

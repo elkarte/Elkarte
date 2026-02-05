@@ -51,7 +51,7 @@ class Connection implements ConnectionInterface
 			$query->query('', 'SET NAMES UTF8');
 
 			// PHP 8.1 default is to throw exceptions, this reverts it to the <=php8 semantics
-			mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_INDEX & ~MYSQLI_REPORT_STRICT);
+			mysqli_report(MYSQLI_REPORT_ERROR & ~MYSQLI_REPORT_STRICT);
 		}
 		catch (\mysqli_sql_exception $e)
 		{

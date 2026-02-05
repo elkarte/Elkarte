@@ -13,7 +13,7 @@
  */
 
 /**
- * This is what is displayed if there's any chmod to be done. If not it returns nothing...
+ * This is what is displayed if there's any chmod to be done. If not, it returns nothing...
  */
 function template_chmod()
 {
@@ -69,20 +69,15 @@ function template_chmod()
 	echo '
 		<div class="content">
 			<h2>Your FTP connection information</h2>
-			<h3>The upgrader can fix any issues with file permissions to make upgrading as simple as possible. Simply enter your connection information below or alternatively click <a href="#" onclick="warning_popup();">here</a> for a list of files which need to be changed.</h3>
+			<h3>The upgrader can fix any issues with file permissions to make upgrading as simple as possible. Enter your connection information below or alternatively click <a href="#" onclick="warning_popup();">here</a> for a list of files which need to be changed.</h3>
 			<script>
 				function warning_popup()
 				{
-					let popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\'),
-						content = popup.document;
-
-					content.write(\'<!DOCTYPE html>\n\');
-					content.write(\'<html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>\n\t<head>\n\t\t<meta name="robots" content="noindex" />\n\t\t\');
-					content.write(\'<title>Warning</title>\n\t\t<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css" />\n\t</head>\n\t<body id="popup">\n\t\t\');
-					content.write(\'<div class="windowbg description">\n\t\t\t<h4>The following files needs to be made writable to continue:</h4>\n\t\t\t\');
-					content.write(\'<p>', implode('<br />\n\t\t\t', $upcontext['chmod']['files']), '</p>\n\t\t\t\');
-					content.write(\'<a href="javascript:self.close();">close</a>\n\t\t</div>\n\t</body>\n</html>\');
-					content.close();
+					new elk_Popup({
+						heading: "Warning",
+						content: "<div class=\'windowbg description\'><h4>The following files needs to be made writable to continue:</h4><p>', implode('<br />', $upcontext['chmod']['files']), '</p></div>",
+						icon: "i-warning"
+					});
 				}
 			</script>';
 
@@ -170,9 +165,9 @@ function template_upgrade_above()
 		<meta charset="utf-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?20RC1" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?20RC1" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?20RC1" />
+		<link rel="stylesheet" href="../themes/default/css/index.css?20RC1" />
+		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?20RC1" />
+		<link rel="stylesheet" href="../themes/default/css/install.css?20RC1" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" id="jquery"></script>
 		<script>
 			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/ext/jquery-3.7.1.min.js"><\/script>\');
@@ -208,35 +203,40 @@ function template_upgrade_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-				<img id="logo" src="', $settings['default_theme_url'], '/images/logos/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+				<img id="logo" src="../themes/default/images/logos/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper" class="wrapper">
-			<div id="inner_wrap">';
+			<div id="upper_section">
+				<div id="inner_section">
+					<div id="inner_wrap">';
 
 	// Show the language selection area
 	if (!empty($upcontext['detected_languages']) && count($upcontext['detected_languages']) > 1 && $upcontext['current_step'] == 0)
 	{
 		echo '
-				<div class="news">
-					<form action="', $upgradeurl, '" method="get">
-						<label for="installer_language">', $txt['installer_language'], ':</label>
-						<select id="installer_language" name="lang_file" onchange="location.href = \'', $upgradeurl, '?lang_file=\' + this.options[this.selectedIndex].value;">';
+						<div class="news">
+							<form action="', $upgradeurl, '" method="get">
+								<label for="installer_language">', $txt['installer_language'], ':</label>
+								<select id="installer_language" name="lang_file" onchange="location.href = \'', $upgradeurl, '?lang_file=\' + this.options[this.selectedIndex].value;">';
 
 		foreach ($upcontext['detected_languages'] as $lang => $name)
 		{
 			echo '
-							<option', isset($_SESSION['installer_temp_lang']) && $_SESSION['installer_temp_lang'] == $lang ? ' selected="selected"' : '', ' value="', $lang, '">', $name, '</option>';
+									<option', isset($_SESSION['installer_temp_lang']) && $_SESSION['installer_temp_lang'] == $lang ? ' selected="selected"' : '', ' value="', $lang, '">', $name, '</option>';
 		}
 
 		echo '
-						</select>
-						<noscript><input type="submit" value="', $txt['installer_language_set'], '" class="button_submit" /></noscript>
-					</form>
-				</div>';
+								</select>
+								<noscript><input type="submit" value="', $txt['installer_language_set'], '" class="button_submit" /></noscript>
+							</form>
+						</div>
+						<hr class="clear" />';
 	}
 
 	echo '
+					</div>
+				</div>
 			</div>
 			<div id="content_section">
 				<div id="main_steps">
@@ -259,8 +259,8 @@ function template_upgrade_above()
 				</div>
 				<div id="progress_bars">
 					<div id="progress_bar">
+						<div id="overall_text">', $upcontext['overall_percent'], '%</div>
 						<div id="overall_progress" style="width: ', $upcontext['overall_percent'], '%;">&nbsp;</div>
-						<div id="overall_text" class="overall_progress">', $upcontext['overall_percent'], '%</div>
 						<div class="overall_progress">', $txt['upgrade_overall_progress'], '</div>
 					</div>';
 
@@ -270,8 +270,8 @@ function template_upgrade_above()
 		echo '
 					<div id="progress_bar_1">
 						<div id="step_progress" style="width: ', $upcontext['step_progress'], '%;">&nbsp;</div>
-						<div id="step_text" class="overall_progress">', $upcontext['step_progress'], '%</div>
-						<div class="overall_progress">', $upcontext['current_step_name'], '</div>
+						<div id="step_text" class="overall_progress">', $upcontext['step_progress'] ?? '0', '%</div>
+						<div style="color: var(--contrast_text)" class="overall_progress">', $upcontext['current_step_name'], '</div>
 					</div>';
 	}
 
@@ -279,7 +279,7 @@ function template_upgrade_above()
 	echo '
 					<div id="substep_bar_div_2" class="', empty($upcontext['substep_progress']) ? ' hide' : '', '">
 						<div id="substep_progress" style="width: ', $upcontext['substep_progress'] ?? 0, '%;">&nbsp;</div>
-						<div id="substep_text" class="overall_progress">', $upcontext['substep_progress'] ?? '', '%</div>
+						<div id="substep_text" class="overall_progress">', $upcontext['substep_progress'] ?? '0', '%</div>
 						<div id="substep_bar_div" class="overall_progress">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], ['.' => ''])) : '', '</div>
 					</div>';
 
@@ -299,7 +299,7 @@ function template_upgrade_above()
 	echo '
 				</div>
 			</div>
-			<div id="main_screen" class="clear">
+			<div id="main_screen">
 				<h2 id="main-content" tabindex="-1">', $upcontext['page_title'], '</h2>
 				<div class="content" role="main" aria-labelledby="main-content">';
 }
@@ -314,49 +314,58 @@ function template_upgrade_below()
 	if (!empty($upcontext['pause']))
 	{
 		echo '
-					<h2 style="margin-top: 2ex;">', $txt['upgrade_not_quite_done'], '</h2>
-					<h3>
-						', $txt['upgrade_paused_overload'], '
-					</h3>';
+						<h2 style="margin-top: 2ex;">', $txt['upgrade_not_quite_done'], '</h2>
+						<h3>
+							', $txt['upgrade_paused_overload'], '
+						</h3>';
 	}
 
 	if (!empty($upcontext['custom_warning']))
 	{
 		echo '
-					<div class="warningbox">
-						<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
-						<div>', $upcontext['custom_warning'], '</div>
-					</div>';
+						<div class="warningbox">
+							<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
+							<div>', $upcontext['custom_warning'], '</div>
+						</div>';
+	}
+
+	if (!empty($upcontext['continue']) || !empty($upcontext['skip']))
+	{
+		echo '
+						<div class="submitbutton">';
+
+		if (!empty($upcontext['continue']))
+		{
+			echo '
+							<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
+		}
+
+		if (!empty($upcontext['skip']))
+		{
+			echo '
+							<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="dontSubmit = true; document.getElementById(\'contbutt\').disabled = \'disabled\'; return true;" class="button_submit" />';
+		}
+
+		echo '
+						</div>';
+	}
+
+	// Show the closing form tag and other data only if not in the last step
+	if (count($upcontext['steps']) - 1 !== (int) $upcontext['current_step'])
+	{
+		echo '
+					</form>';
 	}
 
 	echo '
-					<div class="submitbutton">';
-
-	if (!empty($upcontext['continue']))
-	{
-		echo '
-						<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
-	}
-
-	if (!empty($upcontext['skip']))
-	{
-		echo '
-						<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="dontSubmit = true; document.getElementById(\'contbutt\').disabled = \'disabled\'; return true;" class="button_submit" />';
-	}
-
-	echo '
-					</div>
-				</form>
 				</div>
 			</div>
 		</div>
-		<div id="footer_section"><div class="frame" style="height: 40px;">
-			<div class="smalltext">
-				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2026, ElkArte</a>
+		<div id="footer_section">
+			<div class="frame copyright">
+				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2026, ElkArte Community</a>
 			</div>
-		</div>
-	</body>
-</html>';
+		</div>';
 
 	// Are we on a pause?
 	if (!empty($upcontext['pause']))
@@ -382,6 +391,10 @@ function template_upgrade_below()
 			}
 		</script>';
 	}
+
+	echo '
+	</body>
+</html>';
 }
 
 /**
@@ -426,7 +439,7 @@ function template_error_message()
 
 	if (empty($upcontext['fatal']))
 	{
-		// To early to have even loaded language?
+		// Too early to have even loaded language?
 		$txt['try_again'] = $txt['try_again'] ?? 'Click here to try again.';
 
 		echo '
@@ -446,12 +459,10 @@ function template_welcome_message()
 	global $upcontext, $disable_security, $settings, $txt;
 
 	echo '
-		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
-		<script src="', $settings['default_theme_url'], '/scripts/admin.js"></script>
+		<script src="../themes/default/scripts/admin.js"></script>
 		<script>
 			let oUpgradeCenter = new Elk_AdminIndex({
 				bLoadAnnouncements: false,
-
 				bLoadVersions: true,
 				slatestVersionContainerId: \'latestVersion\',
 				sinstalledVersionContainerId: \'version_warning\',
@@ -466,25 +477,13 @@ function template_welcome_message()
 			});
 		</script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
-		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\');"' : '', '>
+		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform">
 			<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
 			<div id="version_warning" class="errorbox hide">', CURRENT_VERSION, '</div>
 			<div id="latestVersion" class="hide">???</div>';
 
 	$upcontext['chmod_in_form'] = true;
 	template_chmod();
-
-	// For large, forums give them a warning about the possible impact of this upgrade!
-	if ($upcontext['is_large_forum'])
-	{
-		echo '
-			<div class="warningbox" role="status" aria-live="polite">
-				<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-				<div>
-					', $txt['upgrade_warning_lots_data'], '
-				</div>
-			</div>';
-	}
 
 	// A warning message?
 	if (!empty($upcontext['warning']))
@@ -595,7 +594,7 @@ function template_welcome_message()
 	if (!empty($upcontext['login_hash_error']))
 	{
 		echo '
-						<div class="error">Password security has recently been upgraded. Please enter your password again.</div>';
+						<div class="error">Password security has been upgraded. Please reenter your password.</div>';
 	}
 	elseif (!empty($upcontext['password_failed']))
 	{
@@ -613,7 +612,9 @@ function template_welcome_message()
 		echo '
 				<tr>
 					<td colspan="2">
-						<label for="cont"><input type="checkbox" id="cont" name="cont" checked="checked" class="input_check" />Continue from step reached during last execution of upgrade script.</label>
+						<label for="cont">
+							<input type="checkbox" id="cont" name="cont" checked="checked" class="input_check" />Continue from step reached during last execution of upgrade script.
+						</label>
 					</td>
 				</tr>';
 	}
@@ -643,16 +644,15 @@ function template_welcome_message()
 				let latestVer,
 					setLatestVer;
 
+				// After few many tries let the use run the script
+				if (currentVersionRounds > 9)
+					document.getElementById(\'contbutt\').disabled = 0;
+
 				latestVer = document.getElementById(\'latestVersion\');
 				setLatestVer = document.getElementById(\'elkVersion\');
 
 				if (latestVer.innerHTML === \'???\')
 				{
-					// After few many tries let the use run the script
-					if (currentVersionRounds > 9)
-						document.getElementById(\'contbutt\').disabled = 0;
-
-					currentVersionRounds++;
 					setTimeout(\'ourCurrentVersion()\', 50);
 					return;
 				}
@@ -662,8 +662,10 @@ function template_welcome_message()
 					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
 					document.getElementById(\'version_warning\').classList.remove(\'hide\');
 				}
+
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
+			
 			window.addEventListener("load", ourCurrentVersion);
 
 			// This checks that the script file even exists!
@@ -688,42 +690,43 @@ function template_upgrade_options()
 	if (!empty($upcontext['upgrade_options_warning']))
 	{
 		echo '
-				<div style="margin: 1ex; padding: 1ex; border: 1px dashed #cc3344; color: black; background: #ffe4e9;">
-					<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+				<div class="warningbox" role="alert" aria-live="assertive">
 					<strong style="text-decoration: underline;">Warning!</strong><br />
-					<div style="padding-left: 4ex;">
+					<div>
 						', $upcontext['upgrade_options_warning'], '
 					</div>
 				</div>';
 	}
 
 	echo '
-				<table style="border-collapse:collapse; border-spacing: 1px; padding: 2px;">
+				<table class="step_table">
 					<tr>
-						<td style="width: 2%;">
-							<input type="checkbox" name="backup" id="backup" value="1"', $db_type !== 'mysql' && $db_type !== 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
+						<td class="grid4">
+							<input type="checkbox" name="backup" id="backup" value="1"', $db_type !== 'mysql' && $db_type !== 'mysqli' && $db_type !== 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
-						<td style="width: 100%;">
+						<td>
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
 					<tr>
-						<td style="width: 2%;">
+						<td class="grid4">
 							<input type="checkbox" name="maint" id="maint" value="1" checked="checked" class="input_check" />
 						</td>
-						<td style="width: 100%;">
+						<td>
  							<label for="maint">Put the forum into maintenance mode during upgrade.</label> 
- 							<span class="smalltext">(<button type="button" id="maint_customize" class="linkbutton" aria-controls="mainmess" aria-expanded="false">Customize</button>)</span>
+ 							<span>
+ 								<button type="button" id="maint_customize" aria-controls="mainmess" aria-expanded="false">Customize</button>
+ 							</span>
 							<div id="mainmess" class="hide">
 								<strong class="smalltext">Maintenance Title: </strong><br />
 								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle, ENT_COMPAT), '" class="input_text" autocomplete="off" /><br />
 								<strong class="smalltext">Maintenance Message: </strong><br />
-								<textarea name="mainmessage" rows="3" cols="50" autocomplete="off">', htmlspecialchars($mmessage, ENT_COMPAT), '</textarea>
+								<textarea name="mainmessage" rows="3" cols="80" autocomplete="off">', htmlspecialchars($mmessage, ENT_COMPAT), '</textarea>
 							</div>
 							<script>
 								(function(){
-									let btn = document.getElementById("maint_customize");
-									let panel = document.getElementById("mainmess");
+									let btn = document.getElementById("maint_customize"),
+									 	panel = document.getElementById("mainmess");
 									if (btn && panel)
 									{
 										btn.addEventListener("click", function(){
@@ -737,18 +740,18 @@ function template_upgrade_options()
 						</td>
 					</tr>
 					<tr>
-						<td style="width: 2%;">
+						<td class="grid4">
 							<input type="checkbox" name="debug" id="debug" value="1" class="input_check" />
 						</td>
-						<td style="width: 100%;">
+						<td>
 							<label for="debug">Output extra debugging information</label>
 						</td>
 					</tr>
 					<tr>
-						<td style="width: 2%;">
+						<td class="grid4">
 							<input type="checkbox" name="empty_error" id="empty_error" value="1" class="input_check" />
 						</td>
-						<td style="width: 100%;">
+						<td>
 							<label for="empty_error">Empty error log before upgrading</label>
 						</td>
 					</tr>
@@ -790,12 +793,12 @@ function template_backup_database()
 					Current Table: &quot;<span id="current_table">', $upcontext['cur_table_name'], '</span>&quot;
 				</h3>
 				<br />
-				<span id="commess" class="', $upcontext['cur_table_num'] == $upcontext['table_count'] ? '' : 'hide', ';">Backup Complete! Click Continue to Proceed.</span>';
+				<span id="commess" class="', ($upcontext['cur_table_num'] == $upcontext['table_count'] ? '' : 'hide'), '">Backup Complete! Click Continue to Proceed.</span>';
 
 	// Continue please!
 	$upcontext['continue'] = $support_js ? 2 : 1;
 
-	// If javascript allows we want to do this using XML.
+	// If JavaScript allows, we want to do this using XML.
 	if ($support_js)
 	{
 		echo '
@@ -826,7 +829,7 @@ function template_backup_database()
 				lastTable = iTableNum;
 				updateStepProgress(iTableNum, ', $upcontext['table_count'], ', ', $upcontext['step_weight'] * ((100 - $upcontext['step_progress']) / 100), ');';
 
-		// If debug flood the screen.
+		// If debug floods the screen.
 		if ($is_debug)
 		{
 			echo '
@@ -878,7 +881,7 @@ function template_database_changes()
 		<form action="', $upcontext['form_url'], '&amp;filecount=', $upcontext['file_count'], '" name="upform" id="upform" method="post">
 			<input type="hidden" name="database_done" id="database_done" value="0" />';
 
-	// No javascript looks rubbish!
+	// No JavaScript looks rubbish!
 	if (!$support_js)
 	{
 		foreach ($upcontext['actioned_items'] as $num => $item)
@@ -925,7 +928,7 @@ function template_database_changes()
 			<strong>Executing:</strong> &quot;<span id="cur_item_name">', $upcontext['current_item_name'], '</span>&quot; (<span id="item_num">', $upcontext['current_item_num'], '</span> of <span id="total_items"><span id="item_count">', $upcontext['total_items'], '</span>', $upcontext['file_count'] > 1 ? ' - of this script' : '', ')</span>
 		</h3>
 		<br />
-		<span id="commess" class=" ', !empty($upcontext['changes_complete']) || $upcontext['current_debug_item_num'] == $upcontext['debug_items'] ? '' : 'hide', '">Database Updates Complete! Click Continue to Proceed.</span>';
+		<span id="commess" class="', !empty($upcontext['changes_complete']) || $upcontext['current_debug_item_num'] == $upcontext['debug_items'] ? '' : 'hide', '">Database Updates Complete! Click Continue to Proceed.</span>';
 
 		if ($is_debug)
 		{
@@ -949,7 +952,7 @@ function template_database_changes()
 	// We want to continue at some point!
 	$upcontext['continue'] = $support_js ? 2 : 1;
 
-	// If javascript allows, we want to do this using XML.
+	// If JavaScript allows, we want to do this using XML.
 	if ($support_js)
 	{
 		echo '
@@ -1145,7 +1148,7 @@ function template_database_changes()
 					return true;
 				}';
 
-		// If debug scroll the screen.
+		// If debugging, scroll the screen.
 		if ($is_debug)
 		{
 			echo '
@@ -1290,7 +1293,7 @@ function template_upgrade_complete()
 		<script>
 			function doTheDelete(theCheck)
 			{
-				let theImage = document.getElementById ? document.getElementById("delete_upgrader") : document.all.delete_upgrader;
+				let theImage = document.getElementById("delete_upgrader");
 
 				theImage.src = "', $upgradeurl, '?delete=1&ts_" + (new Date().getTime());
 				theCheck.disabled = true;
@@ -1301,7 +1304,7 @@ function template_upgrade_complete()
 
 	echo '
 		<br />
-		If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/index.php">look to us for assistance</a>.<br />
+		If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/community/index.php">look to us for assistance</a>.<br />
 		<br />
 		Best of luck,<br />
 		ElkArte';

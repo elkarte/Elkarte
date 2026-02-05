@@ -53,10 +53,9 @@
 		"ext-mbstring": "*"
     },
 	"require-dev": {
-        "roave/security-advisories": "dev-latest",
-        "phpunit/phpunit-selenium": "9.0.1",
+		"phpunit/phpunit-selenium": "9.0.1",
 		"phpunit/phpunit": "9.6.*",
-		"myclabs/deep-copy": "1.11.0"
+		"myclabs/deep-copy": "1.13.*"
     },
 	"autoload": {
 		"psr-4": { "ElkArte\\": ["sources/ElkArte"] }

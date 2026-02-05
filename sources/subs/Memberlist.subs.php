@@ -69,7 +69,7 @@ function ml_CustomProfile()
 			if (isset($_REQUEST['sort']) && $_REQUEST['sort'] === $curField)
 			{
 				// Build the sort queries.
-				if ($row['field_type'] != 'check')
+				if ($row['field_type'] !== 'check')
 				{
 					$context['custom_profile_fields']['columns'][$curField]['sort'] = [
 						'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',

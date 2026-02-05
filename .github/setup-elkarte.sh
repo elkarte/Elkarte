@@ -21,13 +21,14 @@ fi
 
 # Phpunit and support
 # composer config --file=composer2.json && composer install --no-interaction --quiet
-composer install --no-interaction --quiet
+composer install --no-interaction
 
 # phpunit-selenium is compatible with phpunit 9.3.x, past that it runs all methods not just test methods
 # This combination allows tests to run, but code coverage fails unless we use our version of RemoteCoverage.php
 if [[ "$WEBSERVER" != "none" ]]
 then
 	composer remove phpunit/phpunit phpunit/phpunit-selenium --dev
+	composer config audit.ignore PKSA-z3gr-8qht-p93v
 	composer require phpunit/phpunit:9.3.11 phpunit/phpunit-selenium:9.0.1 --dev --update-with-all-dependencies --ignore-platform-reqs
 fi
 

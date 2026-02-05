@@ -796,7 +796,8 @@ abstract class AbstractQuery implements QueryInterface
 			return false;
 		}
 
-		return $result->fetch_row();
+		$rows = $result->fetch_row();
+		return $rows ?? false;
 	}
 
 	/**
@@ -812,7 +813,8 @@ abstract class AbstractQuery implements QueryInterface
 			return false;
 		}
 
-		return $result->fetch_assoc();
+		$row = $result->fetch_assoc();
+		return $row ?? false;
 	}
 
 	/**

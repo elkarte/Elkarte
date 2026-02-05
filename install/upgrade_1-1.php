@@ -79,8 +79,8 @@ class UpgradeInstructions_upgrade_1_1
 						if ($request)
 						{
 							// Drop it only if it is empty
-							[$count] = (int) $this->db->fetch_row($request);
-							if ($count === 0)
+							$row = $this->db->fetch_row($request);
+							if ($row && $row[0] === 0)
 							{
 								$this->table->drop_table('{db_prefix}admin_info_files');
 							}
@@ -303,16 +303,19 @@ class UpgradeInstructions_upgrade_1_1
 							$enabled_mentions = array_diff($enabled_mentions, array($toggle));
 						}
 
-						$this->db->query('', '
+						if ($this->table->column_exists('{db_prefix}notifications_pref', 'notification_level') === true)
+						{
+							$this->db->query('', '
 							INSERT IGNORE INTO {db_prefix}notifications_pref
 								(id_member, mention_type, notification_level)
 							SELECT id_member, {string:mention_type}, {int:level}
 							FROM {db_prefix}members',
-							array(
-								'mention_type' => $toggle,
-								'level' => 1,
-							)
-						);
+								array(
+									'mention_type' => $toggle,
+									'level' => 1,
+								)
+							);
+						}
 					}
 
 					updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
@@ -663,8 +666,14 @@ class UpgradeInstructions_upgrade_1_1
 							// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 							$this->db->query('', '
 								UPDATE {db_prefix}custom_fields 
-								SET {db_prefix}custom_fields.rows=' . $rows . ' , cols=' . $cols . '
-								WHERE id_field=' . $row['id_field']);
+								SET {db_prefix}custom_fields.rows={int:rows} , cols={int:cols}
+								WHERE id_field={int:id_field}',
+								array(
+									'rows' => $rows,
+									'cols' => $cols,
+									'id_field' => $row['id_field'],
+								)
+							);
 						}
 					}
 				}
@@ -696,22 +705,22 @@ class UpgradeInstructions_upgrade_1_1
 						switch ($row['col_name'])
 						{
 							case 'cust_skye':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose={string:enclose} WHERE id_field={int:id_field}', array('enclose' => '<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>', 'id_field' => $row['id_field']));
 								break;
 							case 'cust_fbook':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose={string:enclose} WHERE id_field={int:id_field}', array('enclose' => '<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>', 'id_field' => $row['id_field']));
 								break;
 							case 'cust_twitt':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.x.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose={string:enclose} WHERE id_field={int:id_field}', array('enclose' => '<a target="_blank" href="https://www.x.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>', 'id_field' => $row['id_field']));
 								break;
 							case 'cust_linked':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose={string:enclose} WHERE id_field={int:id_field}', array('enclose' => '<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>', 'id_field' => $row['id_field']));
 								break;
 							case 'cust_gplus':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose={string:enclose} WHERE id_field={int:id_field}', array('enclose' => '<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>', 'id_field' => $row['id_field']));
 								break;
 							case 'cust_icq':
-								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose={string:enclose} WHERE id_field={int:id_field}', array('enclose' => '<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 'id_field' => $row['id_field']));
 								break;
 						}
 					}
@@ -968,7 +977,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function () {
 					// Adding this index to large forums can take some time
 					detectServer()->setTimeLimit(600);
-					$this->table->db_add_index('{db_prefix}messages', array('name' => 'poster_time', 'columns' => array('poster_time'), 'type' => 'key'));
+					$this->table->add_index('{db_prefix}messages', array('name' => 'poster_time', 'columns' => array('poster_time'), 'type' => 'key'));
 				}
 			)
 		);
@@ -985,7 +994,6 @@ class UpgradeInstructions_upgrade_1_1
 			array(
 				'debug_title' => 'Changing combine and minimize to minimize only...',
 				'function' => static function () {
-					theme()->cleanHives();
 					// If they are using the option, change it to use minimize only
 					if (!empty($modSettings['combine_css_js']))
 					{

@@ -141,7 +141,7 @@ class Bootstrap
 	{
 		// All those wonderful things found in settings
 		global $maintenance, $mtitle, $msubject, $mmessage, $mbname, $language, $boardurl, $webmaster_email;
-		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
+		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd, $install_time;
 		global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send;
 		global $cache_uid, $cache_password, $cache_enable, $cache_servers, $cache_accelerator;
 		global $db_show_debug, $url_format, $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
@@ -165,8 +165,8 @@ class Bootstrap
 	 * Decides installation vs. upgrade vs. a normal load when no lock file is present.
 	 *
 	 * Rules:
-	 * - If Settings.php exists and $install_time is set (not 0/empty) and installer exists → redirect to upgrade.php
-	 * - If Settings.php exists and $install_time is 0/empty and installer exists → redirect to install.php
+	 * - If Settings.php exists and indicates an installed site (via $install_time or $db_user/$db_name) and installer exists → redirect to upgrade.php
+	 * - If Settings.php exists but doesn't indicate an installed site and installer exists → redirect to install.php
 	 * - If Settings.php does not exist and installer exists → redirect to install.php
 	 * - Otherwise, continue (and Settings.php will be loaded by caller if present)
 	 *
@@ -176,7 +176,7 @@ class Bootstrap
 	{
 		// Values defined in Settings
 		global $maintenance, $mtitle, $msubject, $mmessage, $mbname, $language, $boardurl, $webmaster_email;
-		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
+		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd, $install_time;
 		global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send;
 		global $cache_uid, $cache_password, $cache_enable, $cache_servers, $cache_accelerator;
 		global $db_show_debug, $url_format, $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
@@ -201,6 +201,15 @@ class Bootstrap
 			{
 				// If install_time is non-empty and non-zero, prefer upgrade flow when available
 				$isInstalled = !empty($install_time) && $install_time !== '0';
+				$version_running = defined('FORUM_VERSION') ? str_replace('ElkArte ', '', FORUM_VERSION) : '';
+
+				// Older installations (e.g. 1.1) might not have $install_time, so we check for db info
+				if (!$isInstalled)
+				{
+					$isInstalled = !empty($db_user) && !empty($db_name);
+					$version_running = '1.1';
+				}
+
 				if ($isInstalled && $hasUpgrade && empty($_SESSION['installing']))
 				{
 					$redirect_file = 'upgrade.php';
@@ -208,7 +217,6 @@ class Bootstrap
 			}
 
 			// Build a safe, relative redirect to avoid host header issues
-			$version_running = defined('FORUM_VERSION') ? str_replace('ElkArte ', '', FORUM_VERSION) : '';
 			header('Location: install/' . $redirect_file . '?v=' . $version_running);
 			die();
 		}

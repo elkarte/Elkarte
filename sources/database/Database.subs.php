@@ -12,8 +12,12 @@
  *
  */
 
+use ElkArte\Database\AbstractDump;
+use ElkArte\Database\AbstractSearch;
 use ElkArte\Database\AbstractTable;
+use ElkArte\Database\Mysqli\Connection;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Errors\Errors;
 
 /**
  * Initialize database classes and connection.
@@ -62,7 +66,7 @@ function database($fatal = true, $force = false)
 		$type = strtolower($db_type);
 		$type = $type === 'mysql' ? 'mysqli' : $type;
 
-		/** @var \ElkArte\Database\Mysqli\Connection $class */
+		/** @var Connection $class */
 		$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
 		try
 		{
@@ -72,7 +76,7 @@ function database($fatal = true, $force = false)
 		{
 			if ($fatal === true)
 			{
-				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
+				Errors::instance()->display_db_error($e->getMessage());
 			}
 			else
 			{
@@ -85,7 +89,7 @@ function database($fatal = true, $force = false)
 }
 
 /**
- * This function retrieves an existing instance of \ElkArte\AbstractTable
+ * This function retrieves an existing instance of AbstractTable
  * and returns it.
  *
  * @param object|null $db - A database object (e.g. \ElkArte\Mysqli\Query)
@@ -115,7 +119,7 @@ function db_table($db = null, $fatal = false)
 		{
 			if ($fatal === true)
 			{
-				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
+				Errors::instance()->display_db_error($e->getMessage());
 			}
 			else
 			{
@@ -128,10 +132,10 @@ function db_table($db = null, $fatal = false)
 }
 
 /**
- * This function returns an instance of \ElkArte\AbstractSearch,
+ * This function returns an instance of AbstractSearch,
  * specifically designed for database utilities related to search.
  *
- * @return \ElkArte\Database\AbstractSearch
+ * @return AbstractSearch
  */
 function db_search()
 {
@@ -150,9 +154,40 @@ function db_search()
 		}
 		catch (\Exception $e)
 		{
-			\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
+			Errors::instance()->display_db_error($e->getMessage());
 		}
 	}
 
 	return $db_search;
+}
+
+/**
+ * This function returns an instance of AbstractDump,
+ * specifically designed for database utilities related to table dumps.
+ *
+ * @return AbstractDump
+ */
+function db_dump()
+{
+	global $db_type;
+	static $db_dump = null;
+
+	if ($db_dump === null)
+	{
+		$db = database();
+		$db_table = db_table($db);
+		$db_type = strtolower($db_type);
+		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
+		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Dump';
+		try
+		{
+			$db_dump = new $class($db, $db_table);
+		}
+		catch (\Exception $e)
+		{
+			Errors::instance()->display_db_error($e->getMessage());
+		}
+	}
+
+	return $db_dump;
 }
