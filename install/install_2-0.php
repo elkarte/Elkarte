@@ -2545,7 +2545,7 @@ class InstallInstructions_install_2_0
 				array('smiley_sets_names', '{$default_smileyset_name}'),
 				array('smiley_sets_default', 'default'),
 				array('cal_days_for_index', '7'),
-				array('requireAgreement', '1'),
+				array('requireAgreement', '0'),
 				array('unapprovedMembers', '0'),
 				array('default_personal_text', ''),
 				array('package_make_backups', '1'),

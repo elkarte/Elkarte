@@ -169,6 +169,8 @@ $helptxt['registrations'] = '<strong>Registration Management</strong><br />
 		</li>
 	</ul>';
 
+$helptxt['requireAgreement'] = 'This setting is recommended to be enabled in order to comply with the rules of the <a href="https://ec.europa.eu/info/law/law-topic/data-protection/eu-data-protection-rules_en" target="_blank" rel="noopener" class="bbc_link">GDPR</a>.';
+
 $helptxt['modlog'] = '<strong>Moderation Log</strong><br />
 	This section allows members of the moderation team to track all the moderation actions that the forum moderators have performed. To ensure that
 	moderators cannot remove references to the actions they have performed, entries may not be deleted until 24 hours after the action was taken.';
@@ -276,13 +278,13 @@ $helptxt['cache_password'] = 'Some cache systems, for example Redis, may require
 
 $helptxt['enableErrorLogging'] = 'This will log any errors, like a failed login, so you can see what went wrong.';
 $helptxt['enableErrorQueryLogging'] = 'This will include the full query sent to the database in the error log.  Requires error logging to be turned on.<br /><br /><strong>Note:  This will affect the ability to filter the error log by the error message.</strong>';
-$helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notification of topics you announce by checking the &quot;announce topic&quot; checkbox when posting.';
+$helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notification of topics you announce by checking the &quot;Announce Topic&quot; checkbox when posting. Disabling this option violates the rules of the <a href="https://ec.europa.eu/info/law/law-topic/data-protection/eu-data-protection-rules_en" target="_blank" rel="noopener" class="bbc_link">GDPR</a> and many other countries\' privacy and anti-spam laws.';
 $helptxt['metadata_enabled'] = 'This will create OG (Open Graph) and Schema.org microdata suitable for HTML embedding (requires theme support).  It allows search engines to better understand the information on your site pages, and provides for a better link sharing experience on social sites.  When enabled, metadata will made available for the board listing, topic listing and topic display areas of your site.';
 $helptxt['disallow_sendBody'] = 'This option removes the possibility to receive the text of replies, posts and personal messages in notification emails.<br /><br />Often, members will reply to the notification email, which in most cases means the webmaster receives the reply.';
 $helptxt['enable_contactform'] = 'This option adds a contact us button to the registration screen';
 $helptxt['jquery_source'] = 'This will determine the source used to load the jQuery Library.  Auto will use the CDN first and if not available fall back to the local source.  Local will only use the local source, CDN will only load it from Google\'s Content Delivery Network';
-$helptxt['jquery_default'] = 'If you want to use a version of jQuery different than the one that came with ElkArte, select this box and enter the version numer X.XX.X The local file must follow the naming conventing of jquery-X.XX.X.min.js for it to be loaded.';
-$helptxt['jqueryui_default'] = 'If you want to use a version of jQueryUI different than the one that came with ElkArte, select this box and enter the version numer X.XX.X The local file must follow the naming conventing of jquery-ui-X.XX.X.min.js for it to be loaded.';
+$helptxt['jquery_default'] = 'If you want to use a version of jQuery different than the one that came with ElkArte, select this box and enter the version number X.XX.X The local file must follow the naming conventing of jquery-X.XX.X.min.js for it to be loaded.';
+$helptxt['jqueryui_default'] = 'If you want to use a version of jQueryUI different than the one that came with ElkArte, select this box and enter the version number X.XX.X The local file must follow the naming conventing of jquery-ui-X.XX.X.min.js for it to be loaded.';
 $helptxt['minify_css_js'] = 'This will remove unnecessary whitespace and comments from the files to reduce their size.  The minimized files are saved so further requests can instantly serve those files.<br />Note that the first time a compilation is needed/created, there may be a slight delay on that page load in order to create the file (this will also happen after the cache is cleared)';
 $helptxt['combine_css_js'] = 'This will combine multiple CSS or JavaScript files per page as needed.  The combined files are saved so further requests can instantly serve those files.';
 $helptxt['compactTopicPagesEnable'] = 'This will show the supplied number of surrounding pages.<br /><em>Example:</em>
@@ -580,7 +582,7 @@ $helptxt['posts_and_topics'] = '
 			Modify the settings related to topics. The number of topics per page, whether pinned topics are enabled or not, the number of messages needed for a topic to be hot, etc.
 		</li>
 	</ul>';
-$helptxt['allow_no_censored'] = 'When checked, this global setting allows members to disable word censoring in their User Profile through the Look and Layout settings. The members\' ablility to disable word censoring is still limited by their permission profile.';
+$helptxt['allow_no_censored'] = 'When checked, this global setting allows members to disable word censoring in their User Profile through the Look and Layout settings. The members\' ability to disable word censoring is still limited by their permission profile.';
 $helptxt['spider_mode'] = 'Sets the logging level.<br />
 Standard - Logs minimal spider activity.<br />
 Moderate - Provides more accurate statistics.<br />
