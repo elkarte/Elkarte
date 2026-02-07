@@ -557,18 +557,25 @@ function template_edit_agreement()
 						<textarea rows="10" name="agreement" id="agreement">', $context['agreement'], '</textarea>
 					</p>
 					<p>
-						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_agreement'], '.</label>';
+						<label for="requireAgreement">
+							<input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_agreement'], '
+							<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'requireAgreement']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+						</label>';
 
 	if (!empty($context['agreement_show_options']))
 	{
 		echo '
 						<br />
-						<label for="checkboxAgreement"><input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_agreement'], '.</label>';
+						<label for="checkboxAgreement">
+							<input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_agreement'], '
+						</label>';
 	}
 
 	echo '
 						<br />
-						<label for="checkboxAcceptAgreement"><input type="checkbox" name="checkboxAcceptAgreement" id="checkboxAcceptAgreement" tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_accept_agreement'], '.</label>
+						<label for="checkboxAcceptAgreement">
+							<input type="checkbox" name="checkboxAcceptAgreement" id="checkboxAcceptAgreement" tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_accept_agreement'], '
+						</label>
 					</p>
 					<div class="submitbutton" >
 						<input type="submit" name="save" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" />

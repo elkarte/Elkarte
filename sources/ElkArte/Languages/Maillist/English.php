@@ -253,7 +253,6 @@ $txt['ml_bounce_template_add'] = 'Add Template';
 $txt['ml_bounce_template_modify'] = 'Edit Template';
 $txt['ml_bounce_template_delete'] = 'Delete Selected';
 $txt['ml_bounce_template_delete_confirm'] = 'Are you sure you want to delete the selected templates?';
-$txt['ml_bounce_body'] = 'Notification Message';
 $txt['ml_bounce_template_subject_default'] = 'Notification Subject';
 $txt['ml_bounce_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template.';
 $txt['ml_bounce_template_title'] = 'Template Title';

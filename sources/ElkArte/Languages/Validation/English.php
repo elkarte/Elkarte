@@ -4,7 +4,7 @@
 $txt['_validate_required'] = 'The %1$s field is required.';
 $txt['_validate_valid_email'] = 'The %1$s field is required to be a valid email address.';
 $txt['_validate_max_length'] = 'The %1$s field can hold a maximum of %2$s characters.';
-$txt['_validate_min_length'] = 'The %1$s field needs to be a minimun of %2$s characters.';
+$txt['_validate_min_length'] = 'The %1$s field needs to be a minimum of %2$s characters.';
 $txt['_validate_length'] = 'The %1$s field needs to be exactly %2$s character in length.';
 $txt['_validate_alpha'] = 'The %1$s field can only contain letters.';
 $txt['_validate_alpha_numeric'] = 'The %1$s field can only contain letters and numbers.';

@@ -214,7 +214,6 @@ $txt['sort_desc'] = 'Sort descending';
 $txt['admin_login'] = 'Administration Log in';
 // Use numeric entities in the below string.
 $txt['topic'] = 'Topic';
-$txt['help'] = 'Help';
 $txt['notify'] = 'Notify';
 $txt['unnotify'] = 'Unnotify';
 $txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
@@ -260,7 +259,6 @@ $txt['no'] = 'No';
 // @todo this string seems a good candidate for deprecation
 $txt['search_on'] = 'on';
 
-$txt['search'] = 'Search';
 $txt['all'] = 'All';
 $txt['search_entireforum'] = 'Entire Forum';
 $txt['search_thisbrd'] = 'This board';
@@ -307,7 +305,7 @@ $txt['hello_member'] = 'Hey,';
 $txt['hello_guest'] = 'Welcome,';
 $txt['select_destination'] = 'Please select a destination';
 
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['posted_by'] = 'Posted by';
 
 $txt['icon_smiley'] = 'Smiley';
@@ -590,7 +588,6 @@ $txt['calendar_edit'] = 'Edit Event';
 $txt['event_delete_confirm'] = 'Delete this event?';
 $txt['event_delete'] = 'Delete Event';
 $txt['calendar_post_event'] = 'Post Event';
-$txt['calendar'] = 'Calendar';
 $txt['calendar_link'] = 'Link to Calendar';
 $txt['calendar_upcoming'] = 'Upcoming Calendar';
 $txt['calendar_today'] = 'Today\'s Calendar';
@@ -814,7 +811,7 @@ $txt['mark_unread'] = 'Mark unread';
 $txt['ssi_not_direct'] = 'Please don\'t access SSI.php by URL directly; you may want to use the path (%1$s) or add ?ssi_function=something.';
 $txt['ssi_session_broken'] = 'SSI.php was unable to load a session!  This may cause problems with logout and other functions - please make sure SSI.php is included before *anything* else in all your scripts!';
 
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['preview_title'] = 'Preview post';
 $txt['preview_fetch'] = 'Fetching preview...';
 $txt['pm_error_while_submitting'] = 'The following error or errors occurred while sending this personal message:';
@@ -870,7 +867,7 @@ $txt['prompt_text_ftp'] = 'Please enter the FTP address.';
 $txt['prompt_text_url'] = 'Please enter the URL you wish to link to.';
 $txt['prompt_text_img'] = 'Enter image location';
 
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['autosuggest_delete_item'] = 'Delete Item';
 
 // Debug related - when $db_show_debug is true.
@@ -933,6 +930,5 @@ $txt['otp_show_qr'] = 'Show QR-Code';
 
 $txt['other'] = 'Other';
 
-$txt['offline'] = 'OFFLINE';
 $txt['retry'] = 'RETRY';
 $txt['check_connection'] = 'Please check your internet connection';

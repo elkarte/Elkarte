@@ -50,15 +50,6 @@ $txt['admin_logoff'] = 'End Admin Session';
 $txt['admin_maintenance'] = 'Maintenance';
 $txt['admin_image_text'] = 'Show buttons as images instead of text';
 $txt['admin_credits'] = 'Credits';
-$txt['admin_agreement'] = 'Show and require agreement letter when registering';
-$txt['admin_checkbox_agreement'] = 'Show a checkbox for the agreement in registration form instead of a full page';
-$txt['admin_checkbox_accept_agreement'] = 'Force all members to accept this new version of the agreement at the next visit to the forum';
-$txt['admin_agreement_default'] = 'Default';
-$txt['admin_agreement_select_language'] = 'Language to edit';
-$txt['admin_agreement_select_language_change'] = 'Change';
-
-$txt['admin_privacypol'] = 'Show and require accepting the privacy policy when registering';
-$txt['admin_checkbox_accept_privacypol'] = 'Force all members to accept this new version of the privacy policy at the next visit to the forum';
 
 $txt['admin_delete_members'] = 'Delete Selected Members';
 $txt['admin_change_primary_membergroup'] = 'Change primary member group';
@@ -96,10 +87,6 @@ $txt['database_server'] = 'Database Server';
 $txt['database_user'] = 'Database User';
 $txt['database_password'] = 'Database Password';
 $txt['database_name'] = 'Database Name';
-$txt['registration_agreement'] = 'Registration Agreement';
-$txt['registration_agreement_desc'] = 'This agreement is shown when a user registers an account on this forum and has to be accepted before users can continue registration.';
-$txt['privacy_policy'] = 'Privacy Policy';
-$txt['privacy_policy_desc'] = 'This privacy policy is shown when a user registers an account on this forum and can be made mandatory before users can continue registration.';
 $txt['database_prefix'] = 'Database Tables Prefix';
 $txt['errors_list'] = 'Listing of forum errors';
 $txt['errors_found'] = 'The following errors are fouling up your forum';
@@ -136,10 +123,23 @@ $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set'
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
 $txt['live'] = 'Latest Software Updates';
 $txt['remove_all'] = 'Clear Log';
+
+$txt['admin_agreement'] = 'Show and require agreement letter when registering';
+$txt['admin_checkbox_agreement'] = 'Show a checkbox for the agreement in registration form instead of a full page';
+$txt['admin_checkbox_accept_agreement'] = 'Force all members to accept this new version of the agreement at the next visit to the forum';
+$txt['admin_agreement_default'] = 'Default';
+$txt['admin_agreement_select_language'] = 'Language to edit';
+$txt['admin_agreement_select_language_change'] = 'Change';
+$txt['registration_agreement'] = 'Registration Agreement';
+$txt['registration_agreement_desc'] = 'This agreement is shown when a user registers an account on this forum and has to be accepted before users can continue registration.';
 $txt['agreement_not_writable'] = 'Warning - The agreement language file in sources/ElkArte/Languages/Agreement/ is not writable. Any changes you make will NOT be saved.';
 $txt['agreement_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
 $txt['privacypol_not_writable'] = 'Warning - The privacy policy language file in sources/ElkArte/Languages/PrivacyPolicy/ is not writable. Any changes you make will NOT be saved.';
 $txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
+$txt['admin_privacypol'] = 'Show and require accepting the privacy policy when registering';
+$txt['admin_checkbox_accept_privacypol'] = 'Force all members to accept this new version of the privacy policy at the next visit to the forum';
+$txt['privacy_policy'] = 'Privacy Policy';
+$txt['privacy_policy_desc'] = 'This privacy policy is shown when a user registers an account on this forum and can be made mandatory before users can continue registration.';
 
 $txt['version_check_more'] = 'more detailed';
 
@@ -147,7 +147,6 @@ $txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
 $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
-$txt['viewmembers_online'] = 'Last Online';
 
 $txt['smileys_manage'] = 'Emoji & Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
@@ -215,15 +214,15 @@ $txt['ban_expiration'] = 'Expiration';
 $txt['ban_reason_desc'] = 'Reason for ban, to be displayed to banned member.';
 $txt['ban_notes_desc'] = 'Notes that may assist other staff members.';
 $txt['ban_remove_selected'] = 'Remove selected';
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['ban_remove_selected_confirm'] = 'Are you sure you want to remove the selected bans?';
 $txt['ban_modify'] = 'Modify';
 $txt['ban_name'] = 'Ban name';
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['ban_edit'] = 'Edit ban';
 $txt['ban_add_notes'] = '<strong>Note</strong>: after creating the above ban, you can add additional entries that trigger the ban, like IP addresses, hostnames and email addresses.';
 $txt['ban_expired'] = 'Expired / disabled';
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['ban_restriction_empty'] = 'No restriction selected.';
 
 $txt['ban_triggers'] = 'Triggers';
@@ -235,7 +234,7 @@ $txt['ban_edit_trigger_submit'] = 'Modify';
 $txt['ban_remove_selected_triggers'] = 'Remove selected ban triggers';
 $txt['ban_no_entries'] = 'There are currently no bans in effect.';
 
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['ban_remove_selected_triggers_confirm'] = 'Are you sure you want to remove the selected ban triggers?';
 $txt['ban_trigger_browse'] = 'Browse Ban Triggers';
 $txt['ban_trigger_browse_description'] = 'This screen shows all banned entities grouped by IP address, hostname, email address and user name.';

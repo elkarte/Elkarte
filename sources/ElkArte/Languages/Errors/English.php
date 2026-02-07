@@ -423,4 +423,4 @@ $txt['error_sa_not_set'] = 'The Sub-action you requested is not defined';
 $txt['no_sortable_items'] = 'No sortable items were found';
 
 $txt['error_notifier_already_instantiated'] = 'The notifier was already instantiated.';
-$txt['error_token_length'] = 'The requested token lenght is out of bounds';
+$txt['error_token_length'] = 'The requested token length is out of bounds';
