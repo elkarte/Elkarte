@@ -4,12 +4,12 @@
 $txt['post_reply'] = 'Post reply';
 $txt['post_in_board'] = 'Post in the board';
 
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['bbc_quote'] = 'Insert Quote';
 $txt['disable_smileys'] = 'Disable smileys';
 $txt['dont_use_smileys'] = 'Don\'t use smileys.';
 
-// Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
+// Escape any single quotes in here twice. 'it\'s' -> 'it\\\'s'.
 $txt['posted_on'] = 'Posted on';
 $txt['standard'] = 'Standard';
 $txt['thumbs_up'] = 'Thumb Up';

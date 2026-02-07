@@ -61,7 +61,7 @@ $txt['search_method_fulltext_remove'] = 'remove fulltext index';
 $txt['search_method_index_partial'] = 'partially created';
 $txt['search_index_custom_resume'] = 'resume';
 
-// These strings are used in a javascript confirmation popup; don't use entities.
+// These strings are used in a JavaScript confirmation popup; don't use entities.
 $txt['search_method_fulltext_warning'] = 'In order to be able to use fulltext search, you\\\'ll have to create a fulltext index first.';
 $txt['search_index_custom_warning'] = 'In order to be able to use a custom index search, you\\\'ll have to create a custom index first!';
 
