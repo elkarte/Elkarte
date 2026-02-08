@@ -76,7 +76,7 @@ class ImageMagick extends AbstractManipulator
 			return false;
 		}
 
-		if (defined('IMAGETYPE_AVIF') && $this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
+		if ($this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
 		{
 			return false;
 		}
@@ -323,9 +323,9 @@ class ImageMagick extends AbstractManipulator
 				{
 					echo $this->_image->getImagesBlob();
 				}
-				elseif ($preferred_format === IMAGETYPE_GIF && $this->_image->getNumberImages() !== 0)
+				elseif (($preferred_format === IMAGETYPE_GIF || $preferred_format === IMAGETYPE_WEBP || $preferred_format === IMAGETYPE_AVIF) && $this->_image->getNumberImages() !== 0)
 				{
-					// Write all animated GIF frames
+					// Write all animated frames
 					$success = $this->_image->writeImages($file_name, true);
 				}
 				else

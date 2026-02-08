@@ -72,7 +72,7 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
-		if (defined('IMAGETYPE_AVIF') && $this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
+		if ($this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
 		{
 			return false;
 		}

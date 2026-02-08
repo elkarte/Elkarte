@@ -177,7 +177,7 @@ class ImageUploadResize
 		}
 
 		// Do not attempt to reformat AVIF images — keep original format
-		if (defined('IMAGETYPE_AVIF') && $this->_sizeCurrent[2] === IMAGETYPE_AVIF)
+		if ($this->_sizeCurrent[2] === IMAGETYPE_AVIF)
 		{
 			return false;
 		}
