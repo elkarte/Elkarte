@@ -76,6 +76,11 @@ class ImageMagick extends AbstractManipulator
 			return false;
 		}
 
+		if (defined('IMAGETYPE_AVIF') && $this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
@@ -296,6 +301,10 @@ class ImageMagick extends AbstractManipulator
 			case IMAGETYPE_WEBP:
 				$this->_image->setImageCompressionQuality($quality);
 				$success = $this->_image->setImageFormat('webp');
+				break;
+			case IMAGETYPE_AVIF:
+				$this->_image->setImageCompressionQuality($quality);
+				$success = $this->_image->setImageFormat('avif');
 				break;
 			default:
 				$this->_image->borderImage('white', 0, 0);
@@ -613,6 +622,18 @@ class ImageMagick extends AbstractManipulator
 		$check = Imagick::queryformats();
 
 		return in_array('WEBP', $check, true);
+	}
+
+	/**
+	 * Check if this installation supports AVIF
+	 *
+	 * @return bool
+	 */
+	public function hasAvifSupport(): bool
+	{
+		$check = Imagick::queryformats();
+
+		return in_array('AVIF', $check, true) || in_array('avif', $check, true);
 	}
 
 	/**

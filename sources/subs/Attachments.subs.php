@@ -1085,7 +1085,8 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_JPC => 'jpeg',
 		IMAGETYPE_IFF => 'iff',
 		IMAGETYPE_WBMP => 'bmp',
-		IMAGETYPE_WEBP => 'webp'
+		IMAGETYPE_WEBP => 'webp',
+		IMAGETYPE_AVIF => 'avif'
 	];
 
 	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';

@@ -72,6 +72,11 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
+		if (defined('IMAGETYPE_AVIF') && $this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
@@ -212,7 +217,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Create a transparent true image canvas to place our image on
 	 *
-	 * @param resource $dst_img
+	 * @param GdImage $dst_img
 	 */
 	protected function _createCanvas($dst_img): void
 	{
@@ -281,6 +286,13 @@ class Gd2 extends AbstractManipulator
 				if (function_exists('imagewebp'))
 				{
 					$success = imagewebp($this->_image, $output_name, $quality);
+				}
+
+				break;
+			case IMAGETYPE_AVIF:
+				if (function_exists('imageavif'))
+				{
+					$success = imageavif($this->_image, $output_name, $quality);
 				}
 
 				break;
@@ -546,6 +558,18 @@ class Gd2 extends AbstractManipulator
 		$check = gd_info();
 
 		return !empty($check['WebP Support']);
+	}
+
+	/**
+	 * If this installation of GD supports AVIF
+	 *
+	 * @return bool
+	 */
+	public function hasAvifSupport(): bool
+	{
+		$check = gd_info();
+
+		return !empty($check['AVIF Support']) || !empty($check['avif']);
 	}
 
 	/**

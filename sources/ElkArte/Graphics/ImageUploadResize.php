@@ -176,6 +176,12 @@ class ImageUploadResize
 			return true;
 		}
 
+		// Do not attempt to reformat AVIF images — keep original format
+		if (defined('IMAGETYPE_AVIF') && $this->_sizeCurrent[2] === IMAGETYPE_AVIF)
+		{
+			return false;
+		}
+
 		// Already a JPEG and no WebP, out of options, I'm afraid
 		if ($this->_sizeCurrent[2] === IMAGETYPE_JPEG)
 		{

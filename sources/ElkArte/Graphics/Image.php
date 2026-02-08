@@ -38,7 +38,8 @@ class Image
 		IMAGETYPE_PNG => 'png',
 		IMAGETYPE_BMP => 'bmp',
 		IMAGETYPE_WBMP => 'wbmp',
-		IMAGETYPE_WEBP => 'webp'
+		IMAGETYPE_WEBP => 'webp',
+		IMAGETYPE_AVIF => 'avif'
 	];
 
 	/** @var ImageMagick|Gd2 */
