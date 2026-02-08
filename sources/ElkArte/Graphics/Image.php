@@ -85,22 +85,42 @@ class Image
 		if (!$this->_force_gd && ImageMagick::canUse())
 		{
 			$check = \Imagick::queryformats();
-			if (!in_array('WEBP', $check, true))
+			if (in_array('WEBP', $check, true))
 			{
-				return false;
+				return true;
 			}
 		}
 
 		if (Gd2::canUse())
 		{
 			$check = gd_info();
-			if (empty($check['WebP Support']))
+			if (!empty($check['WebP Support']))
 			{
-				return false;
+				return true;
 			}
 		}
 
-		return true;
+		return false;
+	}
+
+	/**
+	 * Check if the current manipulator supports Heic.  Only available in ImageMagick
+	 * when compiled with libheif
+	 *
+	 * @return bool
+	 */
+	public function hasHeicSupport(): bool
+	{
+		if (ImageMagick::canUse())
+		{
+			$check = \Imagick::queryformats();
+			if (in_array('HEIC', $check, true) || in_array('HEIF', $check, true))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -229,7 +249,13 @@ class Image
 		// Try Exif, which reads the file headers, most accurate for images
 		if (function_exists('exif_imagetype'))
 		{
-			return image_type_to_mime_type(exif_imagetype($this->_fileName));
+			$check = exif_imagetype($this->_fileName);
+
+			// exif_imagetype does not know about HEIC/HEIF images
+			if ($check !== false)
+			{
+				return image_type_to_mime_type($check);
+			}
 		}
 
 		return getMimeType($this->_fileName);

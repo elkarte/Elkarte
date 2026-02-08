@@ -174,10 +174,24 @@ function createAttachment(&$attachmentOptions)
 
 	// Now that we have the attach_id, let's rename this and finish up.
 	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
-	if (rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']) && $is_image)
+	set_error_handler(static function () { /* ignore errors */ });
+	try
 	{
-		// Let the manipulator the (loaded) file new location
-		$image->setFileName($attachmentOptions['destination']);
+		if ($is_image && rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']))
+		{
+			// Provide the manipulator the new file location
+			$image->setFileName($attachmentOptions['destination']);
+		}
+	}
+	catch (\Exception)
+	{
+		// Rename failed, clean up and return false
+		@unlink($attachmentOptions['destination']);
+		return false;
+	}
+	finally
+	{
+		restore_error_handler();
 	}
 
 	// If it's not approved then add to the approval queue.

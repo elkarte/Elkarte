@@ -307,6 +307,9 @@ class TemporaryAttachment extends ValuesContainer
 		// Did you pack this bag yourself?
 		$this->checkImageContents();
 
+		// HEIC requires special processing that will affect type (conversion to JPEG)
+		$this->convertFromHeic();
+
 		// WebP may require special processing that will affect size/type
 		$this->convertFromWebp();
 
@@ -412,16 +415,18 @@ class TemporaryAttachment extends ValuesContainer
 	{
 		global $modSettings;
 
+		$extensions = empty($modSettings['attachmentCheckExtensions']) ? [] : explode(',', strtolower($modSettings['attachmentExtensions']));
+
 		// We may have to adjust for webp based on ACP settings
 		if (empty($this->data['imagesize'][2])
 			|| $this->data['imagesize'][2] !== IMAGETYPE_WEBP
 			|| !empty($modSettings['attachment_webp_enable'])
-			|| (!empty($modSettings['attachmentCheckExtensions']) && stripos($modSettings['attachmentExtensions'], ',webp') === false))
+			|| (!in_array('webp', $extensions, true)))
 		{
 			return;
 		}
 
-		// Is a webp image and manipulation is possible?
+		// Are webp image manipulations possible?
 		$image = new Image($this->data['tmp_name']);
 		if ($image->hasWebpSupport())
 		{
@@ -437,7 +442,53 @@ class TemporaryAttachment extends ValuesContainer
 					'imagesize' => $image->getImageDimensions(),
 					'type' => $valid_mime,
 					'mime' => $valid_mime,
-					'name' => $this->data['name'] . '.' . $ext
+					'name' => pathinfo($this->data['name'], PATHINFO_FILENAME) . '.' . $ext
+				];
+
+				$this->data = array_merge($this->data, $update);
+			}
+		}
+	}
+
+	/**
+	 * Converts an uploaded HEIC image to a JPEG when HEIC handling is enabled and applicable.
+	 * Updates internal data properties such as file size, dimensions, MIME type, and name after conversion.
+	 *
+	 * This method checks if the image is in HEIC format and whether conversion capabilities are available.
+	 * If conversion is successful, it replaces the HEIC file with the converted file in the appropriate format.
+	 *
+	 * @return void
+	 */
+	public function convertFromHeic(): void
+	{
+		global $modSettings;
+
+		$extensions = empty($modSettings['attachmentCheckExtensions']) ? [] : explode(',', strtolower($modSettings['attachmentExtensions']));
+
+		// We might convert HEIC to JPG based on ACP settings and checks
+		if (empty($modSettings['attachment_heic_enable'])
+			|| empty($this->data['imagesize'][2]) // failed inspection
+			|| empty($this->data['mime'])
+			|| ($this->data['mime'] !== 'image/heic' && $this->data['mime'] !== 'image/heif')
+			|| (!in_array('heic', $extensions, true) && !in_array('heif', $extensions, true)))
+		{
+			return;
+		}
+
+		// Is HEIC image manipulation possible?
+		$image = new Image($this->data['tmp_name']);
+		if ($image->hasHeicSupport())
+		{
+			$format = IMAGETYPE_JPEG;
+			if ($image->isImageLoaded() && $image->saveImage($this->data['tmp_name'], $format))
+			{
+				// Update to jpg as if that was the original format
+				$update = [
+					'size' => $image->getFilesize(),
+					'imagesize' => $image->getImageDimensions(),
+					'type' => 'image/jpeg',
+					'mime' => 'image/jpeg',
+					'name' => pathinfo($this->data['name'], PATHINFO_FILENAME) . '.jpg'
 				];
 
 				$this->data = array_merge($this->data, $update);
@@ -593,7 +644,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Checks if a file existence/permission and if granted, will attempt
+	 * Checks a file existence w/permission and if granted, will attempt
 	 * to remove/unlink the file.
 	 *
 	 * @return bool

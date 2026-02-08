@@ -333,6 +333,7 @@ $helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller
 $helptxt['attachment_webp_enable'] = 'Enabling this will allow the system to create/save thumbnails and avatars 
 	in WebP format.  It will also allow the image resize function, when enabled, to save an attachment as Webp when
  	necessary.';
+$helptxt['attachment_heic_enable'] = 'Automatically converts HEIC images (from iPhones) to JPG format for browser compatibility. HEIC images cannot be displayed in most web browsers.';
 $helptxt['attachmentThumbWidth'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachmentThumbHeight'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum height to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachment_image_reencode'] = 'Selecting this option will enable the re-encode of uploaded image attachments. Image re-encoding offers better security, however it will also render all animated images static.';

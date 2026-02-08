@@ -70,6 +70,7 @@ class ImageMagick extends AbstractManipulator
 	public function createImageFromFile()
 	{
 		$this->setImageDimensions();
+		$heic = false;
 
 		if ($this->imageDimensions[2] === IMAGETYPE_WEBP && !$this->hasWebpSupport())
 		{
@@ -81,18 +82,26 @@ class ImageMagick extends AbstractManipulator
 			return false;
 		}
 
-		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
+		if ($this->imageDimensions[2] === -1 && $this->hasHeicSupport())
+		{
+			$mime = getMimeType($this->_fileName);
+			$heic = str_contains($mime, 'heic') || str_contains($mime, 'heif');
+		}
+
+		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]) || $heic)
 		{
 			try
 			{
 				$this->_image = new Imagick($this->_fileName);
 			}
-			catch (Exception)
+			catch (ImagickException)
 			{
+				$this->_image->clear();
 				return false;
 			}
 		}
-		else
+
+		if (!($this->_image instanceof Imagick))
 		{
 			return false;
 		}
@@ -179,7 +188,7 @@ class ImageMagick extends AbstractManipulator
 		$success = true;
 
 		// No image, no further
-		if (empty($this->_image))
+		if (!($this->_image instanceof Imagick))
 		{
 			return false;
 		}
@@ -447,7 +456,7 @@ class ImageMagick extends AbstractManipulator
 	public function getTransparency()
 	{
 		// No image, return false
-		if (empty($this->_image))
+		if (!($this->_image instanceof Imagick))
 		{
 			return false;
 		}
@@ -633,7 +642,19 @@ class ImageMagick extends AbstractManipulator
 	{
 		$check = Imagick::queryformats();
 
-		return in_array('AVIF', $check, true) || in_array('avif', $check, true);
+		return in_array('AVIF', $check, true);
+	}
+
+	/**
+	 * Check if this installation supports HEIF/HEIC
+	 *
+	 * @return bool
+	 */
+	public function hasHeicSupport(): bool
+	{
+		$check = Imagick::queryformats();
+
+		return in_array('HEIC', $check, true) || in_array('HEIF', $check, true);
 	}
 
 	/**
@@ -641,12 +662,7 @@ class ImageMagick extends AbstractManipulator
 	 */
 	public function __destruct()
 	{
-		if (!is_object($this->_image))
-		{
-			return;
-		}
-
-		if (!$this->_image instanceof Imagick)
+		if (!($this->_image instanceof Imagick))
 		{
 			return;
 		}

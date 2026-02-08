@@ -185,6 +185,7 @@ class ManageAttachments extends AbstractController
 			$uploadDirPosted = $this->_req->getPost('attachmentUploadDir', 'trim');
 			$webpEnable = !empty($this->_req->getPost('attachment_webp_enable', null, ''));
 			$attachExtensions = $this->_req->getPost('attachmentExtensions', 'trim');
+			$heicEnable = !empty($this->_req->getPost('attachment_heic_enable', null, ''));
 
 			// Default/Manual implies no subdirectories
 			if ($autoManage === 0)
@@ -258,6 +259,12 @@ class ManageAttachments extends AbstractController
 			if (!empty($webpEnable) && $attachExtensions !== null && !str_contains((string) $attachExtensions, 'webp'))
 			{
 				$attachExtensions = rtrim((string) $attachExtensions, ',') . ',webp';
+			}
+
+			// Allow or not heic extensions.
+			if (!empty($heicEnable) && $attachExtensions !== null && !str_contains((string) $attachExtensions, 'heic'))
+			{
+				$attachExtensions = rtrim((string) $attachExtensions, ',') . ',heic';
 			}
 
 			call_integration_hook('integrate_save_attachment_settings');
@@ -349,6 +356,13 @@ class ManageAttachments extends AbstractController
 			updateSettings(['attachment_webp_enable' => 0]);
 		}
 
+		// Check on HEIC support, and correct if wrong
+		$testHeic = $image->hasHeicSupport();
+		if (!$testHeic && !empty($modSettings['attachment_heic_enable']))
+		{
+			updateSettings(['attachment_heic_enable' => 0]);
+		}
+
 		// Check if the server settings support these upload size values
 		$post_max_size = ini_get('post_max_size');
 		$upload_max_filesize = ini_get('upload_max_filesize');
@@ -389,6 +403,7 @@ class ManageAttachments extends AbstractController
 			'',
 			['check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']],
 			['check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']],
+			['check', 'attachment_heic_enable', 'disabled' => !$testHeic, 'postinput' => $testHeic ? "" : $txt['attachment_heic_enable_na']],
 			// Resize limits
 			['title', 'attachment_image_resize'],
 			['check', 'attachment_image_resize_enabled'],
