@@ -5,8 +5,6 @@
  * specifically as needed for avatars (uploaded avatars), attachments, or
  * visual verification images.
  *
- * TrueType fonts supplied by www.LarabieFonts.com
- *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)

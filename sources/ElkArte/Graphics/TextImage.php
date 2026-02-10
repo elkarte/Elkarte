@@ -4,8 +4,6 @@
  * This file deals with creating an image file based on supplied text.  For example,
  * the attachment not found image
  *
- * TrueType fonts supplied by www.LarabieFonts.com
- *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
