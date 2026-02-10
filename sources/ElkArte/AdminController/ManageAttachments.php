@@ -333,7 +333,7 @@ class ManageAttachments extends AbstractController
 			$context['valid_basedirectory'] = true;
 		}
 
-		// A bit of razzle-dazzle with the $txt strings. :)
+		// A bit of razzle-dazzle with the $txt strings.
 		$txt['basedirectory_for_attachments_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['basedirectory_for_attachments_warning']);
 		$txt['attach_current_dir_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['attach_current_dir_warning']);
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
@@ -400,10 +400,6 @@ class ManageAttachments extends AbstractController
 			['int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => $testPM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testPM === false],
 			['int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => $testUM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testUM === false],
 			['int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6],
-			'',
-			['check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']],
-			['check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']],
-			['check', 'attachment_heic_enable', 'disabled' => !$testHeic, 'postinput' => $testHeic ? "" : $txt['attachment_heic_enable_na']],
 			// Resize limits
 			['title', 'attachment_image_resize'],
 			['check', 'attachment_image_resize_enabled'],
@@ -415,7 +411,11 @@ class ManageAttachments extends AbstractController
 			// Extension checks etc.
 			['check', 'attachmentCheckExtensions'],
 			['text', 'attachmentExtensions', 40],
-			'',
+			// Automatic modifications
+			['title', 'attachment_image_adjust'],
+			['check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_webp_enable_na']],
+			['check', 'attachment_heic_enable', 'disabled' => !$testHeic, 'postinput' => $testHeic ? "" : $txt['attachment_heic_enable_na']],
+			['check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']],
 			// Image checks.
 			['warning', $testImg === false ? 'attachment_img_enc_warning' : ''],
 			['check', 'attachment_image_reencode'],
