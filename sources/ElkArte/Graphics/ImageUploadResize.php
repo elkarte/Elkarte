@@ -112,10 +112,10 @@ class ImageUploadResize
 	public function resize($same_format = true): bool
 	{
 		// Attempt to resize the bounds
-		if ($this->image->resizeImage($this->_bounds[0], $this->_bounds[1]))
+		if ($this->image->resizeImage($this->_bounds[0], $this->_bounds[1], false, false))
 		{
-			$new_format = !$same_format && $this->getWebP() ? IMAGETYPE_WEBP : IMAGETYPE_JPEG;
-			$this->image->saveImage($this->_imageName, $same_format ? $this->_sizeCurrent[2] : $new_format);
+			$new_format = !$same_format ? $this->image->getDefaultFormat() : IMAGETYPE_JPEG;
+			$this->image->saveImage($this->_imageName, $same_format ? $this->_sizeCurrent[2] : $new_format, $new_format === IMAGETYPE_JPEG ? 90 : 85);
 
 			return true;
 		}
