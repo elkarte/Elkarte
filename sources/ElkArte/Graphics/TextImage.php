@@ -123,7 +123,7 @@ class TextImage extends Image
 	 * @param string $format image format to save the thumbnail
 	 * @param null|bool $force if forcing the image resize to scale up, the default action
 	 */
-	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null)
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null, $thumbnail = null)
 	{
 	}
 
