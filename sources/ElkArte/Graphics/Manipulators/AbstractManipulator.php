@@ -37,6 +37,9 @@ abstract class AbstractManipulator
 	/** @var int the height of the image, updated after any manipulation */
 	protected $_height = 0;
 
+	/** @var bool whether the image has been resized or not */
+	protected $_resized = false;
+
 	/** @var ImageMagick|resource */
 	protected $_image;
 

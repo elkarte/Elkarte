@@ -510,6 +510,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$valid_avatar_extensions = [
 		IMAGETYPE_PNG => 'png',
 		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_WEBP => 'webp'
 	];
 
@@ -550,7 +551,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		$image->autoRotate();
 	}
 
-	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
+	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format, true, 'avatar');
 	if ($thumb_image !== false)
 	{
 		list ($width, $height) = $thumb_image->getImageDimensions();

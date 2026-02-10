@@ -162,7 +162,7 @@ class Gd2 extends AbstractManipulator
 	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip if to remove the images Exif data (GD will always)
 	 * @param bool $force_resize = false Whether to override defaults and resize it
-	 * @param bool $thumbnail True if creating a simple thumbnail
+	 * @param bool $thumbnail True if creating a simple thumbnail (not used in GD)
 	 *
 	 * @return bool Whether resize was successful.
 	 */
@@ -196,6 +196,7 @@ class Gd2 extends AbstractManipulator
 
 				// Resize it!
 				$success = imagecopyresampled($dst_img, $this->_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+				$this->_resized = $success;
 			}
 			else
 			{
@@ -299,7 +300,14 @@ class Gd2 extends AbstractManipulator
 			default:
 				if (function_exists('imagejpeg'))
 				{
-					$success = imagejpeg($this->_image, $output_name, $quality);
+					if ($this->_resized === false)
+					{
+						$success = true;
+					}
+					else
+					{
+						$success = imagejpeg($this->_image, $output_name, $quality);
+					}
 				}
 		}
 

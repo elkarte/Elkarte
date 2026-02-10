@@ -282,20 +282,22 @@ class Image
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
 	 * @param null|int $format image format image constant value to save the thumbnail
-	 * @param null|bool $force if forcing the image resize to scale up, the default action
+	 * @param null|bool $force if forcing the image resize
+	 * @param bool $type if the image being created is for an avatar image (used to maintain animation)
 	 * @return bool|Image On success returns an image class loaded with new image
 	 */
-	public function createThumbnail($max_width, $max_height, $dstName = '', $format = null, $force = null)
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = null, $force = null, $thumbnail = null)
 	{
 		// The particulars
 		$dstName = $dstName === '' ? $this->_fileName . '_thumb' : $dstName;
 		$default_format = $this->getDefaultFormat();
-		$format = empty($format) || !is_int($format) ? $default_format : $format;
+		$format = !is_int($format) ? $default_format : $format;
+		$thumbnail = $thumbnail ?? true;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
 
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
-		$success = $this->resizeImage($max_width, $max_height, true, $force ?? true, true);
+		$success = $this->resizeImage($max_width, $max_height, true, $force ?? true, $thumbnail);
 
 		// Save our work
 		if ($success)
@@ -316,9 +318,9 @@ class Image
 	}
 
 	/**
-	 * Sets the best output format for a given image's thumbnail
+	 * Sets the best output format for a given image
 	 *
-	 * - If webP is available, use that as it gives the smallest size
+	 * - If webP is available, use that as it gives the smallest size and has better current support (vs AVIF)
 	 * - No webP then, if the image has alpha, we preserve it
 	 * - Finally good ol' jpeg
 	 *
@@ -334,14 +336,6 @@ class Image
 			return IMAGETYPE_WEBP;
 		}
 
-		// They uploaded a webp image, but ACP does not allow saving webp images, then
-		// if the server supports and its alpha save it as a png
-		if ($this->getMimeType() === 'image/webp' && $this->hasWebpSupport() && $this->getTransparency(false))
-		{
-			return IMAGETYPE_PNG;
-		}
-
-		// If you have alpha channels, best keep them with PNG
 		if ($this->getMimeType() !== 'image/png')
 		{
 			// The default, JPG
