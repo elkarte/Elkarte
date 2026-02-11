@@ -37,6 +37,9 @@ abstract class AbstractManipulator
 	/** @var int the height of the image, updated after any manipulation */
 	protected $_height = 0;
 
+	/** @var bool whether the image has been resized or not */
+	protected $_resized = false;
+
 	/** @var ImageMagick|resource */
 	protected $_image;
 
@@ -117,13 +120,18 @@ abstract class AbstractManipulator
 	 */
 	public function setImageDimensions($type = 'file', $data = ''): void
 	{
+		set_error_handler(static function () { /* ignore errors */ });
 		try
 		{
 			$this->imageDimensions = $type === 'string' ? getimagesizefromstring($data) : getimagesize($this->_fileName);
 		}
 		catch (\Exception)
 		{
-			$this->imageDimensions = [];
+			$this->imageDimensions = [-1, -1, -1];
+		}
+		finally
+		{
+			restore_error_handler();
 		}
 
 		// Can't get it, what shall we return

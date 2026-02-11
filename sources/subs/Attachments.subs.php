@@ -174,10 +174,24 @@ function createAttachment(&$attachmentOptions)
 
 	// Now that we have the attach_id, let's rename this and finish up.
 	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
-	if (rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']) && $is_image)
+	set_error_handler(static function () { /* ignore errors */ });
+	try
 	{
-		// Let the manipulator the (loaded) file new location
-		$image->setFileName($attachmentOptions['destination']);
+		if ($is_image && rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']))
+		{
+			// Provide the manipulator the new file location
+			$image->setFileName($attachmentOptions['destination']);
+		}
+	}
+	catch (\Exception)
+	{
+		// Rename failed, clean up and return false
+		@unlink($attachmentOptions['destination']);
+		return false;
+	}
+	finally
+	{
+		restore_error_handler();
 	}
 
 	// If it's not approved then add to the approval queue.
@@ -496,6 +510,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$valid_avatar_extensions = [
 		IMAGETYPE_PNG => 'png',
 		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_WEBP => 'webp'
 	];
 
@@ -536,7 +551,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		$image->autoRotate();
 	}
 
-	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
+	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format, true, 'avatar');
 	if ($thumb_image !== false)
 	{
 		list ($width, $height) = $thumb_image->getImageDimensions();
@@ -1085,7 +1100,8 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_JPC => 'jpeg',
 		IMAGETYPE_IFF => 'iff',
 		IMAGETYPE_WBMP => 'bmp',
-		IMAGETYPE_WEBP => 'webp'
+		IMAGETYPE_WEBP => 'webp',
+		IMAGETYPE_AVIF => 'avif'
 	];
 
 	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';

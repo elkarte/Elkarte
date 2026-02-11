@@ -70,24 +70,38 @@ class ImageMagick extends AbstractManipulator
 	public function createImageFromFile()
 	{
 		$this->setImageDimensions();
+		$heic = false;
 
 		if ($this->imageDimensions[2] === IMAGETYPE_WEBP && !$this->hasWebpSupport())
 		{
 			return false;
 		}
 
-		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
+		if ($this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
+		{
+			return false;
+		}
+
+		if ($this->imageDimensions[2] === -1 && $this->hasHeicSupport())
+		{
+			$mime = getMimeType($this->_fileName);
+			$heic = str_contains($mime, 'heic') || str_contains($mime, 'heif');
+		}
+
+		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]) || $heic)
 		{
 			try
 			{
 				$this->_image = new Imagick($this->_fileName);
 			}
-			catch (Exception)
+			catch (ImagickException)
 			{
+				$this->_image->clear();
 				return false;
 			}
 		}
-		else
+
+		if (!($this->_image instanceof Imagick))
 		{
 			return false;
 		}
@@ -165,7 +179,7 @@ class ImageMagick extends AbstractManipulator
 	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip Whether to have IM strip EXIF data as GD will
 	 * @param bool $force_resize = false Whether to override defaults and resize it
-	 * @param bool $thumbnail True if creating a simple thumbnail
+	 * @param bool|string $thumbnail True if creating a simple thumbnail, 'avatar' if creating an avatar thumbnail.
 	 *
 	 * @return bool Whether resize was successful.
 	 */
@@ -174,7 +188,7 @@ class ImageMagick extends AbstractManipulator
 		$success = true;
 
 		// No image, no further
-		if (empty($this->_image))
+		if (!($this->_image instanceof Imagick))
 		{
 			return false;
 		}
@@ -190,30 +204,41 @@ class ImageMagick extends AbstractManipulator
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		[$dst_width, $dst_height] = $this->imageRatio($max_width, $max_height);
 
-		// Don't bother resizing if it's already smaller...
-		if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
+		// Handle animated images specially
+		if ($this->_image->getNumberImages() > 1 ) {
+			if ($thumbnail === false || $thumbnail === 'avatar')
+			{
+				$success = $this->resizeAnimatedImage($dst_width, $dst_height);
+			}
+
+			if ($thumbnail === true)
+			{
+				$this->_image = $this->_image->getImage();
+				$success = $this->_image->thumbnailImage($dst_width, $dst_height, true);
+			}
+
+			$this->_resized = $success;
+		}
+		// Don't bother resizing if it's already smaller... Maybe
+		elseif (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
 		{
 			try
 			{
-				if ($thumbnail)
+				if ($thumbnail === true)
 				{
 					$success = $this->_image->thumbnailImage($dst_width, $dst_height, true);
-				}
-				elseif ($this->_image->getNumberImages() > 1)
-				{
-					// Animated GIFs are a special case, they need to be resized individually
-					$success = $this->resizeGifImage($dst_width, $dst_height);
 				}
 				else
 				{
 					$success = $this->_image->resizeImage($dst_width, $dst_height, Imagick::FILTER_LANCZOS, .9891, true);
 				}
 			}
-			catch (ImagickException)
+			catch (ImagickException $exception)
 			{
 				return false;
 			}
 
+			$this->_resized = $success;
 			$this->_setImage();
 		}
 
@@ -235,17 +260,17 @@ class ImageMagick extends AbstractManipulator
 	}
 
 	/**
-	 * Resizes a GIF image to the specified dimensions, adjusting each frame individually.
+	 * Resizes an animated image to the specified dimensions, adjusting each frame individually.
 	 *
 	 * @param int $dst_width The desired width of the resized image.
 	 * @param int $dst_height The desired height of the resized image.
 	 * @return bool Indicates whether the resizing operation was successful for all frames.
 	 */
-	public function resizeGifImage($dst_width, $dst_height)
+	public function resizeAnimatedImage($dst_width, $dst_height)
 	{
 		$success = true;
 
-		// Explode the GIF so each frame is a full image
+		// Explode the file so each frame is a full image
 		$this->_image = $this->_image->coalesceImages();
 
 		// Resize every frame individually
@@ -297,7 +322,17 @@ class ImageMagick extends AbstractManipulator
 				$this->_image->setImageCompressionQuality($quality);
 				$success = $this->_image->setImageFormat('webp');
 				break;
+			case IMAGETYPE_AVIF:
+				$this->_image->setImageCompressionQuality($quality);
+				$success = $this->_image->setImageFormat('avif');
+				break;
 			default:
+				if ($this->_resized === true)
+				{
+					// Avoid additive lossy compression if the image wasn't resized.
+					$success = true;
+					break;
+				}
 				$this->_image->borderImage('white', 0, 0);
 				$this->_image->setImageCompression(Imagick::COMPRESSION_JPEG);
 				$this->_image->setImageCompressionQuality($quality);
@@ -314,9 +349,20 @@ class ImageMagick extends AbstractManipulator
 				{
 					echo $this->_image->getImagesBlob();
 				}
-				elseif ($preferred_format === IMAGETYPE_GIF && $this->_image->getNumberImages() !== 0)
+				elseif (($preferred_format === IMAGETYPE_GIF || $preferred_format === IMAGETYPE_WEBP || $preferred_format === IMAGETYPE_AVIF) && $this->_image->getNumberImages() > 1)
 				{
-					// Write all animated GIF frames
+					// Save a few more bits on animated WebP
+					if ($preferred_format === IMAGETYPE_WEBP)
+					{
+						$this->_image->setOption('webp:method', '6');
+						foreach ($this->_image as $frame)
+						{
+							$frame->setImageFormat('webp');
+							$frame->setImageCompressionQuality($quality);
+						}
+					}
+
+					// Write all animated frames
 					$success = $this->_image->writeImages($file_name, true);
 				}
 				else
@@ -438,7 +484,7 @@ class ImageMagick extends AbstractManipulator
 	public function getTransparency()
 	{
 		// No image, return false
-		if (empty($this->_image))
+		if (!($this->_image instanceof Imagick))
 		{
 			return false;
 		}
@@ -616,16 +662,35 @@ class ImageMagick extends AbstractManipulator
 	}
 
 	/**
+	 * Check if this installation supports AVIF
+	 *
+	 * @return bool
+	 */
+	public function hasAvifSupport(): bool
+	{
+		$check = Imagick::queryformats();
+
+		return in_array('AVIF', $check, true);
+	}
+
+	/**
+	 * Check if this installation supports HEIF/HEIC
+	 *
+	 * @return bool
+	 */
+	public function hasHeicSupport(): bool
+	{
+		$check = Imagick::queryformats();
+
+		return in_array('HEIC', $check, true) || in_array('HEIF', $check, true);
+	}
+
+	/**
 	 * CLean up
 	 */
 	public function __destruct()
 	{
-		if (!is_object($this->_image))
-		{
-			return;
-		}
-
-		if (!$this->_image instanceof Imagick)
+		if (!($this->_image instanceof Imagick))
 		{
 			return;
 		}

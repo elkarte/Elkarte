@@ -352,7 +352,7 @@ class Avatars
 		}
 
 		// To be here, the image is either under the size limit or over with the "CSS to resize" option.
-		// Either way try to save as is.  This is the only path to keep an animated GIF
+		// Either way try to save as is.  This is the only path to keep an animated GIF with GD
 		if (!$this->_saveUploadedAvatar($image))
 		{
 			return false;

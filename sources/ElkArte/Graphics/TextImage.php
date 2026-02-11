@@ -4,8 +4,6 @@
  * This file deals with creating an image file based on supplied text.  For example,
  * the attachment not found image
  *
- * TrueType fonts supplied by www.LarabieFonts.com
- *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
@@ -123,7 +121,7 @@ class TextImage extends Image
 	 * @param string $format image format to save the thumbnail
 	 * @param null|bool $force if forcing the image resize to scale up, the default action
 	 */
-	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null)
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null, $thumbnail = null)
 	{
 	}
 

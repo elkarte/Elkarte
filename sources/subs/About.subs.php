@@ -107,9 +107,9 @@ function prepareCreditsData()
 			'<a href="https://github.com/googlefonts/noto-emoji">Noto Emoji</a> | &copy; Googlefonts | Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="https://openmoji.org">OpenMoji</a> | &copy; OpenMoji | Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0</a>',
 			'<a href="https://github.com/KDE/oxygen-icons">Oxygen Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
-			'<a href="https://github.com/twitter/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/twitter/twemoji/blob/master/LICENSE/">MIT</a>',],
+			'<a href="https://github.com/jdecked/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/jdecked/twemoji/blob/main/LICENSE">MIT</a>',],
 		'fonts' => [
-			'<a href="https://www.fontsquirrel.com/fonts/open-sans">Open Sans</a> | &copy; Ascender Fonts | <a href="https://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0',
+			'<a href="https://fonts.google.com/specimen/Open+Sans">Open Sans</a> | &copy; Open Sans Project Authors | Licensed under <a href="https://openfontlicense.org/open-font-license-official-text/">SIL Open Font License, Version 1.1</a>',
 		],
 		'software' => [
 			'<a href="https://ichord.github.com/At.js">At.js</a> | &copy; Chord Luo | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',

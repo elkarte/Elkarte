@@ -72,6 +72,11 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
+		if ($this->imageDimensions[2] === IMAGETYPE_AVIF && !$this->hasAvifSupport())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
@@ -157,7 +162,7 @@ class Gd2 extends AbstractManipulator
 	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip if to remove the images Exif data (GD will always)
 	 * @param bool $force_resize = false Whether to override defaults and resize it
-	 * @param bool $thumbnail True if creating a simple thumbnail
+	 * @param bool $thumbnail True if creating a simple thumbnail (not used in GD)
 	 *
 	 * @return bool Whether resize was successful.
 	 */
@@ -191,6 +196,7 @@ class Gd2 extends AbstractManipulator
 
 				// Resize it!
 				$success = imagecopyresampled($dst_img, $this->_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+				$this->_resized = $success;
 			}
 			else
 			{
@@ -212,7 +218,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Create a transparent true image canvas to place our image on
 	 *
-	 * @param resource $dst_img
+	 * @param GdImage $dst_img
 	 */
 	protected function _createCanvas($dst_img): void
 	{
@@ -284,10 +290,24 @@ class Gd2 extends AbstractManipulator
 				}
 
 				break;
+			case IMAGETYPE_AVIF:
+				if (function_exists('imageavif'))
+				{
+					$success = imageavif($this->_image, $output_name, $quality);
+				}
+
+				break;
 			default:
 				if (function_exists('imagejpeg'))
 				{
-					$success = imagejpeg($this->_image, $output_name, $quality);
+					if ($this->_resized === false)
+					{
+						$success = true;
+					}
+					else
+					{
+						$success = imagejpeg($this->_image, $output_name, $quality);
+					}
 				}
 		}
 
@@ -546,6 +566,18 @@ class Gd2 extends AbstractManipulator
 		$check = gd_info();
 
 		return !empty($check['WebP Support']);
+	}
+
+	/**
+	 * If this installation of GD supports AVIF
+	 *
+	 * @return bool
+	 */
+	public function hasAvifSupport(): bool
+	{
+		$check = gd_info();
+
+		return !empty($check['AVIF Support']) || !empty($check['avif']);
 	}
 
 	/**
