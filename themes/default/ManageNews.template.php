@@ -224,17 +224,7 @@ function template_email_members_compose()
 					<ul>
 						<li>
 							<label for="send_pm">
-								<input type="checkbox" name="send_pm" id="send_pm" ', empty($context['send_pm']) ? '' : 'checked="checked"', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
-							</label>
-						</li>
-						<li>
-							<label for="send_html">
-								<input type="checkbox" name="send_html" id="send_html" ', empty($context['send_html']) ? '' : 'checked="checked"', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
-							</label>
-						</li>
-						<li>
-							<label for="parse_html">
-								<input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" /> ', $txt['email_parsed_html'], '
+								<input type="checkbox" name="send_pm" id="send_pm" ', empty($context['send_pm']) ? '' : 'checked="checked"', ' /> ', $txt['email_as_pms'], '
 							</label>
 						</li>
 					</ul>
@@ -258,23 +248,7 @@ function template_email_members_compose()
 		var form_name = "newsmodify",
 			preview_area = "news",
 			txt_preview_title = "' . $txt['preview_title'] . '",
-			txt_preview_fetch = "' . $txt['preview_fetch'] . '";
-
-		function checkboxes_status (item)
-		{
-			if (item.id === \'send_html\')
-				document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
-
-			if (item.id === \'send_pm\')
-			{
-				if (!document.getElementById(\'send_html\').checked)
-					document.getElementById(\'parse_html\').disabled = true;
-				else
-					document.getElementById(\'parse_html\').disabled = false;
-
-				document.getElementById(\'send_html\').disabled = !document.getElementById(\'send_html\').disabled;
-			}
-		}', true);
+			txt_preview_fetch = "' . $txt['preview_fetch'] . '";', true);
 
 	echo '
 		</form>
@@ -306,9 +280,7 @@ function template_email_members_send()
 					<input type="hidden" name="start" value="', $context['start'], '" />
 					<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
 					<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
-					<input type="hidden" name="send_pm" value="', $context['send_pm'], '" />
-					<input type="hidden" name="send_html" value="', $context['send_html'], '" />
-					<input type="hidden" name="parse_html" value="', $context['parse_html'], '" />';
+					<input type="hidden" name="send_pm" value="', $context['send_pm'], '" />';
 
 	// All the things we must remember!
 	foreach ($context['recipients'] as $key => $values)
