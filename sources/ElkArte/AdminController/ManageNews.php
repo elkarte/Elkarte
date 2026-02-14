@@ -387,7 +387,6 @@ class ManageNews extends AbstractController
 			$context['recipients']['groups'] = empty($this->_req->post->groups) ? [] : explode(',', $this->_req->post->groups);
 			$context['recipients']['exclude_groups'] = empty($this->_req->post->exclude_groups) ? [] : explode(',', $this->_req->post->exclude_groups);
 			$context['recipients']['emails'] = empty($this->_req->post->emails) ? [] : explode(';', $this->_req->post->emails);
-			$context['email_force'] = $this->_req->getPost('email_force', 'isset', false);
 			$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
 			$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
 			$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
@@ -581,7 +580,6 @@ class ManageNews extends AbstractController
 
 		// Where are we actually to?
 		$context['start'] = $this->_req->getPost('start', 'intval', 0);
-		$context['email_force'] = $this->_req->getPost('email_force', 'isset', false);
 		$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
 		$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
 		$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
@@ -848,11 +846,9 @@ class ManageNews extends AbstractController
 				$sendParams['exclude_members'] = $context['recipients']['exclude_members'];
 			}
 
-			// Force them to have it?
-			if (empty($context['email_force']))
-			{
-				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
-			}
+			// Always respect user notification preferences
+			$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
+			$sendParams['notify_announcements'] = 1;
 
 			require_once(SUBSDIR . '/News.subs.php');
 

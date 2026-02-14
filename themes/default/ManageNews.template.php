@@ -60,16 +60,6 @@ function template_email_members()
 						<span id="members_container"></span>
 					</dd>
 				</dl>
-				<hr class="bordercolor" />
-				<dl class="settings">
-					<dt>
-						<label for="email_force">', $txt['admin_news_select_override_notify'], ':</label><br />
-						<span class="smalltext">', $txt['email_force'], '</span>
-					</dt>
-					<dd>
-						<input type="checkbox" name="email_force" id="email_force" value="1" />
-					</dd>
-				</dl>
 			</div>
 			<div id="exclude_panel_header">
 				<h2 class="category_header panel_toggle">
@@ -258,7 +248,6 @@ function template_email_members_compose()
 					<div class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="email_force" value="', $context['email_force'], '" />
 						<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
 						<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
 					</div>
