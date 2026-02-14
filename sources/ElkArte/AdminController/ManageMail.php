@@ -302,7 +302,7 @@ class ManageMail extends AbstractController
 		detectServer()->setTimeLimit(600);
 
 		// Have we already used our maximum time?
-		if (time() - array_sum(explode(' ', $time_start)) < 5)
+		if ((microtime(true) - $time_start) > 3)
 		{
 			return;
 		}

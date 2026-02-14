@@ -72,7 +72,6 @@ function updateAllSignatures($applied_sigs)
 	global $context, $modSettings;
 
 	require_once(SUBSDIR . '/Members.subs.php');
-	$sig_start = time();
 
 	// This is horrid - but I suppose some people will want the option to do it.
 	$done = false;
@@ -345,7 +344,7 @@ function updateAllSignatures($applied_sigs)
 		$applied_sigs += 50;
 		if (!$done)
 		{
-			pauseSignatureApplySettings($applied_sigs, $sig_start);
+			pauseSignatureApplySettings($applied_sigs);
 		}
 	}
 }
@@ -925,21 +924,20 @@ function scanFileSystemForControllers($iterator, $namespace = '')
  * Pause the signature applying thing.
  *
  * @param int $applied_sigs
- * @param int $sig_start
  * @todo Merge with other pause functions?
  *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
  *
  * @todo Move to subs file
  */
-function pauseSignatureApplySettings($applied_sigs, $sig_start)
+function pauseSignatureApplySettings($applied_sigs)
 {
-	global $context, $txt;
+	global $context, $txt, $time_start;
 
 	// Try to get more time...
 	detectServer()->setTimeLimit(600);
 
 	// Have we exhausted all the time we allowed?
-	if (time() - array_sum(explode(' ', $sig_start)) < 3)
+	if ((microtime(true) - $time_start) > 3)
 	{
 		return;
 	}
