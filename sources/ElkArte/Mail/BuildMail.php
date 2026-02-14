@@ -506,9 +506,12 @@ class BuildMail extends BaseMail
 	{
 		global $scripturl;
 
-		$string = strtr($string, [$this->lineBreak => '<br />' . $this->lineBreak]);
+		$string = strtr($string, [$this->lineBreak => '<br />']);
 
-		return preg_replace('~\b(' . preg_quote($scripturl, '~') . '(?:[?/][\w\-%.,?@!:&;=#]+)?)~', '<a href="$1" target="_blank" rel="noopener">$1</a>', $string);
+		// Skip existing HTML tags so URLs inside attributes/anchors are not linkified.
+		$pattern = '~<[^>]+>(*SKIP)(*F)|\b(' . preg_quote($scripturl, '~') . '(?:[?/][\w\-%.,?@!:&;=#]+)?)~';
+
+		return preg_replace($pattern, '<a href="$1" target="_blank" rel="noopener">$1</a>', $string);
 	}
 
 	/**
