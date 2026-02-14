@@ -637,7 +637,7 @@ class Maintenance extends AbstractController
 
 		// An 8-step process should be 12 for the admin
 		$this->total_steps = 8;
-		$this->start = $this->_req->getQuery('start', 'inval', 0);
+		$this->start = $this->_req->getQuery('start', 'intval', 0);
 		$this->step = $this->_req->getQuery('step', 'intval', 0);
 
 		// Get each topic with a wrong reply count and fix it
@@ -1239,7 +1239,7 @@ class Maintenance extends AbstractController
 				// Increase the counter
 				$context['start'] += 10;
 
-				// If this is really taking some time, show the pause screen
+				// If it's really taking some time, show the pause screen
 				if (microtime(true) - $time_start > 3)
 				{
 					// What's the percent?
@@ -1457,12 +1457,12 @@ class Maintenance extends AbstractController
 		{
 			validateToken('admin-maint');
 			$total_members = countContributors();
-			$_SESSION['total_member'] = $total_members;
+			$_SESSION['total_members'] = $total_members;
 		}
 		else
 		{
 			validateToken('admin-recountposts');
-			$total_members = $this->_req->session->total_members;
+			$total_members = $_SESSION['total_members'];
 		}
 
 		// Let's get the next group of members and determine their post-count

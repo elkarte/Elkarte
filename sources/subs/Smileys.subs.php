@@ -515,7 +515,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 		$cols['selected'][] = $i;
 		$cols['path'][] = $set;
 		$cols['name'][] = stripslashes($set_names[$i]);
-		$cols['ext'][] = $set_exts[$i];
+		$cols['ext'][] = $set_exts[$i] ?? 'svg';
 	}
 
 	$sort_flag = !str_contains($sort, 'DESC') ? SORT_ASC : SORT_DESC;

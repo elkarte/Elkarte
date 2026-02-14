@@ -1938,7 +1938,7 @@ class ManageSmileys extends AbstractController
 				'path' => htmlspecialchars($set, ENT_COMPAT),
 				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT),
 				'selected' => $set === $modSettings['smiley_sets_default'],
-				'ext' => Util::htmlspecialchars($set_exts[$i]),
+				'ext' => Util::htmlspecialchars($set_exts[$i] ?? 'svg'),
 			];
 		}
 	}

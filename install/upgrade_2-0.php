@@ -544,7 +544,7 @@ class UpgradeInstructions_upgrade_2_0
 				'debug_title' => 'Add new smiley extension values...',
 				'function' => static function () {
 					global $modSettings;
-					// Not defined is easy, but unlikely
+					// Not defined
 					if (empty($modSettings['smiley_sets_known']))
 					{
 						$smiley_sets_known = 'default';
@@ -560,8 +560,8 @@ class UpgradeInstructions_upgrade_2_0
 						$sets = explode(',', $modSettings['smiley_sets_known']);
 						$key = array_search('default', $sets, true);
 
-						// default does not exist, easy, add it as the first
-						if (empty($key))
+						// default does not exist, add it as the first
+						if ($key === false)
 						{
 							$smiley_sets_known = 'default,' . $modSettings['smiley_sets_known'];
 							$smiley_sets_names = 'Default' . "\n" . $modSettings['smiley_sets_names'];
@@ -684,6 +684,19 @@ class UpgradeInstructions_upgrade_2_0
 			array(
 				'debug_title' => 'Removing / Changing misc modSetting data ...',
 				'function' => static function () {
+					global $modSettings;
+
+					// custom_avatar_enabled => avatar_upload_enabled
+					if (!empty($modSettings['custom_avatar_enabled']))
+					{
+						updateSettings(array(
+							'avatar_upload_enabled' => '1',
+						));
+						removeSettings(
+							array('custom_avatar_enabled')
+						);
+					}
+
 					removeSettings(
 						array('visual_verification_type', 'visual_verification_num_chars')
 					);
