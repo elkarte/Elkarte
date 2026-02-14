@@ -272,7 +272,7 @@ final class ParserWrapper
 	 */
 	public function parseEmail($email): string
 	{
-		return $this->enableSmileys(false)->parse('email', $email);
+		return $this->enableSmileys(true)->parse('email', $email);
 	}
 
 	/**
