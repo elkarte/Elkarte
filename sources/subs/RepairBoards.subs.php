@@ -18,7 +18,6 @@
  */
 
 use ElkArte\Debug;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Languages\Loader as LangLoader;
 
 /**
@@ -87,7 +86,7 @@ function loadForumTests()
 		// Find messages that don't have existing topics.
 		'missing_topics' => [
 			'substeps' => [
-				'step_size' => 1000,
+				'step_size' => 2000,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}messages'
@@ -180,7 +179,7 @@ function loadForumTests()
 		// Find topics with no messages.
 		'missing_messages' => [
 			'substeps' => [
-				'step_size' => 1000,
+				'step_size' => 2000,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}topics'
@@ -219,7 +218,7 @@ function loadForumTests()
 		],
 		'polls_missing_topics' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_poll)
 					FROM {db_prefix}polls'
@@ -324,7 +323,7 @@ function loadForumTests()
 		],
 		'stats_topics' => [
 			'substeps' => [
-				'step_size' => 200,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}topics'
@@ -399,7 +398,7 @@ function loadForumTests()
 		// Find topics with incorrect num_replies.
 		'stats_topics2' => [
 			'substeps' => [
-				'step_size' => 300,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}topics'
@@ -448,7 +447,7 @@ function loadForumTests()
 		// Find topics with incorrect unapproved_posts.
 		'stats_topics3' => [
 			'substeps' => [
-				'step_size' => 1000,
+				'step_size' => 2000,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}topics'
@@ -474,7 +473,7 @@ function loadForumTests()
 		// Find topics with nonexistent boards.
 		'missing_boards' => [
 			'substeps' => [
-				'step_size' => 1000,
+				'step_size' => 2000,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}topics'
@@ -566,7 +565,7 @@ function loadForumTests()
 		// Find messages with nonexistent members.
 		'missing_posters' => [
 			'substeps' => [
-				'step_size' => 2000,
+				'step_size' => 4000,
 				'step_max' => '
 					SELECT MAX(id_msg)
 					FROM {db_prefix}messages'
@@ -633,7 +632,7 @@ function loadForumTests()
 		],
 		'missing_polls' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT 
 						MAX(id_poll)
@@ -666,7 +665,7 @@ function loadForumTests()
 		],
 		'missing_calendar_topics' => [
 			'substeps' => [
-				'step_size' => 1000,
+				'step_size' => 2000,
 				'step_max' => '
 					SELECT 
 						MAX(id_topic)
@@ -700,7 +699,7 @@ function loadForumTests()
 		],
 		'missing_log_topics' => [
 			'substeps' => [
-				'step_size' => 150,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_topics'
@@ -730,7 +729,7 @@ function loadForumTests()
 		],
 		'missing_log_topics_members' => [
 			'substeps' => [
-				'step_size' => 150,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_topics'
@@ -759,7 +758,7 @@ function loadForumTests()
 		],
 		'missing_log_boards' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_boards'
@@ -788,7 +787,7 @@ function loadForumTests()
 		],
 		'missing_log_boards_members' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_boards'
@@ -817,7 +816,7 @@ function loadForumTests()
 		],
 		'missing_log_mark_read' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_mark_read'
@@ -846,7 +845,7 @@ function loadForumTests()
 		],
 		'missing_log_mark_read_members' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_mark_read'
@@ -875,7 +874,7 @@ function loadForumTests()
 		],
 		'missing_pms' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_pm)
 					FROM {db_prefix}pm_recipients'
@@ -906,7 +905,7 @@ function loadForumTests()
 		],
 		'missing_recipients' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}pm_recipients'
@@ -936,7 +935,7 @@ function loadForumTests()
 		],
 		'missing_senders' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_pm)
 					FROM {db_prefix}personal_messages'
@@ -967,7 +966,7 @@ function loadForumTests()
 		],
 		'missing_notify_members' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_notify'
@@ -996,7 +995,7 @@ function loadForumTests()
 		],
 		'missing_cached_subject' => [
 			'substeps' => [
-				'step_size' => 100,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}topics'
@@ -1058,7 +1057,7 @@ function loadForumTests()
 		],
 		'missing_topic_for_cache' => [
 			'substeps' => [
-				'step_size' => 50,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_topic)
 					FROM {db_prefix}log_search_subjects'
@@ -1088,7 +1087,7 @@ function loadForumTests()
 		],
 		'missing_member_vote' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_polls'
@@ -1119,7 +1118,7 @@ function loadForumTests()
 		],
 		'missing_log_poll_vote' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_poll)
 					FROM {db_prefix}log_polls'
@@ -1149,7 +1148,7 @@ function loadForumTests()
 		],
 		'report_missing_comments' => [
 			'substeps' => [
-				'step_size' => 500,
+				'step_size' => 1000,
 				'step_max' => '
 					SELECT MAX(id_report)
 					FROM {db_prefix}log_reported'
@@ -1179,7 +1178,7 @@ function loadForumTests()
 		],
 		'comments_missing_report' => [
 			'substeps' => [
-				'step_size' => 200,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_report)
 					FROM {db_prefix}log_reported_comments'
@@ -1209,7 +1208,7 @@ function loadForumTests()
 		],
 		'group_request_missing_member' => [
 			'substeps' => [
-				'step_size' => 200,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_member)
 					FROM {db_prefix}log_group_requests'
@@ -1238,7 +1237,7 @@ function loadForumTests()
 		],
 		'group_request_missing_group' => [
 			'substeps' => [
-				'step_size' => 200,
+				'step_size' => 500,
 				'step_max' => '
 					SELECT MAX(id_group)
 					FROM {db_prefix}log_group_requests'
@@ -1415,7 +1414,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 	detectServer()->setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
-	if (!$force && microtime(true) - $time_start < 3000)
+	if (!$force && microtime(true) - $time_start > 3)
 	{
 		return;
 	}
@@ -1448,7 +1447,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 	// What about substeps?
 	$context['substep_enabled'] = $max_substep != 0;
 	$context['substep_title'] = sprintf($txt['repair_currently_' . (isset($_GET['fixErrors']) ? 'fixing' : 'checking')], ($txt['repair_operation_' . $current_step_description] ?? $current_step_description));
-	$context['substep_continue_percent'] = $max_substep == 0 ? 0 : round(($_GET['substep'] * 100) / $max_substep, 1);
+	$context['substep_continue_percent'] = $max_substep == 0 ? 0 : round(($_GET['substep'] * 100) / $max_substep);
 
 	$_SESSION['repairboards_to_fix'] = $to_fix;
 	$_SESSION['repairboards_to_fix2'] = $context['repair_errors'];
@@ -1457,7 +1456,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 }
 
 /**
- * Checks for errors in steps until 5 seconds have passed.
+ * Checks for errors in steps until 3 seconds have passed.
  *
  * - It keeps track of the errors it did find so that the actual repair
  * won't have to recheck everything.
@@ -1515,7 +1514,7 @@ function findForumErrors($do_fix = false)
 		// Has it got substeps?
 		if (isset($test['substeps']))
 		{
-			$step_size = $test['substeps']['step_size'] ?? 100;
+			$step_size = $test['substeps']['step_size'] ?? 500;
 			$request = $db->query('',
 				$test['substeps']['step_max'],
 				[]
