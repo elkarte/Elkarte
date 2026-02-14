@@ -173,7 +173,8 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 
 	$db->fetchQuery('
 		SELECT 
-			mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
+			mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups,
+			mem.id_post_group, mem.lngfile, mem.password_salt
 		FROM {db_prefix}members AS mem
 		WHERE mem.id_member > {int:min_id_member}
 			AND mem.id_member < {int:max_id_member}
