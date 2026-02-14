@@ -888,12 +888,12 @@ class ManageAttachments extends AbstractController
 		// Try to give us a while to sort this out...
 		detectServer()->setTimeLimit(600);
 
-		$this->step = $this->_req->getQuery('step', 'intval', 0);
-		$this->substep = $this->_req->getQuery('substep', 'intval', 0);
-		$this->starting_substep = $this->substep;
+		$step = $this->_req->getQuery('step', 'intval', 0);
+		$substep = $this->_req->getQuery('substep', 'intval', 0);
+		$starting_substep = $substep;
 
 		// Don't recall the session just in case.
-		if ($this->step === 0 && $this->substep === 0)
+		if ($step === 0 && $substep === 0)
 		{
 			unset($_SESSION['attachments_to_fix'], $_SESSION['attachments_to_fix2']);
 
@@ -933,104 +933,106 @@ class ManageAttachments extends AbstractController
 		$fix_errors = $this->_req->hasQuery('fixErrors');
 
 		// Get stranded thumbnails.
-		if ($this->step <= 0)
+		if ($step === 0)
 		{
 			$thumbnails = getMaxThumbnail();
+			$increment = 2000;
 
-			for (; $this->substep < $thumbnails; $this->substep += 500)
+			for (; $substep < $thumbnails; $substep += $increment)
 			{
-				$removed = findOrphanThumbnails($this->substep, $fix_errors, $to_fix);
+				$removed = findOrphanThumbnails($substep, $fix_errors, $to_fix, $increment);
 				$context['repair_errors']['missing_thumbnail_parent'] += count($removed);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $starting_substep, $increment, $step, $fix_errors);
 			}
 
 			// Done here, on to the next
-			$this->step = 1;
-			$this->substep = 0;
-			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+			$starting_substep = 0;
+			$substep = 0;
+			$step = 1;
 		}
 
 		// Find parents who think they have thumbnails, but actually, don't.
-		if ($this->step <= 1)
+		if ($step === 1)
 		{
 			$thumbnails = maxNoThumb();
-
-			for (; $this->substep < $thumbnails; $this->substep += 500)
+			$increment = 2000;
+			for (; $substep < $thumbnails; $substep += $increment)
 			{
-				$to_update = findParentsOrphanThumbnails($this->substep, $fix_errors, $to_fix);
+				$to_update = findParentsOrphanThumbnails($substep, $fix_errors, $to_fix, $increment);
 				$context['repair_errors']['parent_missing_thumbnail'] += count($to_update);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $starting_substep, $increment, $step, $fix_errors);
 			}
 
 			// Another step done, but many to go
-			$this->step = 2;
-			$this->substep = 0;
-			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+			$starting_substep = 0;
+			$substep = 0;
+			$step = 2;
 		}
 
 		// This may take forever, I'm afraid, but life sucks... recount EVERY attachment!
-		if ($this->step <= 2)
+		if ($step === 2)
 		{
 			$thumbnails = maxAttachment();
-
-			for (; $this->substep < $thumbnails; $this->substep += 250)
+			$increment = 1000;
+			for (; $substep < $thumbnails; $substep += $increment)
 			{
-				$repair_errors = repairAttachmentData($this->substep, $fix_errors, $to_fix);
+				$repair_errors = repairAttachmentData($substep, $fix_errors, $to_fix, $increment);
 
 				foreach ($repair_errors as $key => $value)
 				{
 					$context['repair_errors'][$key] += $value;
 				}
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $starting_substep, $increment, $step, $fix_errors);
 			}
 
 			// And onward we go
-			$this->step = 3;
-			$this->substep = 0;
-			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+			$starting_substep = 0;
+			$substep = 0;
+			$step = 3;
 		}
 
 		// Get avatars with no members associated with them.
-		if ($this->step <= 3)
+		if ($step === 3)
 		{
 			$thumbnails = maxAttachment();
-
-			for (; $this->substep < $thumbnails; $this->substep += 500)
+			$increment = 2000;
+			for (; $substep < $thumbnails; $substep += $increment)
 			{
-				$to_remove = findOrphanAvatars($this->substep, $fix_errors, $to_fix);
+				$to_remove = findOrphanAvatars($substep, $fix_errors, $to_fix, $increment);
 				$context['repair_errors']['avatar_no_member'] += count($to_remove);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $starting_substep, $increment, $step, $fix_errors);
 			}
 
-			$this->step = 4;
-			$this->substep = 0;
-			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+			// Still more to go...
+			$starting_substep = 0;
+			$substep = 0;
+			$step = 4;
 		}
 
 		// What about attachments, who are missing a message :'(
-		if ($this->step <= 4)
+		if ($step === 4)
 		{
 			$thumbnails = maxAttachment();
-
-			for (; $this->substep < $thumbnails; $this->substep += 500)
+			$increment = 1500;
+			for (; $substep < $thumbnails; $substep += $increment)
 			{
-				$to_remove = findOrphanAttachments($this->substep, $fix_errors, $to_fix);
+				$to_remove = findOrphanAttachments($substep, $fix_errors, $to_fix, $increment);
 				$context['repair_errors']['attachment_no_msg'] += count($to_remove);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+				pauseAttachmentMaintenance($to_fix, $thumbnails, $starting_substep, $increment, $step, $fix_errors);
 			}
 
-			$this->step = 5;
-			$this->substep = 0;
-			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+			$starting_substep = 0;
+			$substep = 0;
+			$step = 5;
 		}
 
 		// What about files that are not recorded in the database?
-		if ($this->step <= 5)
+		if ($step === 5)
 		{
 			// Just use the current path for temp files.
 			if (!is_array($modSettings['attachmentUploadDir']))
@@ -1040,10 +1042,10 @@ class ManageAttachments extends AbstractController
 
 			$attach_dirs = $modSettings['attachmentUploadDir'];
 			$current_check = 0;
-			$max_checks = 500;
+			$max_checks = 750;
 			$attachment_count = getAttachmentCountFromDisk();
+			$files_checked = empty($substep) ? 0 : $substep;
 
-			$files_checked = empty($this->substep) ? 0 : $this->substep;
 			foreach ($attach_dirs as $attach_dir)
 			{
 				try
@@ -1051,7 +1053,7 @@ class ManageAttachments extends AbstractController
 					$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
 					foreach ($files as $file)
 					{
-						if ($file->getFilename() === '.htaccess')
+						if ($file->getFilename() === '.htaccess' || $file->getFilename() === 'index.php')
 						{
 							continue;
 						}
@@ -1083,7 +1085,7 @@ class ManageAttachments extends AbstractController
 									}
 								}
 							}
-							elseif ($file->getFilename() !== 'index.php' && !$file->isDir())
+							elseif (!$file->isDir())
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix, true))
 								{
@@ -1097,11 +1099,11 @@ class ManageAttachments extends AbstractController
 						}
 
 						$current_check++;
-						$this->substep = $current_check;
+						$substep = $current_check;
 
 						if ($current_check - $files_checked >= $max_checks)
 						{
-							pauseAttachmentMaintenance($to_fix, $attachment_count, $this->starting_substep, $this->substep, $this->step, $fix_errors);
+							pauseAttachmentMaintenance($to_fix, $attachment_count, $substep-1, 0, $step, $fix_errors);
 						}
 					}
 				}
@@ -1110,13 +1112,10 @@ class ManageAttachments extends AbstractController
 					// @todo for now do nothing...
 				}
 			}
-
-			$this->step = 5;
-			$this->substep = 0;
-			pauseAttachmentMaintenance($to_fix, 0, $this->starting_substep, $this->substep, $this->step, $fix_errors);
 		}
 
 		// Got here we must be doing well - just the template! :D
+		theme()->getTemplates()->load('Admin');
 		$context['page_title'] = $txt['repair_attachments'];
 		$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
 		$context['sub_template'] = 'attachment_repair';
@@ -1132,61 +1131,6 @@ class ManageAttachments extends AbstractController
 				break;
 			}
 		}
-	}
-
-	/**
-	 * Function called in-between each round of attachments and avatar repairs.
-	 *
-	 * What it does:
-	 *
-	 * - Called by repairAttachments().
-	 * - If repairAttachments() has more steps added, this function needs to be updated!
-	 *
-	 * @param array $to_fix attachments to fix
-	 * @param int $max_substep = 0
-	 * @throws \ElkArte\Exceptions\Exception
-	 * @todo Move to ManageAttachments.subs.php
-	 */
-	private function _pauseAttachmentMaintenance(array $to_fix, int $max_substep = 0): void
-	{
-		global $context, $txt, $time_start;
-
-		// Try to get more time...
-		detectServer()->setTimeLimit(600);
-
-		// Have we already used our maximum time?
-		if (microtime(true) - $time_start < 3 || $this->starting_substep == $this->substep)
-		{
-			return;
-		}
-
-		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . ($this->_req->hasQuery('fixErrors') ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
-		$context['page_title'] = $txt['not_done_title'];
-		$context['continue_post_data'] = '';
-		$context['continue_countdown'] = '2';
-		$context['sub_template'] = 'not_done';
-
-		// Specific items to not break this template!
-		$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
-
-		// Change these two if more steps are added!
-		if (empty($max_substep))
-		{
-			$context['continue_percent'] = round(($this->step * 100) / 25);
-		}
-		else
-		{
-			$context['continue_percent'] = round(($this->step * 100 + ($this->substep * 100) / $max_substep) / 25);
-		}
-
-		// Never more than 100%!
-		$context['continue_percent'] = min($context['continue_percent'], 100);
-
-		// Save the necessary information for the next look
-		$_SESSION['attachments_to_fix'] = $to_fix;
-		$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
-
-		obExit();
 	}
 
 	/**

@@ -21,8 +21,10 @@
 
 use BBC\ParserWrapper;
 use ElkArte\Attachments\AttachmentsDirectory;
+use ElkArte\Errors\Errors;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\Util;
+use ElkArte\Languages\Txt;
 
 /**
  * Approve an attachment, or maybe even more - no permission check!
@@ -540,10 +542,11 @@ function maxNoThumb()
  * @param int $start
  * @param bool $fix_errors
  * @param string[] $to_fix
+ * @param int $increment The number to check in each iteration.
  *
  * @return array
  */
-function findOrphanThumbnails($start, $fix_errors, $to_fix)
+function findOrphanThumbnails($start, $fix_errors, $to_fix, $increment = 500)
 {
 	$db = database();
 
@@ -554,7 +557,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 			thumb.id_attach, thumb.id_folder, thumb.filename, thumb.file_hash
 		FROM {db_prefix}attachments AS thumb
 			LEFT JOIN {db_prefix}attachments AS tparent ON (tparent.id_thumb = thumb.id_attach)
-		WHERE thumb.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+		WHERE thumb.id_attach BETWEEN {int:substep} AND {int:substep} + ' . $increment - 1 . '
 			AND thumb.attachment_type = {int:thumbnail}
 			AND tparent.id_attach IS NULL',
 		[
@@ -611,10 +614,11 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  * @param int $start
  * @param bool $fix_errors
  * @param string[] $to_fix
+ * @param int $increment The number to check in each iteration.
  *
  * @return array
  */
-function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
+function findParentsOrphanThumbnails($start, $fix_errors, $to_fix, $increment = 500)
 {
 	$db = database();
 
@@ -623,7 +627,7 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 			a.id_attach
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
-		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + ' . $increment - 1 . '
 			AND a.id_thumb != {int:no_thumb}
 			AND thumb.id_attach IS NULL',
 		[
@@ -664,10 +668,11 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  * @param int $start
  * @param bool $fix_errors
  * @param string[] $to_fix
+ * @param int $increment The number of attachments to retrieve in each iteration.
  *
  * @return array
  */
-function repairAttachmentData($start, $fix_errors, $to_fix)
+function repairAttachmentData($start, $fix_errors, $to_fix, $increment = 250)
 {
 	global $modSettings;
 
@@ -688,7 +693,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 		SELECT 
 			id_attach, id_folder, filename, file_hash, size, attachment_type
 		FROM {db_prefix}attachments
-		WHERE id_attach BETWEEN {int:substep} AND {int:substep} + 249',
+		WHERE id_attach BETWEEN {int:substep} AND {int:substep} + ' . $increment - 1,
 		[
 			'substep' => $start,
 		]
@@ -811,10 +816,11 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
  * @param int $start The starting point for retrieving attachments.
  * @param bool $fix_errors Whether to fix errors or not.
  * @param array $to_fix The list of errors to fix.
+ * @param int $increment The number of avatars to check in each iteration.
  *
  * @return array The id_attachments of the deleted files (if $fix_errors is true).
  */
-function findOrphanAvatars($start, $fix_errors, $to_fix)
+function findOrphanAvatars($start, $fix_errors, $to_fix, $increment = 500)
 {
 	global $modSettings;
 
@@ -827,7 +833,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 			a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
-		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + ' . $increment - 1 . '
 			AND a.id_member != {int:no_member}
 			AND a.id_msg = {int:no_msg}
 			AND mem.id_member IS NULL',
@@ -882,10 +888,11 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
  * @param int $start
  * @param bool $fix_errors
  * @param string[] $to_fix
+ * @param int $increment
  *
  * @return array
  */
-function findOrphanAttachments($start, $fix_errors, $to_fix)
+function findOrphanAttachments($start, $fix_errors, $to_fix, $increment = 500)
 {
 	$db = database();
 
@@ -896,7 +903,7 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			a.id_attach, a.id_folder, a.filename, a.file_hash
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
-		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + ' . $increment - 1 . '
 			AND a.id_member = {int:no_member}
 			AND a.id_msg != {int:no_msg}
 			AND m.id_msg IS NULL',
@@ -1826,7 +1833,7 @@ function getAttachmentCountFromDisk()
 		{
 			$dir_iterator = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
 			$filter_iterator = new CallbackFilterIterator($dir_iterator, function ($file, $key, $iterator) {
-				return $file->getFilename()[0] !== '.';
+				return $file->getFilename()[0] !== '.' && $file->getFilename()[0] !== 'index.php';
 			});
 			$fileCount += iterator_count($filter_iterator);
 		}
@@ -1865,28 +1872,28 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0, $starting_substep
 	detectServer()->setTimeLimit(600);
 
 	// Have we already used our maximum time?
-	if ($starting_substep === $substep || microtime(true) - $time_start < 3)
+	$context['continue_countdown'] = '1';
+	if ((microtime(true) - $time_start) > 3)
 	{
-		return;
+		$context['continue_countdown'] = '3';
 	}
 
-	$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . ($fixErrors ? ';fixErrors' : '') . ';step=' . $step . ';substep=' . $substep . ';' . $context['session_var'] . '=' . $context['session_id'];
+	$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . ($fixErrors ? ';fixErrors' : '') . ';step=' . $step . ';substep=' . $starting_substep + $substep . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
 	$context['continue_post_data'] = '';
-	$context['continue_countdown'] = '3';
 	$context['sub_template'] = 'not_done';
 
-	// Specific stuff to not break this template!
+	// Specific stuff so we don't break this template!
 	$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
 
 	// Change these two if more steps are added!
 	if ($max_substep === 0)
 	{
-		$context['continue_percent'] = round($step * 20);
+		$context['continue_percent'] = round($step * 16.67);
 	}
 	else
 	{
-		$context['continue_percent'] = round($step * 20 + (($substep / $max_substep) * 20));
+		$context['continue_percent'] = round($step * 16.67 + ((($substep + $starting_substep) / $max_substep) * 16.67));
 	}
 
 	// Never more than 100%!
