@@ -114,7 +114,7 @@ class Notify extends AbstractController
 		}
 
 		checkSession('get');
-		$this->_toggle_topic_notification();
+		$this->_toggleTopicNotification();
 
 		// Send them back to the topic.
 		$start = $this->_req->getQuery('start', 'intval', 0);
@@ -124,7 +124,7 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a topic notification on/off
 	 */
-	private function _toggle_topic_notification($memID = null, $enable = null): void
+	private function _toggleTopicNotification($memID = null, $enable = null): void
 	{
 		global $topic;
 
@@ -185,7 +185,7 @@ class Notify extends AbstractController
 			return;
 		}
 
-		$this->_toggle_topic_notification();
+		$this->_toggleTopicNotification();
 
 		// Return the results so the UI can be updated properly
 		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
@@ -253,7 +253,7 @@ class Notify extends AbstractController
 		checkSession('get');
 
 		// Turn notification on/off for this board.
-		$this->_toggle_board_notification();
+		$this->_toggleBoardNotification();
 
 		// Back to the board!
 		$start = $this->_req->getQuery('start', 'intval', 0);
@@ -263,7 +263,7 @@ class Notify extends AbstractController
 	/**
 	 * Toggle a board notification on/off
 	 */
-	private function _toggle_board_notification($memID = null, $enable = null): void
+	private function _toggleBoardNotification($memID = null, $enable = null): void
 	{
 		global $board;
 
@@ -273,6 +273,20 @@ class Notify extends AbstractController
 		// Turn notification on/off for this board.
 		$isOn = $enable !== null ? $enable : ($this->_req->getQuery('sa', 'trim|strval', '') === 'on');
 		setBoardNotification($memID ?? $this->user->id, $board, $isOn);
+	}
+
+	/**
+	 * Toggle announcement notification on/off for a member
+	 *
+	 * @param int $memID The member id
+	 * @param bool $enable Whether to enable (true) or disable (false) announcements
+	 */
+	private function _toggleAnnouncementNewsletters($memID, $enable): void
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		// Update the member's notify_announcements setting
+		updateMemberData($memID, ['notify_announcements' => (int) $enable]);
 	}
 
 	/**
@@ -328,7 +342,7 @@ class Notify extends AbstractController
 			return;
 		}
 
-		$this->_toggle_board_notification();
+		$this->_toggleBoardNotification();
 
 		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
 		$start = $this->_req->getQuery('start', 'intval', 0);
@@ -486,7 +500,7 @@ class Notify extends AbstractController
 	{
 		global $board, $topic;
 
-		$baseAreas = ['topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg'];
+		$baseAreas = ['topic', 'board', 'newsletters', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg'];
 
 		// Not a base method, so an addon will need to process this
 		if (!in_array($area, $baseAreas))
@@ -501,11 +515,14 @@ class Notify extends AbstractController
 		{
 			case 'topic':
 				$topic = $extra;
-				$this->_toggle_topic_notification($member['id_member'], $forceDisable);
+				$this->_toggleTopicNotification($member['id_member'], $forceDisable);
 				break;
 			case 'board':
 				$board = $extra;
-				$this->_toggle_board_notification($member['id_member'], $forceDisable);
+				$this->_toggleBoardNotification($member['id_member'], $forceDisable);
+				break;
+			case 'newsletters':
+				$this->_toggleAnnouncementNewsletters($member['id_member'], $forceDisable);
 				break;
 			case 'buddy':
 			case 'likemsg':
@@ -579,7 +596,7 @@ class Notify extends AbstractController
 			$potentialAreas[] = strtolower($class::getType());
 		}
 
-		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
+		$potentialAreas = array_merge($potentialAreas, ['topic', 'board', 'newsletters']);
 
 		// Expand the token
 		[$id_member, $hash, $area, $extra, $time] = explode('_', $match[1]);
@@ -679,6 +696,9 @@ class Notify extends AbstractController
 				$name = boardInfo((int) $extra);
 				$name = $name === null ? $txt['notify_unsubscribed_generic'] : $name['name'];
 				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name, $email);
+				break;
+			case 'newsletters':
+				$context['unsubscribe_message'] = sprintf($txt['notify_announcements_unsubscribed'], $txt['news'], $email);
 				break;
 			case 'buddy':
 			case 'likemsg':
