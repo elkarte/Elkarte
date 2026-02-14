@@ -358,8 +358,8 @@ class ManageNews extends AbstractController
 		// Set up the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-		$context['subject'] = empty($this->_req->post->subject) ? $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8') : $this->_req->post->subject;
-		$context['message'] = empty($this->_req->post->message) ? htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8') : $this->_req->post->message;
+		$context['subject'] = empty($this->_req->post->subject) ? $context['forum_name'] . ': ' . Util::htmlspecialchars($txt['subject']) : $this->_req->post->subject;
+		$context['message'] = empty($this->_req->post->message) ? Util::htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}') : $this->_req->post->message;
 
 		// Needed for the WYSIWYG editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -529,7 +529,7 @@ class ManageNews extends AbstractController
 	}
 
 	/**
-	 * Handles the sending of the forum mailing in batches.
+	 * Handles the sending of the mailing in batches.
 	 *
 	 * What it does:
 	 *
@@ -565,16 +565,6 @@ class ManageNews extends AbstractController
 			return;
 		}
 
-		// How many to send at once? Quantity depends on whether we are queueing or not.
-		// @todo Might need an interface? (used in Post.controller.php too with different limits)
-		$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
-
-		// If by PM's I suggest we half the above number.
-		if (!empty($this->_req->post->send_pm))
-		{
-			$num_at_once /= 2;
-		}
-
 		checkSession();
 
 		// Where are we actually to?
@@ -584,6 +574,16 @@ class ManageNews extends AbstractController
 		$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
 		$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
 		$context['parse_html'] = $this->_req->getPost('parse_html', 'isset', false);
+
+
+		// How many to send at once? Quantity depends on whether we are queueing or not.
+		$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
+
+		// If by PM's I suggest we half the above number.
+		if (!empty($context['send_pm']))
+		{
+			$num_at_once /= 2;
+		}
 
 		// Create our main context.
 		$context['recipients'] = [
@@ -670,8 +670,8 @@ class ManageNews extends AbstractController
 		$base_message = $this->_req->getPost('message', 'strval', '');
 
 		// Save the message and its subject in $context
-		$context['subject'] = htmlspecialchars($base_subject, ENT_COMPAT, 'UTF-8');
-		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
+		$context['subject'] = Util::htmlspecialchars($base_subject);
+		$context['message'] = Util::htmlspecialchars($base_message);
 
 		// Prepare the message for sending it as HTML
 		if (!$context['send_pm'] && !empty($context['send_html']))
@@ -696,6 +696,7 @@ class ManageNews extends AbstractController
 			}
 		}
 
+		// Something to send?
 		if (empty($base_message) || empty($base_subject))
 		{
 			$context['preview'] = true;
