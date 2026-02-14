@@ -269,7 +269,7 @@ class ManageNews extends AbstractController
 	 * - Requires the send_mail permission.
 	 * - Form is submitted to ?action=admin;area=news;mailingcompose.
 	 *
-	 * @uses the ManageNews template and email_members sub template.
+	 * @uses ManageNews template and email_members sub template.
 	 */
 	public function action_mailingmembers(): void
 	{
@@ -386,8 +386,7 @@ class ManageNews extends AbstractController
 			$context['recipients']['exclude_members'] = empty($this->_req->post->exclude_members) ? [] : explode(',', $this->_req->post->exclude_members);
 			$context['recipients']['groups'] = empty($this->_req->post->groups) ? [] : explode(',', $this->_req->post->groups);
 			$context['recipients']['exclude_groups'] = empty($this->_req->post->exclude_groups) ? [] : explode(',', $this->_req->post->exclude_groups);
-			$context['recipients']['emails'] = empty($this->_req->post->emails) ? [] : explode(';', $this->_req->post->emails);
-			$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
+			$context['total_emails'] = 0;
 			$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
 			$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
 			$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
@@ -435,7 +434,7 @@ class ManageNews extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// For the progress bar!
-		$context['total_emails'] = count($context['recipients']['emails']);
+		$context['total_emails'] = 0;
 		$context['max_id_member'] = maxMemberID();
 
 		// Make sure to fully load the array with the form choices
@@ -592,7 +591,6 @@ class ManageNews extends AbstractController
 			'exclude_groups' => [],
 			'members' => [],
 			'exclude_members' => [],
-			'emails' => [],
 		];
 
 		// Do we have any excluded members?
@@ -652,20 +650,6 @@ class ManageNews extends AbstractController
 			foreach ($groups as $group)
 			{
 				$context['recipients']['exclude_groups'][] = (int) $group;
-			}
-		}
-
-		// Finally - emails!
-		if (!empty($this->_req->post->emails))
-		{
-			$addressed = array_unique(explode(';', strtr($this->_req->post->emails, ["\n" => ';', "\r" => ';', ',' => ';'])));
-			foreach ($addressed as $curmem)
-			{
-				$curmem = trim($curmem);
-				if ($curmem !== '')
-				{
-					$context['recipients']['emails'][$curmem] = $curmem;
-				}
 			}
 		}
 
@@ -760,39 +744,8 @@ class ManageNews extends AbstractController
 			'{$member.name}'
 		];
 
-		// If we still have emails, do them first!
-		$i = 0;
-		foreach ($context['recipients']['emails'] as $k => $email)
-		{
-			// Done as many as we can?
-			if ($i >= $num_at_once)
-			{
-				break;
-			}
-
-			// Don't send it twice!
-			unset($context['recipients']['emails'][$k]);
-
-			// Dammit - can't PM emails!
-			if ($context['send_pm'])
-			{
-				continue;
-			}
-
-			$to_member = [
-				$email,
-				empty($context['send_html']) ? $email : '<a href="mailto:' . $email . '">' . $email . '</a>',
-				'??',
-				$email
-			];
-
-			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($context['send_html']), 5);
-
-			// Done another...
-			$i++;
-		}
-
 		// Got some more to send this batch?
+		$i = 0;
 		$last_id_member = 0;
 		if ($i < $num_at_once)
 		{
@@ -911,7 +864,7 @@ class ManageNews extends AbstractController
 			$last_id_member = $context['start'] + $num_at_once;
 		}
 		// If we have no id_member, then we're done.
-		elseif (empty($last_id_member) && empty($context['recipients']['emails']))
+		elseif (empty($last_id_member))
 		{
 			// Log this into the admin log.
 			logAction('newsletter', [], 'admin');
@@ -921,9 +874,7 @@ class ManageNews extends AbstractController
 		$context['start'] = $last_id_member;
 
 		// Working out progress is a black art of sorts.
-		$percentEmails = $context['total_emails'] == 0 ? 0 : ((count($context['recipients']['emails']) / $context['total_emails']) * ($context['total_emails'] / ($context['total_emails'] + $context['max_id_member'])));
-		$percentMembers = ($context['start'] / $context['max_id_member']) * ($context['max_id_member'] / ($context['total_emails'] + $context['max_id_member']));
-		$context['percentage_done'] = round(($percentEmails + $percentMembers) * 100, 2);
+		$context['percentage_done'] = round(($context['start'] / $context['max_id_member']) * 100);
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_send';

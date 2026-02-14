@@ -45,13 +45,6 @@ function template_email_members()
 	echo '
 					</dd>
 					<dt>
-						<label for="emails">', $txt['admin_news_select_email'], ':</label><br />
-						<span class="smalltext">', $txt['admin_news_select_email_desc'], '</span>
-					</dt>
-					<dd>
-						<textarea id="emails" name="emails" rows="5" cols="30" style="width: 98%;"></textarea>
-					</dd>
-					<dt>
 						<label for="members">', $txt['admin_news_select_members'], ':</label><br />
 						<span class="smalltext">', $txt['admin_news_select_members_desc'], '</span>
 					</dt>
@@ -257,7 +250,7 @@ function template_email_members_compose()
 	foreach ($context['recipients'] as $key => $values)
 	{
 		echo '
-			<input type="hidden" name="', $key, '" value="', implode(($key === 'emails' ? ';' : ','), $values), '" />';
+			<input type="hidden" name="', $key, '" value="', implode(',', $values), '" />';
 	}
 
 	// The vars used to preview a newsletter without loading a new page, used by post.js previewControl()
@@ -321,7 +314,7 @@ function template_email_members_send()
 	foreach ($context['recipients'] as $key => $values)
 	{
 		echo '
-					<input type="hidden" name="', $key, '" value="', implode(($key === 'emails' ? ';' : ','), $values), '" />';
+					<input type="hidden" name="', $key, '" value="', implode(',', $values), '" />';
 	}
 
 	echo '
