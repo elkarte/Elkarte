@@ -20,6 +20,8 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\BuildMail;
+use ElkArte\Mail\PreparseMail;
 use ElkArte\SettingsForm\SettingsForm;
 
 /**
@@ -269,7 +271,7 @@ class ManageNews extends AbstractController
 	 * - Requires the send_mail permission.
 	 * - Form is submitted to ?action=admin;area=news;mailingcompose.
 	 *
-	 * @uses the ManageNews template and email_members sub template.
+	 * @uses ManageNews template and email_members sub template.
 	 */
 	public function action_mailingmembers(): void
 	{
@@ -358,8 +360,8 @@ class ManageNews extends AbstractController
 		// Set up the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-		$context['subject'] = empty($this->_req->post->subject) ? $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8') : $this->_req->post->subject;
-		$context['message'] = empty($this->_req->post->message) ? htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8') : $this->_req->post->message;
+		$context['subject'] = empty($this->_req->post->subject) ? $context['forum_name'] . ': ' . Util::htmlspecialchars($txt['subject']) : $this->_req->post->subject;
+		$context['message'] = empty($this->_req->post->message) ? Util::htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}') : $this->_req->post->message;
 
 		// Needed for the WYSIWYG editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -386,12 +388,9 @@ class ManageNews extends AbstractController
 			$context['recipients']['exclude_members'] = empty($this->_req->post->exclude_members) ? [] : explode(',', $this->_req->post->exclude_members);
 			$context['recipients']['groups'] = empty($this->_req->post->groups) ? [] : explode(',', $this->_req->post->groups);
 			$context['recipients']['exclude_groups'] = empty($this->_req->post->exclude_groups) ? [] : explode(',', $this->_req->post->exclude_groups);
-			$context['recipients']['emails'] = empty($this->_req->post->emails) ? [] : explode(';', $this->_req->post->emails);
-			$context['email_force'] = $this->_req->getPost('email_force', 'isset', false);
-			$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
+			$context['total_emails'] = 0;
 			$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
-			$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
-			$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
+			$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
 
 			prepareMailingForPreview();
 
@@ -436,7 +435,7 @@ class ManageNews extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// For the progress bar!
-		$context['total_emails'] = count($context['recipients']['emails']);
+		$context['total_emails'] = 0;
 		$context['max_id_member'] = maxMemberID();
 
 		// Make sure to fully load the array with the form choices
@@ -531,7 +530,7 @@ class ManageNews extends AbstractController
 	}
 
 	/**
-	 * Handles the sending of the forum mailing in batches.
+	 * Handles the sending of the mailing in batches.
 	 *
 	 * What it does:
 	 *
@@ -547,7 +546,7 @@ class ManageNews extends AbstractController
 	 */
 	public function action_mailingsend(bool $clean_only = false): void
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $scripturl, $modSettings, $mbname;
 
 		// A nice successful screen if you did it
 		if ($this->_req->hasQuery('success'))
@@ -567,26 +566,22 @@ class ManageNews extends AbstractController
 			return;
 		}
 
-		// How many to send at once? Quantity depends on whether we are queueing or not.
-		// @todo Might need an interface? (used in Post.controller.php too with different limits)
-		$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
-
-		// If by PM's I suggest we half the above number.
-		if (!empty($this->_req->post->send_pm))
-		{
-			$num_at_once /= 2;
-		}
-
 		checkSession();
 
 		// Where are we actually to?
 		$context['start'] = $this->_req->getPost('start', 'intval', 0);
-		$context['email_force'] = $this->_req->getPost('email_force', 'isset', false);
 		$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
 		$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
-		$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
-		$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
-		$context['parse_html'] = $this->_req->getPost('parse_html', 'isset', false);
+		$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
+
+		// How many to send at once? Quantity depends on whether we are queueing or not.
+		$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
+
+		// If by PM's I suggest we half the above number.
+		if (!empty($context['send_pm']))
+		{
+			$num_at_once /= 2;
+		}
 
 		// Create our main context.
 		$context['recipients'] = [
@@ -594,7 +589,6 @@ class ManageNews extends AbstractController
 			'exclude_groups' => [],
 			'members' => [],
 			'exclude_members' => [],
-			'emails' => [],
 		];
 
 		// Do we have any excluded members?
@@ -657,20 +651,6 @@ class ManageNews extends AbstractController
 			}
 		}
 
-		// Finally - emails!
-		if (!empty($this->_req->post->emails))
-		{
-			$addressed = array_unique(explode(';', strtr($this->_req->post->emails, ["\n" => ';', "\r" => ';', ',' => ';'])));
-			foreach ($addressed as $curmem)
-			{
-				$curmem = trim($curmem);
-				if ($curmem !== '')
-				{
-					$context['recipients']['emails'][$curmem] = $curmem;
-				}
-			}
-		}
-
 		// If we're only cleaning, drop out here.
 		if ($clean_only)
 		{
@@ -688,32 +668,10 @@ class ManageNews extends AbstractController
 		$base_message = $this->_req->getPost('message', 'strval', '');
 
 		// Save the message and its subject in $context
-		$context['subject'] = htmlspecialchars($base_subject, ENT_COMPAT, 'UTF-8');
-		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
+		$context['subject'] = Util::htmlspecialchars($base_subject);
+		$context['message'] = Util::htmlspecialchars($base_message);
 
-		// Prepare the message for sending it as HTML
-		if (!$context['send_pm'] && !empty($context['send_html']))
-		{
-			// Prepare the message for HTML.
-			if (!empty($context['parse_html']))
-			{
-				$base_message = str_replace(["\n", '  '], ['<br />' . "\n", '&nbsp; '], $base_message);
-			}
-
-			// This is here to prevent spam filters from tagging this as spam.
-			if (preg_match('~<html~i', $base_message) == 0)
-			{
-				if (preg_match('~<body~i', $base_message) == 0)
-				{
-					$base_message = '<html><head><title>' . $base_subject . '</title></head>' . "\n" . '<body>' . $base_message . '</body></html>';
-				}
-				else
-				{
-					$base_message = '<html>' . $base_message . '</html>';
-				}
-			}
-		}
-
+		// Something to send?
 		if (empty($base_message) || empty($base_subject))
 		{
 			$context['preview'] = true;
@@ -733,17 +691,14 @@ class ManageNews extends AbstractController
 			'{$latest_member.name}'
 		];
 
-		// We might need this in a bit
-		$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
-
 		// Replace in all the standard things.
 		$base_message = str_replace($variables,
 			[
-				empty($context['send_html']) ? $scripturl : '<a href="' . $scripturl . '">' . $scripturl . '</a>',
+				'<a href="' . $scripturl . '">' . $mbname . '</a>',
 				standardTime(forum_time(), false),
-				empty($context['send_html']) ? ($context['send_pm'] ? '[url=' . getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $cleanLatestMember]) . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember) : ('<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $cleanLatestMember]) . '">' . $cleanLatestMember . '</a>'),
+				'<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $modSettings['latestRealName']]) . '">' . $modSettings['latestRealName'] . '</a>',
 				$modSettings['latestMember'],
-				$cleanLatestMember
+				$modSettings['latestRealName']
 			], $base_message);
 
 		$base_subject = str_replace($variables,
@@ -755,46 +710,15 @@ class ManageNews extends AbstractController
 				$modSettings['latestRealName']
 			], $base_subject);
 
-		$from_member = [
+		$to_member = [
 			'{$member.email}',
 			'{$member.link}',
 			'{$member.id}',
-			'{$member.name}'
+			'{$member.name}',
 		];
 
-		// If we still have emails, do them first!
-		$i = 0;
-		foreach ($context['recipients']['emails'] as $k => $email)
-		{
-			// Done as many as we can?
-			if ($i >= $num_at_once)
-			{
-				break;
-			}
-
-			// Don't send it twice!
-			unset($context['recipients']['emails'][$k]);
-
-			// Dammit - can't PM emails!
-			if ($context['send_pm'])
-			{
-				continue;
-			}
-
-			$to_member = [
-				$email,
-				empty($context['send_html']) ? $email : '<a href="mailto:' . $email . '">' . $email . '</a>',
-				'??',
-				$email
-			];
-
-			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($context['send_html']), 5);
-
-			// Done another...
-			$i++;
-		}
-
 		// Got some more to send this batch?
+		$i = 0;
 		$last_id_member = 0;
 		if ($i < $num_at_once)
 		{
@@ -848,13 +772,14 @@ class ManageNews extends AbstractController
 				$sendParams['exclude_members'] = $context['recipients']['exclude_members'];
 			}
 
-			// Force them to have it?
-			if (empty($context['email_force']))
-			{
-				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
-			}
+			// Always respect user notification preferences
+			$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
+			$sendParams['notify_announcements'] = 1;
 
+			// We need some functions for this.
 			require_once(SUBSDIR . '/News.subs.php');
+			require_once(SUBSDIR . '/Notification.subs.php');
+			$mailPreparse = new PreparseMail();
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
@@ -872,19 +797,22 @@ class ManageNews extends AbstractController
 					continue;
 				}
 
-				// We might need this
-				$cleanMemberName = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
+				// Generate the unsubscribe link for this member
+				$unsubscribeLink = replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+					getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'newsletters', ''));
 
 				// Replace the member-dependant variables
-				$message = str_replace($from_member,
+				$message = str_replace($to_member,
 					[
 						$row['email_address'],
-						empty($context['send_html']) ? ($context['send_pm'] ? '[url=' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $cleanMemberName]) . ']' . $cleanMemberName . '[/url]' : $cleanMemberName) : ('<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $cleanMemberName]) . '">' . $cleanMemberName . '</a>'),
+						'<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
 						$row['id_member'],
-						$cleanMemberName,
+						$row['real_name'],
 					], $base_message);
 
-				$subject = str_replace($from_member,
+				$message = $mailPreparse->preparseHtml($message);
+
+				$subject = str_replace($to_member,
 					[
 						$row['email_address'],
 						$row['real_name'],
@@ -895,7 +823,17 @@ class ManageNews extends AbstractController
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
 				{
-					sendmail($row['email_address'], $subject, $message, null, null, !empty($context['send_html']), 5);
+					// Use BuildMail directly
+					$mail = new BuildMail();
+					$mail->setLanguage($row['lngfile']);
+					$mail->setEmailReplacements([
+						'UNSUBSCRIBELINK' => $unsubscribeLink,
+					]);
+					$message = $mail->getBasicHTMLVersion($message);
+					//$message = str_replace('{UNSUBSCRIBELINK}', $unsubscribeLink, $message);
+
+					// Send with priority 5 (newsletter) to bypass PBE
+					$mail->buildEmail($row['email_address'], $subject, $message, null, null, true, 5);
 				}
 				else
 				{
@@ -915,7 +853,7 @@ class ManageNews extends AbstractController
 			$last_id_member = $context['start'] + $num_at_once;
 		}
 		// If we have no id_member, then we're done.
-		elseif (empty($last_id_member) && empty($context['recipients']['emails']))
+		elseif (empty($last_id_member))
 		{
 			// Log this into the admin log.
 			logAction('newsletter', [], 'admin');
@@ -925,9 +863,7 @@ class ManageNews extends AbstractController
 		$context['start'] = $last_id_member;
 
 		// Working out progress is a black art of sorts.
-		$percentEmails = $context['total_emails'] == 0 ? 0 : ((count($context['recipients']['emails']) / $context['total_emails']) * ($context['total_emails'] / ($context['total_emails'] + $context['max_id_member'])));
-		$percentMembers = ($context['start'] / $context['max_id_member']) * ($context['max_id_member'] / ($context['total_emails'] + $context['max_id_member']));
-		$context['percentage_done'] = round(($percentEmails + $percentMembers) * 100, 2);
+		$context['percentage_done'] = round(($context['start'] / $context['max_id_member']) * 100);
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_send';

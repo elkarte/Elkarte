@@ -60,7 +60,7 @@ class ManageMembergroups extends AbstractController
 			'delete' => [$this, 'action_delete', 'permission' => 'manage_membergroups'],
 			'edit' => [$this, 'action_edit', 'permission' => 'manage_membergroups'],
 			'index' => [$this, 'action_list', 'permission' => 'manage_membergroups'],
-			'members' => [Groups::class, 'action_index', 'permission' => 'manage_membergroups'],
+			'members' => ['controller' => Groups::class, 'function' => 'action_index', 'permission' => 'manage_membergroups'],
 			'settings' => [$this, 'action_groupSettings_display', 'permission' => 'admin_forum'],
 		];
 

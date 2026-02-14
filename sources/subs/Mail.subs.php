@@ -401,10 +401,8 @@ function prepareMailingForPreview()
 		'{$latest_member.name}'
 	];
 
-	$html = $context['send_html'];
-
 	// We might need this in a bit
-	$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
+	$cleanLatestMember = $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
 	$bbc_parser = ParserWrapper::instance();
 
@@ -423,21 +421,18 @@ function prepareMailingForPreview()
 
 		preparsecode($context[$key]);
 
-		// Sending as HTML then we convert any bbc
-		if ($html)
-		{
-			$enablePostHTML = $modSettings['enablePostHTML'];
-			$modSettings['enablePostHTML'] = $context['send_html'];
-			$context[$key] = $bbc_parser->parseEmail($context[$key]);
-			$modSettings['enablePostHTML'] = $enablePostHTML;
-		}
+		// Sending as HTML so we convert any bbc
+		$enablePostHTML = $modSettings['enablePostHTML'];
+		$modSettings['enablePostHTML'] = $context['send_html'];
+		$context[$key] = $bbc_parser->parseEmail($context[$key]);
+		$modSettings['enablePostHTML'] = $enablePostHTML;
 
 		// Replace in all the standard things.
 		$context[$key] = str_replace($variables,
 			[
-				!empty($context['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
+				'<a href="' . $scripturl . '">' . $scripturl . '</a>',
 				standardTime(forum_time(), false),
-				!empty($context['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
+				'<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>',
 				$modSettings['latestMember'],
 				$cleanLatestMember
 			], $context[$key]);

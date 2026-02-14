@@ -45,29 +45,12 @@ function template_email_members()
 	echo '
 					</dd>
 					<dt>
-						<label for="emails">', $txt['admin_news_select_email'], ':</label><br />
-						<span class="smalltext">', $txt['admin_news_select_email_desc'], '</span>
-					</dt>
-					<dd>
-						<textarea id="emails" name="emails" rows="5" cols="30" style="width: 98%;"></textarea>
-					</dd>
-					<dt>
 						<label for="members">', $txt['admin_news_select_members'], ':</label><br />
 						<span class="smalltext">', $txt['admin_news_select_members_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="members" id="members" value="" size="30" class="input_text" />
 						<span id="members_container"></span>
-					</dd>
-				</dl>
-				<hr class="bordercolor" />
-				<dl class="settings">
-					<dt>
-						<label for="email_force">', $txt['admin_news_select_override_notify'], ':</label><br />
-						<span class="smalltext">', $txt['email_force'], '</span>
-					</dt>
-					<dd>
-						<input type="checkbox" name="email_force" id="email_force" value="1" />
 					</dd>
 				</dl>
 			</div>
@@ -241,24 +224,13 @@ function template_email_members_compose()
 					<ul>
 						<li>
 							<label for="send_pm">
-								<input type="checkbox" name="send_pm" id="send_pm" ', empty($context['send_pm']) ? '' : 'checked="checked"', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
-							</label>
-						</li>
-						<li>
-							<label for="send_html">
-								<input type="checkbox" name="send_html" id="send_html" ', empty($context['send_html']) ? '' : 'checked="checked"', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
-							</label>
-						</li>
-						<li>
-							<label for="parse_html">
-								<input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" /> ', $txt['email_parsed_html'], '
+								<input type="checkbox" name="send_pm" id="send_pm" ', empty($context['send_pm']) ? '' : 'checked="checked"', ' /> ', $txt['email_as_pms'], '
 							</label>
 						</li>
 					</ul>
 					<div class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="email_force" value="', $context['email_force'], '" />
 						<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
 						<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
 					</div>
@@ -268,7 +240,7 @@ function template_email_members_compose()
 	foreach ($context['recipients'] as $key => $values)
 	{
 		echo '
-			<input type="hidden" name="', $key, '" value="', implode(($key === 'emails' ? ';' : ','), $values), '" />';
+			<input type="hidden" name="', $key, '" value="', implode(',', $values), '" />';
 	}
 
 	// The vars used to preview a newsletter without loading a new page, used by post.js previewControl()
@@ -276,23 +248,7 @@ function template_email_members_compose()
 		var form_name = "newsmodify",
 			preview_area = "news",
 			txt_preview_title = "' . $txt['preview_title'] . '",
-			txt_preview_fetch = "' . $txt['preview_fetch'] . '";
-
-		function checkboxes_status (item)
-		{
-			if (item.id === \'send_html\')
-				document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
-
-			if (item.id === \'send_pm\')
-			{
-				if (!document.getElementById(\'send_html\').checked)
-					document.getElementById(\'parse_html\').disabled = true;
-				else
-					document.getElementById(\'parse_html\').disabled = false;
-
-				document.getElementById(\'send_html\').disabled = !document.getElementById(\'send_html\').disabled;
-			}
-		}', true);
+			txt_preview_fetch = "' . $txt['preview_fetch'] . '";', true);
 
 	echo '
 		</form>
@@ -324,15 +280,13 @@ function template_email_members_send()
 					<input type="hidden" name="start" value="', $context['start'], '" />
 					<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
 					<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
-					<input type="hidden" name="send_pm" value="', $context['send_pm'], '" />
-					<input type="hidden" name="send_html" value="', $context['send_html'], '" />
-					<input type="hidden" name="parse_html" value="', $context['parse_html'], '" />';
+					<input type="hidden" name="send_pm" value="', $context['send_pm'], '" />';
 
 	// All the things we must remember!
 	foreach ($context['recipients'] as $key => $values)
 	{
 		echo '
-					<input type="hidden" name="', $key, '" value="', implode(($key === 'emails' ? ';' : ','), $values), '" />';
+					<input type="hidden" name="', $key, '" value="', implode(',', $values), '" />';
 	}
 
 	echo '

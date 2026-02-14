@@ -782,6 +782,7 @@ $txt['notify_unsubscribed_generic'] = 'specified';
 $txt['notify_board_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent notifications from the %1$s board.';
 $txt['notify_topic_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent notifications on the %1$s topic.';
 $txt['notify_mention_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent "%1$s" notifications.';
+$txt['notify_announcements_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent "%1$s" notifications.';
 $txt['notify_default_unsubscribed'] = 'Your request has been successfully processed.';
 
 $txt['find_members'] = 'Find Members';
