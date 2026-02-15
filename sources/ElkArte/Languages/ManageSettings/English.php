@@ -86,7 +86,6 @@ $txt['today_only'] = 'Only Today';
 $txt['yesterday_today'] = 'Today &amp; Yesterday';
 $txt['relative_time'] = 'Relative Time';
 $txt['onlineEnable'] = 'Show online/offline in posts and PMs';
-$txt['enableVBStyleLogin'] = 'Show a quick login on every page';
 $txt['defaultMaxMembers'] = 'Members per page in member list';
 $txt['displayMemberNames'] = 'Display the member\'s name instead of "My Account" on the profile account button';
 $txt['timeLoadPageEnable'] = 'Display time taken to create every page';

@@ -2417,7 +2417,6 @@ class InstallInstructions_install_2_0
 				array('modules_profile', ''),
 				array('modules_admin', ''),
 				array('modules_messageindex', ''),
-				array('enableVBStyleLogin', '0'),
 				array('onlineEnable', '1'),
 				array('enableCompressedOutput', '{$enableCompressedOutput}'),
 				array('karmaWaitTime', '1'),

@@ -132,7 +132,6 @@ class ManageLayout extends AbstractController
 			// Stuff that just is everywhere - today, search, online, etc.
 			['select', 'todayMod', [$txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time']]],
 			['check', 'onlineEnable'],
-			['check', 'enableVBStyleLogin'],
 			'',
 			// Automagic image resizing.
 			['int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']],

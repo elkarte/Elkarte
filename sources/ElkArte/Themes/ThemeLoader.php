@@ -601,12 +601,6 @@ class ThemeLoader
 		$context['forum_name'] = $mbname;
 		$context['forum_name_html_safe'] = $context['forum_name'];
 
-		// Showing the login bar?
-		if ($this->isGuestShowLoginBar())
-		{
-			$this->showLoginBar();
-		}
-
 		// Set the top level breadcrumbs.
 		array_unshift($context['breadcrumbs'], [
 			'url' => $scripturl,
@@ -685,29 +679,6 @@ class ThemeLoader
 
 		// This allows sticking some HTML on the page output - useful for controls.
 		$context['insert_after_template'] = '';
-	}
-
-	/**
-	 * Determines whether to show the login bar for guest users.
-	 *
-	 * @return bool Returns `true` if the login bar should be shown for guest users, otherwise `false`.
-	 */
-	private function isGuestShowLoginBar(): bool
-	{
-		global $modSettings;
-
-		return (!isset($this->user) || $this->user->is_guest) && $modSettings['enableVBStyleLogin'];
-	}
-
-	/**
-	 * Sets up the login bar.
-	 */
-	private function showLoginBar(): void
-	{
-		global $context;
-
-		$context['show_login_bar'] = true;
-		$context['theme_header_callbacks'][] = 'login_bar';
 	}
 
 	/**
