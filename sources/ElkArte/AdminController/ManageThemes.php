@@ -1052,9 +1052,6 @@ class ManageThemes extends AbstractController
 		{
 			checkSession('get');
 
-			//$th = $this->_req->getQuery('th', 'intval');
-			//$vrt = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
-
 			// If changing members or guests - and there's a variant - assume changing the default variant.
 			if (!empty($variant) && ($u === 0 || $u === -1))
 			{
