@@ -589,14 +589,11 @@ class ProfileOptions extends AbstractController
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($this->_memID, ['id_theme' => $themePicked]);
 
-			// Did they pick a variant as well?
-			if (!empty($variant))
+			// Did they pick a variant as well? (Only for actual themes, not Forum Default)
+			if (!empty($variant) && $themePicked !== 0)
 			{
-				// When selecting "Forum Default" (ID 0), we need to save the variant
-				// for the actual default theme, not for theme ID 0
-				$variantThemeId = ($themePicked === 0) ? (int) $modSettings['theme_default'] : $themePicked;
-				updateThemeOptions([$variantThemeId, $this->_memID, 'theme_variant', $variant]);
-				Cache::instance()->remove('theme_settings-' . $variantThemeId . ':' . $this->_memID);
+				updateThemeOptions([$themePicked, $this->_memID, 'theme_variant', $variant]);
+				Cache::instance()->remove('theme_settings-' . $themePicked . ':' . $this->_memID);
 				$_SESSION['id_variant'] = 0;
 			}
 
@@ -615,12 +612,25 @@ class ProfileOptions extends AbstractController
 			$context['available_themes'][0] = $context['available_themes'][$guest_theme];
 		}
 
+		$default_variant = $GLOBALS['settings']['default_variant'];
 		$context['available_themes'][0]['id'] = 0;
-		// Store the actual theme id for variant handling (the real theme behind "Forum Default")
-		$context['available_themes'][0]['actual_theme_id'] = $guest_theme;
 		$context['available_themes'][0]['name'] = $txt['theme_forum_default'];
 		$context['available_themes'][0]['selected'] = $current_theme === 0;
 		$context['available_themes'][0]['description'] = $txt['theme_global_description'];
+
+		// Forum Default 0 means use whatever the admin configured
+		if (!empty($default_variant))
+		{
+			$context['available_themes'][0]['selected_variant'] = $default_variant;
+			$context['available_themes'][0]['variants'] = isset($context['available_themes'][0]['variants'][$default_variant])
+				? [$default_variant => $context['available_themes'][0]['variants'][$default_variant]]
+				: [];
+			$context['available_themes'][0]['thumbnail_href'] = $context['available_themes'][0]['variants'][$default_variant]['thumbnail'] ?? '';
+		}
+		else
+		{
+			unset($context['available_themes'][0]['variants']);
+		}
 
 		ksort($context['available_themes']);
 

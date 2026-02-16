@@ -275,6 +275,8 @@ class ThemeLoader
 			$themeData = [-1 => [], 0 => [], $member => []];
 		}
 
+		// 0 = Pseudo-ID meaning "use whatever the admin set as default"
+		// -1 = The default theme options set in the ACP, used when the user has not set a value of their own.
 		if (empty($flag))
 		{
 			$db = database();
@@ -326,6 +328,12 @@ class ThemeLoader
 			{
 				$themeData[0]['default_theme_cache_dir'] = CACHEDIR;
 				$themeData[0]['default_theme_cache_url'] = $boardurl . '/cache';
+			}
+
+			// If the user is following the board default, use that variant.
+			if (isset($themeData[$member]['theme_variant'], $themeData[0]['default_variant']) && $this->user->theme === 0)
+			{
+				$themeData[$member]['theme_variant'] = $themeData[0]['default_variant'];
 			}
 
 			// Set the defaults if the user has not chosen on their own

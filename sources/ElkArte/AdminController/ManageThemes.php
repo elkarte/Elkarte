@@ -544,6 +544,15 @@ class ManageThemes extends AbstractController
 				'knownThemes' => implode(',', $this->_req->post->options['known_themes']),
 			]);
 
+			// Save the default variant for the guest theme if one was selected
+			$defaultVariant = $this->_req->getPost('default_variant', 'trim', '');
+			if (!empty($defaultVariant))
+			{
+				$themeGuests = (int) $this->_req->post->options['theme_guests'];
+				updateThemeOptions([$themeGuests, 0, 'default_variant', $defaultVariant]);
+				Cache::instance()->remove('theme_settings-' . $themeGuests);
+			}
+
 			if ((int) $this->_req->post->theme_reset === 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -566,6 +575,9 @@ class ManageThemes extends AbstractController
 			// Load up all the themes.
 			require_once(SUBSDIR . '/Themes.subs.php');
 			$context['themes'] = loadThemes($knownThemes);
+
+			// Store the current default theme for the template
+			$context['theme_guests'] = (int) ($modSettings['theme_guests'] ?? 1);
 
 			// Can we create a new theme?
 			$context['can_create_new'] = $fileFunc->isWritable(BOARDDIR . '/themes');

@@ -356,7 +356,7 @@ function availableThemes($current_theme, $current_member)
 					$row['id_theme'] = (int) $row['id_theme'];
 					$available_themes[$row['id_theme']] = [
 						'id' => $row['id_theme'],
-						'selected' => $current_theme == $row['id_theme'],
+						'selected' => $current_theme === $row['id_theme'],
 						'num_users' => 0
 					];
 				}
@@ -413,6 +413,7 @@ function availableThemes($current_theme, $current_member)
 
 	// Get any member variant preferences.
 	$variant_preferences = [];
+	$pick = HttpReq::instance()->getRequest('area', 'trim') === 'pick';
 	if ($current_member > 0)
 	{
 		$db->fetchQuery('
@@ -424,7 +425,7 @@ function availableThemes($current_theme, $current_member)
 			ORDER BY id_member ASC',
 			[
 				'theme_variant' => 'theme_variant',
-				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'pick' ? [-1, $current_member] : [-1],
+				'id_member' => $pick ? [-1, $current_member] : [-1],
 			]
 		)->fetch_callback(
 			function ($row) use (&$variant_preferences) {

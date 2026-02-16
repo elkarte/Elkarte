@@ -1645,22 +1645,19 @@ function template_pick()
 	// Just go through each theme and show its information - thumbnail, etc.
 	foreach ($context['available_themes'] as $theme)
 	{
-		// For "Forum Default" (id=0), we need the actual theme ID for previews
-		$preview_theme_id = $theme['actual_theme_id'] ?? $theme['id'];
-
 		echo '
 			<h2 class="category_header">
 				', $theme['name'], '
 			</h2>
 			<div class="flow_hidden content">
 				<div class="floatright">
-					<a href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';theme=', $preview_theme_id, ';variant=', $theme['selected_variant'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '">
+					<a href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';variant=', $theme['selected_variant'] ?? '', ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '">
 						<img class="avatar" src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" />
 					</a>
 				</div>
 				<p>', $theme['description'], '</p>';
 
-		if (!empty($theme['variants']))
+		if (!empty($theme['variants']) && count($theme['variants']) > 1)
 		{
 			echo '
 				<label for="variant', $theme['id'], '">
@@ -1671,7 +1668,7 @@ function template_pick()
 			foreach ($theme['variants'] as $key => $variant)
 			{
 				echo '
-					<option value="', $key, '" ', $theme['selected_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
+					<option value="', $key, '" ', $theme['selected_variant'] === $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
 			}
 
 			echo '
@@ -1685,7 +1682,7 @@ function template_pick()
 				<br />
 				<div class="separator"></div>
 				<a class="linkbutton" href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], empty($theme['variants']) ? '' : ';vrt=' . $theme['selected_variant'], '" id="theme_use_', $theme['id'], '">', $txt['theme_set'], '</a>
-				<a class="linkbutton" href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';theme=', $preview_theme_id, ';', $context['session_var'], '=', $context['session_id'], ';variant=', $theme['selected_variant'], '" id="theme_preview_', $theme['id'], '">', $txt['theme_preview'], '</a>
+				<a class="linkbutton" href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], empty($theme['variants']) ? '' : ';variant=' . $theme['selected_variant'], '" id="theme_preview_', $theme['id'], '">', $txt['theme_preview'], '</a>
 			</div>';
 
 		if (!empty($theme['variants']))
@@ -1693,7 +1690,7 @@ function template_pick()
 			echo '
 			<script>
 				let sBaseUseUrl', $theme['id'], " = elk_prepareScriptUrl(elk_scripturl) + 'action=profile;area=pick;u=", $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
-					sBasePreviewUrl', $theme['id'], " = elk_prepareScriptUrl(elk_scripturl) + 'action=profile;area=pick;u=", $context['current_member'], ';theme=', $preview_theme_id, ';', $context['session_var'], '=', $context['session_id'], '\',
+					sBasePreviewUrl', $theme['id'], " = elk_prepareScriptUrl(elk_scripturl) + 'action=profile;area=pick;u=", $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
 					oThumbnails', $theme['id'], ' = {';
 
 			// All the variant thumbnails.
