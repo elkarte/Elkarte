@@ -2534,7 +2534,7 @@ class InstallInstructions_install_2_0
 				array('recycle_board', '0'),
 				array('maxMsgID', '1'),
 				array('enableAllMessages', '0'),
-				array('knownThemes', '1,2,3'),
+				array('knownThemes', '1'),
 				array('who_enabled', '1'),
 				array('time_offset', '0'),
 				array('cookieTime', '60'),
