@@ -316,7 +316,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 
 .linkbutton:link, .linkbutton:visited {
 	font-size: var(--font13);
-	padding: .5rem .3rem;
+	padding: 0 .3rem;
 }
 
 /* Hover effects. */
@@ -846,11 +846,10 @@ a.active {
 
 /* Top level subsection indicators. */
 .pm_indicator {
-	font-size: var(--font12);
+	font-size: var(--font11);
 	font-weight: bold;
-	position: relative;
-	top: -.7rem;
-	left: -1px;
+	top: -.1rem;
+	right: -.1rem;
 	float: none;
 	padding: 0 .4rem;
 	color: var(--contrast_text);
@@ -1133,6 +1132,10 @@ nav.breadcrumb {
 
 .board_avatar {
 	padding-top: 0;
+}
+
+.board_info {
+	border-right-color: var(--transparent);
 }
 
 .childboards {

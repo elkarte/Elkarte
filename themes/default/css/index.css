@@ -2267,7 +2267,7 @@ button[type="submit"].quick_quote_button.hide {
 	float: left;
 	clear: both;
 	width: 45%;
-	min-height: 3rem;
+	min-height: 2.5rem;
 	margin: 0 0 1rem 0;
 }
 
@@ -2275,7 +2275,7 @@ button[type="submit"].quick_quote_button.hide {
 	float: right;
 	overflow: auto;
 	width: 55%;
-	min-height: 3rem;
+	min-height: 2.5rem;
 	margin: 0 0 .3rem 0;
 	padding: .2rem .5rem .2rem .5rem;
 }
