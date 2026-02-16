@@ -15,6 +15,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Emoji;
 use ElkArte\Helper\Util;
 
 /**
@@ -121,157 +122,12 @@ function enforceSignatureMaxTextSize(&$sig, $max_size)
 		return;
 	}
 
-	if (!preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)?~i', $sig, $matches) || !isset($matches[2]))
+	$replacements = getFontSizeViolations($sig, $max_size);
+
+	foreach ($replacements as $original => $replacement)
 	{
-		return;
+		$sig = str_replace($original, $replacement, $sig);
 	}
-
-	// Same as parse_bbc
-	$sizes = [1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95];
-
-	foreach ($matches[1] as $ind => $size)
-	{
-		$limit_broke = 0;
-
-		// Just specifying as [size=x]?
-		if (empty($matches[2][$ind]))
-		{
-			$matches[2][$ind] = 'em';
-			$size = $sizes[(int) $size] ?? 0;
-		}
-
-		// Attempt to allow all sizes of abuse, so to speak.
-		if ($matches[2][$ind] === 'px' && $size > $max_size)
-		{
-			$limit_broke = $max_size . 'px';
-		}
-		elseif ($matches[2][$ind] === 'pt' && $size > ($max_size * 0.75))
-		{
-			$limit_broke = ((int) $max_size * 0.75) . 'pt';
-		}
-		elseif ($matches[2][$ind] === 'em' && $size > ((float) $max_size / 16))
-		{
-			$limit_broke = ((float) $max_size / 16) . 'em';
-		}
-		elseif ($matches[2][$ind] !== 'px' && $matches[2][$ind] !== 'pt' && $matches[2][$ind] != 'em' && $max_size < 18)
-		{
-			$limit_broke = 'large';
-		}
-
-		if ($limit_broke)
-		{
-			$sig = str_replace($matches[0][$ind], '[size=' . $max_size . 'px', $sig);
-		}
-	}
-}
-
-/**
- * Enforce maximum smiley limit on signature
- *
- * Finds smiley codes in the unparsed signature and replaces excess ones with ''
- * Works by getting smiley codes from the database and replacing excess matches.
- *
- * @param string $sig The unparsed signature text (modified by reference)
- * @param int $max_smileys Maximum number of smileys allowed (0 = unlimited, -1 = none allowed)
- */
-function enforceSignatureMaxSmileys(&$sig, $max_smileys)
-{
-	if (empty($max_smileys))
-	{
-		return;
-	}
-
-	// Determine the limit (if -1, no smileys allowed so limit is 0)
-	$limit = ($max_smileys == -1) ? 0 : $max_smileys;
-
-	// Count current smileys
-	$smiley_count = countSignatureSmileys($sig);
-
-	// Check if we need to enforce anything
-	if ($smiley_count <= $limit)
-	{
-		return;
-	}
-
-	$db = database();
-
-	// Get smiley codes from the database, ordered by length (longest first to avoid partial replacements)
-	$smileyCodes = [];
-	$db->fetchQuery('
-		SELECT code
-		FROM {db_prefix}smileys
-		ORDER BY LENGTH(code) DESC',
-		[]
-	)->fetch_callback(
-		static function ($row) use (&$smileyCodes) {
-			$smileyCodes[] = $row['code'];
-		}
-	);
-
-	if (empty($smileyCodes))
-	{
-		return;
-	}
-
-	// Build a pattern to match any smiley
-	$escapedCodes = array_map(static fn($code) => preg_quote($code, '~'), $smileyCodes);
-	$pattern = '~(' . implode('|', $escapedCodes) . ')~';
-
-	// Replace smileys beyond the limit
-	$count = 0;
-	$sig = preg_replace_callback(
-		$pattern,
-		static function ($matches) use (&$count, $limit) {
-			$count++;
-			if ($count > $limit)
-			{
-				return '';
-			}
-
-			return $matches[0];
-		},
-		$sig
-	);
-}
-
-/**
- * Collect image tag matches from a signature string.
- *
- * @param string $sig The signature text
- * @return array The preg_match_all matches array
- */
-function getSignatureImageMatches($sig)
-{
-	$matches = [];
-	preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $sig, $matches);
-
-	$matches2 = [];
-	preg_match_all('~(?:&lt;|<)img\s+src=(?:&quot;|")?((?:http://|ftp://|https://|ftps://).+?)(?:&quot;|")?(?:\s+alt=(?:&quot;|")?(.*?)(?:&quot;|")?)?(?:\s?/)?(?:&gt;|>)~i', $sig, $matches2, PREG_PATTERN_ORDER);
-
-	for ($i = 0; $i <= 7; $i++)
-	{
-		if (!isset($matches[$i]))
-		{
-			$matches[$i] = [];
-		}
-	}
-
-	if (!empty($matches2[0]))
-	{
-		foreach ($matches2[0] as $ind => $dummy)
-		{
-			$matches[0][] = $matches2[0][$ind];
-			$matches[1][] = '';
-			$matches[2][] = '';
-			$matches[3][] = '';
-			$matches[4][] = '';
-			$matches[5][] = '';
-			$matches[6][] = '';
-			$matches[7][] = $matches2[1][$ind];
-		}
-	}
-
-	return $matches;
 }
 
 /**
@@ -329,9 +185,34 @@ function signatureHasTooLargeFontSize($sig, $max_size, &$limit_broke)
 		return false;
 	}
 
+	$violations = getFontSizeViolations($sig, $max_size);
+
+	if (!empty($violations))
+	{
+		// Get the first violation's limit value for the error message
+		$limit_broke = reset($violations);
+		$limit_broke = str_replace('[size=', '', $limit_broke);
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Parse font size tags and find violations of max size limit
+ *
+ * @param string $sig The signature text
+ * @param int $max_size Maximum font size in pixels
+ * @return array Associative array of original tags to replacement tags for violations
+ */
+function getFontSizeViolations($sig, $max_size)
+{
+	$violations = [];
+
 	if (!preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)?~i', $sig, $matches) || !isset($matches[2]))
 	{
-		return false;
+		return $violations;
 	}
 
 	// Same as parse_bbc
@@ -339,6 +220,8 @@ function signatureHasTooLargeFontSize($sig, $max_size, &$limit_broke)
 
 	foreach ($matches[1] as $ind => $size)
 	{
+		$limit_broke = '';
+
 		// Just specifying as [size=x]?
 		if (empty($matches[2][$ind]))
 		{
@@ -366,11 +249,135 @@ function signatureHasTooLargeFontSize($sig, $max_size, &$limit_broke)
 
 		if ($limit_broke !== '')
 		{
-			return true;
+			$violations[$matches[0][$ind]] = '[size=' . $max_size . 'px';
 		}
 	}
 
-	return false;
+	return $violations;
+}
+
+/**
+ * Enforce maximum smiley limit on signature
+ *
+ * Finds smiley codes and emoji in the unparsed signature and replaces excess ones with ''
+ * Works by getting smiley codes from the database and using the Emoji class regex.
+ *
+ * @param string $sig The unparsed signature text (modified by reference)
+ * @param int $max_smileys Maximum number of smileys allowed (0 = unlimited, -1 = none allowed)
+ */
+function enforceSignatureMaxSmileys(&$sig, $max_smileys)
+{
+	if (empty($max_smileys))
+	{
+		return;
+	}
+
+	// Determine the limit (if -1, no smileys allowed so limit is 0)
+	$limit = ($max_smileys == -1) ? 0 : $max_smileys;
+
+	// Count current smileys
+	$smiley_count = countSignatureSmileys($sig);
+
+	// Check if we need to enforce anything
+	if ($smiley_count <= $limit)
+	{
+		return;
+	}
+
+	$db = database();
+	$emoji = Emoji::instance();
+
+	// First, convert HTML-encoded emoji (&#128512;, &#x1f600;) to Unicode characters
+	$sig = $emoji->emojiFromHTML($sig);
+
+	// Get smiley codes from the database, ordered by length (longest first to avoid partial replacements)
+	$smileyCodes = [];
+	$db->fetchQuery('
+		SELECT code
+		FROM {db_prefix}smileys
+		ORDER BY LENGTH(code) DESC',
+		[]
+	)->fetch_callback(
+		static function ($row) use (&$smileyCodes) {
+			$smileyCodes[] = $row['code'];
+		}
+	);
+
+	// Build a pattern to match any smiley code
+	$smileyPattern = '';
+	if (!empty($smileyCodes))
+	{
+		$escapedCodes = array_map(static fn($code) => preg_quote($code, '~'), $smileyCodes);
+		$smileyPattern = '(?:' . implode('|', $escapedCodes) . ')';
+	}
+
+	// Get the emoji regex from the Emoji class
+	$emoji->setSearchReplaceRegex();
+	$emojiRegex = $emoji->emoji_regex;
+
+	// Remove the delimiters (~...~u) from the emoji regex to combine it
+	// The emoji regex format is ~pattern~u, so strip first char and last 2 chars
+	$emojiPatternInner = '(?:' . substr($emojiRegex, 1, -2) . ')';
+
+	// Build combined pattern - emoji first (longest matches), then smileys
+	$patterns = array_filter([$emojiPatternInner, $smileyPattern]);
+	$combinedPattern = '~(' . implode('|', $patterns) . ')~u';
+
+	// Replace smileys/emoji beyond the limit
+	$count = 0;
+	$sig = preg_replace_callback(
+		$combinedPattern,
+		static function ($matches) use (&$count, $limit) {
+			$count++;
+			if ($count > $limit)
+			{
+				return '';
+			}
+
+			return $matches[0];
+		},
+		$sig
+	);
+}
+
+/**
+ * Collect image tag matches from a signature string.
+ *
+ * @param string $sig The signature text
+ * @return array The preg_match_all matches array
+ */
+function getSignatureImageMatches($sig)
+{
+	$matches = [];
+	preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $sig, $matches);
+
+	$matches2 = [];
+	preg_match_all('~(?:&lt;|<)img\s+src=(?:&quot;|")?((?:http://|ftp://|https://|ftps://).+?)(?:&quot;|")?(?:\s+alt=(?:&quot;|")?(.*?)(?:&quot;|")?)?(?:\s?/)?(?:&gt;|>)~i', $sig, $matches2, PREG_PATTERN_ORDER);
+
+	for ($i = 0; $i <= 7; $i++)
+	{
+		if (!isset($matches[$i]))
+		{
+			$matches[$i] = [];
+		}
+	}
+
+	if (!empty($matches2[0]))
+	{
+		foreach ($matches2[0] as $ind => $dummy)
+		{
+			$matches[0][] = $matches2[0][$ind];
+			$matches[1][] = '';
+			$matches[2][] = '';
+			$matches[3][] = '';
+			$matches[4][] = '';
+			$matches[5][] = '';
+			$matches[6][] = '';
+			$matches[7][] = $matches2[1][$ind];
+		}
+	}
+
+	return $matches;
 }
 
 /**
@@ -384,7 +391,7 @@ function countSignatureSmileys($sig)
 	$wrapper = ParserWrapper::instance();
 	$parser = $wrapper->getSmileyParser();
 	$parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none' && trim($sig) !== '');
-	$smiley_parsed = $parser->parseBlock($sig);
+	$smiley_parsed = $parser->parse($sig);
 
 	// Count smileys by finding new <img tags added by the smiley parser
 	return substr_count(strtolower($smiley_parsed), '<img') - substr_count(strtolower($sig), '<img');
