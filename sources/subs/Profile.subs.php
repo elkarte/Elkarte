@@ -1528,6 +1528,12 @@ function getNumAttachments($boardsAllowed, $memID)
 
 	$db = database();
 
+	$exclude_boards = null;
+	if (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
+	{
+		$exclude_boards = [$modSettings['recycle_board']];
+	}
+
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
 		SELECT 
@@ -1539,10 +1545,12 @@ function getNumAttachments($boardsAllowed, $memID)
 			AND a.id_msg != {int:no_message}
 			AND m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!empty($exclude_boards) ? '
+			AND b.id_board NOT IN ({array_int:exclude_boards})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}'),
 		[
 			'boards_list' => $boardsAllowed,
+			'exclude_boards' => $exclude_boards,
 			'attachment_type' => 0,
 			'no_message' => 0,
 			'current_member' => $memID,
@@ -1550,6 +1558,7 @@ function getNumAttachments($boardsAllowed, $memID)
 			'board' => $board,
 		]
 	);
+
 	list ($attachCount) = $request->fetch_row();
 	$request->free_result();
 
