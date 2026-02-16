@@ -30,7 +30,7 @@ class ManageSignature extends AbstractController
 	public function pre_dispatch()
 	{
 		// We need this in a few places, so it's easier to have it loaded here
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		require_once(SUBSDIR . '/ManageSignatures.subs.php');
 
 		Txt::load('Help+ManageSettings');
 	}
@@ -173,12 +173,13 @@ class ManageSignature extends AbstractController
 			$config_values['signature_settings'] = $signature_settings_local;
 			$settingsForm->setConfigValues($config_values);
 			$settingsForm->save();
-			redirectexit('action=admin;area=featuresettings;sa=sig');
+
+			redirectexit('action=admin;area=postsettings;sa=sig');
 		}
 
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'sa' => 'sig', 'save']);
 		$context['settings_title'] = $txt['signature_settings'];
-		$context['settings_message'] = empty($settings_applied) ? sprintf($txt['signature_settings_warning'], getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'apply', '{session_data}'])) : $txt['signature_settings_applied'];
+		$context['settings_message'] = empty($settings_applied) ? sprintf($txt['signature_settings_warning'], getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'sa' => 'sig', 'apply', '{session_data}'])) : $txt['signature_settings_applied'];
 
 		$settingsForm->prepare();
 	}
