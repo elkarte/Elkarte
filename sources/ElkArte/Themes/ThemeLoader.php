@@ -14,6 +14,7 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\HttpReq;
@@ -141,10 +142,11 @@ class ThemeLoader
 		$loader->setPsr4('\\ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
 
-		// Initialize Theme.php from the custom theme, or fall back to the default theme
+		// If the theme doesn't have a Theme.php, use the default one, but log an error about it cuz that's not right.
 		$themeFile = $settings['theme_dir'] . '/Theme.php';
 		if (!file_exists($themeFile))
 		{
+			Errors::instance()->log_error('The theme "%s" is missing its Theme.php file. Falling back to the default theme ' . $themeName, 'template');
 			$themeFile = $themeData[0]['default_theme_dir'] . '/Theme.php';
 			$themeName = 'DefaultTheme';
 		}
@@ -155,7 +157,7 @@ class ThemeLoader
 		static::$dirs = new Directories($settings);
 		User::$info = User::$info ?? new UserInfo([]);
 
-		// Initialize Theme.php from the default or from the custom theme
+		// Initialize the theme class, which will load the layers and templates for it.
 		$this->theme = new $class($this->id, User::$info, static::$dirs);
 		$context['theme_instance'] = $this->theme;
 	}
