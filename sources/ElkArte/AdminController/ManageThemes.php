@@ -14,7 +14,6 @@
  *
  * @version 2.0 Beta 1
  *
- *
  * Creating and distributing theme packages:
  * There isn't that much required to package and distribute your own themes...
  * Do the following:
@@ -205,16 +204,17 @@ class ManageThemes extends AbstractController
 	{
 		global $context, $boardurl, $txt;
 
-		// Load in the helpers we need
-		require_once(SUBSDIR . '/Themes.subs.php');
-		Txt::load('Admin');
-		$fileFunc = FileFunctions::instance();
-
+		// If we're trying to edit a theme, go to the settings.
 		if ($this->_req->hasQuery('th'))
 		{
 			$this->action_setthemesettings();
 			return;
 		}
+
+		// Load in the helpers we need
+		require_once(SUBSDIR . '/Themes.subs.php');
+		Txt::load('Admin');
+		$fileFunc = FileFunctions::instance();
 
 		// Saving?
 		if ($this->_req->hasPost('save'))
@@ -249,11 +249,8 @@ class ManageThemes extends AbstractController
 			redirectexit('action=admin;area=themes;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		theme()->getTemplates()->load('ManageThemes');
-
-		$context['themes'] = installedThemes();
-
 		// For each theme, make sure the directory exists and try to fetch the theme version
+		$context['themes'] = installedThemes();
 		foreach ($context['themes'] as $i => $theme)
 		{
 			$context['themes'][$i]['theme_dir'] = realpath($context['themes'][$i]['theme_dir']);
@@ -266,7 +263,7 @@ class ManageThemes extends AbstractController
 				fclose($fp);
 
 				// Can we find a version comment, at all?
-				if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) == 1)
+				if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $header, $match) === 1)
 				{
 					$context['themes'][$i]['version'] = $match[1];
 				}
@@ -276,8 +273,9 @@ class ManageThemes extends AbstractController
 		}
 
 		// Off to the template we go
-		$context['sub_template'] = 'list_themes';
+		theme()->getTemplates()->load('ManageThemes');
 		theme()->addJavascriptVar(['txt_theme_remove_confirm' => $txt['theme_remove_confirm']], true);
+		$context['sub_template'] = 'list_themes';
 		$context['reset_dir'] = realpath(BOARDDIR . '/themes');
 		$context['reset_url'] = $boardurl . '/themes';
 
@@ -302,9 +300,6 @@ class ManageThemes extends AbstractController
 	{
 		global $txt, $context, $settings, $modSettings;
 
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$fileFunc = FileFunctions::instance();
-
 		// Nothing chosen, back to the start you go
 		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
 		if (empty($theme))
@@ -312,18 +307,16 @@ class ManageThemes extends AbstractController
 			redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		// The theme's ID is needed
-		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
-
-		// Validate inputs/user.
-		if (empty($theme))
-		{
-			throw new Exception('no_theme', false);
-		}
+		require_once(SUBSDIR . '/Themes.subs.php');
+		$fileFunc = FileFunctions::instance();
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
+
+		// Load the important language files...
 		Txt::load('Admin');
+		Txt::load('Settings', false, true);
+		Txt::load('ThemeStrings', false);
 
 		// Fetch the smiley sets...
 		$sets = explode(',', 'none,' . $modSettings['smiley_sets_known']);
@@ -337,14 +330,9 @@ class ManageThemes extends AbstractController
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 		$old_js_inline = $context['js_inline'];
+		$old_js_vars = $context['js_vars'];
 
 		new ThemeLoader($theme, false);
-
-		// Also load the actual themes language file - in case of special settings.
-		Txt::load('Settings', false, true);
-
-		// And the custom language strings...
-		Txt::load('ThemeStrings', false);
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
@@ -426,9 +414,6 @@ class ManageThemes extends AbstractController
 			redirectexit('action=admin;area=themes;sa=list;th=' . $theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		$context['sub_template'] = 'set_settings';
-		$context['page_title'] = $txt['theme_settings'];
-
 		foreach ($settings as $setting => $set)
 		{
 			if (!in_array($setting, ['theme_url', 'theme_dir', 'images_url', 'template_dirs']))
@@ -489,13 +474,22 @@ class ManageThemes extends AbstractController
 		// Restore the current theme.
 		new ThemeLoader($old_id, true);
 
+		// Restore the settings and js_inline.
 		$settings = $old_settings;
 		$context['js_inline'] = $old_js_inline;
+		$context['js_vars'] = $old_js_vars;
 
 		// Reinit just incase.
 		theme()->getSettings();
 
+		// Restore the admin menu layer
+		theme()->getTemplates()->load('GenericMenu');
+		theme()->getLayers()->add('generic_menu_dropdown');
+
+		// Off to the template we go.
 		theme()->getTemplates()->load('ManageThemes');
+		$context['sub_template'] = 'set_settings';
+		$context['page_title'] = $txt['theme_settings'];
 
 		createToken('admin-sts');
 	}
@@ -550,6 +544,15 @@ class ManageThemes extends AbstractController
 				'knownThemes' => implode(',', $this->_req->post->options['known_themes']),
 			]);
 
+			// Save the default variant for the guest theme if one was selected
+			$defaultVariant = $this->_req->getPost('default_variant', 'trim', '');
+			if (!empty($defaultVariant))
+			{
+				$themeGuests = (int) $this->_req->post->options['theme_guests'];
+				updateThemeOptions([$themeGuests, 0, 'default_variant', $defaultVariant]);
+				Cache::instance()->remove('theme_settings-' . $themeGuests);
+			}
+
 			if ((int) $this->_req->post->theme_reset === 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -572,6 +575,9 @@ class ManageThemes extends AbstractController
 			// Load up all the themes.
 			require_once(SUBSDIR . '/Themes.subs.php');
 			$context['themes'] = loadThemes($knownThemes);
+
+			// Store the current default theme for the template
+			$context['theme_guests'] = (int) ($modSettings['theme_guests'] ?? 1);
 
 			// Can we create a new theme?
 			$context['can_create_new'] = $fileFunc->isWritable(BOARDDIR . '/themes');
@@ -831,6 +837,10 @@ class ManageThemes extends AbstractController
 		new ThemeLoader($old_id, true);
 		$settings = $old_settings;
 
+		// Restore the admin menu layer
+		theme()->getTemplates()->load('GenericMenu');
+		theme()->getLayers()->add('generic_menu_dropdown');
+
 		theme()->getTemplates()->load('ManageThemes');
 		createToken('admin-sto');
 	}
@@ -1053,9 +1063,6 @@ class ManageThemes extends AbstractController
 		if (isset($themePicked))
 		{
 			checkSession('get');
-
-			//$th = $this->_req->getQuery('th', 'intval');
-			//$vrt = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
 
 			// If changing members or guests - and there's a variant - assume changing the default variant.
 			if (!empty($variant) && ($u === 0 || $u === -1))

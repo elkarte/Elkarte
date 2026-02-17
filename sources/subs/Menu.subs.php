@@ -340,7 +340,7 @@ function loadDefaultMenuButtons()
 				],
 				'theme' => [
 					'title' => $txt['theme'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'themes', 'u' => User::$info->id, 'name' => User::$info->name]),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => allowedTo(['profile_extra_any', 'profile_extra_own', 'profile_extra_any']),
 				],
 				'logout' => [

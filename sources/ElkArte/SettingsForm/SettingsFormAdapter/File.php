@@ -591,9 +591,15 @@ class File extends Db
 					return '';
 				}
 
-				// Rewrite the definition a bit.
+				// Rewrite the definition a bit for the database-based settings in a mixed File adapter
 				if ($configVar[2] === 'db')
 				{
+					// For select types, include the options array from position 4
+					if ($configVar[3] === 'select' && isset($configVar[4]))
+					{
+						return [$configVar[3], $configVar[0], $configVar[4]];
+					}
+
 					return [$configVar[3], $configVar[0]];
 				}
 

@@ -86,7 +86,6 @@ $txt['today_only'] = 'Only Today';
 $txt['yesterday_today'] = 'Today &amp; Yesterday';
 $txt['relative_time'] = 'Relative Time';
 $txt['onlineEnable'] = 'Show online/offline in posts and PMs';
-$txt['enableVBStyleLogin'] = 'Show a quick login on every page';
 $txt['defaultMaxMembers'] = 'Members per page in member list';
 $txt['displayMemberNames'] = 'Display the member\'s name instead of "My Account" on the profile account button';
 $txt['timeLoadPageEnable'] = 'Display time taken to create every page';
@@ -229,7 +228,7 @@ $txt['setting_warning_show_all'] = 'All Users';
 
 $txt['signature_settings'] = 'Signature Settings';
 $txt['signature_settings_desc'] = 'Use the settings on this page to decide how member signatures should be treated.';
-$txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default.<br /><a class="button_submit" href="%1$s">Run the process now</a>';
+$txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default.<br /><a class="linkbutton" href="%1$s">Run the process now</a>';
 $txt['signature_settings_applied'] = 'The updated rules have been applied to the existing signatures.';
 $txt['signature_enable'] = 'Enable signatures';
 $txt['signature_repetition_guests'] = 'Show signatures to guests:';

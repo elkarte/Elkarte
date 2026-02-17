@@ -1099,6 +1099,7 @@ function profileValidateSignature(&$value)
 	global $modSettings, $txt;
 
 	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(SUBSDIR . '/ManageSignatures.subs.php');
 
 	// Admins can do whatever they hell they want!
 	if (!allowedTo('admin_forum'))
@@ -1107,11 +1108,12 @@ function profileValidateSignature(&$value)
 		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
 		$sig_limits = explode(',', $sig_limits);
 		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : [];
+		$disabledTags[] = 'footnote';
 
 		$unparsed_signature = strtr(un_htmlspecialchars($value), ["\r" => '', '&#039' => '\'']);
 
 		// Too many lines?
-		if (!empty($sig_limits[2]) && substr_count($unparsed_signature, "\n") >= $sig_limits[2])
+		if (signatureExceedsMaxLines($unparsed_signature, $sig_limits[2] ?? 0))
 		{
 			$txt['profile_error_signature_max_lines'] = sprintf($txt['profile_error_signature_max_lines'], $sig_limits[2]);
 
@@ -1119,7 +1121,7 @@ function profileValidateSignature(&$value)
 		}
 
 		// Too many images?!
-		if (!empty($sig_limits[3]) && (substr_count(strtolower($unparsed_signature), '[img') + substr_count(strtolower($unparsed_signature), '<img')) > $sig_limits[3])
+		if (signatureExceedsMaxImages($unparsed_signature, $sig_limits[3] ?? 0))
 		{
 			$txt['profile_error_signature_max_image_count'] = sprintf($txt['profile_error_signature_max_image_count'], $sig_limits[3]);
 
@@ -1127,19 +1129,13 @@ function profileValidateSignature(&$value)
 		}
 
 		// What about too many smileys?
-		$smiley_parsed = $unparsed_signature;
-		$wrapper = ParserWrapper::instance();
-		$parser = $wrapper->getSmileyParser();
-		$parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none' && trim($smiley_parsed) !== '');
-		$smiley_parsed = $parser->parseBlock($smiley_parsed);
-
-		$smiley_count = substr_count(strtolower($smiley_parsed), '<img') - substr_count(strtolower($unparsed_signature), '<img');
-		if (!empty($sig_limits[4]) && $sig_limits[4] == -1 && $smiley_count > 0)
+		$smiley_check = signatureExceedsMaxSmileys($unparsed_signature, $sig_limits[4] ?? 0);
+		if ($smiley_check === 'disallowed')
 		{
 			return 'signature_allow_smileys';
 		}
 
-		if (!empty($sig_limits[4]) && $sig_limits[4] > 0 && $smiley_count > $sig_limits[4])
+		if ($smiley_check === true)
 		{
 			$txt['profile_error_signature_max_smileys'] = sprintf($txt['profile_error_signature_max_smileys'], $sig_limits[4]);
 
@@ -1147,174 +1143,26 @@ function profileValidateSignature(&$value)
 		}
 
 		// Maybe we are abusing font sizes?
-		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)(\]|px|pt|em|x-large|larger)~i', $unparsed_signature, $matches) !== false)
+		$limit_broke = '';
+		if (signatureHasTooLargeFontSize($unparsed_signature, $sig_limits[7] ?? 0, $limit_broke))
 		{
-			// Same as parse_bbc
-			$sizes = [1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95];
+			$txt['profile_error_signature_max_font_size'] = sprintf($txt['profile_error_signature_max_font_size'], $limit_broke);
 
-			foreach ($matches[1] as $ind => $size)
-			{
-				$limit_broke = 0;
-
-				// Just specifying as [size=x]?
-				if (empty($matches[2][$ind]))
-				{
-					$matches[2][$ind] = 'em';
-					$size = $sizes[(int) $size] ?? 0;
-				}
-
-				// Attempt to allow all sizes of abuse, so to speak.
-				if ($matches[2][$ind] === 'px' && $size > $sig_limits[7])
-				{
-					$limit_broke = $sig_limits[7] . 'px';
-				}
-				elseif ($matches[2][$ind] === 'pt' && $size > ($sig_limits[7] * 0.75))
-				{
-					$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
-				}
-				elseif ($matches[2][$ind] === 'em' && $size > ((float) $sig_limits[7] / 14))
-				{
-					$limit_broke = ((float) $sig_limits[7] / 14) . 'em';
-				}
-				elseif ($matches[2][$ind] !== 'px' && $matches[2][$ind] !== 'pt' && $matches[2][$ind] !== 'em' && $sig_limits[7] < 18)
-				{
-					$limit_broke = 'large';
-				}
-
-				if ($limit_broke)
-				{
-					$txt['profile_error_signature_max_font_size'] = sprintf($txt['profile_error_signature_max_font_size'], $limit_broke);
-
-					return 'signature_max_font_size';
-				}
-			}
+			return 'signature_max_font_size';
 		}
 
 		// The challenging one - image sizes! Don't error on this - just fix it.
-		if ((!empty($sig_limits[5]) || !empty($sig_limits[6])))
+		if (!empty($sig_limits[5]) || !empty($sig_limits[6]))
 		{
-			// Get all BBC tags...
-			preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $unparsed_signature, $matches);
-
-			// ... and all HTML ones.
-			preg_match_all('~<img\s+src=(?:")?((?:http://|ftp://|https://|ftps://).+?)(?:")?(?:\s+alt=(?:")?(.*?)(?:")?)?(?:\s?/)?>~i', $unparsed_signature, $matches2, PREG_PATTERN_ORDER);
-
-			// And stick the HTML in the BBC.
-			if (!empty($matches2))
-			{
-				foreach ($matches2[0] as $ind => $dummy)
-				{
-					$matches[0][] = $matches2[0][$ind];
-					$matches[1][] = '';
-					$matches[2][] = '';
-					$matches[3][] = '';
-					$matches[4][] = '';
-					$matches[5][] = '';
-					$matches[6][] = '';
-					$matches[7][] = $matches2[1][$ind];
-				}
-			}
-
-			$replaces = [];
-
-			// Try to find all the images!
-			if (!empty($matches))
-			{
-				foreach ($matches[0] as $key => $image)
-				{
-					$width = -1;
-					$height = -1;
-
-					// Does it have predefined restraints? Width first.
-					if ($matches[6][$key])
-					{
-						$matches[2][$key] = $matches[6][$key];
-					}
-
-					if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
-					{
-						$width = $sig_limits[5];
-						$matches[4][$key] *= $width / $matches[2][$key];
-					}
-					elseif ($matches[2][$key])
-					{
-						$width = $matches[2][$key];
-					}
-
-					// ... and height.
-					if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
-					{
-						$height = $sig_limits[6];
-						if ($width != -1)
-						{
-							$width *= $height / $matches[4][$key];
-						}
-					}
-					elseif ($matches[4][$key])
-					{
-						$height = $matches[4][$key];
-					}
-
-					// If the dimensions are still not fixed - we need to check the actual image.
-					if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
-					{
-						require_once(SUBSDIR . '/Attachments.subs.php');
-						$sizes = url_image_size($matches[7][$key]);
-						if (is_array($sizes))
-						{
-							// Too wide?
-							if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
-							{
-								$width = $sig_limits[5];
-								$sizes[1] *= $width / $sizes[0];
-							}
-
-							// Too high?
-							if ($sizes[1] > $sig_limits[6] && $sig_limits[6])
-							{
-								$height = $sig_limits[6];
-								if ($width == -1)
-								{
-									$width = $sizes[0];
-								}
-								$width *= $height / $sizes[1];
-							}
-							elseif ($width != -1)
-							{
-								$height = $sizes[1];
-							}
-						}
-					}
-
-					// Did we come up with some changes? If so, remake the string.
-					if ($width != -1 || $height != -1)
-					{
-						$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
-					}
-				}
-
-				if (!empty($replaces))
-				{
-					$value = str_replace(array_keys($replaces), array_values($replaces), $value);
-				}
-			}
+			enforceSignatureImageConstraints($value, 0, $sig_limits[5] ?? 0, $sig_limits[6] ?? 0);
 		}
 
-		// @todo temporary, footnotes in signatures is not available at this time
-		$disabledTags[] = 'footnote';
-
 		// Any disabled BBC?
-		$disabledSigBBC = implode('|', $disabledTags);
-
-		if (!empty($disabledSigBBC))
+		if (signatureUsesDisabledBbc($unparsed_signature, array_unique($disabledTags)))
 		{
-			if (preg_match('~\[(' . $disabledSigBBC . '[ =\]/])~i', $unparsed_signature, $matches) !== false && isset($matches[1]))
-			{
-				$disabledTags = array_unique($disabledTags);
-				$txt['profile_error_signature_disabled_bbc'] = sprintf($txt['profile_error_signature_disabled_bbc'], implode(', ', $disabledTags));
+			$txt['profile_error_signature_disabled_bbc'] = sprintf($txt['profile_error_signature_disabled_bbc'], implode(', ', array_unique($disabledTags)));
 
-				return 'signature_disabled_bbc';
-			}
+			return 'signature_disabled_bbc';
 		}
 	}
 
@@ -1680,6 +1528,12 @@ function getNumAttachments($boardsAllowed, $memID)
 
 	$db = database();
 
+	$exclude_boards = null;
+	if (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
+	{
+		$exclude_boards = [$modSettings['recycle_board']];
+	}
+
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
 		SELECT 
@@ -1691,10 +1545,12 @@ function getNumAttachments($boardsAllowed, $memID)
 			AND a.id_msg != {int:no_message}
 			AND m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!empty($exclude_boards) ? '
+			AND b.id_board NOT IN ({array_int:exclude_boards})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}'),
 		[
 			'boards_list' => $boardsAllowed,
+			'exclude_boards' => $exclude_boards,
 			'attachment_type' => 0,
 			'no_message' => 0,
 			'current_member' => $memID,
@@ -1702,6 +1558,7 @@ function getNumAttachments($boardsAllowed, $memID)
 			'board' => $board,
 		]
 	);
+
 	list ($attachCount) = $request->fetch_row();
 	$request->free_result();
 

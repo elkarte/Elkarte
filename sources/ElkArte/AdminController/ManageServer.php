@@ -360,11 +360,25 @@ class ManageServer extends AbstractController
 	{
 		global $txt;
 
+		$login_cookie_times = [
+			3153600 => 'always_logged_in',
+			60 => 'one_hour',
+			1440 => 'one_day',
+			10080 => 'one_week',
+			43200 => 'one_month',
+		];
+
 		// Define the variables we want to edit or show in the cookie form.
 		$config_vars = [
 			// Cookies...
 			['cookiename', $txt['cookie_name'], 'file', 'text', 20],
-			['cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']],
+			['cookieTime', $txt['cookieTime'], 'db', 'select', array_filter(array_map(
+				static function ($str) use ($txt)
+				{
+					return $txt[$str] ?? '';
+				},
+				$login_cookie_times
+			))],
 			['localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'],
 			['globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'],
 			['globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'],
