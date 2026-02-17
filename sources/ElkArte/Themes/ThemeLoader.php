@@ -136,18 +136,26 @@ class ThemeLoader
 			? 'DefaultTheme'
 			: ucfirst(basename($settings['theme_dir']));
 
+		// Maps namespace e.g. \ElkArte\Themes\Mytheme\ to themes/mytheme
 		$loader = new ClassLoader();
 		$loader->setPsr4('\\ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
 
-		// Set up the theme file.
-		require_once($settings['theme_dir'] . '/Theme.php');
+		// Initialize Theme.php from the custom theme, or fall back to the default theme
+		$themeFile = $settings['theme_dir'] . '/Theme.php';
+		if (!file_exists($themeFile))
+		{
+			$themeFile = $themeData[0]['default_theme_dir'] . '/Theme.php';
+			$themeName = 'DefaultTheme';
+		}
+
+		require_once($themeFile);
 		$class = '\\ElkArte\\Themes\\' . $themeName . '\\Theme';
 
 		static::$dirs = new Directories($settings);
 		User::$info = User::$info ?? new UserInfo([]);
 
-		// Initialize Theme.php from the default or if it exists from the custom theme
+		// Initialize Theme.php from the default or from the custom theme
 		$this->theme = new $class($this->id, User::$info, static::$dirs);
 		$context['theme_instance'] = $this->theme;
 	}
@@ -227,18 +235,26 @@ class ThemeLoader
 	 */
 	private function _validThemeID(): void
 	{
-		global $modSettings, $ssi_theme;
+		global $modSettings, $ssi_theme, $board_info;
 
-		// Ensure that the theme is known... no foul play.
-		if (!allowedTo('admin_forum'))
+		// Always allow the board specific theme, if they are forcing overriding.
+		if (!empty($board_info['theme']) && $board_info['override_theme'])
 		{
+			$this->id = $board_info['theme'];
+		}
+		elseif (!allowedTo('admin_forum'))
+		{
+			//  Verify the id_theme... no foul play.
 			$themes = explode(',', $modSettings['knownThemes']);
 			if ((!empty($ssi_theme) && $this->id !== (int) $ssi_theme)
 				|| !in_array($this->id, $themes, true))
 			{
-				$this->id = $modSettings['theme_guests'];
+				$this->id = (int) $modSettings['theme_guests'];
 			}
 		}
+
+		// Allow addons a way to override the theme for custom frontpage themes
+		call_integration_hook('integrate_pre_load_theme', [&$this->id]);
 	}
 
 	/**
