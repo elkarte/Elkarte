@@ -23,6 +23,25 @@ use ElkArte\Themes\Theme as BaseTheme;
  *
  * - Extends the abstract theme class
  * - Override any base methods here if this theme requires custom behavior
+ * - Themes can override specific trait methods to customize behavior while keeping the rest of the functionality intact.
+ * - Example of a custom theme extending the base theme:
+ *
+ * class CustomTheme extends Theme
+ * {
+ *      public function getSettings()
+ *      {
+ *          // Custom theme settings
+ *      }
+ *
+ *      // Can override any trait methods as needed
+ *      public function setupThemeContext($forceload = false): void
+ *      {
+ *          // Custom context setup
+ *          parent::setupThemeContext($forceload);
+ *
+ *          // Additional custom logic
+ *      }
+ * }
  *
  * @package Themes\DefaultTheme
  */
@@ -120,7 +139,6 @@ class Theme extends BaseTheme
 				'none' => '<li class="hide"><a href="#"></a></li>',
 			],
 
-			// @todo find a better place if we are going to create a notifications template
 			'mentions' => [
 				'mentioner_template' => '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>',
 			]
