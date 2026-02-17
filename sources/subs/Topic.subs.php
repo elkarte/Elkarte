@@ -2023,7 +2023,7 @@ function topicStatus($topic)
 	// Find out who started the topic, and the lock status.
 	$starter = topicAttribute($topic, ['id_member_started', 'locked']);
 
-	return [$starter['id_member_started'], $starter['locked']];
+	return [(int) $starter['id_member_started'], (int) $starter['locked']];
 }
 
 /**
