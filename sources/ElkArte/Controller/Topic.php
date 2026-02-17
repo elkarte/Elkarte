@@ -3,7 +3,7 @@
 /**
  * This file takes care of actions on topics including
  * - lock/unlock a topic,
- * - sticky (pin) /unsticky (unpin) it
+ * - sticky (pin) / unsticky (unpin) it
  * - printing
  *
  * @package   ElkArte Forum
@@ -20,6 +20,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
 
@@ -35,24 +36,25 @@ class Topic extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $topic;
+		global $topic, $context;
 
-		// Call the right method if it is not done yet.
-		//
-		// This is done by the dispatcher, so let's leave it alone...
-		// We don't want to assume what it means if the user doesn't
-		// send us a ?sa=, do we? (lock topics out of nowhere?)
-		// Unless... we can printpage()
+		// Call the right method
+		$subActions = [
+			'lock' => [$this, 'action_lock'],
+			'sticky' => [$this, 'action_sticky', 'permission' => 'make_sticky'],
+			'printpage' => [$this, 'action_printpage'],
+		];
 
 		// Without anything it throws an error, so redirect somewhere
-		if (!empty($topic))
-		{
-			redirectexit('topic=' . $topic . '.0');
-		}
-		else
+		if (empty($topic))
 		{
 			redirectexit();
 		}
+
+		$action = new Action('topics');
+		$subAction = $action->initialize($subActions, 'none');
+		$context['sub_action'] = $subAction;
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -98,19 +100,19 @@ class Topic extends AbstractController
 		}
 
 		// Locking with high privileges.
-		if ($locked == '0' && !$user_lock)
+		if ($locked === 0 && !$user_lock)
 		{
-			$locked = '1';
+			$locked = 1;
 		}
 		// Locking with low privileges.
-		elseif ($locked == '0')
+		elseif ($locked === 0)
 		{
-			$locked = '2';
+			$locked = 2;
 		}
 		// Unlocking - make sure you don't unlock what you can't.
-		elseif ($locked == '2' || ($locked == '1' && !$user_lock))
+		elseif ($locked === 2 || ($locked === 1 && !$user_lock))
 		{
-			$locked = '0';
+			$locked = 0;
 		}
 		// You cannot unlock this!
 		else
@@ -124,7 +126,7 @@ class Topic extends AbstractController
 		// If they are allowed a "moderator" permission, log it in the moderator log.
 		if (!$user_lock)
 		{
-			logAction($locked !== '' ? 'lock' : 'unlock', ['topic' => $topic, 'board' => $board]);
+			logAction($locked !== 0 ? 'lock' : 'unlock', ['topic' => $topic, 'board' => $board]);
 		}
 
 		// Notify people that this topic has been locked?
@@ -200,13 +202,7 @@ class Topic extends AbstractController
 	 */
 	public function action_printpage(): void
 	{
-		global $topic, $context, $board_info, $modSettings;
-
-		// Redirect to the boardindex if no valid topic id is provided.
-		if (empty($topic))
-		{
-			redirectexit();
-		}
+		global $topic, $context, $board_info, $modSettings, $db_show_debug;
 
 		// It isn't enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
@@ -219,6 +215,7 @@ class Topic extends AbstractController
 		// Clean out the template layers
 		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();
+		$db_show_debug = false;
 
 		// Get the topic starter information.
 		require_once(SUBSDIR . '/Topic.subs.php');
