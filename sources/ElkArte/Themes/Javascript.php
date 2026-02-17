@@ -249,7 +249,7 @@ class Javascript
 	{
 		global $modSettings, $settings;
 
-		// Scrunch
+		// Minify
 		if (!empty($modSettings['minify_css_js']))
 		{
 			// Inline can have user prefs etc. so caching is not a viable option

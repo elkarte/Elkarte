@@ -23,6 +23,7 @@ use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
+use ElkArte\Menu\MenuContext;
 use ElkArte\User;
 
 /**
@@ -41,7 +42,8 @@ abstract class Theme
 		'fatal_error' => 'text/html',
 		'json' => 'application/json',
 		'xml' => 'text/xml',
-		'generic_xml' => 'text/xml'
+		'generic_xml' => 'text/xml',
+		'html' => 'text/html',
 	];
 
 	/** @var ValuesContainer */
@@ -87,7 +89,6 @@ abstract class Theme
 		$this->user = $user;
 		$this->layers = new TemplateLayers();
 		$this->templates = new Templates($dirs);
-
 		$this->no_index_actions = [
 			'profile',
 			'search',
@@ -99,9 +100,11 @@ abstract class Theme
 			'login',
 			'reminder',
 			'register',
-			'contact'
+			'contact',
+			'admin',
+			'moderate',
+			'printpage'
 		];
-
 		$this->_req = HttpReq::instance();
 
 		// Theme posse
@@ -114,17 +117,263 @@ abstract class Theme
 	 */
 	abstract public function getSettings();
 
-	abstract public function template_header();
+	/**
+	 * The header template
+	 *
+	 * What it does:
+	 *  - Performs security checks
+	 *  - Sets up the theme context
+	 *  - Sets up headers (expiration, content type)
+	 *  - Loads template layers
+	 *  - Sends headers
+	 */
+	public function template_header(): void
+	{
+		doSecurityChecks();
 
-	abstract public function setupThemeContext();
+		$this->setupThemeContext();
 
-	abstract public function setupCurrentUserContext();
+		$header = Headers::instance();
+		$this->setupHeadersExpiration($header);
+		$this->setupHeadersContentType($header, $this->getRequestAPI());
 
-	abstract public function loadCustomCSS();
+		foreach ($this->getLayers()->prepareContext() as $layer)
+		{
+			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
+		}
 
-	abstract public function template_footer();
+		$this->loadDefaultThemeSettings();
 
-	abstract public function loadThemeJavascript();
+		$header->sendHeaders();
+	}
+
+	/**
+	 * Sets up the basic theme context.
+	 *
+	 * What it does:
+	 *  - Sets the current time and action
+	 *  - Checks if the current action should be indexed by robots
+	 *  - Prepares search engines dropdown
+	 *  - Sets up news lines, user context, menu, PM popup, common stats, theme data
+	 *  - Loads custom CSS
+	 *
+	 * @param bool $forceload = false
+	 */
+	public function setupThemeContext($forceload = false): void
+	{
+		global $context;
+
+		static $loaded = false;
+
+		// Under SSI this function can be called more than once.  That can cause some problems.
+		// So only run the function once unless we are forced to run it again.
+		if ($loaded && !$forceload)
+		{
+			return;
+		}
+
+		$loaded = true;
+
+		$context['current_time'] = standardTime(time(), false);
+		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
+		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions, true);
+		$context['additional_dropdown_search'] = prepareSearchEngines();
+
+		$this->setupNewsLines();
+		$this->setupCurrentUserContext();
+		(new MenuContext())->setupMenuContext();
+		$this->setContextShowPmPopup();
+		$this->setContextCommonStats();
+		$this->setContextThemeData();
+		$this->loadCustomCSS();
+	}
+
+	/**
+	 * Sets up the information context for the current user
+	 *
+	 * What it does:
+	 *  - Sets the current time and current action
+	 *  - Checks if the current action should be indexed by robots
+	 *  - Calls setupLoggedUserContext if the user is not a guest
+	 *  - Calls setupGuestContext if the user is a guest
+	 *  - Checks if the PM popup should be shown and adds the necessary JavaScript code
+	 */
+	public function setupCurrentUserContext(): void
+	{
+		global $scripturl, $context, $options, $txt;
+
+		$context['current_time'] = standardTime(time(), false);
+		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
+		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions, true);
+
+		if ($this->user->is_guest === false)
+		{
+			$this->setupLoggedUserContext();
+		}
+		else
+		{
+			$this->setupGuestContext();
+		}
+
+		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && $context['current_action'] !== 'pm';
+		if ($context['show_pm_popup'])
+		{
+			$this->addInlineJavascript('
+		$(function() {
+			new elk_Popup({
+				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
+				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
+				icon: \'i-envelope\'
+			});
+		});', true);
+		}
+	}
+
+	/**
+	 * Load custom CSS files and add CSS rules
+	 *
+	 * What it does:
+	 *  - Loads custom.css if it exists for the theme
+	 *  - Adds avatar resize rules
+	 *  - Adds forum wrapper width (can use important to override in theme css)
+	 *  - Sets show more quote rules (localization & --quote_height)
+	 *  - Sets the profile button avatar
+	 */
+	public function loadCustomCSS(): void
+	{
+		global $settings, $modSettings, $txt;
+
+		// Load a base theme custom CSS file?
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/custom.css'))
+		{
+			loadCSSFile('custom.css');
+		}
+
+		// Since it's nice to have avatars all the same size, and in some cases the size detection may fail,
+		// let's add the css in any case
+		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+		{
+			$this->css->addCSSRules('
+		.avatarresize {' . (empty($modSettings['avatar_max_width']) ? '' : '
+			max-width:' . $modSettings['avatar_max_width'] . 'px;') . (empty($modSettings['avatar_max_height']) ? '' : '
+			max-height:' . $modSettings['avatar_max_height'] . 'px;') . '
+		}');
+		}
+
+		// Save some database hits, if a width for multiple wrappers is set in admin.
+		if (!empty($settings['forum_width']))
+		{
+			$this->css->addCSSRules('
+		.wrapper {width: ' . $settings['forum_width'] . ';}');
+		}
+
+		// Localization for the show more quote and it's container height
+		$quote_height = empty($modSettings['heightBeforeShowMore']) ? 'none' : $modSettings['heightBeforeShowMore'] . 'px';
+		$this->css->addCSSRules('
+		input[type=checkbox].quote-show-more:after {content: "' . $txt['quote_expand'] . '";}
+		.quote-read-more > .bbc_quote {--quote_height: ' . $quote_height . ';}'
+		);
+
+		if (!empty($this->user->avatar['href']))
+		{
+			$this->css->addCSSRules('
+		.i-menu-profile::before, .i-menu-profile.enabled::before {
+			content: "";
+			background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
+			background-position: center;
+			filter: unset;
+		}');
+		}
+	}
+
+	/**
+	 * The template footer
+	 *
+	 * What it does:
+	 *  - Sets up load time display if enabled
+	 *  - Restores theme settings if using default images
+	 *  - Loads template layers in reverse order
+	 */
+	public function template_footer(): void
+	{
+		global $context, $settings, $modSettings, $time_start;
+
+		$db = database();
+
+		// Show the load time?  (only makes sense for the footer.)
+		$context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
+		$context['load_time'] = round(microtime(true) - $time_start, 3);
+		$context['load_queries'] = $db->num_queries();
+
+		if (isset($settings['use_default_images'], $settings['default_template'])
+			&& $settings['use_default_images'] === 'defaults')
+		{
+			$settings['theme_url'] = $settings['actual_theme_url'];
+			$settings['images_url'] = $settings['actual_images_url'];
+			$settings['theme_dir'] = $settings['actual_theme_dir'];
+		}
+
+		foreach ($this->getLayers()->reverseLayers() as $layer)
+		{
+			$this->getTemplates()->loadSubTemplate($layer . '_below', 'ignore');
+		}
+	}
+
+	/**
+	 * Load the base JS that gives ElkArte functionality
+	 *
+	 * What it does:
+	 *  - Loads core JavaScript files
+	 *  - Sets up default JS variables
+	 *  - Initializes PWA, video embedding, code prettify, relative times
+	 *  - Handles scheduled mail sending
+	 */
+	public function loadThemeJavascript(): void
+	{
+		global $settings, $context, $modSettings, $scripturl, $txt, $options;
+
+		// Queue our Javascript
+		loadJavascriptFile(['script.js', 'script_elk.js', 'elk_menu.js']);
+		loadJavascriptFile(['theme.js'], ['defer' => true]);
+
+		// Default JS variables for use in every theme
+		$this->addJavascriptVar([
+			'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
+			'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
+			'elk_images_url' => JavaScriptEscape($settings['images_url']),
+			'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
+			'elk_scripturl' => "'" . $scripturl . "'",
+			'elk_charset' => '"UTF-8"',
+			'elk_session_id' => JavaScriptEscape($context['session_id']),
+			'elk_session_var' => JavaScriptEscape($context['session_var']),
+			'elk_member_id' => $context['user']['id'],
+			'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
+			'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
+			'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
+			'use_click_menu' => empty($options['use_click_menu']) ? 'false' : 'true',
+			'todayMod' => empty($modSettings['todayMod']) ? 0 : (int) $modSettings['todayMod']]
+		);
+
+		// PWA?
+		$this->progressiveWebApp();
+
+		// Auto video embedding enabled, then load the needed JS
+		$this->autoEmbedVideo();
+
+		// Prettify code tags? Load the needed JS and CSS.
+		$this->addCodePrettify();
+
+		// Relative times for posts?
+		$this->relativeTimes();
+
+		// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
+		if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ||
+			(!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])))
+		{
+			$this->doScheduledSendMail();
+		}
+	}
 
 	/**
 	 * Get the layers associated with the current theme
