@@ -97,7 +97,7 @@ class ManagePwa extends AbstractController
 			];
 
 			// Only check the rest if they entered something.
-			$valid_urls = ['pwa_small_icon', 'pwa_large_icon', 'favicon_icon', 'apple_touch_icon'];
+			$valid_urls = ['pwa_small_icon', 'pwa_large_icon', 'pwa_mobile_screenshot', 'pwa_desktop_screenshot', 'favicon_icon', 'apple_touch_icon'];
 			foreach ($valid_urls as $url)
 			{
 				if ($this->_req->getPost($url, 'trim') !== '')
@@ -130,6 +130,8 @@ class ManagePwa extends AbstractController
 		theme()->addInlineJavascript('
 			pwaPreview("pwa_small_icon");
 			pwaPreview("pwa_large_icon");
+			pwaPreview("pwa_mobile_screenshot");
+			pwaPreview("pwa_desktop_screenshot");
 			pwaPreview("favicon_icon");
 			pwaPreview("apple_touch_icon");', true);
 
@@ -156,9 +158,12 @@ class ManagePwa extends AbstractController
 			['text', 'pwa_short_name', 12, 'mask' => 'nohtml', 'helptext' => $txt['pwa_short_name_desc'], 'maxlength' => 12],
 			['color', 'pwa_theme_color', 'helptext' => $txt['pwa_theme_color_desc']],
 			['color', 'pwa_background_color', 'helptext' => $txt['pwa_background_color_desc']],
-			'',
+			['title', 'pwa_application_icons'],
 			['url', 'pwa_small_icon', 'size' => 40, 'helptext' => $txt['pwa_small_icon_desc'], 'onchange' => "pwaPreview('pwa_small_icon');"],
 			['url', 'pwa_large_icon', 'size' => 40, 'helptext' => $txt['pwa_large_icon_desc'], 'onchange' => "pwaPreview('pwa_large_icon');"],
+			['title', 'pwa_screenshots_title'],
+			['url', 'pwa_mobile_screenshot', 'size' => 40, 'helptext' => $txt['pwa_mobile_screenshot_desc'], 'onchange' => "pwaPreview('pwa_mobile_screenshot');"],
+			['url', 'pwa_desktop_screenshot', 'size' => 40, 'helptext' => $txt['pwa_desktop_screenshot_desc'], 'onchange' => "pwaPreview('pwa_desktop_screenshot');"],
 			['title', 'other_icons_title'],
 			['url', 'favicon_icon', 'size' => 40, 'helptext' => $txt['favicon_icon_desc'], 'onchange' => "pwaPreview('favicon_icon');"],
 			['url', 'apple_touch_icon', 'size' => 40, 'helptext' => $txt['apple_touch_icon_desc'], 'onchange' => "pwaPreview('apple_touch_icon');"],
