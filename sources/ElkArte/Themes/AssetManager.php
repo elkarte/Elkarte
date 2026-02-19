@@ -46,7 +46,7 @@ class AssetManager
 	 * Load custom CSS files and add CSS rules
 	 *
 	 * What it does:
-	 *  - Loads custom.css if it exists for the theme
+	 *  - Loads base (not variant) custom.css if it exists for the theme
 	 *  - Adds avatar resize rules
 	 *  - Adds forum wrapper width (can use important to override in theme CSS)
 	 *  - Sets show more quote rules (localization & --quote_height)
@@ -198,9 +198,17 @@ class AssetManager
 	}
 
 	/**
-	 * If a variant CSS is needed, this loads it
+	 * Load the theme variant CSS file if needed
 	 *
-	 * @param HttpReq $req Request object
+	 * What it does:
+	 *  - Checks for a user-selected theme variant and loads it if allowed
+	 *  - Falls back to the default variant if the selected one is not valid
+	 *  - Loads the appropriate CSS files for the variant including
+	 *    - custom_variant.css
+	 *    - index_variant.css
+	 *    - icons_svg_variant.css
+	 *
+	 * @param HttpReq $req Request object containing potential variant selection
 	 */
 	public function loadThemeVariant(HttpReq $req): void
 	{
@@ -232,13 +240,14 @@ class AssetManager
 		// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 		if (!empty($context['theme_variant']))
 		{
+			// Load a theme variant custom CSS file if it exists for the theme (structural overrides)
+			$this->loadVariant('custom', false);
+
+			// Load variant CSS file for the theme (color overrides)
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 
 			// Variant icon definitions?
 			$this->loadVariant('icons_svg', false);
-
-			// Load a theme variant custom CSS
-			$this->loadVariant('custom', false);
 		}
 	}
 
