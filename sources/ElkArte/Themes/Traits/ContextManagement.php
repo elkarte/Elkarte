@@ -226,7 +226,7 @@ trait ContextManagement
 			$this->addJavascriptVar(['elk_scripturl' => $scripturl], true);
 		}
 
-		$this->addJavascriptVar(['elk_forum_action' => getUrlQuery('action', $modSettings['default_forum_action'])], true);
+		$this->addJavascriptVar(['elk_forum_action' => getUrlQuery('action', $modSettings['default_forum_action'] ?? [])], true);
 
 		$context['page_title'] = $context['page_title'] ?? $mbname;
 		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (empty($context['current_page']) ? '' : ' - ' . $txt['page'] . (' ' . ($context['current_page'] + 1)));

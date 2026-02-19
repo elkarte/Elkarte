@@ -17,7 +17,7 @@ use ElkArte\AbstractController;
 class Offline extends AbstractController
 {
 	/**
-	 * Default action handler: just Offline.
+	 * Default action handler: just Offline, used by PWA to display when the user is offline.
 	 */
 	public function action_index()
 	{

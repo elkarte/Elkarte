@@ -80,6 +80,7 @@ class ManifestMinimus
 		$manifest['background_color'] = $this->getBackgroundColor();
 		$manifest['theme_color'] = $this->getThemeColor();
 		$manifest['icons'] = $this->getManifestIcons();
+		$manifest['screenshots'] = $this->getScreenshots();
 
 		return array_filter($manifest);
 	}
@@ -193,5 +194,45 @@ class ManifestMinimus
 		}
 
 		return $icons;
+	}
+
+	protected function getScreenshots(): array
+	{
+		global $modSettings, $settings;
+
+		$screenshots = [];
+
+		// Ensure URL paths use forward slashes for web delivery
+		$base = rtrim($settings['default_images_url'], '/');
+		$mobileScreenshot = $modSettings['pwa_mobile_screenshot'] ?? $base . '/logos/screenshot_mobile.png';
+		$desktopScreenshot = $modSettings['pwa_desktop_screenshot'] ?? $base . '/logos/screenshot_desktop.png';
+
+		// Mobile screenshot (required for richer install UI)
+		if ($mobileScreenshot)
+		{
+			$screenshot = [
+				'src' => $mobileScreenshot,
+				'sizes' => '390x844',
+				'type' => 'image/png',
+				'form_factor' => 'narrow',
+				'label' => 'Mobile view of the forum'
+			];
+			$screenshots[] = $screenshot;
+		}
+
+		// Desktop screenshot (optional but recommended)
+		if ($desktopScreenshot)
+		{
+			$screenshotDesktop = [
+				'src' => $desktopScreenshot,
+				'sizes' => '1920x1080',
+				'type' => 'image/png',
+				'form_factor' => 'wide',
+				'label' => 'Desktop view of the forum'
+			];
+			$screenshots[] = $screenshotDesktop;
+		}
+
+		return $screenshots;
 	}
 }
