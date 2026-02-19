@@ -1,0 +1,239 @@
+/**
+ * ___________.__   __      _____          __
+ * \_   _____/|  | |  | __ /  _  \________/  |_  ____
+ *  |    __)_ |  | |  |/ //  /_\  \_  __ \   __\/ __ \
+ *  |        \|  |_|    </    |    \  | \/|  | \  ___/
+ * /_______  /|____/__|_ \____|__  /__|   |__|  \___  >
+ *         \/           \/       \/                 \/
+ * https://www.elkarte.net
+ * © ElkArte Forum contributors
+ *
+ * INTRODUCTION
+ * Gold Theme - Custom Structural Overrides
+ *
+ * This file contains structural CSS overrides for the Gold variant.
+ * Only layout, spacing, typography sizing, and positioning adjustments.
+ * No colors, shadows, or visual effects should be in this file.
+ */
+
+/* ========================================
+   WRAPPER & GENERAL
+   ======================================== */
+
+/* Wrapper font sizing */
+.wrapper {
+	font-size: var(--font15);
+}
+
+/* ========================================
+   CATEGORY HEADERS
+   ======================================== */
+
+/* Category header typography */
+.category_header, .forum_category .category_header {
+	line-height: 1.5;
+	font-size: var(--font15);
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+/* Header padding */
+#header {
+	padding: 1.2rem .2rem 1.2rem .2rem;
+}
+
+/* ========================================
+   TOP SECTION
+   ======================================== */
+
+/* Top section border structure */
+#top_section {
+	border-top: none;
+	border-bottom: 2px solid;
+}
+
+/* ========================================
+   NAVIGATION - FIXED POSITIONING
+   ======================================== */
+
+/* Menu nav sticky positioning */
+#menu_nav.sticky {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	z-index: 100;
+}
+
+/* Menu nav padding */
+#menu_nav {
+	padding: 1.4rem .4rem 1.1rem .4rem;
+}
+
+/* ========================================
+   MENUS & NAVIGATION - TYPOGRAPHY
+   ======================================== */
+
+/* Menu list level 1 line height */
+.listlevel1 {
+	line-height: 1.7;
+}
+
+/* ========================================
+   TYPOGRAPHY - STRUCTURAL
+   ======================================== */
+
+/* Forum title weight */
+#forumtitle > a {
+	font-weight: 600;
+	background-clip: text;
+	font-size: var(--font24);
+}
+
+/* Forum title sizing */
+#forumtitle {
+	font-size: var(--font24);
+}
+
+#wrapper {
+    border-radius: 0;
+    width: 100%;
+    padding: 1.8rem 3.6rem;
+}
+
+/* ========================================
+   BBC TABLES
+   ======================================== */
+
+/* BBC Table borders - structural */
+.inner > .bbc_table_container > .bbc_table td,
+.messageContent > .bbc_table_container > .bbc_table td {
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.inner > .bbc_table_container > .bbc_table th,
+.messageContent > .bbc_table_container > .bbc_table th {
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.inner > .bbc_table_container > .bbc_table td:last-child,
+.inner > .bbc_table_container > .bbc_table th:last-child,
+.messageContent > .bbc_table_container > .bbc_table td:last-child,
+.messageContent > .bbc_table_container > .bbc_table th:last-child {
+	border-right: none;
+}
+
+/* ========================================
+   INDICATORS - POSITIONING & SIZING
+   ======================================== */
+
+/* PM and Button indicators positioning */
+.pm_indicator, .button_indicator {
+	top: -1.2rem;
+	right: 1rem;
+	padding: 0 0.4rem;
+	border-radius: .4rem;
+	font-size: var(--font10);
+	font-weight: 400;
+}
+
+/* ========================================
+   BUTTONS - SIZING
+   ======================================== */
+
+/* Collapse and search button sizing */
+#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+	padding: .5rem;
+	height: 2.7rem;
+}
+
+/* Inline mod checkbox padding */
+.quickbuttons .inline_mod_check {
+	padding: .2rem .4rem;
+}
+
+/* ========================================
+   POPUP - CLIPPING
+   ======================================== */
+
+/* Popup window clipping */
+.popup_window {
+	background-clip: padding-box;
+}
+
+/* ========================================
+   BOARD ELEMENTS
+   ======================================== */
+
+.board_info {
+    border-left: 1px solid;
+    padding-left: .8rem !important;
+    padding-right: .8rem !important;
+}
+
+.childboards {
+    border-left: 1px solid;
+}
+
+/* Board stats left border */
+.board_stats {
+    border-left: 1px solid;
+}
+
+/* =====================================
+    MESSAGE TOPICS - STRUCTURAL
+    =====================================
+ */
+
+.topic_info {
+    border-left: 1px solid;
+}
+
+/* Topic stats side borders */
+.topic_stats {
+    border-left: 1px solid;
+    border-right: 1px solid;
+}
+
+/* Attachment borders */
+.attachment_name, .attachment_details {
+	border: solid 1px;
+}
+
+.generic_border .attachment_name {
+	border: 1px solid;
+}
+
+/* ========================================
+   EDITOR & FORMS
+   ======================================== */
+
+/* Abort button border */
+.abort {
+	border: 2px solid;
+}
+
+/* ========================================
+   RESPONSIVE - MEDIA QUERIES
+   ======================================== */
+
+/* Large screens - menu button sizing */
+@media screen and (max-width: 60em) {
+    #collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+        width: 4.4rem;
+        height: 4.5rem;
+        padding: 1.4rem 0 0 0 !important;
+    }
+}
+
+/* Small screens - poster separator */
+@media screen and (max-width: 34em) {
+    .poster:after, .posterarea:before {
+        border-bottom: 1px solid;
+    }
+}
+

@@ -1,0 +1,141 @@
+/*
+ * ___________.__   __      _____          __
+ * \_   _____/|  | |  | __ /  _  \________/  |_  ____
+ *  |    __)_ |  | |  |/ //  /_\  \_  __ \   __\/ __ \
+ *  |        \|  |_|    </    |    \  | \/|  | \  ___/
+ * /_______  /|____/__|_ \____|__  /__|   |__|  \___  >
+ *         \/           \/       \/                 \/
+ * https://www.elkarte.net
+ * © ElkArte Forum contributors
+ *
+ * INTRODUCTION
+ * Dark Theme - Custom Structural Overrides
+ *
+ * This file contains structural CSS overrides for the Dark variant.
+ * Only layout, spacing, typography sizing, and positioning adjustments.
+ * No colors, shadows, or visual effects should be in this file.
+ */
+
+/* ========================================
+   BACKGROUND - POSITIONING & SIZING
+   ======================================== */
+body {
+	background-repeat: no-repeat;
+	background-position: top 0 center;
+	background-size: 120% 200rem, 100% 200rem;
+}
+
+/* ========================================
+   TYPOGRAPHY & STRUCTURAL ELEMENTS
+   ======================================== */
+
+/* PM Indicator circular styling */
+.pm_indicator {
+	border-radius: 50%;
+}
+
+/* ========================================
+   POSTS & MESSAGES
+   ======================================== */
+
+/* BBC Table borders */
+.inner > .bbc_table_container > .bbc_table td,
+.messageContent > .bbc_table_container > .bbc_table td {
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.inner > .bbc_table_container > .bbc_table th,
+.messageContent > .bbc_table_container > .bbc_table th {
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.inner > .bbc_table_container > .bbc_table td:last-child,
+.inner > .bbc_table_container > .bbc_table th:last-child,
+.messageContent > .bbc_table_container > .bbc_table td:last-child,
+.messageContent > .bbc_table_container > .bbc_table th:last-child {
+	border-right: none;
+}
+
+/* Attachment borders */
+.generic_border .attachment_name {
+	border: 1px solid;
+}
+
+/* ========================================
+   EDITOR & FORMS
+   ======================================== */
+
+/* Abort button border */
+.abort {
+	border: 2px solid;
+}
+
+/* ========================================
+   FORM ELEMENTS
+   ======================================== */
+
+fieldset {
+	border-radius: 0;
+}
+
+/* ========================================
+   TYPOGRAPHY - STRUCTURAL
+   ======================================== */
+
+/* Forum title weight */
+#forumtitle > a {
+	font-weight: 700;
+	background-clip: text;
+}
+
+/* ========================================
+   INDICATORS - POSITIONING & SIZING
+   ======================================== */
+
+/* PM Indicator positioning and sizing */
+.pm_indicator {
+	top: -1rem;
+	right: -.2rem;
+	width: 1.6rem;
+	height: 1.6rem;
+	padding: 0;
+	text-indent: -9999px;
+}
+
+/* ========================================
+   SEPARATORS - SPACING
+   ======================================== */
+
+/* New post separator margin */
+.new_post_separator {
+	margin: -.1rem 0 -.8rem 0;
+}
+
+.new_post_separator:after {
+	top: -1.6rem;
+}
+
+/* ========================================
+   POPUP - CLIPPING
+   ======================================== */
+
+/* Popup window clipping */
+.popup_window {
+	background-clip: padding-box;
+}
+
+/* More boxes, although SVG they have embedded color so they are here */
+.warningbox, .successbox, .infobox, .errorbox, .genericbox {
+	background-repeat: no-repeat;
+}
+
+/* ========================================
+   RESPONSIVE - Small Screens
+   ======================================== */
+@media screen and (max-width: 34em) {
+    .poster:after, .posterarea:before {
+        border-bottom: 1px solid;
+    }
+}

@@ -1,0 +1,144 @@
+/**
+/*
+ * ___________.__   __      _____          __
+ * \_   _____/|  | |  | __ /  _  \________/  |_  ____
+ *  |    __)_ |  | |  |/ //  /_\  \_  __ \   __\/ __ \
+ *  |        \|  |_|    </    |    \  | \/|  | \  ___/
+ * /_______  /|____/__|_ \____|__  /__|   |__|  \___  >
+ *         \/           \/       \/                 \/
+ * https://www.elkarte.net
+ * © ElkArte Forum contributors
+ *
+ * INTRODUCTION
+ * Blue Theme - Custom Structural Overrides
+ *
+ * This file contains structural CSS overrides for the Blue variant.
+ * Only layout, spacing, typography sizing, and positioning adjustments.
+ * No colors, shadows, or visual effects should be in this file.
+ */
+
+/* ========================================
+   TYPOGRAPHY & STRUCTURAL ELEMENTS
+   ======================================== */
+
+/* Forum wrapper border radius */
+#wrapper {
+	border-radius: .8rem;
+}
+
+/* Next controls the overall forum font */
+.wrapper {
+    font-size: var(--font14);
+}
+
+/* Forum title typography */
+#forumtitle > a {
+	font-weight: 600;
+	background-clip: text;
+	font-size: var(--font24);
+}
+
+#forumtitle {
+	font-size: var(--font24);
+}
+
+/* Category headers */
+.category_header, .forum_category .category_header {
+    line-height: 1.8;
+    font-size: var(--font15);
+    padding: .2rem .8rem .2rem .8rem;
+}
+
+#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+    padding: .5rem;
+    height: 2.7rem;
+}
+
+.quickbuttons .inline_mod_check {
+    padding: .2rem .4rem;
+}
+
+/* Menu list level 1 line height */
+.listlevel1 {
+	line-height: 1.7;
+}
+
+/* ========================================
+   POSTS & MESSAGES
+   ======================================== */
+
+/* BBC Table borders */
+.inner > .bbc_table_container > .bbc_table td,
+.messageContent > .bbc_table_container > .bbc_table td {
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.inner > .bbc_table_container > .bbc_table th,
+.messageContent > .bbc_table_container > .bbc_table th {
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.inner > .bbc_table_container > .bbc_table td:last-child,
+.inner > .bbc_table_container > .bbc_table th:last-child,
+.messageContent > .bbc_table_container > .bbc_table td:last-child,
+.messageContent > .bbc_table_container > .bbc_table th:last-child {
+	border-right: none;
+}
+
+/* Attachment borders */
+.generic_border .attachment_name {
+	border: 1px solid;
+}
+
+/* ========================================
+   CALENDAR - POSITIONING & SIZING
+   ======================================== */
+
+.previous_month, .next_month {
+    margin-top: 0;
+}
+
+#month_grid .category_header {
+    padding-bottom: .4rem;
+}
+
+/* ========================================
+   POPUPS - STRUCTURAL
+   ======================================== */
+.popup_window {
+    background-clip: padding-box;
+}
+
+/* More boxes, although SVG they have embedded color so they are here */
+.warningbox, .successbox, .infobox, .errorbox {
+    background-repeat: no-repeat;
+}
+
+/* ========================================
+   EDITOR & FORMS
+   ======================================== */
+
+/* Abort button border */
+.abort {
+	border: 2px solid;
+}
+
+/* ========================================
+   RESPONSIVE - Small Screens
+   ======================================== */
+
+@media screen and (max-width: 60em) {
+    #collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+        width: 4.4rem;
+        height: 4.5rem;
+        padding: 1.4rem 0 0 0 !important;
+    }
+}
+
+@media screen and (max-width: 33.750em) {
+	.poster:after, .posterarea:before {
+		border-bottom: 1px solid;
+	}
+}
