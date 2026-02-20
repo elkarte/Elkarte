@@ -24,7 +24,7 @@ use ElkArte\Controller\ModerateAttachments;
 use ElkArte\Controller\Notify;
 use ElkArte\Controller\Post;
 use ElkArte\Controller\Register;
-use ElkArte\Controller\RemoveTopic;
+use ElkArte\Controller\Removetopic;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
 use ElkArte\SiteDispatcher;
@@ -75,7 +75,7 @@ class DispatcherTest extends TestCase
 			'collapse' => BoardIndex::class,
 			'contact' => About::class,
 			'coppa' => About::class,
-			'deletemsg' => RemoveTopic::class,
+			'deletemsg' => Removetopic::class,
 			'dlattach' => Attachment::class,
 			'unwatchtopic' => Notify::class,
 			'quickhelp' => Help::class,
@@ -173,7 +173,7 @@ class DispatcherTest extends TestCase
 				'action' => 'removetopic2',
 				'result' => array(
 					'function_name' => 'action_removetopic2',
-					'controller_name' => RemoveTopic::class,
+					'controller_name' => Removetopic::class,
 				),
 			),
 			// An existing one, not in the action array, naming patterns, defer to action_index

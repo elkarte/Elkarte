@@ -1003,7 +1003,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// Let's go straight to the restore area.
 		if ($selected_qaction === 'restore' && !empty($selected_topics))
 		{
-			redirectexit('action=restoretopic;topics=' . implode(',', $selected_topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=removetopic;sa=restoretopic;topics=' . implode(',', $selected_topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		if (isset($_SESSION['topicseen_cache']))

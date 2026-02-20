@@ -34,7 +34,7 @@ use ElkArte\Controller\Notify;
 use ElkArte\PersonalMessage\PersonalMessage;
 use ElkArte\Controller\Poll;
 use ElkArte\Controller\Post;
-use ElkArte\Controller\RemoveTopic;
+use ElkArte\Controller\Removetopic;
 use ElkArte\Controller\SplitTopics;
 use ElkArte\Controller\Unread;
 use ElkArte\Controller\Xml;
@@ -91,9 +91,7 @@ class SiteDispatcher
 	protected $actionArray = [
 		'admin' => [Admin::class, 'action_index'],
 		'attachapprove' => [ModerateAttachments::class, 'action_attachapprove'],
-		'buddy' => [Members::class, 'action_buddy'],
 		'collapse' => [BoardIndex::class, 'action_collapse'],
-		'deletemsg' => [RemoveTopic::class, 'action_deletemsg'],
 		'dlattach' => [Attachment::class, 'action_index'],
 		'unwatchtopic' => [Notify::class, 'action_unwatchtopic'],
 		'forum' => [BoardIndex::class, 'action_index'],
@@ -114,9 +112,7 @@ class SiteDispatcher
 		'quotefast' => [Post::class, 'action_quotefast'],
 		'quickmod' => [MessageIndex::class, 'action_quickmod'],
 		'quickmod2' => [Display::class, 'action_quickmod2'],
-		'removetopic2' => [RemoveTopic::class, 'action_removetopic2'],
 		'reporttm' => [Emailmoderator::class, 'action_reporttm'],
-		'restoretopic' => [RemoveTopic::class, 'action_restoretopic'],
 		'splittopics' => [SplitTopics::class, 'action_splittopics'],
 		'trackip' => [ProfileHistory::class, 'action_trackip'],
 		'unreadreplies' => [Unread::class, 'action_unreadreplies'],
