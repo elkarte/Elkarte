@@ -23,18 +23,13 @@ use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
 use ElkArte\Controller\Emailmoderator;
 use ElkArte\Controller\Help;
-use ElkArte\Controller\Members;
 use ElkArte\Controller\MergeTopics;
 use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
 use ElkArte\Controller\ModerationCenter;
-use ElkArte\Controller\MoveTopic;
 use ElkArte\Controller\News;
-use ElkArte\Controller\Notify;
 use ElkArte\PersonalMessage\PersonalMessage;
-use ElkArte\Controller\Poll;
 use ElkArte\Controller\Post;
-use ElkArte\Controller\Removetopic;
 use ElkArte\Controller\SplitTopics;
 use ElkArte\Controller\Unread;
 use ElkArte\Controller\Xml;
@@ -93,7 +88,6 @@ class SiteDispatcher
 		'attachapprove' => [ModerateAttachments::class, 'action_attachapprove'],
 		'collapse' => [BoardIndex::class, 'action_collapse'],
 		'dlattach' => [Attachment::class, 'action_index'],
-		'unwatchtopic' => [Notify::class, 'action_unwatchtopic'],
 		'forum' => [BoardIndex::class, 'action_index'],
 		'quickhelp' => [Help::class, 'action_quickhelp'],
 		'jsmodify' => [Post::class, 'action_jsmodify'],
@@ -104,7 +98,6 @@ class SiteDispatcher
 		'logout' => [Auth::class, 'action_logout'],
 		'mergetopics' => [MergeTopics::class, 'action_index'],
 		'moderate' => [ModerationCenter::class, 'action_index'],
-		'notifyboard' => [Notify::class, 'action_notifyboard'],
 		'pm' => [PersonalMessage::class, 'action_index'],
 		'post2' => [Post::class, 'action_post2'],
 		'profile' => [Profile::class, 'action_index'],

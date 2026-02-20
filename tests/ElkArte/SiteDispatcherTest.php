@@ -71,13 +71,10 @@ class DispatcherTest extends TestCase
 		$actions = array(
 			'activate' => Register::class,
 			'attachapprove' => ModerateAttachments::class,
-			'addbuddy' => Members::class,
 			'collapse' => BoardIndex::class,
 			'contact' => About::class,
 			'coppa' => About::class,
-			'deletemsg' => Removetopic::class,
 			'dlattach' => Attachment::class,
-			'unwatchtopic' => Notify::class,
 			'quickhelp' => Help::class,
 			'login' => Auth::class,
 			'login2' => Auth::class,
