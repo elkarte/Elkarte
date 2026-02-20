@@ -36,7 +36,7 @@ class Poll extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $topic, $context;
+		global $context;
 
 		// Call the right method
 		$subActions = [
@@ -48,7 +48,7 @@ class Poll extends AbstractController
 			'interface' => [$this, 'action_interface'],
 		];
 
-		$action = new Action('movetopic');
+		$action = new Action('poll');
 		$subAction = $action->initialize($subActions, 'none');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

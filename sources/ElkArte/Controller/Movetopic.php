@@ -25,7 +25,7 @@ use ElkArte\Languages\Loader;
 /**
  * Move Topic Controller
  */
-class MoveTopic extends AbstractController
+class Movetopic extends AbstractController
 {
 	/** @var int The id of the topic being manipulated */
 	private $_topic;
