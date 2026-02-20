@@ -85,6 +85,7 @@ class Admin extends AbstractController
 		Txt::load('Admin+Help+ManageSettings');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 		loadJavascriptFile('admin.js', [], 'admin_script');
 
 		// Actually create the menu!

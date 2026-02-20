@@ -872,11 +872,6 @@ function loadCSSFile($filenames, $params = [], $id = '')
 		$filenames = [$filenames];
 	}
 
-	if (in_array('admin.css', $filenames))
-	{
-		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
-	}
-
 	$params['subdir'] = $params['subdir'] ?? 'css';
 	$params['extension'] = 'css';
 	$params['index_name'] = 'css_files';

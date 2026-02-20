@@ -1037,6 +1037,7 @@ class ManageMaillist extends AbstractController
 		$settingsForm->prepare();
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 		$context['sub_template'] = 'show_settings';
 	}
 
@@ -1446,6 +1447,7 @@ class ManageMaillist extends AbstractController
 		$settingsForm->prepare();
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 		$context['sub_template'] = 'show_settings';
 	}
 
@@ -1525,6 +1527,7 @@ class ManageMaillist extends AbstractController
 		Txt::load('Admin');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = [];

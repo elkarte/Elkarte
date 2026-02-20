@@ -84,6 +84,7 @@ class ModerationCenter extends AbstractController
 		// Load the language, and the template.
 		Txt::load('ModerationCenter');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 
 		if (!empty($options['admin_preferences']))
 		{
