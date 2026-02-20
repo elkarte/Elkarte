@@ -860,8 +860,6 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  */
 function loadCSSFile($filenames, $params = [], $id = '')
 {
-	global $context;
-
 	if (empty($filenames))
 	{
 		return;

@@ -990,7 +990,7 @@ class Display extends AbstractController
 				'test' => 'can_move',
 				'text' => 'move_topic',
 				'lang' => true,
-				'url' => getUrl('action', ['action' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
+				'url' => getUrl('action', ['action' => 'movetopic', 'sa' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
 			],
 			'delete' => [
 				'test' => 'can_delete',

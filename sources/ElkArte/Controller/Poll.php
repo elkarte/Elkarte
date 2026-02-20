@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
@@ -35,7 +36,22 @@ class Poll extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Figure out the right action to do.
+		global $topic, $context;
+
+		// Call the right method
+		$subActions = [
+			'editpoll' => [$this, 'action_editpoll'],
+			'editpoll2' => [$this, 'action_editpoll2'],
+			'lockvoting' => [$this, 'action_lockvoting'],
+			'remove' => [$this, 'action_remove'],
+			'vote' => [$this, 'action_vote'],
+			'interface' => [$this, 'action_interface'],
+		];
+
+		$action = new Action('movetopic');
+		$subAction = $action->initialize($subActions, 'none');
+		$context['sub_action'] = $subAction;
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -213,7 +229,7 @@ class Poll extends AbstractController
 	 * - If not an admin must have poll_lock_any permission, otherwise must
 	 * be poll starter with poll_lock_own permission.
 	 * - Upon successful completion of action will direct user back to topic.
-	 * - Accessed via ?action=lockvoting.
+	 * - Accessed via ?action=poll;sa=lockvoting.
 	 */
 	public function action_lockvoting(): void
 	{
@@ -233,33 +249,33 @@ class Poll extends AbstractController
 		}
 
 		// It's been locked by a non-moderator.
-		if ($poll['locked'] == '1')
+		if ($poll['voting_locked'] == '1')
 		{
-			$poll['locked'] = '0';
+			$poll['voting_locked'] = '0';
 		}
 		// Locked by a moderator, and this is a moderator.
-		elseif ($poll['locked'] == '2' && allowedTo('moderate_board'))
+		elseif ($poll['voting_locked'] == '2' && allowedTo('moderate_board'))
 		{
-			$poll['locked'] = '0';
+			$poll['voting_locked'] = '0';
 		}
 		// Sorry, a moderator locked it.
-		elseif ($poll['locked'] == '2' && !allowedTo('moderate_board'))
+		elseif ($poll['voting_locked'] == '2' && !allowedTo('moderate_board'))
 		{
 			throw new Exception('locked_by_admin', 'user');
 		}
 		// A moderator *is* locking it.
-		elseif ($poll['locked'] == '0' && allowedTo('moderate_board'))
+		elseif ($poll['voting_locked'] == '0' && allowedTo('moderate_board'))
 		{
-			$poll['locked'] = '2';
+			$poll['voting_locked'] = '2';
 		}
 		// Well, it's gonna be locked one way or another otherwise...
 		else
 		{
-			$poll['locked'] = '1';
+			$poll['voting_locked'] = '1';
 		}
 
 		// Lock!  *Poof* - no one can vote.
-		lockPoll($poll['id_poll'], $poll['locked']);
+		lockPoll($poll['id_poll'], $poll['voting_locked']);
 
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
 	}
@@ -276,7 +292,7 @@ class Poll extends AbstractController
 	 * - In the case of an error, this function will redirect back to action_editpoll and
 	 * display the relevant error message.
 	 * - Upon successful completion of the action, it will direct user back to topic.
-	 * - Accessed via ?action=editpoll2.
+	 * - Accessed via ?action=poll;sa=editpoll2.
 	 */
 	public function action_editpoll2(): void
 	{
@@ -776,7 +792,7 @@ class Poll extends AbstractController
 		}
 
 		$context['page_title'] = $context['is_edit'] ? $txt['poll_edit'] : $txt['add_poll'];
-		$context['form_url'] = getUrl('action', ['action' => 'editpoll2'] + ($context['is_edit'] ? [] : ['add']) + ['topic' => $context['current_topic'] . '.' . $context['start']]);
+		$context['form_url'] = getUrl('action', ['action' => 'poll', 'sa' => 'editpoll2'] + ($context['is_edit'] ? [] : ['add']) + ['topic' => $context['current_topic'] . '.' . $context['start']]);
 
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);

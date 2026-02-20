@@ -85,7 +85,9 @@ class SiteDispatcher
 		'function' => 'action_boardindex'
 	];
 
-	/** @var string[] Build our nice and cozy err... *cough* */
+	/** @var string[] Build our nice and cozy err... *cough*
+	 * If you need to directly call a method inside a controller, add it here.  Otherwise, you should
+	 * use the action_index of the controller and let it dispatch normally */
 	protected $actionArray = [
 		'admin' => [Admin::class, 'action_index'],
 		'attachapprove' => [ModerateAttachments::class, 'action_attachapprove'],
@@ -94,21 +96,16 @@ class SiteDispatcher
 		'deletemsg' => [RemoveTopic::class, 'action_deletemsg'],
 		'dlattach' => [Attachment::class, 'action_index'],
 		'unwatchtopic' => [Notify::class, 'action_unwatchtopic'],
-		'editpoll' => [Poll::class, 'action_editpoll'],
-		'editpoll2' => [Poll::class, 'action_editpoll2'],
 		'forum' => [BoardIndex::class, 'action_index'],
 		'quickhelp' => [Help::class, 'action_quickhelp'],
 		'jsmodify' => [Post::class, 'action_jsmodify'],
 		'jsoption' => [ManageThemes::class, 'action_jsoption'],
 		'keepalive' => [Auth::class, 'action_keepalive'],
-		'lockvoting' => [Poll::class, 'action_lockvoting'],
 		'login' => [Auth::class, 'action_login'],
 		'login2' => [Auth::class, 'action_login2'],
 		'logout' => [Auth::class, 'action_logout'],
 		'mergetopics' => [MergeTopics::class, 'action_index'],
 		'moderate' => [ModerationCenter::class, 'action_index'],
-		'movetopic' => [MoveTopic::class, 'action_movetopic'],
-		'movetopic2' => [MoveTopic::class, 'action_movetopic2'],
 		'notifyboard' => [Notify::class, 'action_notifyboard'],
 		'pm' => [PersonalMessage::class, 'action_index'],
 		'post2' => [Post::class, 'action_post2'],

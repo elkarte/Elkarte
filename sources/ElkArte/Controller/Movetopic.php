@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Loader;
@@ -56,8 +57,24 @@ class MoveTopic extends AbstractController
 	 */
 	public function action_index()
 	{
-		// move a topic, what else?!
-		// $this->action_movetopic();
+		global $topic, $context;
+
+		// Call the right method, move a topic, what else?!
+		$subActions = [
+			'movetopic' => [$this, 'action_movetopic'],
+			'movetopic2' => [$this, 'action_movetopic2'],
+		];
+
+		// Without anything it throws an error, so redirect somewhere
+		if (empty($topic))
+		{
+			redirectexit();
+		}
+
+		$action = new Action('movetopic');
+		$subAction = $action->initialize($subActions, 'none');
+		$context['sub_action'] = $subAction;
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -210,7 +227,7 @@ class MoveTopic extends AbstractController
 	 * - It is called on the submitting of action_movetopic.
 	 * - This function logs that topics have been moved in the moderation log.
 	 * - Upon successful completion redirects to message index.
-	 * - Accessed via ?action=movetopic2.
+	 * - Accessed via ?action=movetopic;sa=movetopic2.
 	 *
 	 * @uses subs/Post.subs.php.
 	 */
@@ -252,7 +269,7 @@ class MoveTopic extends AbstractController
 		moveTopics($this->_topic, $this->_toboard);
 
 		// Log that they moved this topic.
-		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $this->user->id)
+		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] !== $this->user->id)
 		{
 			logAction('move', ['topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard]);
 		}
@@ -402,7 +419,6 @@ class MoveTopic extends AbstractController
 	{
 		global $board, $language;
 
-		// @todo Does this make sense if the topic was unapproved before? I'd just about say so.
 		if (isset($this->_req->post->postRedirect))
 		{
 			// Should be in the boardwide language.

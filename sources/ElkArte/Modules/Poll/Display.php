@@ -119,20 +119,20 @@ class Display extends AbstractModule
 					'test' => 'allow_lock_poll',
 					'text' => ($context['poll']['is_locked'] ? 'poll_unlock' : 'poll_lock'),
 					'lang' => true,
-					'url' => getUrl('action', ['action' => 'lockvoting', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+					'url' => getUrl('action', ['action' => 'poll', 'sa' => 'lockvoting', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
 				],
 				'edit' => [
 					'test' => 'allow_edit_poll',
 					'text' => 'poll_edit',
 					'lang' => true,
-					'url' => getUrl('action', ['action' => 'editpoll', 'topic' => $context['current_topic'] . '.' . $context['start']])
+					'url' => getUrl('action', ['action' => 'poll', 'sa' => 'editpoll', 'topic' => $context['current_topic'] . '.' . $context['start']])
 				],
 				'remove_poll' => [
 					'test' => 'can_remove_poll',
 					'text' => 'poll_remove',
 					'lang' => true,
 					'custom' => 'onclick="return confirm(\'' . $txt['poll_remove_warn'] . '\');"',
-					'url' => getUrl('action', ['action' => 'poll', 'sa' => 'remove', 'topic' => $context['current_topic'] . '.' . $context['start'] . '{session_data}'])
+					'url' => getUrl('action', ['action' => 'poll', 'sa' => 'remove', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
 				],
 			];
 
