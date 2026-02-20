@@ -161,6 +161,7 @@
 	--icon_online_grad: #64533F; /* part of icon online gradient */
 	--sticky_row: #8E8E2C; /* sticky row background */
 	--locked_row: #CF1876; /* locked row background */
+	--basic_row: #0B0B0B; /* basic row background */
 	--forum_posts: #0B0B0B; /* Post background */
 	--forum_posts_alternative: #0B0B0B; /* If stripping is wanted */
 
@@ -1137,7 +1138,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .basic_row {
-	background: var(--primary_content_background);
+	background: var(--basic_row);
 }
 
 .topic_sorting_row {

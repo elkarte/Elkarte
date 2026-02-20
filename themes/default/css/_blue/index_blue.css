@@ -157,6 +157,7 @@
 	--poster_name: #c06002;
 	--sticky_row: #cfdce8; /* sticky row background */
 	--locked_row: #e8d8cf; /* locked row background */
+	--basic_row: #fefefe; /* basic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
 	--forum_posts: #FEFEFE; /* Post background */
@@ -1195,7 +1196,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .basic_row {
-	background: var(--primary_content_background);
+	background: var(--basic_row);
 }
 
 .topic_sorting_row {

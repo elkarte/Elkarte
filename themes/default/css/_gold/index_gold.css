@@ -157,6 +157,7 @@
 	--poster_name: #5f4724;
 	--sticky_row: #cfdce8; /* sticky row background */
 	--locked_row: #e8d8cf; /* locked row background */
+	--basic_row: #fefefe; /* basic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
 	--forum_posts: #FEFEFE; /* Post background */
@@ -1202,11 +1203,18 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_listing > li {
 	border-color: var(--primary_border);
-	background: var(--news_background);
 }
 
-.basic_row {
-	background: var(--primary_content_background);
+.topic_listing > li.basic_row {
+	background: var(--basic_row);
+}
+
+.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
+	background: var(--sticky_row);
+}
+
+.topic_listing > li.locked_row {
+	background: var(--locked_row);
 }
 
 .topic_sorting_row {
@@ -1225,7 +1233,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .topic_info {
 	border-right-color: var(--primary_border);
 	border-left-color: var(--primary_border);
-	background: var(--primary_content_background);
+	background: var(--transparent);
 }
 
 .topic_name h4 a {
@@ -1252,14 +1260,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .approvetopic_row, .approve_row {
 	background: var(--notice);
-}
-
-.sticky_row, .locked_row.sticky_row {
-	background: var(--primary_content_background);
-}
-
-.locked_row {
-	background: var(--primary_content_background);
 }
 
 #topic_icons {
