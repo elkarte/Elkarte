@@ -2396,7 +2396,6 @@ class InstallInstructions_install_2_0
 			array(
 				array('elkVersion', '{$current_version}'),
 				array('news', '{$default_news}'),
-				array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js'),
 				array('compactTopicPagesContiguous', '5'),
 				array('compactTopicPagesEnable', '1'),
 				array('todayMod', '3'),
@@ -2650,7 +2649,7 @@ class InstallInstructions_install_2_0
 				array('usernotif_favicon_enable', '1'),
 				array('displayMemberNames', '1'),
 				array('url_format', 'semantic'),
-				array('loginHistoryDays', '31'),
+				array('loginHistoryDays', '30'),
 				array('badbehavior_accept_header', '1'),
 				array('badbehavior_httpbl_threat', '25'),
 				array('badbehavior_httpbl_maxage', '30'),
