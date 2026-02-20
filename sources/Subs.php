@@ -1580,7 +1580,7 @@ function replaceBasicActionUrl($string)
 			'{forum_name_html_unsafe}' => un_htmlspecialchars($context['forum_name_html_safe']),
 			'{script_url}' => $scripturl,
 			'{board_url}' => $boardurl,
-			'{login_url}' => getUrl('action', ['action' => 'login']),
+			'{login_url}' => getUrl('action', ['action' => 'auth', 'sa' => 'login']),
 			'{register_url}' => getUrl('action', ['action' => 'register']),
 			'{activate_url}' => getUrl('action', ['action' => 'register', 'sa' => 'activate']),
 			'{help_url}' => getUrl('action', ['action' => 'help']),

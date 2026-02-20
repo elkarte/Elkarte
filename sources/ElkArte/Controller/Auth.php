@@ -18,6 +18,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
@@ -41,19 +42,34 @@ class Auth extends AbstractController
 	 */
 	public function needSecurity($action = '')
 	{
-		return $action !== 'action_keepalive';
+		return $action !== 'action_keepalive' && $action !== 'keepalive';
 	}
 
 	/**
 	 * Entry point in Auth controller
 	 *
-	 * - (well no, not really. We route directly to the rest.)
+	 * - handles certain SA in some cases, although routing directly is supported as well.
 	 *
 	 * @see AbstractController::action_index
 	 */
 	public function action_index()
 	{
 		// What can we do? login page!
+		$subActions = [
+			'keepalive' => [$this, 'action_keepalive'],
+			'login' => [$this, 'action_login'],
+			'login2' => [$this, 'action_login2'],
+			'logout' => [$this, 'action_logout'],
+		];
+
+		// We like action, so let's get ready for some
+		$action = new Action('auth');
+
+		// Get the subAction or just go to action_notify
+		$subAction = $action->initialize($subActions, 'login');
+
+		// forward to our respective method.
+		$action->dispatch($subAction);
 		$this->action_login();
 	}
 
@@ -63,7 +79,7 @@ class Auth extends AbstractController
 	 * What it does:
 	 *  - Shows a page for the user to type in their username and password.
 	 *  - It caches the referring URL in $_SESSION['login_url'].
-	 *  - It is accessed from ?action=login.
+	 *  - It is accessed from ?action=auth;sa=login.
 	 *
 	 * @uses Login template and language file with the login sub-template.
 	 */
@@ -99,7 +115,7 @@ class Auth extends AbstractController
 
 		// Add the login chain to the link tree.
 		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'login']),
+			'url' => getUrl('action', ['action' => 'auth', 'sa' => 'login']),
 			'name' => $txt['login'],
 		];
 
@@ -127,7 +143,7 @@ class Auth extends AbstractController
 	 *   a login to an account.
 	 * - Upgrades password encryption on login, if necessary.
 	 * - After successful login, redirects you to $_SESSION['login_url'].
-	 * - Accessed from ?action=login2, by forms.
+	 * - Accessed from ?action=auth;sa=login2, by forms.
 	 *
 	 * @uses the same templates action_login()
 	 */
@@ -182,7 +198,7 @@ class Auth extends AbstractController
 
 		// Add the login chain to the link tree.
 		$context['breadcrumbs'][] = [
-			'url' => getUrl('action', ['action' => 'login']),
+			'url' => getUrl('action', ['action' => 'auth', 'sa' => 'login']),
 			'name' => $txt['login'],
 		];
 
@@ -812,7 +828,7 @@ function doLogin(UserSettingsLoader $user)
 	}
 	else
 	{
-		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=auth;sa=logout;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 }
 

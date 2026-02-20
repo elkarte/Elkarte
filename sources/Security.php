@@ -220,7 +220,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	if (!theme()->getLayers()->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
-		redirectexit('action=login');
+		redirectexit('action=auth;sa=login');
 	}
 	elseif (isset($_GET['api']))
 	{

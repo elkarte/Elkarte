@@ -23,7 +23,6 @@ use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
 use ElkArte\Controller\Emailmoderator;
 use ElkArte\Controller\Help;
-use ElkArte\Controller\MergeTopics;
 use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
 use ElkArte\Controller\ModerationCenter;
@@ -92,11 +91,6 @@ class SiteDispatcher
 		'quickhelp' => [Help::class, 'action_quickhelp'],
 		'jsmodify' => [Post::class, 'action_jsmodify'],
 		'jsoption' => [ManageThemes::class, 'action_jsoption'],
-		'keepalive' => [Auth::class, 'action_keepalive'],
-		'login' => [Auth::class, 'action_login'],
-		'login2' => [Auth::class, 'action_login2'],
-		'logout' => [Auth::class, 'action_logout'],
-		'mergetopics' => [MergeTopics::class, 'action_index'],
 		'moderate' => [ModerationCenter::class, 'action_index'],
 		'pm' => [PersonalMessage::class, 'action_index'],
 		'post2' => [Post::class, 'action_post2'],
@@ -451,7 +445,7 @@ class SiteDispatcher
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only log in
-			if ($this->action === 'login2' || $this->action === 'logout')
+			if ($this->action === 'auth' && ($this->subAction === 'login2' || $this->subAction === 'logout'))
 			{
 				$this->_controller_name = Auth::class;
 				$this->_function_name = 'action_' . $this->action;
@@ -491,6 +485,7 @@ class SiteDispatcher
 
 		return empty($modSettings['allow_guestAccess'])
 			&& User::$info->is_guest
+			&& $this->subAction !== 'login2' && $this->subAction !== 'login'
 			&& !in_array($this->action, ['login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq']);
 	}
 

@@ -589,7 +589,7 @@ function elk_sessionKeepAlive ()
 	if (elk_scripturl && curTime - lastKeepAliveCheck > 900000)
 	{
 		let tempImage = new Image();
-		tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=keepalive;time=' + curTime;
+		tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=auth;sa=keepalive;time=' + curTime;
 		lastKeepAliveCheck = curTime;
 	}
 

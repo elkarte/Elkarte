@@ -26,7 +26,7 @@ use ElkArte\TopicsMerge;
 /**
  * Merges two or more topics into a single topic.
  */
-class MergeTopics extends AbstractController
+class Mergetopics extends AbstractController
 {
 	/**
 	 * Merges two or more topics into one topic.

@@ -1078,7 +1078,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 					redirectexit($redirect_url);
 				}
 
-				$controller = new MergeTopics(new EventManager());
+				$controller = new Mergetopics(new EventManager());
 				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 

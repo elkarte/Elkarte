@@ -20,7 +20,7 @@ function template_login()
 	global $context, $scripturl, $modSettings, $txt;
 
 	echo '
-		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=auth;sa=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8">
 			<div class="login">
 				<h2 class="category_header hdicon i-menu-login centertext">
 					', $txt['login'], '
@@ -116,7 +116,7 @@ function template_kick_guest()
 
 	// This isn't that much... just like normal login but with a message at the top.
 	echo '
-	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin">
+	<form action="', $scripturl, '?action=auth;sa=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin">
 		<div class="login">
 			<h2 class="category_header">', $txt['notice'], '</h2>';
 
@@ -192,7 +192,7 @@ function template_maintenance()
 
 	// Display the administrator's message at the top.
 	echo '
-<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8">
+<form action="', $scripturl, '?action=auth;sa=login2" method="post" accept-charset="UTF-8">
 	<div id="maintenance_mode" class="login" >
 		<h2 class="category_header">', $context['title'], '</h2>
 		<p class="description flow_auto">
