@@ -1,4 +1,5 @@
 <?php
+// Version: 2.0; Emoji
 
 // Settings
 $txt['emoji_title'] = 'Emoji';
