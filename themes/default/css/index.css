@@ -2944,7 +2944,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 }
 
 #quickreplybox .poster, #quicktopicbox .poster {
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
 
 /* Poster container, holds mugshot, flyout, poster info etc */

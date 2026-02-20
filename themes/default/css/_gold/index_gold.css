@@ -1246,9 +1246,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_stats {
 	color: var(--strong_text);
-	background: var(--primary_content_background);
-	border-left-color: var(--primary_border);
-	border-right-color: var(--primary_border);
+	border-left-color: var(--transparent);
+	border-right-color: var(--transparent);
 }
 
 .approvetopic_row, .approve_row {
