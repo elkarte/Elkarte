@@ -293,7 +293,6 @@ class AssetManager
 						theme_scope: ' . JavaScriptEscape($theme_scope) . ',
 						default_theme_scope: ' . JavaScriptEscape($default_theme_scope) . ',
 						sw_scope: ' . JavaScriptEscape($sw_scope) . ',
-						nav_preload: 1, // set to 1 to enable, 0 to disable
 					}
 				};
 	
