@@ -14,17 +14,14 @@ use ElkArte\AdminController\Admin;
 use ElkArte\Controller\About;
 use ElkArte\Controller\Announce;
 use ElkArte\Controller\Attachment;
-use ElkArte\Controller\Auth;
 use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
 use ElkArte\Controller\Help;
-use ElkArte\Controller\Members;
 use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
-use ElkArte\Controller\Notify;
 use ElkArte\Controller\Post;
 use ElkArte\Controller\Register;
-use ElkArte\Controller\Removetopic;
+use ElkArte\Controller\SplitTopics;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
 use ElkArte\SiteDispatcher;
@@ -164,10 +161,10 @@ class DispatcherTest extends TestCase
 			// An existing one, action array
 			array(
 				'test_name' => 'action from actionarray',
-				'action' => 'removetopic2',
+				'action' => 'splittopics',
 				'result' => array(
-					'function_name' => 'action_removetopic2',
-					'controller_name' => Removetopic::class,
+					'function_name' => 'action_splittopics',
+					'controller_name' => SplitTopics::class,
 				),
 			),
 			// An existing one, not in the action array, naming patterns, defer to action_index
