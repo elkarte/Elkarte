@@ -197,7 +197,7 @@ class DisplayRenderer extends Renderer
 			// How about... even... remove it entirely?!
 			'remove_topic' => [
 				'text' => 'remove_topic',
-				'url' => getUrl('action', ['action' => 'removetopic2', 'topic' => $topic . '.' . $context['start'], '{session_data}']),
+				'url' => getUrl('action', ['action' => 'removetopic', 'sa' => 'removetopic2', 'topic' => $topic . '.' . $context['start'], '{session_data}']),
 				'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"',
 				'icon' => 'warn',
 				'enabled' => $context['can_delete'] && $context['topic_first_message'] === $output['id'],
@@ -206,7 +206,7 @@ class DisplayRenderer extends Renderer
 			// How about... remove the message
 			'remove' => [
 				'text' => 'remove',
-				'url' => getUrl('action', ['action' => 'deletemsg', 'topic' => $topic . '.' . $context['start'], 'msg' => $output['id'], '{session_data}']),
+				'url' => getUrl('action', ['action' => 'removetopic', 'sa' => 'deletemsg', 'topic' => $topic . '.' . $context['start'], 'msg' => $output['id'], '{session_data}']),
 				'custom' => 'onclick="return confirm(\'' . $txt['remove_message'] . '?\');"',
 				'icon' => 'delete',
 				'enabled' => $output['can_remove'] && ($context['topic_first_message'] !== $output['id']),
@@ -231,7 +231,7 @@ class DisplayRenderer extends Renderer
 			// Can we restore topics?
 			'restore' => [
 				'text' => 'restore_message',
-				'url' => getUrl('action', ['action' => 'restoretopic', 'msgs' => $output['id'], '{session_data}']),
+				'url' => getUrl('action', ['action' => 'removetopic', 'sa' => 'restoretopic', 'msgs' => $output['id'], '{session_data}']),
 				'icon' => 'recycle',
 				'enabled' => $context['can_restore_msg'],
 				'submenu' => true,

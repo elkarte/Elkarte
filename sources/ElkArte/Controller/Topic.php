@@ -51,7 +51,7 @@ class Topic extends AbstractController
 			redirectexit();
 		}
 
-		$action = new Action('topics');
+		$action = new Action('topicattributes');
 		$subAction = $action->initialize($subActions, 'none');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

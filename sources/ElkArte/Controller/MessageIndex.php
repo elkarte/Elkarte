@@ -937,7 +937,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				'test' => 'can_mark_notify',
 				'text' => $this->is_marked_notify ? 'unnotify' : 'notify',
 				'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"',
-				'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->is_marked_notify ? 'off' : 'on'), 'board' => $board . '.' . $this->sort_start, '{session_data}'])],
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'notifyboard', 'toggle' => ($this->is_marked_notify ? 'off' : 'on'), 'board' => $board . '.' . $this->sort_start, '{session_data}'])],
 		];
 
 		// They can only mark read if they are logged in, and it's enabled!
@@ -1003,7 +1003,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// Let's go straight to the restore area.
 		if ($selected_qaction === 'restore' && !empty($selected_topics))
 		{
-			redirectexit('action=restoretopic;topics=' . implode(',', $selected_topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=removetopic;sa=restoretopic;topics=' . implode(',', $selected_topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		if (isset($_SESSION['topicseen_cache']))
@@ -1078,7 +1078,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 					redirectexit($redirect_url);
 				}
 
-				$controller = new MergeTopics(new EventManager());
+				$controller = new Mergetopics(new EventManager());
 				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 

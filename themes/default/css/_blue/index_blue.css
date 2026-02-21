@@ -9,8 +9,8 @@
  * © ElkArte Forum contributors
  *
  * INTRODUCTION
- * This variant is the standard, light, Elkarte theme.
- * This is Eye Candy / Colors. All the layout code is in index.css.
+ * This variant is the standard, Blue Variant, Elkarte theme.
+ * This is eye candy / colors, specific layout override code is in custom_blue.css
  *
  *      $CONSTANTS...........CSS Vars for easy updates
  *		$GENERAL.............Global resets, clearfixes, etc.
@@ -157,6 +157,7 @@
 	--poster_name: #c06002;
 	--sticky_row: #cfdce8; /* sticky row background */
 	--locked_row: #e8d8cf; /* locked row background */
+	--basic_row: #fefefe; /* basic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
 	--forum_posts: #FEFEFE; /* Post background */
@@ -259,8 +260,6 @@
  */
 
 .wrapper {
-	/* Next controls the overall forum font */
-	font-size: var(--font14);
 }
 
 /* Normal, standard links. */
@@ -384,9 +383,6 @@ strong {
 	border-bottom-color: var(--category_border_bottom);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
 	text-shadow: -1px -1px 1px var(--box_shadow);
-	line-height: 1.5;
-	font-size: var(--font15);
-	padding: .2rem .8rem .2rem .8rem;
 }
 
 /* Single ones a bit darker than board index ones. */
@@ -563,14 +559,14 @@ input[type=checkbox].quote-show-more {
 
 .inner > .bbc_table_container > .bbc_table td,
 .messageContent > .bbc_table_container > .bbc_table td {
-	border-right: 1px solid var(--primary_border_right);
-	border-bottom: 1px solid var(--primary_border_bottom);
+	border-right-color: var(--primary_border_right);
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
-	border-right: 1px solid var(--primary_border_right);
-	border-bottom: 1px solid var(--secondary_border_bottom);
+	border-right-color: var(--primary_border_right);
+	border-bottom-color: var(--secondary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table td:last-child,
@@ -647,16 +643,11 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #forumtitle > a {
-	font-weight: 600;
 	color: var(--transparent);
 	background: linear-gradient(95deg, var(--title-compliment), var(--title));
-	-webkit-background-clip: text;
-	background-clip: text;
-	font-size: var(--font24);
 }
 
 #forumtitle {
-	font-size: var(--font24);
 }
 
 /* News section. */
@@ -679,7 +670,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-bottom-color: var(--top_section_bottom_border);
 	background: var(--content_background);
 	box-shadow: 0 2px 4px var(--opacity20);
-	border-radius: .8rem;
 }
 
 /* The footer with copyright links etc. */
@@ -832,8 +822,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-	padding: .5rem;
-	height: 2.7rem;
 }
 
 /* Hover effects for those buttons. */
@@ -989,7 +977,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .quickbuttons .inline_mod_check {
-	padding: .2rem .4rem;
 }
 
 /* The active one */
@@ -1209,7 +1196,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .basic_row {
-	background: var(--primary_content_background);
+	background: var(--basic_row);
 }
 
 .topic_sorting_row {
@@ -1434,7 +1421,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .generic_border .attachment_name {
-	border: 1px solid var(--transparent);
+	border-color: var(--transparent);
 }
 
 /* Poor Mans lightbox support */
@@ -1816,11 +1803,9 @@ ul.cf_icons {
 }
 
 .previous_month, .next_month {
-	margin-top: 0;
 }
 
 #month_grid .category_header {
-	padding-bottom: .4rem;
 }
 
 /* -------------------------------------------------------
@@ -1854,7 +1839,6 @@ ul.cf_icons {
 .popup_window {
 	border-color: var(--secondary_border);
 	background: var(--content_background);
-	background-clip: padding-box;
 	box-shadow: var(--shadow-elevation-high);
 }
 
@@ -1956,7 +1940,6 @@ ul.cf_icons {
 /* More boxes, although SVG they have embedded color so they are here */
 .warningbox, .successbox, .infobox, .errorbox {
 	border-color: var(--primary_border);
-	background-repeat: no-repeat;
 }
 
 .warningbox {
@@ -2152,16 +2135,13 @@ ul.cf_icons {
 	}
 
 	#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-		width: 4.4rem;
-		height: 4.5rem;
-		padding: 1.4rem 0 0 0 !important;
 	}
 }
 
 /* This one does up to 540 screens.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 34em) {
+@media screen and (max-width: 33.750em) {
 	.board_lastpost {
 		border-top-color: var(--primary_border);
 	}
@@ -2172,7 +2152,7 @@ ul.cf_icons {
 	}
 
 	.poster:after, .posterarea:before {
-		border-bottom: 1px solid var(--secondary_border);
+		border-bottom-color: var(--secondary_border);
 	}
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {

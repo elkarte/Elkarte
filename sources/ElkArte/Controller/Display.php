@@ -958,7 +958,7 @@ class Display extends AbstractController
 				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
 				'lang' => true,
 				'custom' => 'onclick="return unwatchButton(this);"',
-				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
 				'submenu' => true,
 			],
 			'print' => [
@@ -990,14 +990,14 @@ class Display extends AbstractController
 				'test' => 'can_move',
 				'text' => 'move_topic',
 				'lang' => true,
-				'url' => getUrl('action', ['action' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
+				'url' => getUrl('action', ['action' => 'movetopic', 'sa' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
 			],
 			'delete' => [
 				'test' => 'can_delete',
 				'text' => 'remove_topic',
 				'lang' => true,
 				'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"',
-				'url' => getUrl('action', ['action' => 'removetopic2', 'topic' => $context['current_topic'] . '.0', '{session_data}'])
+				'url' => getUrl('action', ['action' => 'removetopic', 'sa' => 'removetopic2', 'topic' => $context['current_topic'] . '.0', '{session_data}'])
 			],
 			'lock' => [
 				'test' => 'can_lock',
@@ -1025,7 +1025,7 @@ class Display extends AbstractController
 			$context['mod_buttons'][] = [
 				'text' => 'restore_topic',
 				'lang' => true,
-				'url' => getUrl('action', ['action' => 'restoretopic', 'topics' => $context['current_topic'], '{session_data}'])
+				'url' => getUrl('action', ['action' => 'removetopic', 'sa' => 'restoretopic', 'topics' => $context['current_topic'], '{session_data}'])
 			];
 		}
 
@@ -1081,7 +1081,7 @@ class Display extends AbstractController
 		// We are restoring messages. We handle this in another place.
 		if ($this->_req->hasQuery('restore_selected'))
 		{
-			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=removetopic;sa=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		if ($this->_req->hasQuery('split_selection'))

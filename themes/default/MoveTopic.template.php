@@ -21,7 +21,7 @@ function template_move_topic()
 
 	echo '
 	<div id="move_topic">
-		<form action="', $scripturl, '?action=movetopic2;current_board=' . $context['current_board'] . ';topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
+		<form action="', $scripturl, '?action=movetopic;sa=movetopic2;current_board=' . $context['current_board'] . ';topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<h2 class="category_header">', $txt['move_topic'], '</h2>
 			<div class="centertext">
 				<div class="content">
@@ -36,7 +36,9 @@ function template_move_topic()
 	// Disable the reason textarea when the postRedirect checkbox is unchecked...
 	echo '
 						</dl>
-						<label for="reset_subject"><input type="checkbox" name="reset_subject" id="reset_subject" onclick="document.getElementById(\'subjectArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic2'], '.</label><br />
+						<label for="reset_subject">
+							<input type="checkbox" name="reset_subject" id="reset_subject" onclick="document.getElementById(\'subjectArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic2'], '.
+						</label><br />
 						<fieldset id="subjectArea" class="hide">
 							<dl class="settings">
 								<dt>
@@ -46,9 +48,13 @@ function template_move_topic()
 									<input type="text" id="custom_subject" name="custom_subject" size="80" value="', $context['subject'], '" class="input_text" />
 								</dd>
 							</dl>
-							<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" /> ', $txt['moveTopic4'], '.</label>
+							<label for="enforce_subject">
+								<input type="checkbox" name="enforce_subject" id="enforce_subject" /> ', $txt['moveTopic4'], '.
+							</label>
 						</fieldset>
-						<label for="postRedirect"><input type="checkbox" name="postRedirect" id="postRedirect" ', $context['is_approved'] ? 'checked="checked"' : '', ' onclick="', $context['is_approved'] ? '' : "if (this.checked && !confirm('" . $txt['move_topic_unapproved_js'] . "')) return false; ", 'document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic1'], '.</label>
+						<label for="postRedirect">
+							<input type="checkbox" name="postRedirect" id="postRedirect" ', $context['is_approved'] ? 'checked="checked"' : '', ' onclick="', $context['is_approved'] ? '' : "if (this.checked && !confirm('" . $txt['move_topic_unapproved_js'] . "')) return false; ", 'document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic1'], '.
+						</label>
 						<fieldset id="reasonArea" class="', $context['is_approved'] ? '' : 'hide', '">
 							<dl class="settings">
 								<dt>

@@ -14,17 +14,14 @@ use ElkArte\AdminController\Admin;
 use ElkArte\Controller\About;
 use ElkArte\Controller\Announce;
 use ElkArte\Controller\Attachment;
-use ElkArte\Controller\Auth;
 use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
 use ElkArte\Controller\Help;
-use ElkArte\Controller\Members;
 use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
-use ElkArte\Controller\Notify;
 use ElkArte\Controller\Post;
 use ElkArte\Controller\Register;
-use ElkArte\Controller\RemoveTopic;
+use ElkArte\Controller\SplitTopics;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
 use ElkArte\SiteDispatcher;
@@ -71,17 +68,11 @@ class DispatcherTest extends TestCase
 		$actions = array(
 			'activate' => Register::class,
 			'attachapprove' => ModerateAttachments::class,
-			'addbuddy' => Members::class,
 			'collapse' => BoardIndex::class,
 			'contact' => About::class,
 			'coppa' => About::class,
-			'deletemsg' => RemoveTopic::class,
 			'dlattach' => Attachment::class,
-			'unwatchtopic' => Notify::class,
 			'quickhelp' => Help::class,
-			'login' => Auth::class,
-			'login2' => Auth::class,
-			'logout' => Auth::class,
 			'quotefast' => Post::class,
 			'quickmod' => MessageIndex::class,
 			'quickmod2' => Display::class,
@@ -170,10 +161,10 @@ class DispatcherTest extends TestCase
 			// An existing one, action array
 			array(
 				'test_name' => 'action from actionarray',
-				'action' => 'removetopic2',
+				'action' => 'splittopics',
 				'result' => array(
-					'function_name' => 'action_removetopic2',
-					'controller_name' => RemoveTopic::class,
+					'function_name' => 'action_splittopics',
+					'controller_name' => SplitTopics::class,
 				),
 			),
 			// An existing one, not in the action array, naming patterns, defer to action_index

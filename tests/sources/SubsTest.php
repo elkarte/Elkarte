@@ -60,7 +60,7 @@ class SubsTest extends TestCase
 			'{forum_name_html_safe}' => $context['forum_name'],
 			'{script_url}' => $scripturl,
 			'{board_url}' => $boardurl,
-			'{login_url}' => $scripturl . '?action=login',
+			'{login_url}' => $scripturl . '?action=auth;sa=login',
 			'{register_url}' => $scripturl . '?action=register',
 			'{activate_url}' => $scripturl . '?action=register;sa=activate',
 			'{admin_url}' => $scripturl . '?action=admin',

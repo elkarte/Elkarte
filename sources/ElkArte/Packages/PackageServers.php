@@ -52,6 +52,7 @@ class PackageServers extends AbstractController
 		// Use the PackageServers template.
 		theme()->getTemplates()->load('PackageServers');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 
 		// Load our subs.
 		require_once(SUBSDIR . '/Package.subs.php');

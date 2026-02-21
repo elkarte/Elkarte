@@ -860,8 +860,6 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  */
 function loadCSSFile($filenames, $params = [], $id = '')
 {
-	global $context;
-
 	if (empty($filenames))
 	{
 		return;
@@ -870,11 +868,6 @@ function loadCSSFile($filenames, $params = [], $id = '')
 	if (!is_array($filenames))
 	{
 		$filenames = [$filenames];
-	}
-
-	if (in_array('admin.css', $filenames))
-	{
-		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 	}
 
 	$params['subdir'] = $params['subdir'] ?? 'css';

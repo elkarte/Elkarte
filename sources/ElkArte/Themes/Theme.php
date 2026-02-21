@@ -89,8 +89,6 @@ abstract class Theme
 	 */
 	public function __construct(int $id, ValuesContainer $user, Directories $dirs)
 	{
-		global $settings;
-
 		$this->id = $id;
 		$this->user = $user;
 		$this->layers = new TemplateLayers();

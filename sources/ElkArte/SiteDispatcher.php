@@ -23,18 +23,12 @@ use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
 use ElkArte\Controller\Emailmoderator;
 use ElkArte\Controller\Help;
-use ElkArte\Controller\Members;
-use ElkArte\Controller\MergeTopics;
 use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
 use ElkArte\Controller\ModerationCenter;
-use ElkArte\Controller\MoveTopic;
 use ElkArte\Controller\News;
-use ElkArte\Controller\Notify;
 use ElkArte\PersonalMessage\PersonalMessage;
-use ElkArte\Controller\Poll;
 use ElkArte\Controller\Post;
-use ElkArte\Controller\RemoveTopic;
 use ElkArte\Controller\SplitTopics;
 use ElkArte\Controller\Unread;
 use ElkArte\Controller\Xml;
@@ -85,31 +79,19 @@ class SiteDispatcher
 		'function' => 'action_boardindex'
 	];
 
-	/** @var string[] Build our nice and cozy err... *cough* */
+	/** @var string[] Build our nice and cozy err... *cough*
+	 * If you need to directly call a method inside a controller, add it here.  Otherwise, you should
+	 * use the action_index of the controller and let it dispatch normally */
 	protected $actionArray = [
 		'admin' => [Admin::class, 'action_index'],
 		'attachapprove' => [ModerateAttachments::class, 'action_attachapprove'],
-		'buddy' => [Members::class, 'action_buddy'],
 		'collapse' => [BoardIndex::class, 'action_collapse'],
-		'deletemsg' => [RemoveTopic::class, 'action_deletemsg'],
 		'dlattach' => [Attachment::class, 'action_index'],
-		'unwatchtopic' => [Notify::class, 'action_unwatchtopic'],
-		'editpoll' => [Poll::class, 'action_editpoll'],
-		'editpoll2' => [Poll::class, 'action_editpoll2'],
 		'forum' => [BoardIndex::class, 'action_index'],
 		'quickhelp' => [Help::class, 'action_quickhelp'],
 		'jsmodify' => [Post::class, 'action_jsmodify'],
 		'jsoption' => [ManageThemes::class, 'action_jsoption'],
-		'keepalive' => [Auth::class, 'action_keepalive'],
-		'lockvoting' => [Poll::class, 'action_lockvoting'],
-		'login' => [Auth::class, 'action_login'],
-		'login2' => [Auth::class, 'action_login2'],
-		'logout' => [Auth::class, 'action_logout'],
-		'mergetopics' => [MergeTopics::class, 'action_index'],
 		'moderate' => [ModerationCenter::class, 'action_index'],
-		'movetopic' => [MoveTopic::class, 'action_movetopic'],
-		'movetopic2' => [MoveTopic::class, 'action_movetopic2'],
-		'notifyboard' => [Notify::class, 'action_notifyboard'],
 		'pm' => [PersonalMessage::class, 'action_index'],
 		'post2' => [Post::class, 'action_post2'],
 		'profile' => [Profile::class, 'action_index'],
@@ -117,9 +99,7 @@ class SiteDispatcher
 		'quotefast' => [Post::class, 'action_quotefast'],
 		'quickmod' => [MessageIndex::class, 'action_quickmod'],
 		'quickmod2' => [Display::class, 'action_quickmod2'],
-		'removetopic2' => [RemoveTopic::class, 'action_removetopic2'],
 		'reporttm' => [Emailmoderator::class, 'action_reporttm'],
-		'restoretopic' => [RemoveTopic::class, 'action_restoretopic'],
 		'splittopics' => [SplitTopics::class, 'action_splittopics'],
 		'trackip' => [ProfileHistory::class, 'action_trackip'],
 		'unreadreplies' => [Unread::class, 'action_unreadreplies'],
@@ -465,7 +445,7 @@ class SiteDispatcher
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only log in
-			if ($this->action === 'login2' || $this->action === 'logout')
+			if ($this->action === 'auth' && ($this->subAction === 'login2' || $this->subAction === 'logout'))
 			{
 				$this->_controller_name = Auth::class;
 				$this->_function_name = 'action_' . $this->action;
@@ -505,6 +485,7 @@ class SiteDispatcher
 
 		return empty($modSettings['allow_guestAccess'])
 			&& User::$info->is_guest
+			&& $this->subAction !== 'login2' && $this->subAction !== 'login'
 			&& !in_array($this->action, ['login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq']);
 	}
 

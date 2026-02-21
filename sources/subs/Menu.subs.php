@@ -345,7 +345,7 @@ function loadDefaultMenuButtons()
 				],
 				'logout' => [
 					'title' => $txt['logout'],
-					'href' => getUrl('action', ['action' => 'logout']),
+					'href' => getUrl('action', ['action' => 'auth', 'sa' => 'logout']),
 					'show' => User::$info->is_guest === false,
 				],
 			],
@@ -396,7 +396,7 @@ function loadDefaultMenuButtons()
 		],
 		'login' => [
 			'title' => $txt['login'],
-			'href' => getUrl('action', ['action' => 'login']),
+			'href' => getUrl('action', ['action' => 'auth', 'sa' => 'login']),
 			'onclick' => 'return reqOverlayDiv(this.href, ' . JavaScriptEscape($txt['login']) . ', \'i-menu-login\');',
 			'data-icon' => 'i-menu-login',
 			'show' => User::$info->is_guest,

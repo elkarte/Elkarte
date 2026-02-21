@@ -176,7 +176,7 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 		return false;
 	}
 
-	$link = '<a class="linkbutton" href="' . $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['logout'] . '</a>';
+	$link = '<a class="linkbutton" href="' . $scripturl . '?action=auth;sa=logout;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['logout'] . '</a>';
 
 	if ($output_method === 'echo')
 	{
@@ -1127,7 +1127,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 
 	echo '
-		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=auth;sa=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8">
 		<div class="login centertext">
 			<div class="well">';
 

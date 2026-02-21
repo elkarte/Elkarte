@@ -78,6 +78,7 @@ class Packages extends AbstractController
 		Txt::load('Packages');
 		theme()->getTemplates()->load('Packages');
 		loadCSSFile('admin.css');
+		theme()->loadVariant('admin', false);
 
 		$this->fileFunc = FileFunctions::instance();
 	}

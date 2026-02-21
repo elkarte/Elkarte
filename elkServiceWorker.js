@@ -12,15 +12,12 @@
  */
 
 const OFFLINE = 'index.php?action=offline';
-const pendingRequests = new Map();
 
-// Navigation preload can be toggled via query param `nav_preload=0|1`
 let STATIC_CACHE_NAME = 'elk_sw_cache_static',
 	PAGES_CACHE_NAME = 'elk_sw_cache_pages',
 	IMAGES_CACHE_NAME = 'elk_sw_cache_images',
 	CACHE_ID = null,
-	SW_SCOPE = '/',
-	navigationPreload = true;
+	SW_SCOPE = '/';
 
 // On sw installation cache some defined ASSETS and the OFFLINE page
 self.addEventListener('install', event => {
@@ -30,19 +27,12 @@ self.addEventListener('install', event => {
 
 	// Use a cache id, so we can do pruning/resets from elk_pwa.js messages
 	const cid = passedParam.searchParams.get('cache_id') || 'elk20b1';
-	const np = passedParam.searchParams.get('nav_preload');
 
 	CACHE_ID = '::' + cid;
 	STATIC_CACHE_NAME += CACHE_ID;
 	PAGES_CACHE_NAME += CACHE_ID;
 	IMAGES_CACHE_NAME += CACHE_ID;
 	SW_SCOPE = passedParam.searchParams.get('sw_scope') || '/';
-
-	// Allow runtime toggle of Navigation Preload: nav_preload=0|1 (default 1)
-	if (np !== null)
-	{
-		navigationPreload = np === '1' || np.toLowerCase() === 'true';
-	}
 
 	const themeScope = passedParam.searchParams.get('theme_scope') || '/themes/default/',
 		defaultThemeScope = passedParam.searchParams.get('default_theme_scope') || '/themes/default/',
@@ -74,24 +64,12 @@ self.addEventListener('install', event => {
 });
 
 /**
- * After install is complete, enable preloading if available.
- *
- * If navigation preload is enabled, a HEAD request is sent to the page's origin at the same time
- * as the service worker starts up. This way, if the service worker is going to just fetch the page
- * from the network anyway, it can get going without having to wait for the installation.
- *
- * Delete any caches that do not match our current version
+ * After install is complete, claim clients.
+ * Delete any caches that do not match our current version.
  */
 self.addEventListener('activate', event => {
 	event.waitUntil(
-		(async function() {
-			if (self.registration.navigationPreload)
-			{
-				await self.registration.navigationPreload[navigationPreload ? 'enable' : 'disable']();
-			}
-		})()
-			.then(() => deleteOldCache())
-			.then(() => self.clients.claim())
+		deleteOldCache().then(() => self.clients.claim())
 	);
 });
 
@@ -103,14 +81,14 @@ self.addEventListener('fetch', event => {
 	// Third Party request, POST, non link or address bar
 	if (!request.url.startsWith(self.location.origin) || event.request.method !== 'GET')
 	{
-		event.respondWith(handleNavigationPreload(event));
+		event.respondWith(fetchWithOfflineFallback(event.request));
 		return;
 	}
 
 	// Admin, tasks, api, install, attachments, other cruft, Network only
 	if (request.url.match(/scheduled|api=|dlattach|install|action=credits|action=admin|action=moderate|action=mentions|action=who|action=help|action=search|action=memberlist|action=stats/))
 	{
-		event.respondWith(handleNavigationPreload(event));
+		event.respondWith(fetchWithOfflineFallback(event.request));
 		return;
 	}
 
@@ -123,7 +101,7 @@ self.addEventListener('fetch', event => {
 			return processNetworkFirstRequest(event, PAGES_CACHE_NAME);
 		}
 
-		event.respondWith(handleNavigationPreload(event));
+		event.respondWith(fetchWithOfflineFallback(event.request));
 		return;
 	}
 
@@ -144,6 +122,9 @@ self.addEventListener('fetch', event => {
 	{
 		return processCacheFirstRequest(event, IMAGES_CACHE_NAME);
 	}
+
+	// Catch-all for anything unmatched (e.g. favicon.ico with */* Accept header)
+	event.respondWith(fetchWithOfflineFallback(event.request));
 });
 
 // Message handler, provides a way to interact with the service worker
@@ -179,63 +160,23 @@ self.addEventListener('message', function(event) {
 });
 
 /**
- * Deduplicates network requests to prevent redundant calls
+ * Simple fetch with offline fallback. Replaces handleNavigationPreload now that
+ * navigation preload has been removed.
  *
- * @param {string} requestKey - Unique key for the request
- * @param {function} fetchFunction - Function that returns a promise for the fetch
- * @returns {Promise<Response>} - The response promise
+ * @param {Request} request - The request to fetch.
+ * @returns {Promise<Response>}
  */
-function deduplicateRequest (requestKey, fetchFunction)
+async function fetchWithOfflineFallback (request)
 {
-	// Check if there's already a pending request
-	if (pendingRequests.has(requestKey))
+	try
 	{
-		return pendingRequests.get(requestKey);
+		return await fetch(request);
 	}
-
-	// Create new request promise
-	const requestPromise = fetchFunction()
-		.finally(() => {
-			// Clean up after request completes
-			pendingRequests.delete(requestKey);
-		});
-
-	// Store the promise for deduplication
-	pendingRequests.set(requestKey, requestPromise);
-
-	return requestPromise;
-}
-
-/**
- * Handles navigation preload for the given event.
- *
- * @param {Event} event - The event object.
- * @returns {Promise<unknown | Response>} - A promise that resolves to the preloaded response or fetch response.
- * @throws {Error} - Throws an error if navigation preload is not available or there is no valid preload response.
- */
-function handleNavigationPreload (event)
-{
-	// Gracefully fall back to network when preload isn't available/enabled
-	if (!navigationPreload || !event.preloadResponse)
+	catch (error)
 	{
-		return fetch(event.request).catch(async() => {
-			const cachedOffline = await caches.open(PAGES_CACHE_NAME).then(c => c.match(`${SW_SCOPE}${OFFLINE}`));
-			return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
-		});
+		const cachedOffline = await caches.open(PAGES_CACHE_NAME).then(c => c.match(`${SW_SCOPE}${OFFLINE}`));
+		return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
 	}
-
-	return event.preloadResponse
-		.then(preloadedResponse => {
-			if (preloadedResponse && preloadedResponse.ok)
-			{
-				return preloadedResponse;
-			}
-			return fetch(event.request);
-		})
-		.catch(async() => {
-			const cachedOffline = await caches.open(PAGES_CACHE_NAME).then(c => c.match(`${SW_SCOPE}${OFFLINE}`));
-			return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
-		});
 }
 
 /**
@@ -280,12 +221,8 @@ function defineAssets (themeScope, cache_stale, defaultThemeScope)
  * Processes the first request by checking if the response is available in the cache.
  *
  * If it is, the cached response is returned.
- * If not, it checks if there is a preloaded response available. If yes, it adds the preloaded response to the cache
- * and returns the preloaded response.
- * If neither the cached response nor the preloaded response is available, it makes a network call and returns
- * the network response and saves it to the cache.
- * If an error occurs during the process, it returns an offline page or a fallback response if there is no
- * cached offline response.
+ * If not, it makes a network call, caches the response, and returns it.
+ * If an error occurs during the process, it returns an offline page or a fallback response.
  *
  * @param {FetchEvent} event - The event object representing the request.
  * @param {String} cache_name - The name of the cache to be used.
@@ -296,37 +233,25 @@ async function processCacheFirstRequest (event, cache_name)
 {
 	event.respondWith(
 		(async() => {
-			// Start both promises at the same time
-			const cachePromise = caches.open(cache_name).then(cache => cache.match(event.request));
-			const preloadPromise = event.preloadResponse;
-
-			// If cached Response is available, use it
-			const cachedResponsePromise = await cachePromise;
-			if (cachedResponsePromise)
+			// Check cache first
+			const cachedResponse = await caches.open(cache_name).then(cache => cache.match(event.request));
+			if (cachedResponse)
 			{
-				return cachedResponsePromise;
+				return cachedResponse;
 			}
 
-			// If preloadResponse is usable, use it
-			const preloadResponsePromise = await preloadPromise;
-			if (preloadResponsePromise)
-			{
-				return cacheAndReturnResponse(preloadResponsePromise, event.request, cache_name);
-			}
+			// Not in cache, fetch from network
+			const networkResponse = await fetch(event.request).catch(() => null);
 
-			// No response found in cache or preload, fetch from network
-			const requestKey = event.request.url + event.request.method;
-			const networkResponsePromise = await deduplicateRequest(requestKey, () => fetch(event.request));
-
-			if (networkResponsePromise && networkResponsePromise.ok)
+			if (networkResponse && networkResponse.ok)
 			{
-				return cacheAndReturnResponse(networkResponsePromise, event.request, cache_name);
+				return cacheAndReturnResponse(networkResponse, event.request, cache_name);
 			}
 
 			// Still nothing, return the offline page
 			const offlineRequest = new Request(OFFLINE);
-			const cachedResponse = await caches.match(offlineRequest);
-			return cachedResponse || new Response('Sorry, you are offline. Please check your connection.');
+			const cachedOffline = await caches.match(offlineRequest);
+			return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
 		})()
 	);
 }
@@ -334,11 +259,8 @@ async function processCacheFirstRequest (event, cache_name)
 /**
  * Processes a network-first request.
  *
- * Tries the preloadResponse first
- * If the preloadResponse fails, tries a networkResponse
- * If the networkResponse fails or returns an error status code, it falls back to the cache.
- * If all fail, it returns an offline page.
- * Successful preloadResponse or networkResponse are saved to the cache.
+ * Tries the network first, falls back to cache, then offline page.
+ * Successful network responses are saved to the cache.
  *
  * @param {FetchEvent} event - The event object for the fetch event.
  * @param {string} cache_name - The cache to look in/open.
@@ -348,24 +270,14 @@ async function processNetworkFirstRequest (event, cache_name)
 {
 	event.respondWith(
 		(async() => {
-			const requestKey = event.request.url + event.request.method;
-			const networkResponsePromise = deduplicateRequest(requestKey, () => fetch(event.request)).catch(() => null);
-			const preloadResponsePromise = (event.preloadResponse || Promise.resolve(null)).catch(() => null);
-			const [networkResponse, preloadResponse] = await Promise.all([networkResponsePromise, preloadResponsePromise]);
+			const networkResponse = await fetch(event.request).catch(() => null);
 
-			// If preloadResponse is usable, use it
-			if (preloadResponse && preloadResponse.ok)
-			{
-				return cacheAndReturnResponse(preloadResponse, event.request, cache_name);
-			}
-
-			// If networkResponse is usable, use it
 			if (networkResponse && networkResponse.ok)
 			{
 				return cacheAndReturnResponse(networkResponse, event.request, cache_name);
 			}
 
-			// Both failed, so try the cache
+			// Network failed, try cache
 			const cachedResponse = await caches.match(event.request);
 			if (cachedResponse)
 			{
@@ -383,11 +295,9 @@ async function processNetworkFirstRequest (event, cache_name)
 /**
  * Processes a stale-while-revalidate request.
  *
- * When a request is made, this method first checks if there is a cached response for the request.
- * If a cached response is found, it returns the cached response immediately.
- * Meanwhile, it also sends a network request to fetch the latest response from the server.
- * If the network request is successful, the fetched response is stored in the cache for future use.
- * If both the cache and network requests fail, it returns the offline page.
+ * Returns cached response immediately if available, then updates cache in background.
+ * If no cache, fetches from network and caches the result.
+ * If all fail, returns the offline page.
  *
  * @param {FetchEvent} event - The fetch event object containing the request.
  * @param {string} cache_name - The cache to look in/open.
@@ -397,26 +307,24 @@ async function processStaleWhileRevalidateRequest (event, cache_name)
 {
 	async function fetchAndUpdate ()
 	{
-		const requestKey = event.request.url + event.request.method;
-
-		return deduplicateRequest(requestKey, async() => {
-			try
+		try
+		{
+			const networkResponse = await fetch(event.request);
+			if (networkResponse && networkResponse.ok)
 			{
-				const networkResponse = await fetch(event.request);
 				const cache = await caches.open(cache_name);
 				cache.put(event.request, networkResponse.clone());
-				return networkResponse;
 			}
-			catch (error)
-			{
-				const offlineRequest = new Request(OFFLINE);
-				const cachedOffline = await caches.match(offlineRequest);
-				return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
-			}
-		});
+			return networkResponse;
+		}
+		catch (error)
+		{
+			const offlineRequest = new Request(OFFLINE);
+			const cachedOffline = await caches.match(offlineRequest);
+			return cachedOffline || new Response('Sorry, you are offline. Please check your connection.');
+		}
 	}
 
-	// Ensure we respond within the fetch event
 	event.respondWith((async() => {
 		const cache = await caches.open(cache_name);
 		const cachedResponse = await cache.match(event.request);
@@ -427,19 +335,7 @@ async function processStaleWhileRevalidateRequest (event, cache_name)
 			return cachedResponse;
 		}
 
-		if (event.preloadResponse)
-		{
-			const preloadResponse = await event.preloadResponse;
-			if (preloadResponse)
-			{
-				cache.put(event.request, preloadResponse.clone());
-				// Also refresh in background
-				event.waitUntil(fetchAndUpdate());
-				return preloadResponse;
-			}
-		}
-
-		// Lastly try network or offline fallback
+		// No cache, fetch from network
 		return fetchAndUpdate();
 	})());
 }
@@ -447,20 +343,19 @@ async function processStaleWhileRevalidateRequest (event, cache_name)
 /**
  * Caches the response and returns it.
  *
- * @param {Promise<Response>} responsePromise - The promise that resolves to the response.
+ * @param {Response} response - The response to cache and return.
  * @param {Request} request - The request object.
  * @param {string} cache_name - The name of the cache.
- * @returns {Promise<Response>} - The response promise that was passed as an argument.
+ * @returns {Promise<Response>} - The response that was passed as an argument.
  */
-async function cacheAndReturnResponse (responsePromise, request, cache_name)
+async function cacheAndReturnResponse (response, request, cache_name)
 {
-	if (responsePromise && responsePromise.ok)
+	if (response && response.ok)
 	{
-		// Add to cache but don't wait for it to complete
 		let cache = await caches.open(cache_name);
-		cache.put(request, responsePromise.clone());
-		return responsePromise;
+		cache.put(request, response.clone());
 	}
+	return response;
 }
 
 /**

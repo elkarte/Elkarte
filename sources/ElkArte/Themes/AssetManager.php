@@ -13,6 +13,7 @@
 
 namespace ElkArte\Themes;
 
+use ElkArte\Cache\Cache;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\SiteCombiner;
@@ -46,7 +47,7 @@ class AssetManager
 	 * Load custom CSS files and add CSS rules
 	 *
 	 * What it does:
-	 *  - Loads custom.css if it exists for the theme
+	 *  - Loads base (not variant) custom.css if it exists for the theme
 	 *  - Adds avatar resize rules
 	 *  - Adds forum wrapper width (can use important to override in theme CSS)
 	 *  - Sets show more quote rules (localization & --quote_height)
@@ -177,10 +178,21 @@ class AssetManager
 	{
 		global $settings, $context;
 
+		$cache = Cache::instance();
 		$fileFunc = FileFunctions::instance();
-		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css'))
+
+		$check1 = $settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css';
+		$temp = null;
+		$cache->getVar($temp, $check1, 3600);
+		if ($temp !== null || $fileFunc->fileExists($check1))
 		{
 			loadCSSFile($context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css');
+			if ($temp === null)
+			{
+				// Cache the fact that this file exists, so we don't have to check the file system again for a while.
+				$cache->put($check1, '1', 3600);
+			}
+
 			return;
 		}
 
@@ -189,18 +201,32 @@ class AssetManager
 			return;
 		}
 
-		if (!$fileFunc->fileExists($settings['theme_dir'] . '/css/' . $cssFile . '.css'))
+		$check2 = $settings['theme_dir'] . '/css/' . $cssFile . '.css';
+		$cache->getVar($temp, $check2, 600);
+		if ($temp !== null || $fileFunc->fileExists($check2))
 		{
-			return;
+			loadCSSFile($cssFile . '.css');
+			if ($temp === null)
+			{
+				// Cache the fact that this file exists, so we don't have to check the file system again for a while.
+				$cache->put($check2, '1', 600);
+			}
 		}
-
-		loadCSSFile($cssFile . '.css');
 	}
 
 	/**
-	 * If a variant CSS is needed, this loads it
+	 * Load the theme variant CSS file if needed
 	 *
-	 * @param HttpReq $req Request object
+	 * What it does:
+	 *  - Checks for a user-selected theme variant and loads it if allowed
+	 *  - Falls back to the default variant if the selected one is not valid
+	 *  - Loads the appropriate CSS files for the variant including
+	 *   - custom_variant.css
+	 *   - index_variant.css
+	 *   - icons_svg_variant.css
+	 *   - override_variant.css
+	 *
+	 * @param HttpReq $req Request object containing potential variant selection
 	 */
 	public function loadThemeVariant(HttpReq $req): void
 	{
@@ -232,13 +258,17 @@ class AssetManager
 		// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 		if (!empty($context['theme_variant']))
 		{
+			// Load optional variant custom CSS, structural tweaks, if it exists.
+			$this->loadVariant('custom', false);
+
+			// Load required variant CSS file for the variant colors
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 
-			// Variant icon definitions?
+			// Load optional variant icon definitions, if it exists.
 			$this->loadVariant('icons_svg', false);
 
-			// Load a theme variant custom CSS
-			$this->loadVariant('custom', false);
+			// Load optional final variant override, intended only for user overrides
+			$this->loadVariant('override', false);
 		}
 	}
 
@@ -284,7 +314,6 @@ class AssetManager
 						theme_scope: ' . JavaScriptEscape($theme_scope) . ',
 						default_theme_scope: ' . JavaScriptEscape($default_theme_scope) . ',
 						sw_scope: ' . JavaScriptEscape($sw_scope) . ',
-						nav_preload: 1, // set to 1 to enable, 0 to disable
 					}
 				};
 	

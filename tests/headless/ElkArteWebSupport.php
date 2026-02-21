@@ -172,7 +172,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 			$this->timeouts()->implicitWait(3000);
 
 			// Select login from the main page
-			$this->url('index.php?action=login');
+			$this->url('index.php?action=auth;sa=login');
 			$this->assertEquals('Log in', $this->title(), 'Unable to find the login forum');
 
 			// Fill in the form, long hand style

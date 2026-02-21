@@ -10,7 +10,7 @@
  *
  * INTRODUCTION
  * This variant is the standard, gold, Elkarte theme.
- * This is Eye Candy / Colors. All the layout code is in index.css.
+ * This is eye candy / colors, specific layout override code is in custom_gold.css
  *
  *      $CONSTANTS...........CSS Vars for easy updates
  *		$GENERAL.............Global resets, clearfixes, etc.
@@ -157,6 +157,7 @@
 	--poster_name: #5f4724;
 	--sticky_row: #cfdce8; /* sticky row background */
 	--locked_row: #e8d8cf; /* locked row background */
+	--basic_row: #fefefe; /* basic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
 	--forum_posts: #FEFEFE; /* Post background */
@@ -258,11 +259,6 @@
  *	$GENERAL
  * ---------------
  */
-
-.wrapper {
-	/* Next controls forum width, when it is not set in admin. */
-	font-size: var(--font15);
-}
 
 /* Normal, standard links. */
 a, a:link, a:visited,
@@ -385,8 +381,6 @@ strong {
 	border-bottom-color: var(--category_border_bottom);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
 	text-shadow: -1px -1px 1px var(--box_shadow);
-	line-height: 1.5;
-	font-size: var(--font15);
 }
 
 /* Single ones a bit darker than board index ones. */
@@ -558,14 +552,14 @@ input[type=checkbox].quote-show-more {
 
 .inner > .bbc_table_container > .bbc_table td,
 .messageContent > .bbc_table_container > .bbc_table td {
-	border-right: 1px solid var(--primary_border_right);
-	border-bottom: 1px solid var(--primary_border_bottom);
+	border-right-color: var(--primary_border_right);
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
-	border-right: 1px solid var(--primary_border_right);
-	border-bottom: 1px solid var(--secondary_border_bottom);
+	border-right-color: var(--primary_border_right);
+	border-bottom-color: var(--secondary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table td:last-child,
@@ -621,14 +615,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  * -------------------------------------------------------
  */
 
-#header {
-	padding: 1.2rem .2rem 1.2rem .2rem;
-}
-
 /* The top bar. */
 #top_section {
-	border-top: none;
-	border-bottom: 2px solid;
 	border-top-color: var(--top_section_top_border);
 	border-bottom-color: var(--top_section_bottom_border);
 	background-image: linear-gradient(to left, var(--top_section) 0%, var(--top_section_compliment) 50%, var(--top_section) 100%);
@@ -638,15 +626,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #menu_nav {
 	border-bottom-color: var(--top_section_bottom_border);
 	background-image: linear-gradient(to bottom, var(--menu_nav_grad_1) 0%, var(--menu_nav_grad_2) 100%);
-	padding: 1.4rem .4rem 1.1rem .4rem;
-}
-
-#menu_nav.sticky {
-	position: fixed;
-	top: 0;
-	right: 0;
-	left: 0;
-	z-index: 100;
 }
 
 /* Maintenance mode warning. */
@@ -655,16 +634,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #forumtitle > a {
-	font-weight: 600;
 	color: var(--transparent);
 	background: linear-gradient(95deg, var(--title-compliment), var(--title));
 	-webkit-background-clip: text;
-	background-clip: text;
-	font-size: var(--font24);
-}
-
-#forumtitle {
-	font-size: var(--font24);
 }
 
 /* News section. */
@@ -685,9 +657,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--transparent);
 	background: var(--body_grad_1);
 	box-shadow: none;
-	border-radius: 0;
-	width: 100%;
-	padding: 1.8rem 3.6rem;
 }
 
 /* The footer with copyright links etc. */
@@ -759,11 +728,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 #search_form_menu {
 	background: var(--menu_background);
-}
-
-
-.listlevel1 {
-	line-height: 1.7;
 }
 
 /* Level 1-2-3 button hover and focus effects, focus for keyboard navigation */
@@ -857,11 +821,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	box-shadow: var(--shadow-elevation-low);
 }
 
-#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-	padding: .5rem;
-	height: 2.7rem;
-}
-
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator,
@@ -922,15 +881,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* PM and Notification bubble indicator */
-.pm_indicator, .button_indicator {
-	font-size: var(--font10);
-	font-weight: 400;
-	top: -1.2rem;
-	right: 1rem;
-	padding: 0 0.4rem;
-	border-radius: .4rem;
-}
-
 .pm_indicator {
 	box-shadow: none;
 	background: var(--attention);
@@ -1022,10 +972,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top-color: var(--menu_border_top);
 	border-left-color: var(--menu_border_left);
 	background-image: linear-gradient(var(--menu_background) 0%, var(--menu_background_compliment) 70%);
-}
-
-.quickbuttons .inline_mod_check {
-	padding: .2rem .4rem;
 }
 
 /* The active one */
@@ -1185,16 +1131,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .board_stats {
 	color: var(--strong_text);
 	background: var(--content_background);
-	border-left: 1px solid;
 	border-left-color: var(--primary_border);
 }
 
 .board_info {
 	border-right-color: var(--primary_border);
-	border-left: 1px solid;
 	border-left-color: var(--primary_border);
-	padding-left: .8rem !important;
-	padding-right: .8rem !important;
 	background: var(--content_background);
 }
 
@@ -1208,7 +1150,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .childboards {
 	border-top-color: var(--primary_border_top);
-	border-left: 1px solid;
 	border-left-color: var(--primary_border);
 	background: var(--news_background);
 }
@@ -1262,11 +1203,18 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_listing > li {
 	border-color: var(--primary_border);
-	background: var(--news_background);
 }
 
-.basic_row {
-	background: var(--primary_content_background);
+.topic_listing > li.basic_row {
+	background: var(--basic_row);
+}
+
+.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
+	background: var(--sticky_row);
+}
+
+.topic_listing > li.locked_row {
+	background: var(--locked_row);
 }
 
 .topic_sorting_row {
@@ -1284,9 +1232,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_info {
 	border-right-color: var(--primary_border);
-	border-left: 1px solid;
 	border-left-color: var(--primary_border);
-	background: var(--primary_content_background);
+	background: var(--transparent);
 }
 
 .topic_name h4 a {
@@ -1307,21 +1254,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_stats {
 	color: var(--strong_text);
-	background: var(--primary_content_background);
-	border-left: 1px solid var(--primary_border);
-	border-right: 1px solid var(--primary_border);
+	border-left-color: var(--transparent);
+	border-right-color: var(--transparent);
 }
 
 .approvetopic_row, .approve_row {
 	background: var(--notice);
-}
-
-.sticky_row, .locked_row.sticky_row {
-	background: var(--primary_content_background);
-}
-
-.locked_row {
-	background: var(--primary_content_background);
 }
 
 #topic_icons {
@@ -1484,7 +1422,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
 	color: var(--emphasize_text) !important;
-	border: solid 1px var(--secondary_border);
+	border-color: var(--secondary_border);
 	background: var(--mid_grey_background) !important;
 }
 
@@ -1493,7 +1431,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .generic_border .attachment_name {
-	border: 1px solid var(--transparent);
+	border-color: var(--transparent);
 }
 
 /* Poor Mans lightbox support */
@@ -1538,7 +1476,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--primary_border);
 	background: var(--notice);
 	box-shadow: 0 0 8px 1px var(--opacity30);
-
 }
 
 /* Used by share topic */
@@ -1617,7 +1554,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .abort {
-	border: 2px solid var(--alert);
+	border-color: var(--alert);
 }
 
 /* The post page ILA button */
@@ -1906,7 +1843,6 @@ ul.cf_icons {
 .popup_window {
 	border-color: var(--secondary_border);
 	background: var(--content_background);
-	background-clip: padding-box;
 	box-shadow: var(--shadow-elevation-high);
 }
 
@@ -2210,12 +2146,6 @@ ul.cf_icons {
 		border-color: transparent;
 		box-shadow: none;
 	}
-
-	#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-		width: 4.4rem;
-		height: 4.5rem;
-		padding: 1.4rem 0 0 0 !important;
-	}
 }
 
 /* This one does up to 540 screens.
@@ -2232,7 +2162,7 @@ ul.cf_icons {
 	}
 
 	.poster:after, .posterarea:before {
-		border-bottom: 1px solid var(--secondary_border);
+		border-bottom-color: var(--secondary_border);
 	}
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
