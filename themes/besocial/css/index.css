@@ -5970,15 +5970,28 @@ div.labels {
  * Of course, having comments to map em to px for each query is a good idea too.
  */
 
-/* Styles for print media. */
 @media print {
     #headerarea {
         display: none;
     }
 }
 
+/* Some do not want a lot of motion/animation, for accessibility reasons, this attempts to
+   honor that system setting.  In windows this is "show animations in Windows" setting
+   -------------------------------------------------------------------------------------------*/
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* 1600+ wide screens, Allow for 640/360 video to stack side X side
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (min-width: 100em) {
     .elk_video_container {
         max-width: 64rem;
@@ -5991,6 +6004,7 @@ div.labels {
 
 /* less than 1440 width, drop the menu icons other than profile
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 89em) {
     .icon-menu {
         display: none;
@@ -6003,6 +6017,7 @@ div.labels {
 
 /* 1376+ wide screens, Allow videos to stack side by side but with a smaller WxH
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (min-width: 86em) {
     .elk_video_container {
         display: inline-block;
@@ -6022,6 +6037,7 @@ div.labels {
 
 /* This one does 1024 screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 64em) {
     .category_boards .board_row {
         grid-template-columns: [bicon] 6rem [info] 1fr [avatar] 6.5rem [latest] 40% [end];
@@ -6062,13 +6078,13 @@ div.labels {
         min-width: 98%;
     }
 
-    .icon_anchor {
-        min-width: 0;
+    .category_boards .board_row {
+        grid-template-columns: [bicon] 8.5rem [info] auto [avatar] 6.5rem [latest] 40% [end];
     }
 }
 
 /* At approximately 960px we change to menu icons, if you do not ADD any top menu items (portal/gallery/etc.)
-   this can be delayed for a smaller screen.  it's seperated out to allow easy modification, be sure to
+   this can be delayed for a smaller screen.  it's separated out to allow easy modification, be sure to
    check your color variant as well.
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 60em) {
@@ -6079,8 +6095,8 @@ div.labels {
         height: 4.5rem;
         min-height: 4.5rem;
         margin: .2rem;
-        padding: .6rem;
-        border: 2px solid;
+        padding: .2rem;
+        border: .2rem solid;
         border-radius: .4rem;
     }
 
@@ -6140,14 +6156,27 @@ div.labels {
 
 /* At approximately 900px we open up the wrapper so the menu can expand w/o using icons
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 56em) {
     #quickreplybox .post_wrapper, #quicktopicbox .post_wrapper {
         grid-template-columns: [poster] minmax(0, 17rem) [postarea] minmax(0, 1fr);
+    }
+
+    /* menu to icons */
+    #main_menu .icon-menu, #main_menu .icon-menu.i-menu-profile {
+        border: .4rem solid;
+    }
+
+    #search_form_button .main-menu-icon {
+        width: 3rem;
+        height: 3rem;
+        margin-bottom: -.1rem;
     }
 }
 
 /* This one does 825 screens at default font size, this is the break point for icon top menu
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 51.5em) {
     #logobox img {
         max-width: 95%;
@@ -6330,7 +6359,6 @@ div.labels {
     .statistics .category_header {
         min-width: 100%;
         margin: 0;
-        border-radius: 0;
     }
 
     /* member list, turn off most columns */
@@ -6453,17 +6481,11 @@ div.labels {
     }
 
     /* End playing silly buggers. */
-    .pagelinks {
-        padding-bottom: .8rem;
-    }
-
-    body {
-        margin-top: 2rem;
-    }
 }
 
 /* This one does 540 and smaller screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 34em) {
     /* Hide top clutter on smaller screens */
     #news, #logobox, .rightheader #logobox, #top_section_notice {
@@ -6665,6 +6687,8 @@ div.labels {
     }
 
     .topic_name h4 a {
+        overflow: hidden;
+        white-space: nowrap;
         text-overflow: ellipsis;
     }
 
@@ -6836,8 +6860,6 @@ div.labels {
     /* Stats page */
     #popularposts, #popularactivity {
         padding: .6rem .2rem 0 .2rem;
-        float: none;
-        width: 100%;
     }
 
     .ignoreboards {
@@ -6980,6 +7002,11 @@ div.labels {
     }
 
     /* User profile Stats */
+    #popularposts, #popularactivity {
+        float: none;
+        width: 100%;
+    }
+
     #popularposts div.content dt, #popularactivity div.content dt {
         width: 67% !important;
     }
@@ -6991,6 +7018,7 @@ div.labels {
 
 /* This one does 480px screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 30em) {
     #wrapper {
         padding: 0 !important;
@@ -7043,14 +7071,14 @@ div.labels {
     }
 
     #main_menu .icon-menu, #main_menu .icon-menu.i-menu-profile {
-        width: 3.4rem;
-        height: 3.4rem;
-        min-height: 3.4rem;
+        width: 4rem;
+        height: 4rem;
+        min-height: 4rem;
     }
 
-    #search_form_button .linklevel1 {
-        width: 3.4rem;
-        height: 3.4rem;
+    #search_form_button .main-menu-icon {
+        width: 3rem;
+        height: 3rem;
         margin-bottom: -.1rem;
     }
 
@@ -7059,6 +7087,7 @@ div.labels {
         height: 3rem;
         top: 1px;
         left: 0;
+        border-radius: 0;
     }
 
     #main_menu .listlevel2, #main_menu .listlevel3 {
@@ -7320,6 +7349,7 @@ div.labels {
 
 /* This one does 320px screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 20em) {
     .icon-menu {
         width: 2.3rem;
@@ -7334,604 +7364,5 @@ div.labels {
     .i-menu-profile::before {
         width: 3rem;
         height: 3rem;
-    }
-}
-
-/* Some do not want a lot of motion/animation, for accessibility reasons, this attempts to
-   honors that system setting.  In windows this is "show animations in Windows" setting
-   -------------------------------------------------------------------------------------------*/
-@media (prefers-reduced-motion: reduce) {
-    * {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-    }
-}
-
-/**
- * ___________.__   __      _____          __
- * \_   _____/|  | |  | __ /  _  \________/  |_  ____
- *  |    __)_ |  | |  |/ //  /_\  \_  __ \   __\/ __ \
- *  |        \|  |_|    </    |    \  | \/|  | \  ___/
- * /_______  /|____/__|_ \____|__  /__|   |__|  \___  >
- *         \/           \/       \/                 \/
- * https://www.elkarte.net
- * © ElkArte Forum contributors
- *
- *
- * INTRODUCTION
- * BeSocial Theme - Custom Structural Overrides
- *
- * This file contains structural CSS overrides for the BeSocial variant.
- * Only layout, spacing, typography sizing, and positioning adjustments.
- * No colors, shadows, or visual effects should be in this file.
- */
-/* ========================================
-   GENERAL LAYOUT & SPACING
-   ======================================== */
-/* Base typography */
-/* Link text decoration */
-a, a:link, a:visited,
-a.new_win:link, a.new_win:visited {
-    text-decoration: none;
-}
-
-/* Fixed menu positioning */
-/* Body padding for fixed header */
-body {
-    padding-top: 3.5rem;
-}
-
-/* Common button sizing */
-.linkbutton:link, .linkbutton:visited {
-    padding: 0 .3rem;
-}
-
-/* Top section padding */
-#top_section .wrapper {
-    padding: 0 1.5rem;
-    border-right: 1px solid;
-    border-left: 1px solid;
-}
-
-/* News padding */
-/* Main forum wrapper border */
-/* Box padding */
-/* The "Loading" bar for quick edit, etc. */
-/* Main menu layout */
-/* ========================================
-   TYPOGRAPHY
-   ======================================== */
-/* Forum title */
-#forumtitle {
-    font-size: var(--font30);
-    font-weight: bolder;
-    padding: 0;
-}
-
-/* News heading */
-/* Category headers */
-.category_header,
-.forum_category .category_header {
-    font-size: var(--font20);
-    font-weight: bolder;
-    margin-bottom: .5rem;
-    padding: .5rem 1rem 0 1rem;
-    border-radius: .5rem;
-}
-
-/* Board names */
-.board_name > a {
-    font-size: var(--font18);
-    font-weight: bold;
-}
-
-/* Reply # padding */
-.keyinfo.above h2,
-.keyinfo.above h3 {
-    padding: 1rem 2rem 0 2rem;
-}
-
-/* ========================================
-   NAVIGATION & MENUS
-   ======================================== */
-/* Menu typography */
-.listlevel1.inline_mod_check {
-    line-height: 1.8;
-}
-
-.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
-    font-size: var(--font13);
-    border-radius: .2rem;
-}
-
-/* Menu hover states */
-.linklevel1:hover, .listlevel1:hover .linklevel1,
-.linklevel1:focus, .listlevel1:focus .linklevel1,
-.linklevel2:hover, .linklevel2:hover .linklevel2,
-.linklevel2:focus, .listlevel2:focus .linklevel2,
-.linklevel3:hover, .listlevel3:hover .linklevel3,
-.linklevel3:focus, .listlevel3:focus .linklevel3,
-#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
-    text-decoration: none;
-}
-
-.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-    text-decoration: none;
-}
-
-.listlevel2:hover .linklevel2,
-.linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
-.linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
-    text-decoration: none;
-}
-
-.linklevel2.chosen, .linklevel3.chosen {
-    font-weight: bold;
-}
-
-/* Menu subsection indicators */
-#menu_sidebar .listlevel1.subsections .linklevel1::after {
-    font-size: var(--font14);
-    content: "\25BA";
-}
-
-#menu_nav .listlevel1.subsections > a:before {
-    font-size: var(--font11);
-    margin: .3rem .3rem 0 0;
-    float: left;
-    content: "\25BC";
-}
-
-.listlevel2.subsections .linklevel2::after {
-    font-size: var(--font14);
-    content: "\25BA";
-}
-
-/* PM indicator */
-.pm_indicator {
-    font-size: var(--font11);
-    font-weight: bold;
-    border-radius: .4rem;
-    top: -.1rem;
-    right: -.1rem;
-    float: none;
-    padding: 0 .2rem;
-}
-
-/* Main menu icon positioning */
-/* PM indicator positioning */
-/* Breadcrumb adjustments */
-nav.breadcrumb {
-    --arrow: 2.6rem;
-    border: 1px solid;
-}
-
-/* Breadcrumb icon padding */
-.breadcrumb .crumb > a > i.i-home {
-    padding: .3rem 0 0 0;
-}
-
-/* Button typography */
-/* Pagelinks */
-.pagelinks .navPages, .pagelinks .current_page {
-    border-radius: .8rem;
-}
-
-/* ========================================
-   BOARD & TOPIC LISTINGS
-   ======================================== */
-/* Board icon sizing */
-/* Board grid layout */
-/* Board stats alignment */
-.board_stats {
-    text-align: left;
-}
-
-/* Board avatar padding */
-/* Topic listing grid */
-/* Hide views text */
-.views_text {
-    display: none;
-}
-
-/* ========================================
-   POSTS & MESSAGES
-   ======================================== */
-/* Anchor positioning for fixed navigation */
-.post_anchor,
-.pm_anchor,
-#new {
-    display: block;
-    visibility: hidden;
-    margin-top: -4.5rem;
-    padding-top: 4.5rem;
-}
-
-/* Footnote anchor positioning */
-.bbc_footnotes div::before {
-    display: block;
-    visibility: hidden;
-    height: 7.5rem;
-    margin-top: -7.5rem;
-    content: " ";
-}
-
-/* Attachment borders */
-/* ========================================
-   EDITOR & FORMS
-   ======================================== */
-/* Editor width */
-/* Abort button border */
-.abort {
-    border: 2px solid;
-}
-
-/* ========================================
-   PROFILE & SIDEBAR
-   ======================================== */
-/* Poster typography */
-.poster:hover a.name {
-    text-decoration: none;
-}
-
-.poster .listlevel1 a.linklevel1 {
-    font-size: var(--font14);
-}
-
-.poster .subsections > a::after, .poster .subsections:hover > .name.linklevel1::after {
-    font-size: var(--font16);
-    content: "\25BC";
-}
-
-/* Profile sidebar hover state */
-.poster li.subsections.listlevel1:hover .linklevel1 {
-    background: var(--transparent);
-    box-shadow: none;
-}
-
-/* Profile sidebar list items */
-.poster li.listlevel1.subsections {
-    width: 100%;
-}
-
-/* Profile submenu positioning */
-/* Profile tabs padding */
-#tabs .profile_content {
-    padding-top: .8rem;
-}
-
-/* Tabs typography */
-.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor, li.ui-state-hover {
-    text-decoration: none;
-}
-
-/* ========================================
-   RESPONSIVE BREAKPOINTS
-   ======================================== */
-
-/* Tablet/Desktop: 80em+ (1280px+) */
-@media screen and (min-width: 80em) {
-    /* Board grid with 6 columns */
-    .category_boards .board_row {
-        grid-template-columns: [bicon] 8.5rem [info] auto [stats] minmax(8rem, 12.5rem) [avatar] 6.5rem [latest] 25% [end];
-    }
-}
-
-/* Large Desktop: 90em+ (1440px+) */
-@media screen and (min-width: 90em) {
-    /* Wider editor */
-    .editor_wrapper {
-        width: 85%;
-    }
-}
-
-/* Tablet: 60em to 79.9375em (960px to 1279px) */
-@media screen and (min-width: 60em) and (max-width: 79.9375em) {
-    /* Board grid adjustments */
-    .category_boards .board_row {
-        grid-template-columns: [bicon] 7.5rem [info] auto [stats] 11rem [avatar] 5.5rem [latest] 22% [end];
-    }
-
-    /* Topic listing adjustments */
-    .topic_listing > li {
-        grid-template-columns: [topic_icon] 4.5rem [topic_info] auto [topic_latest] 28rem [topic_stats] 11rem [topic_moderation] 7rem;
-    }
-
-    /* Forum title sizing */
-    #forumtitle {
-        font-size: var(--font26);
-    }
-
-    /* News heading sizing */
-    #news > h2 {
-        font-size: var(--font19);
-    }
-
-    /* Category header sizing */
-    .category_header,
-    .forum_category .category_header {
-        font-size: var(--font18);
-    }
-
-    /* Board name sizing */
-    .board_name > a {
-        font-size: var(--font16);
-    }
-}
-
-/* Mobile/Tablet: 48em to 59.9375em (768px to 959px) */
-@media screen and (min-width: 48em) and (max-width: 59.9375em) {
-    /* Board grid - 5 columns */
-    .category_boards .board_row {
-        grid-template-columns: [bicon] 7rem [info] auto [stats] 10rem [avatar] 5rem [latest] 20% [end];
-    }
-
-    /* Topic listing - compact */
-    .topic_listing > li {
-        grid-template-columns: [topic_icon] 4rem [topic_info] auto [topic_latest] 25rem [topic_stats] 10rem [topic_moderation] 6.5rem;
-    }
-
-    /* Board icon sizing */
-    .board_icon {
-        width: 2.2rem;
-        height: 2.2rem;
-    }
-
-    /* Typography adjustments */
-    #forumtitle {
-        font-size: var(--font24);
-    }
-
-    #news > h2 {
-        font-size: var(--font18);
-    }
-
-    .category_header,
-    .forum_category .category_header {
-        font-size: var(--font17);
-        padding: .4rem .8rem 0 .8rem;
-    }
-
-    .board_name > a {
-        font-size: var(--font15);
-    }
-
-    /* Editor width */
-    .editor_wrapper {
-        width: 90%;
-    }
-}
-
-/* Small Mobile: 30em to 47.9375em (480px to 767px) */
-@media screen and (min-width: 30em) and (max-width: 47.9375em) {
-    /* Board grid - simplified 4 columns */
-    .category_boards .board_row {
-        grid-template-columns: [bicon] 6rem [info] auto [stats] 9rem [latest] 18% [end];
-    }
-
-    /* Topic listing - mobile layout */
-    .topic_listing > li {
-        grid-template-columns: [topic_icon] 3.5rem [topic_info] auto [topic_latest] 22rem [topic_stats] 9rem [topic_moderation] 6rem;
-    }
-
-    /* Board icon sizing */
-    .board_icon {
-        width: 2rem;
-        height: 2rem;
-    }
-
-    /* Hide board avatar on small screens */
-    .board_avatar {
-        display: none;
-    }
-
-    /* Typography adjustments */
-    #forumtitle {
-        font-size: var(--font22);
-    }
-
-    #news > h2 {
-        font-size: var(--font17);
-    }
-
-    .category_header,
-    .forum_category .category_header {
-        font-size: var(--font16);
-        padding: .3rem .6rem 0 .6rem;
-    }
-
-    .board_name > a {
-        font-size: var(--font14);
-    }
-
-    /* Editor full width */
-    .editor_wrapper {
-        width: 95%;
-    }
-}
-
-/* Extra Small Mobile: under 30em (under 480px) */
-@media screen and (max-width: 29.9375em) {
-    /* Board grid - stacked layout */
-    .category_boards .board_row {
-        grid-template-columns: [bicon] 5rem [info] auto [stats] 8rem [end];
-        grid-template-rows: auto auto;
-    }
-
-    /* Topic listing - minimal layout */
-    .topic_listing > li {
-        grid-template-columns: [topic_icon] 3rem [topic_info] auto [topic_stats] 8rem [end];
-    }
-
-    /* Board icon sizing */
-    .board_icon {
-        width: 1.8rem;
-        height: 1.8rem;
-    }
-
-    /* Hide elements on smallest screens */
-    .board_avatar,
-    .views_text {
-        display: none;
-    }
-
-    /* Typography adjustments */
-    #forumtitle {
-        font-size: var(--font20);
-        padding: 0 .5rem;
-    }
-
-    #news > h2 {
-        font-size: var(--font16);
-    }
-
-    .category_header,
-    .forum_category .category_header {
-        font-size: var(--font15);
-        padding: .2rem .5rem 0 .5rem;
-        margin-bottom: .3rem;
-    }
-
-    .board_name > a {
-        font-size: var(--font13);
-    }
-
-    .keyinfo.above h2,
-    .keyinfo.above h3 {
-        padding: .8rem 1rem 0 1rem;
-    }
-
-    /* Editor full width */
-    .editor_wrapper {
-        width: 100%;
-    }
-
-    /* Fixed menu adjustments */
-    #menu_nav {
-        min-height: 3rem;
-    }
-
-    body {
-        padding-top: 3rem;
-        margin-top: 0;
-    }
-
-    /* Anchor adjustments for smaller fixed header */
-    .post_anchor,
-    .pm_anchor,
-    #new {
-        margin-top: -4rem;
-        padding-top: 4rem;
-    }
-
-    /* Breadcrumb adjustments */
-    nav.breadcrumb {
-        --arrow: 2.2rem;
-    }
-
-    .breadcrumb .crumb:first-child {
-        padding-left: 1rem;
-    }
-
-    .breadcrumb .crumb {
-        padding: 0 .6rem 0 1.5rem;
-    }
-
-    /* Profile tabs */
-    #tabs .profile_content {
-        padding-top: .5rem;
-    }
-}
-
-/* Max-width adjustments */
-@media screen and (max-width: 55em) {
-    #main_menu .icon-menu {
-        margin: .1rem .4rem;
-    }
-
-    #main_menu .icon-menu, #main_menu .icon-menu.i-menu-profile {
-        display: inline-block;
-        width: 4.5rem;
-        height: 4.5rem;
-        margin: .1rem;
-        padding: .6rem;
-        border-radius: .4rem;
-    }
-
-    .i-menu-profile::before {
-        width: 3.6rem;
-        height: 3.6rem;
-        transform: translate(-.3rem, -.5rem);
-    }
-
-    #main_menu .subsections .linklevel1::after, #main_menu .subsections:hover .linklevel1::after {
-        display: none;
-    }
-
-    #collapse_button {
-        margin-top: -1rem;
-    }
-
-    .wrapper {
-        width: 95% !important;
-    }
-}
-
-@media screen and (max-width: 33.750em) {
-    #gotop, #gobottom {
-        padding: 0.8rem .2rem .6rem .2rem;
-    }
-
-    dd.statsbar {
-        padding: 0 !important;
-    }
-
-    .topic_listing h4 {
-        max-width: 3.2rem;
-        margin-bottom: .3rem;
-    }
-
-    #top_section {
-        width: 100%;
-        margin: 0;
-    }
-
-    #top_section .wrapper {
-        width: 100%;
-        padding: 0;
-    }
-
-    nav.breadcrumb {
-        margin: .4rem 0;
-    }
-
-    #search_form {
-        border-bottom: 1px solid;
-        justify-content: center;
-        width: 100%;
-        padding: .4rem 0;
-    }
-
-    #main_menu {
-        justify-content: start;
-    }
-
-    .frame {
-        border-radius: 0;
-    }
-
-    .topic_sorting_row {
-        border: none !important;
-    }
-
-    .forum_category, .forumposts, .content_category {
-        border: none;
-    }
-
-    .stats.floatleft {
-        border: none;
     }
 }

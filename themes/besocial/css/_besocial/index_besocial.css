@@ -1862,59 +1862,19 @@ nav.breadcrumb {
  * Of course, having comments to map em to px for each query is a good idea too.
  */
 
-/* This one does 1024 screens at default font size.
-   -------------------------------------------------------------------------------------------*/
-
-@media screen and (max-width: 64em) {
-	.category_boards .board_row {
-		grid-template-columns: [bicon] 8.5rem [info] auto [avatar] 6.5rem [latest] 40% [end];
-	}
-
-	.icon_anchor {
-	}
-}
-
-/* 880px seems best to switch between text and icons for this variant, normally this is
-   done at 800px, so we have to copy the index.css code to this media query */
-
-@media screen and (max-width: 55em) {
-	#main_menu .icon-menu {
-	}
-
-	/* menu to icons */
-	#main_menu .icon-menu, #main_menu .icon-menu.i-menu-profile {
-		border: .4rem solid;
-	}
-
-	.i-menu-profile::before {
-	}
-
-	#main_menu .subsections .linklevel1::after, #main_menu .subsections:hover .linklevel1::after {
-	}
-
-	#collapse_button {
-	}
-
-	.wrapper {
-	}
-}
-
 /* This one does 825 screens at default font size.
    -------------------------------------------------------------------------------------------*/
+@media screen and (max-width: 60em) {
+	#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
+		color: transparent;
+	}
+
+	#button_profile .linklevel1 {
+		color: var(--transparent);
+	}
+}
 
 @media screen and (max-width: 51.5em) {
-	#forumtitle {
-	}
-
-	.pagelinks {
-	}
-
-	body {
-	}
-
-	.category_boards .board_row {
-	}
-
 	#menu_sidebar {
 		border-color: var(--secondary_border);
 		background: var(--primary_content_background);
@@ -1939,13 +1899,7 @@ nav.breadcrumb {
 /* This one does up to 540 screens.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 33.750em) {
-	#main_menu {
-	}
-
-	#gotop, #gobottom {
-	}
-
+@media screen and (max-width: 34em) {
 	.board_latest {
 		border-left: 0;
 	}
@@ -1954,15 +1908,6 @@ nav.breadcrumb {
 		border-color: var(--primary_border);
 		background-color: var(--primary_content_background);
 		box-shadow: 1px 1px 3px var(--box_shadow);
-	}
-
-	dd.statsbar {
-	}
-
-	.topic_listing h4 {
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
 	}
 
 	.topic_listing li.sticky_row {
@@ -1977,43 +1922,12 @@ nav.breadcrumb {
 		color: var(--strong_text);
 	}
 
-	.topic_sorting_row {
-	}
-
-	.topic_name h4 {
-	}
-
-	.poster .subsections > a::after {
-	}
-
-	.board_icon {
-	}
-
 	.forum_category, .forumposts, .content_category {
 		background: var(--primary_content_background);
 	}
 
-	.poster .subsections > a::after, .poster .subsections:hover > .name.linklevel1::after,
-	.listlevel2.subsections .linklevel2::after {
-	}
-
-	.stats.floatleft {
-	}
-
-	#top_section {
-	}
-
-	#top_section .wrapper {
-	}
-
-	nav.breadcrumb {
-	}
-
 	#search_form {
 		border-bottom-color: var(--primary_border);
-	}
-
-	#search_form .input_text {
 	}
 }
 
