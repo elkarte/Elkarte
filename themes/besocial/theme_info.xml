@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+	<theme-info xmlns="https://www.elkarte.net/site/theme-info" xmlns:elk="https://www.elkarte.net/">
+		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
+		<id>eurich:besocial</id>
+		<version>2.0</version>
+		<!-- Theme name, used purely for aesthetics. -->
+		<name>beSocial</name>
+		<!-- Author: your email address or contact information. The name attribute is optional. -->
+		<author name="TE">te@elkarte.net</author>
+		<!-- Website... where to get updates and more information. -->
+		<website>https://elkarte.github.io/themes//</website>
+		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
+		<based-on>default</based-on>
+	</theme-info>

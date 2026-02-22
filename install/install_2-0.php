@@ -2533,7 +2533,7 @@ class InstallInstructions_install_2_0
 				array('recycle_board', '0'),
 				array('maxMsgID', '1'),
 				array('enableAllMessages', '0'),
-				array('knownThemes', '1'),
+				array('knownThemes', '1,2'),
 				array('who_enabled', '1'),
 				array('time_offset', '0'),
 				array('cookieTime', '60'),
@@ -2644,6 +2644,8 @@ class InstallInstructions_install_2_0
 				array('pm_posts_per_hour', '6'),
 				array('pwa_small_icon', '{BOARDDIR}/themes/default/images/logos/icon_pwa_small.png'),
 				array('pwa_large_icon', '{BOARDDIR}/themes/default/images/logos/icon_pwa_large.png'),
+				array('pwa_desktop_screenshot', '{BOARDDIR}/themes/default/images/logos/screenshot_desktop.png'),
+				array('pwa_mobile_screenshot', '{BOARDDIR}/themes/default/images/logos/screenshot_mobile.png'),
 				array('favicon_icon', '{BOARDDIR}/favicon.ico'),
 				array('apple_touch_icon', '{BOARDDIR}/themes/default/images/logos/apple-touch-icon.png'),
 				array('usernotif_favicon_enable', '1'),
@@ -2927,6 +2929,10 @@ class InstallInstructions_install_2_0
 				array(1, 'enable_news', '1'),
 				array(1, 'forum_width', '90%'),
 				array(1, 'show_keyinfo_above', '1'),
+				array(2, 'name', 'beSocial'),
+				array(2, 'theme_url', '{$boardurl}/themes/besocial'),
+				array(2, 'images_url', '{$boardurl}/themes/besocial/images'),
+				array(2, 'theme_dir', '{BOARDDIR}/themes/besocial'),
 			),
 			array('id_theme', 'id_member', 'variable')
 		);

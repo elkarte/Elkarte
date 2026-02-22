@@ -995,7 +995,8 @@ nav.breadcrumb {
 .childboard_row,
 .forumposts > li,
 .content_category > div,
-.content_category > li {
+.content_category > li,
+#content > .forumposts {
 	border-color: var(--transparent);
 }
 
@@ -1374,7 +1375,7 @@ nav.breadcrumb {
 }
 
 .drop_area {
-	color: var(--emphasize_text);
+	color: var(--title);
 	border-color: var(--primary_border);
 	background-color: var(--mid_grey_background);
 }
@@ -1456,6 +1457,7 @@ nav.breadcrumb {
  */
 
 #tabs .profile_content {
+	background: var(--news_background);
 }
 
 /* The container */
@@ -1467,6 +1469,7 @@ nav.breadcrumb {
 .ui-tabs .ui-tabs-nav li {
 	color: var(--contrast_text);
 	border-color: var(--primary_border) !important;
+	border-bottom-color: var(--transparent) !important;
 	box-shadow: 2px 0 0 var(--opacity30);
 }
 
@@ -1478,13 +1481,13 @@ nav.breadcrumb {
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
 	border-color: var(--menu_button_active_2);
-	border-bottom-color: var(--primary_border);
-	background: var(--menu_button_active);
+	border-bottom-color: var(--transparent);
+	background: var(--input_submit_background_hover);
 }
 
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor, li.ui-state-hover {
 	color: var(--menu_text);
-	border-color: transparent;
+	border-color: var(--transparent);
 	background: var(--content_background);
 }
 

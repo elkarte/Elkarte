@@ -1,20 +1,17 @@
 <?php
 
 /**
- * The default theme
+ * The besocial theme
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 Beta 1
  *
  */
 
-namespace ElkArte\Themes\DefaultTheme;
+namespace ElkArte\Themes\Besocial;
 
 use ElkArte\Themes\Theme as BaseTheme;
 
@@ -43,7 +40,7 @@ use ElkArte\Themes\Theme as BaseTheme;
  *      }
  * }
  *
- * @package Themes\DefaultTheme
+ * @package Themes\BesocialTheme
  */
 class Theme extends BaseTheme
 {
@@ -84,15 +81,9 @@ class Theme extends BaseTheme
 			/*
 			 * Specify the color variants. Each variant has its own
 			 * directory, where additional CSS files may be loaded.
-			 *
-			 * Example:
-			 * - _light/index_light.css is loaded when index.css is needed.
 			 */
 			'theme_variants' => [
-				'light',
-				'dark',
-				'blue',
-				'gold'
+				'besocial'
 			],
 
 			/*

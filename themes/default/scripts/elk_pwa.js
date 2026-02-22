@@ -27,14 +27,15 @@ const elkPwa = (opt) => {
 		// Pass swOpt as Query parameters to the service worker
 		let params = new URLSearchParams(settings.swOpt).toString();
 		let urlWithParams = settings.swUrl + '?' + params;
+		let scope = settings.swOpt.sw_scope || '/';
 
 		if ('serviceWorker' in navigator)
 		{
-			navigator.serviceWorker.getRegistration(urlWithParams)
+			navigator.serviceWorker.getRegistration(scope)
 				.then((registration) => {
 					if (!registration)
 					{
-						navigator.serviceWorker.register(urlWithParams)
+						navigator.serviceWorker.register(urlWithParams, { scope: scope })
 							.then(registration => {
 								if ('console' in window && console.info)
 								{
