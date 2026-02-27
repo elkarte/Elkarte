@@ -3285,7 +3285,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 .attachment_block, .attachment {
     display: inline-block;
     overflow: hidden;
-    min-width: 21.5rem;
+    width: 22rem;
     margin: 0 .4rem 1.6rem 0;
     text-align: center;
 }
