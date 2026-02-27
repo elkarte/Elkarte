@@ -177,16 +177,22 @@ function createAttachment(&$attachmentOptions)
 	set_error_handler(static function () { /* ignore errors */ });
 	try
 	{
-		if ($is_image && rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']))
+		$renamed = rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']);
+		if ($renamed === false)
 		{
-			// Provide the manipulator the new file location
+			return false;
+		}
+
+		// Provide the image manipulator the new file location
+		if ($is_image)
+		{
 			$image->setFileName($attachmentOptions['destination']);
 		}
 	}
 	catch (\Exception)
 	{
-		// Rename failed, clean up and return false
-		@unlink($attachmentOptions['destination']);
+		// Rename failed, clean up the temp file and return false
+		@unlink($attachmentOptions['tmp_name']);
 		return false;
 	}
 	finally

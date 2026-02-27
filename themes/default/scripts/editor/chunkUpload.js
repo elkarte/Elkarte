@@ -16,6 +16,7 @@ class chunkUpload
 		this.url = params.url;
 		this.form = params.form;
 		this.chunkSize = params.chunkSize || 250000;
+		this.maxChunks = params.maxChunks || 1000;
 		this.retries = params.retries || 4;
 		this.delayBeforeRetry = params.delayBeforeRetry || 5;
 		this.signal = params.signal;
@@ -27,6 +28,13 @@ class chunkUpload
 		this._init();
 		this._reader = new FileReader();
 		this._eventEmitter = new ChunkEventEmitter();
+
+		// Guard: abort before sending anything if the file requires more chunks than the server allows
+		if (this.totalChunks > this.maxChunks)
+		{
+			setTimeout(() => this._eventEmitter.emit('error', 'chunk_quota'), 0);
+			return;
+		}
 
 		// Send the fragments
 		this._sendChunks();

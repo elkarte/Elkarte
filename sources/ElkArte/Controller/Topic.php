@@ -195,6 +195,8 @@ class Topic extends AbstractController
 	 * What id does:
 	 * - Must be called with a topic specified.
 	 * - Accessed via ?action=topic;sa=printpage.
+	 * - It is enabled with the disable_print_topic setting.
+	 * - Guests cannot access this, as bot scrapers love print pages.
 	 *
 	 * @uses template_print_page() in Printpage.template,
 	 * @uses template_print_above() later without the main layer.
@@ -205,7 +207,7 @@ class Topic extends AbstractController
 		global $topic, $context, $board_info, $modSettings, $db_show_debug;
 
 		// It isn't enabled, give them the boot
-		if (!empty($modSettings['disable_print_topic']))
+		if (!empty($modSettings['disable_print_topic']) || $this->user->is_guest)
 		{
 			$this->_req->clearValue('action', 'query');
 			$context['theme_loaded'] = false;

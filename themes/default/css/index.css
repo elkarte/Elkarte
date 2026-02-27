@@ -3268,7 +3268,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 .attachment_block, .attachment {
 	display: inline-block;
 	overflow: hidden;
-	min-width: 21.5rem;
+	width: 22rem;
 	margin: 0 .4rem 1.6rem 0;
 	text-align: center;
 }
@@ -5947,11 +5947,25 @@ div.labels {
  * Of course, having comments to map em to px for each query is a good idea too.
  */
 
-/* Styles for print media. */
+/* Styles for print media.
+   -------------------------------------------------------------------------------------------*/
 
 @media print {
 	#headerarea {
 		display: none;
+	}
+}
+
+/* Some do not want a lot of motion/animation, for accessibility reasons, this attempts to
+   honor that system setting.  In windows this is "show animations in Windows" setting
+   -------------------------------------------------------------------------------------------*/
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
 	}
 }
 
@@ -6046,7 +6060,7 @@ div.labels {
 }
 
 /* At approximately 960px we change to menu icons, if you do not ADD any top menu items (portal/gallery/etc.)
-   this can be delayed for a smaller screen.  it's seperated out to allow easy modification, be sure to
+   this can be delayed for a smaller screen.  it's separated out to allow easy modification, be sure to
    check your color variant as well.
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 60em) {
@@ -7293,7 +7307,6 @@ div.labels {
 	.track_ip {
 		float: right;
 	}
-
 }
 
 /* This one does 320px screens at default font size.
@@ -7313,18 +7326,5 @@ div.labels {
 	.i-menu-profile::before {
 		width: 3rem;
 		height: 3rem;
-	}
-}
-
-/* Some do not want a lot of motion/animation, for accessibility reasons, this attempts to
-   honors that system setting.  In windows this is "show animations in Windows" setting
-   -------------------------------------------------------------------------------------------*/
-
-@media (prefers-reduced-motion: reduce) {
-	* {
-		transition-duration: 0.01ms !important;
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		scroll-behavior: auto !important;
 	}
 }

@@ -164,10 +164,10 @@ class TestDatabase extends TestCase
 			'permission_profiles' => 4,
 			'permissions' => 40,
 			'scheduled_tasks' => 14,
-			'settings' => 243,
+			'settings' => 245,
 			'smileys' => 56,
 			'spiders' => 57,
-			'themes' => 21,
+			'themes' => 25,
 			'topics' => 1,
 		];
 

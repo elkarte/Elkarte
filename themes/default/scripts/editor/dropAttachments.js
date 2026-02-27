@@ -23,6 +23,7 @@
 			individualSizeAllowed = null,
 			numOfAttachmentAllowed = null,
 			attachmentChunkSize = null,
+			attachmentMaxChunks = 1000,
 			totalAttachSizeUploaded = 0,
 			numAttachUploaded = 0,
 			filesUploadedSuccessfully = [],
@@ -65,6 +66,7 @@
 				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
 				totalAttachSizeUploaded = params.totalAttachSizeUploaded || 0;
 				attachmentChunkSize = params.chunkSize || 250000;
+				attachmentMaxChunks = params.maxChunks || 1000;
 				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];
@@ -125,7 +127,7 @@
 					url = elk_prepareScriptUrl(elk_scripturl) + 'action=attachment;sa=ulasync;api=json;;board=' + board;
 				try
 				{
-					const uploader = new chunkUpload({url: url, form: formData, chunkSize: attachmentChunkSize, signal: abortSignal})
+					const uploader = new chunkUpload({url: url, form: formData, chunkSize: attachmentChunkSize, maxChunks: attachmentMaxChunks, signal: abortSignal})
 						.on('progress', (progress) => {
 							status.setProgress(progress.detail);
 						})

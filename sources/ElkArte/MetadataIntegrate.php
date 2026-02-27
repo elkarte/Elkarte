@@ -194,6 +194,13 @@ class MetadataIntegrate
 	private function getLogo(): array
 	{
 		global $context, $boardurl;
+		static $logoCache = null;
+
+		// Return cached result if available
+		if ($logoCache !== null)
+		{
+			return $logoCache;
+		}
 
 		// Set in ThemeLoader
 		if (!empty($context['header_logo_url_html_safe']))
@@ -209,7 +216,10 @@ class MetadataIntegrate
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		[$width, $height] = url_image_size(un_htmlspecialchars($logo));
 
-		return [$width, $height, $logo];
+		// Cache the result for subsequent calls
+		$logoCache = [$width, $height, $logo];
+
+		return $logoCache;
 	}
 
 	/**
