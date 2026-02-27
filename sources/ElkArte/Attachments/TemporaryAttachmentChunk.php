@@ -40,6 +40,9 @@ class TemporaryAttachmentChunk
 	/** @var int Maximum chunk size allowed */
 	public mixed $chunkSize;
 
+	/** @var int Maximum number of chunks permitted for a single file upload */
+	public int $maxChunks;
+
 	/** @var string the combined file temporary path and name */
 	private string $combinedFilePath;
 
@@ -57,6 +60,24 @@ class TemporaryAttachmentChunk
 		$this->attachmentDirectory->automanageCheckDirectory();
 		$this->attach_current_dir = $this->attachmentDirectory->getCurrent();
 		$this->chunkSize = empty($modSettings['attachmentChunkSize']) ? 250000 : $modSettings['attachmentChunkSize'];
+
+		// Derive the maximum allowable chunk count from the configured file-size limit.
+		// Uses attachmentSizeLimit (KB) when set, otherwise falls back to PHP's upload_max_filesize.
+		// Always capped at a hard ceiling of 1000 to prevent a malicious client from
+		// claiming an absurd totalChunkCount and causing excessive server-side requests.
+		$hardCeiling = 1000;
+		if (!empty($modSettings['attachmentSizeLimit']))
+		{
+			$maxBytes = (int) $modSettings['attachmentSizeLimit'] * 1024;
+		}
+		else
+		{
+			$maxBytes = memoryReturnBytes(ini_get('upload_max_filesize'));
+		}
+
+		$this->maxChunks = $maxBytes > 0
+			? min((int) ceil($maxBytes / $this->chunkSize), $hardCeiling)
+			: $hardCeiling;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 	}
@@ -156,6 +177,14 @@ class TemporaryAttachmentChunk
 			return 'invalid_uuid';
 		}
 
+		// Reject every request where the claimed chunk count exceeds our server-side cap.
+		// This must happen on every chunk, not just the first, to prevent a client from
+		// sending chunk 0 with a sane count then resending with an inflated count.
+		if ($totalChunkCount > $this->maxChunks)
+		{
+			return 'chunk_quota';
+		}
+
 		return $this->validateInitialChunk($totalChunkCount, $chunkIndex);
 	}
 
@@ -194,15 +223,15 @@ class TemporaryAttachmentChunk
 	 * Check if the total size of the chunks is within the allowed upload limits.
 	 *
 	 * @param int $totalChunks The total number of chunks.
-	 * @param int $chunkSize The size of each chunk, in bytes. Default is 250,000.
+	 * @param int|null $chunkSize The size of each chunk in bytes. Defaults to the instance chunk size.
 	 *
 	 * @return bool True if the total size does not exceed the allowed limits, false otherwise.
 	 */
-	public function checkTotalSize(int $totalChunks, int $chunkSize = 250000): bool
+	public function checkTotalSize(int $totalChunks, ?int $chunkSize = null): bool
 	{
 		global $modSettings;
 
-		$expectedSize = $totalChunks * $chunkSize;
+		$expectedSize = $totalChunks * ($chunkSize ?? $this->chunkSize);
 
 		// What upload max sizes are defined?
 		$post_max_size = ini_get('post_max_size');
