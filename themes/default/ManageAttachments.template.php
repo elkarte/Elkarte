@@ -219,7 +219,7 @@ function template_attachment_repair()
 	{
 		echo '
 	<div id="manage_attachments">
-		<div class="content">
+		<div class="infobox">
 			', $txt['repair_attachments_complete_desc'], '
 		</div>
 	</div>';
@@ -230,7 +230,7 @@ function template_attachment_repair()
 		echo '
 	<div id="manage_attachments">
 		<h2 class="category_header">', $txt['repair_attachments_complete'], '</h2>
-		<div class="content">
+		<div class="infobox">
 			', $txt['repair_attachments_no_errors'], '
 		</div>
 	</div>';
@@ -241,7 +241,7 @@ function template_attachment_repair()
 		echo '
 	<form id="admin_form_wrapper" action="', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'repair', 'fixErrors' => 1, 'step' => 0, 'substep' => 0, '{session_data}']), '" method="post" accept-charset="UTF-8">
 		<h2 class="category_header">', $txt['repair_attachments'], '</h2>
-		<div class="content">
+		<div class="warningbox">
 			<p>', $txt['repair_attachments_error_desc'], '</p>';
 
 		// Loop through each error reporting the status
@@ -257,10 +257,10 @@ function template_attachment_repair()
 		}
 
 		echo '
-			<div class="submitbutton">
-				<input type="submit" value="', $txt['repair_attachments_continue'], '" />
-				<input type="submit" name="cancel" value="', $txt['repair_attachments_cancel'], '" />
-			</div>
+		</div>
+		<div class="submitbutton">
+			<input type="submit" value="', $txt['repair_attachments_continue'], '" />
+			<input type="submit" name="cancel" value="', $txt['repair_attachments_cancel'], '" />
 		</div>
 	</form>';
 	}
