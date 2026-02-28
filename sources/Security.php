@@ -1540,20 +1540,53 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 		$fh = @fopen($path . '/.htaccess', 'wb');
 		if ($fh)
 		{
-			fwrite($fh, '# Apache 2.4
+			// Full deny for upload/content dirs (files='*', no localhost allow):
+			//   Require all denied / Deny from all, plus RemoveHandler outside IfModule blocks.
+			// Localhost-allow for admin dirs (allow_localhost=true):
+			//   Require all denied + Require local / Deny + Allow from localhost, no RemoveHandler.
+			// Selective file serving (files != '*', no localhost allow):
+			//   Deny all but allow matching file pattern, no RemoveHandler.
+			if ($files === '*' && empty($allow_localhost))
+			{
+				$htaccess = '# Apache 2.4
 <IfModule mod_authz_core.c>
 	Require all denied
-	<Files ' . ($files === '*' ? $files : '~ ' . $files) . '>
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+	Order Deny,Allow
+	Deny from all
+</IfModule>
+
+RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
+			}
+			elseif (!empty($allow_localhost))
+			{
+				$htaccess = '# Apache 2.4
+<IfModule mod_authz_core.c>
+	Require all denied
+	Require local
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</IfModule>';
+			}
+			else
+			{
+				$htaccess = '# Apache 2.4
+<IfModule mod_authz_core.c>
+	Require all denied
+	<Files ~ ' . $files . '>
 		<RequireAll>
 			Require all granted
-			Require not env blockAccess' . (empty($allow_localhost) ? '
-		</RequireAll>
-	</Files>' : '
-		Require host localhost
+			Require not env blockAccess
 		</RequireAll>
 	</Files>
-
-	RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml') . '
 </IfModule>
 
 # Apache 2.2
@@ -1562,17 +1595,18 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 	Deny from all
 
 	<Files ' . $files . '>
-		Allow from all' . (empty($allow_localhost) ? '
-	</Files>' : '
-		Allow from localhost
+		Allow from all
 	</Files>
+</IfModule>';
+			}
 
-	RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml') . '
-</IfModule>');
+			fwrite($fh, $htaccess);
 			fclose($fh);
 		}
-
-		$errors[] = 'htaccess_cannot_create_file';
+		else
+		{
+			$errors[] = 'htaccess_cannot_create_file';
+		}
 	}
 
 	if (file_exists($path . '/index.php'))
@@ -1602,8 +1636,10 @@ else
 	exit;');
 			fclose($fh);
 		}
-
-		$errors[] = 'index-php_cannot_create_file';
+		else
+		{
+			$errors[] = 'index-php_cannot_create_file';
+		}
 	}
 
 	if (!empty($errors))

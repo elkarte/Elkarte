@@ -1845,7 +1845,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		'only_approved' => true,
 		'include_sticky' => false,
 		'ascending' => false,
-		'include_avatars' => false,
+		'include_avatars' => true,
 		'previews' => $length
 	];
 
@@ -1876,7 +1876,6 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$row['poster_time'] = $row[$preview . '_poster_time'];
 		$row['poster_name'] = $row[$preview . '_display_name'];
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
-
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 

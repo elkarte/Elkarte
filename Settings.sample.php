@@ -19,14 +19,14 @@ $mtitle = 'Maintenance Mode';
  * Description of why the forum is in maintenance mode.
  * @global string $mmessage
  */
-$mmessage = 'Okay faithful users...we\'re attempting to restore an older backup of the database...news will be posted once we\'re back!';
+$mmessage = 'Hey folks! ... We\’re doing a bit of maintenance to keep things running smoothly. The forum will be back up soon, thanks for hanging tight with us';
 
 ########## Forum Info ##########
 /**
  * The name of your forum.
  * @global string $mbname
  */
-$mbname = 'My Community';
+$mbname = 'My ElkArte Community';
 
 /**
  * The default language file set for the forum.

@@ -146,7 +146,7 @@ class Loader
 		$this->loaded[$file] = true;
 
 		// Keep track of what we're up to, soldier.
-		if (!$found && $db_show_debug === true)
+		if ($found && $db_show_debug === true)
 		{
 			$this->logDebug($file);
 		}
