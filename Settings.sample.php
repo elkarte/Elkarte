@@ -82,7 +82,7 @@ $db_name = 'elkarte';
  * Database username
  * @global string $db_user
  */
-$db_user = '';
+$db_user = 'root';
 
 /**
  * Database password
