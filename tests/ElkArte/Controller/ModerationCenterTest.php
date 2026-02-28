@@ -66,7 +66,7 @@ class ModerationCenterTest extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		$this->assertEquals($context[$context['moderation_menu_name']]['tab_data']['title'], $txt['moderation_center']);
-		$this->assertEquals('My Community', $context['breadcrumbs'][1]['name']);
+		$this->assertEquals('My ElkArte Community', $context['breadcrumbs'][1]['name']);
 	}
 
 	/**
