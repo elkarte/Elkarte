@@ -612,7 +612,7 @@ class ProfileOptions extends AbstractController
 			$context['available_themes'][0] = $context['available_themes'][$guest_theme];
 		}
 
-		$default_variant = $GLOBALS['settings']['default_variant'];
+		$default_variant = $GLOBALS['settings']['default_variant'] ?? '';
 		$context['available_themes'][0]['id'] = 0;
 		$context['available_themes'][0]['name'] = $txt['theme_forum_default'];
 		$context['available_themes'][0]['selected'] = $current_theme === 0;
