@@ -522,7 +522,35 @@ class Auth extends AbstractController
 	 */
 	public function action_logout($internal = false, $redirect = true): void
 	{
-		// Make sure they aren't being auto-logged out.
+		global $context, $txt;
+
+		// Changed their mind?  Go back.
+		if (!$internal && isset($_POST['cancel'], $_GET[$context['session_var']]))
+		{
+			redirectexit($_SESSION['logout_return'] ?? '');
+		}
+
+		// No session? Give them a nice logout form instead of a jolting session validation failed
+		if (!$internal && !isset($_GET[$context['session_var']]))
+		{
+			Txt::load('Login');
+			theme()->getTemplates()->load('Login');
+			$context['sub_template'] = 'logout';
+
+			if (isset($_SESSION['old_url']))
+			{
+				$_SESSION['logout_return'] = $_SESSION['old_url'];
+			}
+
+			$context['page_title'] = $txt['logout'];
+			$context['breadcrumbs'][] = [
+				'url' => getUrl('action', ['action' => 'auth', 'sa' => 'logout']),
+				'name' => $txt['logout'],
+			];
+
+			obExit();
+		}
+
 		if (!$internal)
 		{
 			checkSession('get');

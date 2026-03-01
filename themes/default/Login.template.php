@@ -108,6 +108,33 @@ function template_login()
 }
 
 /**
+ * This is the basic logout confirmation form.
+ */
+function template_logout()
+{
+	global $context, $settings, $scripturl, $modSettings, $txt;
+
+	echo '
+	<form action="', $scripturl . '?action=auth;sa=logout;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+		<div class="logout">
+			<h2 class="category_header hdicon i-menu-login centertext">'
+				, $txt['logout_confirm'], '
+			</h2>
+			<div class="well">
+				<p class="description">
+					', $txt['logout_notice'], '
+				</p>
+
+				<p class="submitbutton centertext">
+					<input type="submit" value="', $txt['continue'], '" />
+					<input type="submit" name="cancel" value="', $txt['modify_cancel'], '" />
+				</p>
+			</div>
+		</div>
+	</form>';
+}
+
+/**
  * Tell a guest to get lost or login!
  */
 function template_kick_guest()
