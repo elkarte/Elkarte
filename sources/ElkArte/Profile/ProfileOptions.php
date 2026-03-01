@@ -224,7 +224,7 @@ class ProfileOptions extends AbstractController
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editIgnoreList';
-		loadJavascriptFile('suggest.js', ['defer' => true]);
+		loadJavascriptFile('suggest.js', ['defer' => false]);
 
 		// For making changes!
 		$ignoreArray = array_map('intval', explode(',', $this->_profile['pm_ignore_list']));
