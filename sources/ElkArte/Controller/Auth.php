@@ -60,6 +60,8 @@ class Auth extends AbstractController
 			'login' => [$this, 'action_login'],
 			'login2' => [$this, 'action_login2'],
 			'logout' => [$this, 'action_logout'],
+			'maintenance_mode' => [$this, 'action_maintenance_mode'],
+			'kickguest' => [$this, 'action_kickguest'],
 		];
 
 		// We like action, so let's get ready for some

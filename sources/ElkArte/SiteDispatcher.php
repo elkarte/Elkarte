@@ -448,13 +448,12 @@ class SiteDispatcher
 			if ($this->action === 'auth' && ($this->subAction === 'login2' || $this->subAction === 'logout'))
 			{
 				$this->_controller_name = Auth::class;
-				$this->_function_name = 'action_' . $this->action;
 			}
 			// "maintenance mode" page
 			else
 			{
 				$this->_controller_name = Auth::class;
-				$this->_function_name = 'action_maintenance_mode';
+				$this->subAction = 'maintenance_mode';
 			}
 
 			// re-initialize the controller and the event manager
@@ -464,7 +463,7 @@ class SiteDispatcher
 		elseif ($this->restrictedGuestAccess())
 		{
 			$this->_controller_name = Auth::class;
-			$this->_function_name = 'action_kickguest';
+			$this->subAction = 'kickguest';
 
 			// re-initialize... you got the drift
 			$this->_controller = new $this->_controller_name(new EventManager());
