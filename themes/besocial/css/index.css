@@ -1061,6 +1061,7 @@ a.bbc_link {
 #top_section {
     border-top: 4px solid;
     border-bottom: 4px solid;
+    margin-top: 3.5rem;
 }
 
 #top_section.th_collapse {
