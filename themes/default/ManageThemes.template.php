@@ -51,7 +51,9 @@ function template_manage_themes()
 	{
 		echo '
 									<li>
-										<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' /> ', $theme['name'], '</label>
+										<label for="options-known_themes_', $theme['id'], '">
+											<input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' /> ', $theme['name'], '
+										</label>
 									</li>';
 	}
 
