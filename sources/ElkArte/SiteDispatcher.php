@@ -361,8 +361,8 @@ class SiteDispatcher
 			// Maybe the default requires an abstract method
 			if ($this->_function_name !== 'action_index'
 				&& !isset($this->actionArray[$this->action])
-				&& in_array('action_index', get_class_methods($this->_controller_name), true)
-				&& is_subclass_of($this->_controller_name, AbstractController::class))
+				&& is_subclass_of($this->_controller_name, AbstractController::class)
+				&& in_array('action_index', get_class_methods($this->_controller_name), true))
 			{
 				// Calling a sa directly on an abstract class? This should be dispatched by the
 				// class itself e.g., $action->dispatch($subAction) to ensure permissions
@@ -448,12 +448,13 @@ class SiteDispatcher
 			if ($this->action === 'auth' && ($this->subAction === 'login2' || $this->subAction === 'logout'))
 			{
 				$this->_controller_name = Auth::class;
+				$this->_function_name = 'action_index';
 			}
 			// "maintenance mode" page
 			else
 			{
 				$this->_controller_name = Auth::class;
-				$this->subAction = 'maintenance_mode';
+				$this->_function_name = 'action_maintenance_mode';
 			}
 
 			// re-initialize the controller and the event manager
@@ -463,7 +464,7 @@ class SiteDispatcher
 		elseif ($this->restrictedGuestAccess())
 		{
 			$this->_controller_name = Auth::class;
-			$this->subAction = 'kickguest';
+			$this->_function_name = 'action_kickguest';
 
 			// re-initialize... you got the drift
 			$this->_controller = new $this->_controller_name(new EventManager());
