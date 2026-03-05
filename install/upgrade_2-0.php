@@ -40,6 +40,8 @@ class UpgradeInstructions_upgrade_2_0
 
 	protected $table;
 
+	protected $beSocialId;
+
 	public function __construct($db, $table)
 	{
 		$this->db = $db;
@@ -673,6 +675,220 @@ class UpgradeInstructions_upgrade_2_0
 		);
 	}
 
+	public function migrate_themes_to_20_title()
+	{
+		return 'Migrating themes to 2.0...';
+	}
+
+	public function migrate_themes_to_20()
+	{
+		return array(
+			array(
+				'debug_title' => 'Updating default theme (id 1) paths for 2.0 directory structure...',
+				'function' => function () {
+					global $boardurl;
+
+					// Ensure the default theme has the correct paths for 2.0
+					$defaultThemeSettings = array(
+						array('theme_url', $boardurl . '/themes/default'),
+						array('images_url', $boardurl . '/themes/default/images'),
+						array('theme_dir', BOARDDIR . '/themes/default'),
+					);
+
+					foreach ($defaultThemeSettings as $setting)
+					{
+						$this->db->insert('replace',
+							'{db_prefix}themes',
+							array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							array(1, 0, $setting[0], $setting[1]),
+							array('id_theme', 'id_member', 'variable')
+						);
+					}
+				}
+			),
+			array(
+				// Install beSocial at the lowest available slot >= 2, update knownThemes.
+				'debug_title' => 'Installing beSocial theme entry for 2.0...',
+				'function' => function () {
+					global $boardurl;
+
+					require_once(SUBSDIR . '/Themes.subs.php');
+					$installedThemes = installedThemes();
+
+					// Check if beSocial is already installed (script re-run).
+					$this->beSocialId = null;
+					foreach ($installedThemes as $theme)
+					{
+						if (isset($theme['name']) && strtolower($theme['name']) === 'besocial')
+						{
+							$this->beSocialId = (int) $theme['id'];
+							break;
+						}
+					}
+
+					// Not yet installed, find the lowest unused id_theme slot >= 2
+					// e.g. installed keys [1, 2, 5, 42] → candidate = 3
+					if ($this->beSocialId === null)
+					{
+						$usedIds = array_map('intval', array_keys($installedThemes));
+						sort($usedIds, SORT_NUMERIC);
+						$this->beSocialId = 2;
+						foreach ($usedIds as $id)
+						{
+							if ($id === $this->beSocialId)
+							{
+								$this->beSocialId++;
+							}
+							elseif ($id > $this->beSocialId)
+							{
+								break;
+							}
+						}
+
+						$this->db->insert('ignore',
+							'{db_prefix}themes',
+							array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							array(
+								array($this->beSocialId, 0, 'name', 'beSocial'),
+								array($this->beSocialId, 0, 'theme_url', $boardurl . '/themes/besocial'),
+								array($this->beSocialId, 0, 'images_url', $boardurl . '/themes/besocial/images'),
+								array($this->beSocialId, 0, 'theme_dir', BOARDDIR . '/themes/besocial'),
+							),
+							array('id_theme', 'id_member', 'variable')
+						);
+					}
+
+					// knownThemes = default + beSocial only; enforce system-wide theme defaults
+					updateSettings(array(
+						'knownThemes' => '1,' . $this->beSocialId,
+						'theme_default' => '1',
+						'theme_guests' => '1',
+					));
+				}
+			),
+			array(
+				// Migrate members who had chosen the beSocial variant (id_theme 0 or 1)
+				// to the new standalone beSocial theme id.
+				'debug_title' => 'Migrating beSocial variant members to the new beSocial theme...',
+				'function' => function () {
+					// Resolve beSocial id fresh from the DB
+					if (empty($this->beSocialId))
+					{
+						return;
+					}
+
+					// Find members on id_theme 0 or 1 who have a theme_variant=besocial row in
+					// elk_themes that matches their chosen id_theme value (0 or 1).
+					$request = $this->db->query('', '
+						SELECT DISTINCT
+							m.id_member
+						FROM {db_prefix}members AS m
+							INNER JOIN {db_prefix}themes AS t ON t.id_member = m.id_member
+								AND t.id_theme = m.id_theme
+						WHERE m.id_theme IN ({array_int:default_themes})
+							AND t.variable = {string:theme_variant}
+							AND t.value = {string:besocial_variant}',
+						array(
+							'default_themes' => array(0, 1),
+							'theme_variant' => 'theme_variant',
+							'besocial_variant' => 'besocial',
+						)
+					);
+
+					$membersForBeSocial = array();
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$membersForBeSocial[] = (int) $row['id_member'];
+					}
+
+					$this->db->free_result($request);
+
+					if (empty($membersForBeSocial))
+					{
+						return;
+					}
+
+					// Move matched members to the new beSocial theme id
+					$this->db->query('', '
+						UPDATE {db_prefix}members
+						SET id_theme = {int:besocial_theme}
+						WHERE id_member IN ({array_int:member_ids})',
+						array(
+							'besocial_theme' => $this->beSocialId,
+							'member_ids' => $membersForBeSocial,
+						)
+					);
+
+					// Remove the stale theme_variant=besocial rows for these members
+					// beSocial is a standalone theme in 2.0 and variant flags are not used.
+					$this->db->query('', '
+						DELETE FROM {db_prefix}themes
+						WHERE id_member IN ({array_int:member_ids})
+							AND variable = {string:theme_variant}
+							AND value = {string:besocial_variant}',
+						array(
+							'member_ids' => $membersForBeSocial,
+							'theme_variant' => 'theme_variant',
+							'besocial_variant' => 'besocial',
+						)
+					);
+				}
+			),
+			array(
+				// Reset any member not on id_theme 0 (system default), 1 (default), or
+				// beSocial back to 1.
+				'debug_title' => 'Resetting remaining member theme assignments to the default...',
+				'function' => function () {
+					// Keep: 0 (system default), 1 (explicit default), beSocial id (if found)
+					$keepIds = array(0, 1);
+					if (!empty($this->beSocialId))
+					{
+						$keepIds[] = $this->beSocialId;
+					}
+
+					// Members on any other theme id get reset to the default theme (1)
+					$this->db->query('', '
+						UPDATE {db_prefix}members
+						SET id_theme = {int:default_theme}
+						WHERE id_theme NOT IN ({array_int:keep_ids})',
+						array(
+							'default_theme' => 1,
+							'keep_ids' => $keepIds,
+						)
+					);
+
+					// Boards: id_theme=0 (use system default) is left alone; everything else → 1
+					$this->db->query('', '
+						UPDATE {db_prefix}boards
+						SET id_theme = {int:default_theme}
+						WHERE id_theme NOT IN ({array_int:keep_ids})',
+						array(
+							'default_theme' => 1,
+							'keep_ids' => array(0, 1),
+						)
+					);
+				}
+			),
+			array(
+				// Clean up theme_variant=besocial rows stored under id_theme 0 or 1
+				'debug_title' => 'Removing stale beSocial variant rows from the themes table...',
+				'function' => function () {
+					$this->db->query('', '
+						DELETE FROM {db_prefix}themes
+						WHERE id_theme IN ({array_int:default_themes})
+							AND variable = {string:theme_variant}
+							AND value = {string:besocial_variant}',
+						array(
+							'default_themes' => array(0, 1),
+							'theme_variant' => 'theme_variant',
+							'besocial_variant' => 'besocial',
+						)
+					);
+				}
+			),
+		);
+	}
+
 	public function migrate_misc_settings_title()
 	{
 		return 'Updating misc data ...';
@@ -700,11 +916,12 @@ class UpgradeInstructions_upgrade_2_0
 					removeSettings(
 						array('visual_verification_type', 'visual_verification_num_chars')
 					);
+
 					updateSettings(array(
 						'pwa_small_icon' => '{BOARDDIR}/themes/default/images/logos/icon_pwa_small.png',
 						'pwa_large_icon' => '{BOARDDIR}/themes/default/images/logos/icon_pwa_large.png',
 						'apple_touch_icon' => '{BOARDDIR}/themes/default/images/logos/apple-touch-icon.png',
-						'url_format', 'standard',
+						'url_format' => 'standard',
 					));
 				}
 			)
@@ -755,6 +972,10 @@ class UpgradeInstructions_upgrade_2_0
 							'minify_css_js' => '1',
 						));
 					}
+
+					removeSettings(
+						array('combine_css_js')
+					);
 				}
 			)
 		);

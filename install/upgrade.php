@@ -1356,47 +1356,9 @@ function action_deleteUpgrade()
 	// Drop old check for MySQL 5.0.50 and 5.0.51 bug.
 	removeSettings('db_mysql_group_by_fix');
 
-	// Set jquery to auto, and theme to default.
-	updateSettings(['jquery_source' => 'auto', 'theme_guests' => '1', 'theme_allow' => '1', 'knownThemes' => '1']);
-
-	// Custom themes may cause errors, so we set everyone to the default theme.
-	$db = load_database();
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET id_theme = {int:default_theme}',
-		[
-			'default_theme' => 0,
-		]
-	);
-
-	$db->query('', '
-		UPDATE {db_prefix}boards
-		SET id_theme = {int:default_theme}',
-		[
-			'default_theme' => 0,
-		]
-	);
-
-	// Lastly, reset the default theme paths.
-	$db->query('', '
-		UPDATE {db_prefix}themes
-		SET value = CASE 
-			WHEN variable = {string:theme_url} THEN {string:theme_url_val}
-			WHEN variable = {string:theme_dir} THEN {string:theme_dir_val}
-			WHEN variable = {string:images_url} THEN {string:images_url_val}
-		END
-		WHERE id_theme = {int:id_theme}
-			AND variable IN ({string:theme_url}, {string:theme_dir}, {string:images_url})',
-		[
-			'id_theme' => 1,
-			'theme_url' => 'theme_url',
-			'theme_dir' => 'theme_dir',
-			'images_url' => 'images_url',
-			'theme_url_val' => $boardurl . '/themes/default',
-			'theme_dir_val' => BOARDDIR . '/themes/default',
-			'images_url_val' => $boardurl . '/themes/default/images',
-		]
-	);
+	// Set jquery to auto and allow theme selection.
+	// Theme migration (knownThemes, member/board id_theme resets, beSocial, etc.) is handled by upgrade_2-0.php.
+	updateSettings(['jquery_source' => 'auto', 'theme_allow' => '1']);
 
 	// Make sure it says we're done.
 	$upcontext['overall_percent'] = 100;
