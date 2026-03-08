@@ -17,12 +17,15 @@
 namespace ElkArte\Controller;
 
 use BBC\ParserWrapper;
+use BBC\PreparseCode;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
+use ElkArte\Emoji;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\PreparseMail;
 use ElkArte\MembersList;
 
 /**
@@ -382,17 +385,16 @@ class News extends AbstractController
 
 		// Prepare it for the feed in the format chosen (rss, atom)
 		$data = [];
-		$bbc_parser = ParserWrapper::instance();
 
 		foreach ($results as $row)
 		{
-			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-			{
-				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), ["\n" => '<br />']);
-			}
+			$row['body'] = $this->prepareFeed($row['body'], $row['smileys_enabled']);
 
-			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
+			// Limit the length of the message, if the option is set.
+			if (!empty($modSettings['xmlnews_maxlen']))
+			{
+				$row['body'] = Util::shorten_html($row['body'], $modSettings['xmlnews_maxlen']);
+			}
 
 			// Dirty mouth?
 			$row['body'] = censor($row['body']);
@@ -421,7 +423,7 @@ class News extends AbstractController
 				}
 
 				$data[] = [
-					'title' => cdata_parse($row['subject']),
+					'title' => cdata_parse(un_htmlspecialchars($row['subject'])),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'summary' => cdata_parse($row['body']),
 					'category' => $row['bname'],
@@ -581,5 +583,101 @@ class News extends AbstractController
 		MembersList::unset($uid);
 
 		return $data;
+	}
+
+	/**
+	 * Prepares a post so that it is better suited for RSS feeds.  Feed readers will silently ignore
+	 * HTML they don't accept, so we do some work to make sure the posts look good in feeds.
+	 *
+	 * - Pre-converts select bbc tags to HTML, so they are more generic
+	 * - Uses parse-bbc to convert remaining bbc to HTML
+	 * - Hides code blocks so they don't get converted by the bbc parsing, and restores them at the end
+	 * - Converts smileys to images with inline size attributes
+	 * - Strips onclick events from quote and code tags
+	 *
+	 * @param string $message the post in glorious BBC format
+	 * @return string HTML text
+	 */
+	public function prepareFeed($message, $smileys_enabled): string
+	{
+		// <br /> back to newlines for easier processing
+		$message = str_replace('<br />', "\n", $message);
+
+		// Convert bbc [quotes] before we go to parsebbc
+		$message = preg_replace_callback('~\[quote[^]]*?]~iu', fn(array $matches): string => $this->quoteCallback($matches), $message);
+		$message = str_replace('[/quote]', '</blockquote>', $message);
+
+		// Prevent img tags from getting linked
+		$message = preg_replace('~\[img](.*?)\[/img]~is', '`&lt;img src="\\1">', $message);
+
+		// Hide code tags so they don't get messed with by the bbc parsing, we'll restore them at the end
+		$preparse = PreparseCode::instance('');
+		$message = $preparse->tokenizeCodeBlocks($message);
+
+		// Allow addons to account for their own unique bbc additions e.g., gallery's etc.
+		call_integration_hook('integrate_rss_pre_parsebbc', [&$message]);
+
+		// Convert the remaining BBC to HTML
+		$bbc_wrapper = ParserWrapper::instance();
+		$md_wrapper = $bbc_wrapper->getMarkdownParser();
+		$message = $bbc_wrapper->parseMessage(trim($message), $smileys_enabled);
+
+		// Add size to smiley/emoji images, strip class attribute.  Note that the style attribute is stripped by
+		// feed readers, so we have to use width and height attributes to ensure they look right.
+		$message = preg_replace(
+			'~(<img\s[^>]*)class="[^"]*(?:smiley|emoji)[^"]*"([^>]*)(/?>)~',
+			'$1width="16" height="16"$2$3',
+			$message
+		);
+
+		// Drop the quote-show-more input box, and add a newline after the cite for better formatting in feeds
+		$message = str_replace(['<input type="checkbox" title="show" class="quote-show-more">', '</cite>'], ['', "</cite>\n"], $message);
+
+		// Allow addons to account for their own unique bbc additions e.g., gallery's etc.
+		call_integration_hook('integrate_rss_post_parsebbc', [&$message]);
+
+		// Restore code blocks and convert newlines back to <br />
+		$message = $preparse->restoreCodeBlocks($message);
+		$message = str_replace("\n", '<br />', $message);
+
+		// Convert Markdown code tags to BBC code tags
+		$message = $md_wrapper->inlineCodeTags($message);
+
+		// Simple code tags for the feeds
+		$message = preg_replace('~\[code(.*?)](.*?)\[/code]~is', '<code$1>$2</code>', $message);
+		$message = preg_replace('~\[icode](.*?)\[/icode]~is', '<span>[ $1 ]</span>', $message);
+
+		return strtr($message, ['&#91;' => '[', '&#93;' => ']', '`&lt;' => '<']);
+	}
+
+	/**
+	 * Replace full bbc quote tags with HTML blockquote version where the cite line
+	 * is used as the first line of the quote.
+	 *
+	 * - Callback for preparseHtml
+	 * - Only replaces opening [quote] tags, the closing /quote is replaced back in
+	 * the main function
+	 *
+	 * @param string[] $matches array of matches from the regex in the preg_replace
+	 * @return string
+	 */
+	private function quoteCallback($matches): string
+	{
+		global $txt;
+
+		$date = '';
+		$author = $txt['quote'];
+
+		if (preg_match('~date=(\d{8,10})~ui', $matches[0], $match) === 1)
+		{
+			$date = $txt['email_on'] . ': ' . date('D M j, Y', $match[1]);
+		}
+
+		if (preg_match('~author=([^<>\n]+?)(?=(?:link=|date=|\]))~ui', $matches[0], $match) === 1)
+		{
+			$author = $match[1] . $txt['email_wrote'] . ': ';
+		}
+
+		return '<blockquote><cite>' . $date . ' ' . $author . '</cite><hr>';
 	}
 }
