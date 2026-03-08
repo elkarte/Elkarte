@@ -54,9 +54,10 @@ class PreparseMail extends BaseMail
 
 		// Protect code tags from parseBBC
 		$preparse = PreparseCode::instance('');
+		$message = str_replace('<br />', "\n", $message);
 		$message = $preparse->tokenizeCodeBlocks($message);
 
-		// Convert :emoji: tags to html versions
+		// Convert :emoji: tags to HTML versions, done separately as we don't have smiley parsing enabled in parseBBC
 		$emoji = Emoji::instance();
 		$message = $emoji->emojiNameToImage($message, true, false);
 
@@ -65,10 +66,11 @@ class PreparseMail extends BaseMail
 
 		// Convert the remaining bbc to HTML
 		$bbc_wrapper = ParserWrapper::instance();
+		$md_wrapper = $bbc_wrapper->getMarkdownParser();
 		$message = $bbc_wrapper->parseMessage(trim($message), false);
 
 		// Drop the quote-show-more input box
-		$message = str_replace('<input type="checkbox" title="show" class="quote-show-more">', '', $message);
+		$message = str_replace(['<input type="checkbox" title="show" class="quote-show-more">', '</cite>'], ['', "</cite>\n"], $message);
 
 		// Change list style to something standard to make text conversion easier
 		$message = preg_replace('~<ul class="bbc_list" style="list-style-type: decimal;">(.*?)</ul>~si', '<ol>\\1</ol>', $message);
@@ -81,6 +83,11 @@ class PreparseMail extends BaseMail
 
 		// Restore code blocks
 		$message = $preparse->restoreCodeBlocks($message);
+		$message = str_replace("\n", '<br />', $message);
+
+		// Markdown code tags are a bit different, so convert them now
+		$message = $md_wrapper->inlineCodeTags($message);
+
 		$message = preg_replace('~\[code(.*?)](.*?)\[/code]~is', '<code$1>$2</code>', $message);
 		$message = preg_replace('~\[icode](.*?)\[/icode]~is', '<span class="bbc_code_inline">$1</span>', $message);
 
