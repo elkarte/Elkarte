@@ -716,7 +716,7 @@ function action_welcomeLogin()
 			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . BOARDDIR . '&quot; but should probably be &quot;' . TMP_BOARDDIR . '&quot;. Settings.php currently lists your paths as:<br />
 			<ul>
 				<li>Board Directory: ' . BOARDDIR . '</li>
-				<li>Source Directory: ' . BOARDDIR . '</li>
+				<li>Source Directory: ' . SOURCEDIR . '</li>
 				<li>Cache Directory: ' . $CACHEDIR_temp . '</li>
 			</ul>
 			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the ElkArte website before continuing.';
