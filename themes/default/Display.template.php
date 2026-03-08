@@ -109,7 +109,7 @@ function template_messages()
 	global $context, $settings, $options, $txt, $modSettings;
 
 	$context['quick_reply_removableMessageIDs'] = [];
-	$context['quick_reply_ignoredMsgs'] = [];
+	$context['ignoredMsgs'] = [];
 
 	// Get all the messages...
 	$reset = isset($context['reset_renderer']);
@@ -127,7 +127,7 @@ function template_messages()
 		if (!empty($message['is_ignored']))
 		{
 			$ignoring = true;
-			$context['quick_reply_ignoredMsgs'][] = $message['id'];
+			$context['ignoredMsgs'][] = $message['id'];
 		}
 		else
 		{
@@ -194,7 +194,7 @@ function template_messages()
 						<section id="msg_', $message['id'], '" data-msgid="', $message['id'], '" class="messageContent', $ignoring ? ' hide' : '', !empty($settings['show_keyinfo_above']) ? ' above' : '', '">',
 							$message['body'], '
 						</section>
-						<footer class="post_footer">';
+						<footer id="footer_', $message['id'], '" class="post_footer">';
 
 		// This is the floating Quick Quote button.
 		echo '
@@ -357,10 +357,19 @@ function template_keyinfo($message, $ignoring, $above = false)
  */
 function template_messages_informations_below()
 {
+	global $context, $txt;
+
 	echo '
 			</form>
 			</section>
 		</main>';
+
+	// Provide a toggle for any messages that are being ignored.
+	if (!empty($context['ignoredMsgs']))
+	{
+		theme()->addInlineJavascript('
+			ignore_toggles([' . implode(', ', $context['ignoredMsgs']) . '], ' . JavaScriptEscape($txt['show_ignore_user_post']) . ');', true);
+	}
 }
 
 /**
@@ -569,13 +578,6 @@ function template_quickreply_below()
 			sAction: "messageicons;board=' . $context['current_board'] . '" ,
 			sLabelIconList: "' . $txt['message_icon'] . '",
 		});', true);
-
-	// Provide a toggle for any messages that are being ignored.
-	if (!empty($context['quick_reply_ignoredMsgs']))
-	{
-		theme()->addInlineJavascript('
-			ignore_toggles([' . implode(', ', $context['quick_reply_ignoredMsgs']) . '], ' . JavaScriptEscape($txt['show_ignore_user_post']) . ');', true);
-	}
 }
 
 /**

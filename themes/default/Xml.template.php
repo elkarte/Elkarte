@@ -304,7 +304,6 @@ function template_results()
 						<time>', $message['time'], '</time>
 						<timestamp>', $message['timestamp'], '</timestamp>
 						<start>', $message['start'], '</start>
-
 						<author>
 							<id>', $message['member']['id'], '</id>
 							<name>', cleanXml($message['member']['name']), '</name>
@@ -471,20 +470,20 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
  * Additionally, formats data based on the specific format passed.
  * This function is recursively called to handle subarrays of data.
  *
- * @param array $data the array to output as xml data
+ * @param array $data the array to output as XML data
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
- * @param string $xml_format one of rss, rss2, rdf, atom
+ * @param string $xml_format one of rss2, atom
  */
-function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
+function template_xml_news($data, $i, $tag = null, $xml_format = 'rss2')
 {
 	require_once(SUBSDIR . '/News.subs.php');
 
 	// For every array in the data...
 	foreach ($data as $key => $val)
 	{
-		// Skip it, it's been set to null.
-		if ($val === null)
+		// Skip null or empty values — don't emit empty tags.
+		if ($val === null || $val === '')
 		{
 			continue;
 		}
@@ -503,26 +502,20 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 		}
 
 		// If it's empty/0/nothing simply output an empty tag.
-		if ($val == '')
-		{
-			echo '<', $key, ' />';
-		}
-		elseif ($xml_format === 'atom' && $key === 'category')
+		if ($xml_format === 'atom' && $key === 'category')
 		{
 			echo '<', $key, ' term="', $val, '" />';
 		}
 		else
 		{
 			// Beginning tag.
-			if ($xml_format === 'rdf' && $key === 'item' && isset($val['link']))
-			{
-				echo '<', $key, ' rdf:about="', fix_possible_url($val['link']), '">';
-				echo "\n", str_repeat("\t", $i + 1);
-				echo '<dc:format>text/html</dc:format>';
-			}
-			elseif ($xml_format === 'atom' && $key === 'summary')
+			if ($xml_format === 'atom' && $key === 'summary')
 			{
 				echo '<', $key, ' type="html">';
+			}
+			elseif ($xml_format === 'atom' && $key === 'rights')
+			{
+				echo '<', $key, ' type="text">';
 			}
 			else
 			{
@@ -549,39 +542,6 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 	}
 }
 
-/**
- * Main Atom feed template
- */
-function template_rdf()
-{
-	global $context, $scripturl, $txt;
-
-	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
-	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
-		<channel rdf:about="', $scripturl, '">
-			<title>', $context['feed_title'], '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<items>
-				<rdf:Seq>';
-
-	foreach ($context['recent_posts_data'] as $item)
-	{
-		echo '
-					<rdf:li rdf:resource="', $item['link'], '" />';
-	}
-
-	echo '
-				</rdf:Seq>
-			</items>
-		</channel>
-	';
-
-	template_xml_news($context['recent_posts_data'], 1, 'item', $context['xml_format']);
-
-	echo '
-	</rdf:RDF>';
-}
 
 /**
  * Main Atom feed template
@@ -590,16 +550,30 @@ function template_feedatom()
 {
 	global $context, $scripturl, $txt;
 
+	$self_url = $scripturl . '?action=.xml;sa=' . $context['feed_subaction'] . ';type=atom' . (empty($context['url_parts']) ? '' : ';' . $context['url_parts']);
+
 	echo '<?xml version="1.0" encoding="UTF-8"?>
 	<feed xmlns="http://www.w3.org/2005/Atom">
 		<title>', $context['feed_title'], '</title>
 		<link rel="alternate" type="text/html" href="', $scripturl, '" />
-		<link rel="self" type="application/rss+xml" href="', $scripturl, '?type=atom;action=.xml', $context['url_parts'], '" />
-		<id>', $scripturl, '</id>
-		<icon>', $context['favicon'] . '</icon>
-		<logo>', $context['header_logo_url_html_safe'], '</logo>
+		<link rel="self" type="application/atom+xml" href="', $self_url, '" />
+		<id>', $self_url, '</id>';
 
+	if (!empty($context['favicon']))
+	{
+		echo '
+		<icon>', $context['favicon'], '</icon>';
+	}
+
+	if (!empty($context['header_logo_url_html_safe']))
+	{
+		echo '
+		<logo>', $context['header_logo_url_html_safe'], '</logo>';
+	}
+
+	echo '
 		<updated>', Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
+		<rights type="text">', $context['feed_copyright'], '</rights>
 		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
 		<generator uri="https://www.elkarte.net" version="', strtr(FORUM_VERSION, ['ElkArte' => '']), '">ElkArte</generator>
 		<author>
@@ -613,20 +587,24 @@ function template_feedatom()
 }
 
 /**
- * Main RSS feed template (0.92 and 2.0)
+ * Main RSS 2.0 feed template
  */
 function template_feedrss()
 {
 	global $context, $scripturl, $txt;
 
+	$self_url = $scripturl . '?action=.xml;sa=' . $context['feed_subaction'] . ';type=rss2' . (empty($context['url_parts']) ? '' : ';' . $context['url_parts']);
+
 	echo '<?xml version="1.0" encoding="UTF-8"?>
-	<rss version=', $context['xml_format'] === 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
+	<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
 		<channel>
 			<title>', $context['feed_title'], '</title>
 			<link>', $scripturl, '</link>
 			<description><![CDATA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']]></description>
+			<copyright>', $context['feed_copyright'], '</copyright>
 			<generator>ElkArte</generator>
 			<ttl>30</ttl>
+			<atom:link rel="self" type="application/rss+xml" href="', $self_url, '" />
 			<image>
 				<url>', $context['header_logo_url_html_safe'], '</url>
 				<title>', $context['feed_title'], '</title>

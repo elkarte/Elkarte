@@ -116,7 +116,7 @@ $db_prefix = 'elkarte_';
 $db_persist = 0;
 
 /**
- *
+ * Email the admin when a database error occurs. (0 for no, 1 for yes)
  * @global int|bool $db_error_send
  */
 $db_error_send = 0;
@@ -124,8 +124,7 @@ $db_error_send = 0;
 ########## Cache Info ##########
 /**
  * Select a cache system. You want to leave this up to the cache area of the admin panel for
- * proper detection of apc, eaccelerator, memcache, mmcache, output_cache or filesystem-based
- * (you can add more with a mod).
+ * proper detection of apc, memcached, redis or filesystem-based
  * @global string $cache_accelerator
  */
 $cache_accelerator = '';
@@ -137,7 +136,7 @@ $cache_accelerator = '';
 $cache_enable = 0;
 
 /**
- * This is only used for memcache / memcached / redis. Should be a string of 'server:port,server:port'
+ * This is only used for memcached / redis. Should be a string of 'server:port,server:port'
  * @global string $cache_servers
  */
 $cache_servers = '';
@@ -201,7 +200,7 @@ $url_format = 'standard';
 $db_show_debug = false;
 
 /**
- * The install time of the forum.
+ * The installation time of the forum.
  * @global string $install_time
  */
 $install_time = '0';

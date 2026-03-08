@@ -207,14 +207,14 @@ class MarkdownParser
 		// code block
 		if (str_contains($data, '```'))
 		{
-			$data = preg_replace_callback('~(?<=\s|^|<br />)```\s*(?:\n|<br />)([\s\S]+?(?=(<br />|\n)```))(?:<br />|\n)```~u',
+			$data = preg_replace_callback('~(?:^|(?<=<br />))```[a-z]*[^\S\r\n]*(?:<br />)([\s\S]+?)<br />```~u',
 				static fn($match) => '[code]' . strtr($match[1], ['[' => '&#91;', ']' => '&#93;']) . '[/code]', $data);
 		}
 
 		// icode line
 		if (str_contains($data, '`'))
 		{
-			return preg_replace_callback('~(?<=\W|^)`([^`]+)`(?=\W|$)~u', static function ($match) {
+			return preg_replace_callback('~(?<![`\w])`([^`<]+)`(?![`\w])~u', static function ($match) {
 				if (str_contains($match[1], '<br />'))
 				{
 					return $match[0];

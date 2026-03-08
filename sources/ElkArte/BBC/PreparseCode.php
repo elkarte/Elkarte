@@ -318,6 +318,65 @@ class PreparseCode
 			$message = implode('', $parts);
 		}
 
+		// When not processing HTML and Markdown is enabled, also protect MD backtick code blocks
+		if (!$html && !empty($GLOBALS['modSettings']['enablePostMarkdown']))
+		{
+			$message = $this->_tokenizeMarkdownCodeBlocks($message, $tokenizer);
+		}
+
+		return $message;
+	}
+
+	/**
+	 * Protects Markdown backtick code spans and fenced code blocks from preparse processing.
+	 *
+	 * Handles:
+	 *   - ```lang\ncode\n``` fenced blocks
+	 *   - `inline code` spans
+	 *
+	 * Note: runs before \n is converted to <br />, so patterns match raw newlines.
+	 * Must run after BBC [code]/[icode] tokenization so those blocks are already protected.
+	 * See tokenizeCodeBlocks() and MarkdownParser::inlineCodeTags() for more details.
+	 *
+	 * @param string $message
+	 * @param TokenHash $tokenizer
+	 * @return string
+	 */
+	private function _tokenizeMarkdownCodeBlocks($message, $tokenizer): string
+	{
+		// Fenced code blocks: ```lang\ncode\n```
+		if (str_contains($message, '```'))
+		{
+			$message = preg_replace_callback(
+				'~(?:^|(?<=\n))```[a-z]*[^\S\r\n]*\n([\s\S]+?)\n```~u',
+				function ($match) use ($tokenizer)
+				{
+					$key = $tokenizer->generate_hash(8);
+					$this->code_blocks['%%' . $key . '%%'] = $match[0];
+
+					return '%%' . $key . '%%';
+				},
+				$message
+			);
+		}
+
+		// Inline code spans: `code`
+		if (str_contains($message, '`'))
+		{
+			$message = preg_replace_callback(
+				'~(?<![`\w])`([^`\n]+)`(?![`\w])~u',
+				function ($match) use ($tokenizer)
+				{
+
+					$key = $tokenizer->generate_hash(8);
+					$this->code_blocks['%%' . $key . '%%'] = $match[0];
+
+					return '%%' . $key . '%%';
+				},
+				$message
+			);
+		}
+
 		return $message;
 	}
 
@@ -594,7 +653,7 @@ class PreparseCode
 		$me_regex = '~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i';
 		$footnote_regex = '~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i';
 
-		if (preg_match('~[\[\]\\"]~', $this->user_name) !== false)
+		if (preg_match('~[\[\]"]~', $this->user_name) !== false)
 		{
 			$this->message = preg_replace($me_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]', $this->message);
 			$this->message = preg_replace($footnote_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]$3', $this->message);

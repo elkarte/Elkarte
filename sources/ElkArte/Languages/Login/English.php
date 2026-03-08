@@ -39,6 +39,9 @@ $txt['confirm_request_accept_privacy_policy'] = 'Are you sure you want to force 
 
 $txt['login_hash_error'] = 'Password security has recently been upgraded.<br />Please enter your password again.';
 
+$txt['logout_confirm'] = 'Are you sure you want to logout?';
+$txt['logout_notice'] = 'You are about to be logged out of your account';
+
 $txt['ban_register_prohibited'] = 'Sorry, you are not allowed to register on this forum.';
 $txt['under_age_registration_prohibited'] = 'Sorry, but users under the age of %1$d are not allowed to register on this forum.';
 

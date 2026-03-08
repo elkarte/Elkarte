@@ -1058,7 +1058,6 @@ class Install_Controller
 
 		definePaths();
 
-		// These files may be or may not be included, better safe than sorry for now
 		require_once(SOURCEDIR . '/Subs.php');
 
 		$db = load_database();
@@ -1077,7 +1076,7 @@ class Install_Controller
 		$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']), ENT_COMPAT, 'UTF-8');
 		$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
-		// Only allow create an admin account if they don't have one already.
+		// Only allow creation of an admin account if they don't have one already.
 		$db->skip_next_error();
 		$request = $db->query('', '
 			SELECT 
@@ -1121,13 +1120,6 @@ class Install_Controller
 			if (strlen($_POST['password1']) < 4)
 			{
 				$incontext['error'] = $txt['error_user_settings_no_password'];
-
-				return false;
-			}
-
-			if (!file_exists(SOURCEDIR . '/Subs.php'))
-			{
-				$incontext['error'] = $txt['error_subs_missing'];
 
 				return false;
 			}
@@ -1205,24 +1197,54 @@ class Install_Controller
 			$request = $db->insert('',
 				$db_prefix . 'members',
 				[
-					'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
-					'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int',
-					'password_salt' => 'string', 'lngfile' => 'string', 'avatar' => 'string',
-					'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
-					'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string',
-					'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
-					'additional_groups' => 'string', 'ignore_boards' => 'string',
+					'member_name' => 'string-25',
+					'real_name' => 'string-25',
+					'passwd' => 'string',
+					'email_address' => 'string',
+					'id_group' => 'int',
+					'posts' => 'int',
+					'date_registered' => 'int',
+					'password_salt' => 'string',
+					'lngfile' => 'string',
+					'avatar' => 'string',
+					'member_ip' => 'string',
+					'member_ip2' => 'string',
+					'buddy_list' => 'string',
+					'pm_ignore_list' => 'string',
+					'message_labels' => 'string',
+					'website_title' => 'string',
+					'website_url' => 'string',
+					'signature' => 'string',
+					'usertitle' => 'string',
+					'secret_question' => 'string',
+					'additional_groups' => 'string',
+					'ignore_boards' => 'string',
 				],
 				[
-					stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
-					1, 0, time(),
-					$incontext['member_salt'], '', '',
-					$ip, $ip, '', '',
-					'', '', '',
-					'', '', '',
-					'', '',
+					stripslashes($_POST['username']),
+					stripslashes($_POST['username']),
+					$incontext['passwd'],
+					stripslashes($_POST['email']),
+					1,
+					0,
+					time(),
+					$incontext['member_salt'],
+					'',
+					'',
+					$ip,
+					$ip,
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
 				],
-				['id_member']
+				['id_member'],
 			);
 
 			// Awww, crud!
@@ -1379,6 +1401,7 @@ class Install_Controller
 				],
 				['session_id']
 			);
+			$_SESSION['first_login'] = true;
 		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -1417,6 +1440,7 @@ class Install_Controller
 			User::load(true);
 			User::$info->ip = $_SERVER['REMOTE_ADDR'];
 			User::$info->id = $incontext['member_id'] ?? 0;
+			User::$info->last_login = time();
 
 			logAction('install', ['version' => $forum_version], 'admin');
 		}

@@ -34,6 +34,9 @@ class Connection implements ConnectionInterface
 		$db_name = empty($db_options['select_db']) ? '' : $db_name;
 		$db_server = (empty($db_options['persist']) ? '' : 'p:') . $db_server;
 
+		// Set reporting mode before any connection attempt
+		mysqli_report(MYSQLI_REPORT_OFF);
+
 		try
 		{
 			$connection = mysqli_init();
@@ -49,9 +52,6 @@ class Connection implements ConnectionInterface
 
 			// Few databases still have not set UTF-8 as their default input charset
 			$query->query('', 'SET NAMES UTF8');
-
-			// PHP 8.1 default is to throw exceptions, this reverts it to the <=php8 semantics
-			mysqli_report(MYSQLI_REPORT_ERROR & ~MYSQLI_REPORT_STRICT);
 		}
 		catch (\mysqli_sql_exception $e)
 		{
