@@ -790,6 +790,7 @@ h2.hdicon {
 .bbc_quote {
 	margin: .6rem 0 1.6rem 0;
 	border-top: 1px solid;
+	border-left: 4px solid;
 }
 
 /* Expanding quotes */
@@ -813,11 +814,13 @@ input[type=checkbox].quote-show-more {
 	bottom: 0;
 	width: 100%;
 	height: 12rem;
-	margin: 0 1px 1px 1px;
+	margin: 0 1px 1px 0;
 	padding-top: 9rem;
 	cursor: pointer;
 	text-align: center;
 	appearance: none;
+	border-left: .4rem solid;
+	border-radius: 0;
 }
 
 /* The read moar, with the 100% width clicking anywhere in the quote base will work

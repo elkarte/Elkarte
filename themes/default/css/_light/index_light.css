@@ -194,6 +194,7 @@
 	--news_background: #FAFAFA; /* Background of news section */
 	--action_available: #21873C; /* new button, approval links */
 	--mid_grey_background: #E4E4E4; /* Various uses where a slightly darker background is needed */
+	--quote_background: #FAFAFA; /* Quote box background; also used by the fade overlay */
 	--dark_background: #989898; /* A bit darker, useful in some places */
 
 	/* Text colors */
@@ -499,7 +500,7 @@ strong {
 .codeheader, .bbc_quote > cite {
 	color: var(--body_text);
 	border-color: var(--primary_border);
-	background: var(--primary_content_background);
+	background: var(--quote_background);
 }
 
 .codeheader {
@@ -507,23 +508,25 @@ strong {
 }
 
 /* A quote, perhaps from another post. */
-.bbc_quote,
+.bbc_quote {
+	border-color: var(--primary_border);
+	background: var(--quote_background, var(--news_background));
+	box-shadow: var(--shadow-elevation-low);
+}
+
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
 }
 
-/* Special box-shadow */
+/* Special box-shadow - gradient end-stop must match the quote background */
 input[type=checkbox].quote-show-more {
-	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_content_background) 90%);
-	box-shadow: 0 1px 0 1px var(--box_shadow);
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--quote_background, var(--news_background)) 90%);
+	box-shadow: 1px 1px 0 0 var(--box_shadow);
+	border-left-color: var(--primary_border);
 }
 
-/* Extra quote styling */
-.bbc_quote {
-	box-shadow: var(--shadow-elevation-low);
-}
 
 /* Extra code block styling. */
 .bbc_code, .bbc_code_inline {
