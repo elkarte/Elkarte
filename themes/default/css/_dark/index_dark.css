@@ -505,6 +505,7 @@ strong {
 
 input[type=checkbox].quote-show-more {
 	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_content_background) 100%);
+	border-left-color: var(--primary_border);
 }
 
 /* Extra quote styling */
