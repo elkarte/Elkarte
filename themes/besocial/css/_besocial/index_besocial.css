@@ -814,7 +814,6 @@ a.active {
 
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2::after {
-	top: .5rem;
 	color: var(--footer_text);
 }
 

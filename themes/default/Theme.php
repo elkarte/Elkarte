@@ -26,6 +26,10 @@ use ElkArte\Themes\Theme as BaseTheme;
  * - Themes can override specific trait methods to customize behavior while keeping the rest of the functionality intact.
  * - Example of a custom theme extending the base theme:
  *
+ * namespace ElkArte\Themes\Mytheme; // Directory must be the same as the theme name, .../themes/mytheme
+ *
+ * use ElkArte\Themes\Theme as BaseTheme;
+ *
  * class CustomTheme extends Theme
  * {
  *      public function getSettings()
@@ -43,7 +47,6 @@ use ElkArte\Themes\Theme as BaseTheme;
  *      }
  * }
  *
- * @package Themes\DefaultTheme
  */
 class Theme extends BaseTheme
 {

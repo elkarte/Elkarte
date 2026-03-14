@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The besocial theme
+ * The beSocial theme
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,29 +18,7 @@ use ElkArte\Themes\Theme as BaseTheme;
 /**
  * Class Theme
  *
- * - Extends the abstract theme class
- * - Override any base methods here if this theme requires custom behavior
- * - Themes can override specific trait methods to customize behavior while keeping the rest of the functionality intact.
- * - Example of a custom theme extending the base theme:
- *
- * class CustomTheme extends Theme
- * {
- *      public function getSettings()
- *      {
- *          // Custom theme settings
- *      }
- *
- *      // Can override any trait methods as needed
- *      public function setupThemeContext($forceload = false): void
- *      {
- *          // Custom context setup
- *          parent::setupThemeContext($forceload);
- *
- *          // Additional custom logic
- *      }
- * }
- *
- * @package Themes\BesocialTheme
+ * - Extends the abstract core theme class
  */
 class Theme extends BaseTheme
 {
@@ -74,7 +52,7 @@ class Theme extends BaseTheme
 
 			/*
 			 * Whether this theme requires the optional theme strings
-			 * file to be loaded. (ThemeStrings.[language].php)
+			 * file to be loaded. (ThemeStrings/[language].php)
 			 */
 			'require_theme_strings' => false,
 
