@@ -28,6 +28,7 @@ $txt['try_again'] = 'Click here to try again.';
 
 $txt['install_welcome'] = 'Welcome';
 $txt['install_welcome_desc'] = 'Welcome to ElkArte. This script will guide you through the process of installing <strong>%1$s</strong>. We\'ll gather a few details about your forum over the next few steps, and after a couple of minutes your forum will be ready for use.';
+$txt['install_readme'] = 'Before proceeding, you may want to review the <a href="%1$s" target="_blank" class="new_win">readme file</a> for helpful information about requirements, upgrading, and getting started.';
 $txt['install_all_lovely'] = 'We\'ve completed some initial tests on your server and everything appears to be in order. Simply click the &quot;Continue&quot; button below to get started.';
 
 $txt['user_refresh_install'] = 'Forum Refreshed';
