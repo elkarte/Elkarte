@@ -477,6 +477,7 @@ function template_welcome_message()
 			});
 		</script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
+		<p>', sprintf($txt['install_readme'], '../docs/readme.html#upgrading'), '</p>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform">
 			<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
 			<div id="version_warning" class="errorbox hide">', CURRENT_VERSION, '</div>

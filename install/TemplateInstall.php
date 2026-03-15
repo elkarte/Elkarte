@@ -167,6 +167,7 @@ function template_welcome_message()
 	</script>
 	<form id="welcome" action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
+		<p>', sprintf($txt['install_readme'], '../docs/readme.html'), '</p>
 		<div id="version_warning" class="warningbox hide">', CURRENT_VERSION, '</div>
 		<div id="latestVersion" class="hide">???</div>';
 
