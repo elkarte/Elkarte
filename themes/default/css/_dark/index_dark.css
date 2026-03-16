@@ -1931,6 +1931,42 @@ ul.cf_icons {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23A80000' viewBox='0 0 31 36'%3E%3Cpath d='M15.429 2.571c8.518 0 15.429 6.911 15.429 15.429s-6.911 15.429-15.429 15.429S0 26.518 0 18 6.911 2.571 15.429 2.571zM18 27.623v-3.817c0-.362-.281-.663-.623-.663H13.52a.668.668 0 00-.663.663v3.817c0 .362.301.663.663.663h3.857c.342 0 .623-.301.623-.663zm-.04-6.911l.362-12.475a.403.403 0 00-.201-.362.776.776 0 00-.482-.161h-4.42a.768.768 0 00-.482.161.402.402 0 00-.201.362l.342 12.475c0 .281.301.502.683.502h3.717c.362 0 .663-.221.683-.502z'/%3E%3C/svg%3E");
 }
 
+.bbc_callout_note {
+	border-left-color: var(--infobox_border);
+	background-color: var(--transparent);
+}
+
+.bbc_callout_note .bbc_callout_title {
+	color: var(--strong_text);
+}
+
+.bbc_callout_tip {
+	border-left-color: var(--successbox_border);
+	background-color: var(--transparent);
+}
+
+.bbc_callout_tip .bbc_callout_title {
+	color: var(--strong_text);
+}
+
+.bbc_callout_important, .bbc_callout_warning {
+	border-left-color: var(--warningbox_border);
+	background-color: var(--transparent);
+}
+
+.bbc_callout_important .bbc_callout_title, .bbc_callout_warning .bbc_callout_title {
+	color: var(--strong_text);
+}
+
+.bbc_callout_caution {
+	border-left-color: var(--errorbox_border);
+	background-color: var(--transparent);
+}
+
+.bbc_callout_caution .bbc_callout_title {
+	color: var(--strong_text);
+}
+
 /* -------------------------------------------------------
  *	$PROGRESS
  * -------------------------------------------------------

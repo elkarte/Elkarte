@@ -863,6 +863,20 @@ input[type=checkbox].quote-show-more:checked + .bbc_quote {
 	line-height: 1.4;
 }
 
+/* BBC callout / alert blocks — [quote box=note|tip|important|warning|caution] */
+.bbc_callout {
+	margin: .6rem 0 1.6rem 0;
+	padding: .6rem 1rem .6rem 1rem;
+	border-left: 4px solid;
+}
+
+.bbc_callout_title {
+	font-weight: bold;
+	text-transform: capitalize;
+	margin: 0 0 .4rem 0;
+	padding: 0;
+}
+
 /* the "inherit" declarations allow bbc tag color nesting to work, due to strong,
    anchors and others having a color defined */
 .bbc_color a {
