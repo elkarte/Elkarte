@@ -533,6 +533,12 @@ $txt['quick_edit'] = 'Quick Edit';
 $txt['post_options'] = 'More Options';
 $txt['quote_expand'] = 'Show Quote';
 
+$txt['callout_note'] = 'Note';
+$txt['callout_tip'] = 'Tip';
+$txt['callout_important'] = 'Important';
+$txt['callout_warning'] = 'Warning';
+$txt['callout_caution'] = 'Caution';
+
 $txt['set_sticky'] = 'Pin';
 $txt['set_nonsticky'] = 'Unpin';
 $txt['set_lock'] = 'Lock';
