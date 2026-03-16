@@ -670,6 +670,26 @@ class Codes
 				self::ATTR_LENGTH => 5,
 			],
 			[
+				self::ATTR_TAG => 'quote',
+				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
+				self::ATTR_PARAM => [
+					'box' => [
+						self::PARAM_ATTR_MATCH => '(note|tip|important|warning|caution)',
+						self::PARAM_ATTR_VALIDATE => static function ($data) {
+							global $txt;
+
+							$label = \ElkArte\Helper\Util::htmlspecialchars($txt['callout_' . $data] ?? ucfirst($data), ENT_QUOTES);
+							return '<div class="bbc_callout bbc_callout_' . $data . '" role="note"><p class="bbc_callout_title">' . $label . '</p>';
+						},
+					],
+				],
+				self::ATTR_BEFORE => '{box}',
+				self::ATTR_AFTER => '</div>',
+				self::ATTR_BLOCK_LEVEL => true,
+				self::ATTR_AUTOLINK => true,
+				self::ATTR_LENGTH => 5,
+			],
+			[
 				self::ATTR_TAG => 'right',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div style="text-align: right;">',
