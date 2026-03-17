@@ -64,44 +64,13 @@ class Stats extends AbstractController
 			throw new Exception('feature_disabled', true);
 		}
 
-		// Expanding out the history summary
-		[$year, $month] = $this->_expandedStats();
-
 		// Just a lil' help from our friend :P
 		require_once(SUBSDIR . '/Stats.subs.php');
-
-		// Handle the Ajax request.
-		if ($this->getApi() === 'xml')
-		{
-			if (empty($year) || empty($month))
-			{
-				redirectexit('action=stats');
-			}
-
-			// Collapsing stats only needs adjustments of the session variables.
-			if (!empty($this->_req->query->collapse))
-			{
-				obExit(false);
-			}
-
-			$template_layers = theme()->getLayers();
-			$template_layers->removeAll();
-			$context['sub_template'] = 'stats';
-
-			getDailyStats('YEAR(date) = {int:year} AND MONTH(date) = {int:month}', ['year' => $year, 'month' => $month]);
-
-			$context['yearly'][$year]['months'][$month]['date'] = [
-				'month' => sprintf('%02d', $month),
-				'year' => $year,
-			];
-
-			return true;
-		}
 
 		// Stats it is
 		Txt::load('Stats');
 		theme()->getTemplates()->load('Stats');
-		loadJavascriptFile(['stats.js', 'ext/chart.min.js', 'elk_chart.js']);
+		loadJavascriptFile(['ext/chart.min.js', 'elk_chart.js']);
 
 		// Build the link tree......
 		$context['breadcrumbs'][] = [
@@ -128,46 +97,6 @@ class Stats extends AbstractController
 		call_integration_hook('integrate_forum_stats');
 
 		return true;
-	}
-
-	/**
-	 * Sanitize and validate the year / month for the expand / collapse stats
-	 *
-	 * @return array of year and month from expand / collapse link
-	 */
-	private function _expandedStats(): array
-	{
-		global $context;
-
-		$year = '';
-		$month = '';
-		$expand = $this->_req->getQuery('expand', 'trim');
-		$collapse = $this->_req->getQuery('collapse', 'trim');
-		$calData = $expand ?? $collapse;
-
-		// No data, nothing to do
-		if (!isset($calData))
-		{
-			return [$year, $month];
-		}
-
-		// Extract the values
-		$month = (int) substr($calData, 4);
-		$year = (int) substr($calData, 0, 4);
-		$context['robot_no_index'] = true;
-
-		if (!empty($expand) && $year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
-		{
-			$_SESSION['expanded_stats'][$year][] = $month;
-		}
-
-		// Done looking at the details and want to fold it back up
-		if (!empty($collapse) && !empty($_SESSION['expanded_stats'][$year]))
-		{
-			$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], [$month]);
-		}
-
-		return [$year, $month];
 	}
 
 	/**
@@ -282,39 +211,7 @@ class Stats extends AbstractController
 			$context['yearly'][$year]['new_members'] = comma_format($data['new_members']);
 			$context['yearly'][$year]['most_members_online'] = comma_format($data['most_members_online']);
 			$context['yearly'][$year]['hits'] = comma_format($data['hits']);
-
-			// Keep a list of collapsed years.
-			if (!$data['expanded'] && !$data['current_year'])
-			{
-				$context['collapsed_years'][] = $year;
-			}
 		}
-
-		// Want to expand out the yearly stats
-		if (empty($_SESSION['expanded_stats']))
-		{
-			return false;
-		}
-
-		$condition_text = [];
-		$condition_params = [];
-		foreach ($_SESSION['expanded_stats'] as $year => $months)
-		{
-			if (!empty($months))
-			{
-				$condition_text[] = 'YEAR(date) = {int:year_' . $year . '} AND MONTH(date) IN ({array_int:months_' . $year . '})';
-				$condition_params['year_' . $year] = $year;
-				$condition_params['months_' . $year] = $months;
-			}
-		}
-
-		// No daily stats to even look at?
-		if (empty($condition_text))
-		{
-			return false;
-		}
-
-		getDailyStats(implode(' OR ', $condition_text), $condition_params);
 
 		return true;
 	}
