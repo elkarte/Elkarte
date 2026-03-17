@@ -1104,30 +1104,6 @@ function toggleBaseDir ()
 }
 
 /**
- * Called from purgeinactive users maintenance task, used to show or hide
- * the membergroup list.  If collapsed will select all the member groups if expanded
- * unselect them so the user can choose.
- */
-function swapMembers ()
-{
-	let membersForm = document.getElementById('membersForm');
-	membersSwap = !membersSwap;
-	document.getElementById('membersIcon').src = elk_images_url + (membersSwap ? '/selected_open.png' : '/selected.png');
-	document.getElementById('membersText').innerHTML = membersSwap ? maintain_members_choose : maintain_members_all;
-
-	// Check or uncheck them all based on if we are expanding or collasping the area
-	for (let i = 0; i < membersForm.length; i++)
-	{
-		if (membersForm.elements[i].type.toLowerCase() === 'checkbox')
-		{
-			membersForm.elements[i].checked = !membersSwap;
-		}
-	}
-
-	return false;
-}
-
-/**
  * Called from reattribute member posts to build the confirmation message for the action
  * Keeps the action button (reattribute) disabled until all necessary fields have been filled
  */
