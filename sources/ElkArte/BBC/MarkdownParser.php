@@ -49,7 +49,48 @@ class MarkdownParser
 	}
 
 	/**
+	 * Convert GitHub-style callout/alert blocks to [quote box=TYPE] BBC tags.
+	 *
+	 * > [!NOTE]
+	 * > content
+	 * > lines
+	 *
+	 * This MUST be called on the full message before the BBC parse_loop runs.
+	 *
+	 * @param string $data Message with <br /> as line separators
+	 *
+	 * @return string
+	 */
+	public function calloutTags(string $data): string
+	{
+		if (!str_contains($data, '[!'))
+		{
+			return $data;
+		}
+
+		// Work with real newlines for line-based matching
+		$data = (string) str_replace('<br />', "\n", $data);
+
+		/** @var string|null $replaced */
+		$replaced = preg_replace_callback(
+			'~(^|\n)(?:&gt;|>) *\[!(note|tip|important|warning|caution)][^\n]*\n((?:(?:&gt;|>)[^\n]*\n?)*)~iu',
+			static function ($m) {
+				$type = strtolower($m[2]);
+				// Strip the leading "> " from each content line
+				$body = (string) preg_replace('~^(?:&gt;|>) ?~m', '', trim($m[3]));
+
+				return $m[1] . '[quote box=' . $type . ']' . $body . '[/quote]';
+			},
+			$data
+		);
+		$data = $replaced ?? $data;
+
+		return str_replace("\n", '<br />', $data);
+	}
+
+	/**
 	 * Convert > Text to [quote]Text[/quote] tags
+	 * Callout blocks > [!TYPE] ... are handled by calloutTags() via BBCParser
 	 *
 	 * @param string $data
 	 *

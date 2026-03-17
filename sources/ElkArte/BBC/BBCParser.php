@@ -197,6 +197,9 @@ class BBCParser
 
 			// To protect bbc tags inside `icode` and ```code``` blocks, we need to process them up front
 			$this->message = $this->markdown_parser->inlineCodeTags($this->message);
+
+			// Convert callout blocks > [!NOTE] etc. on the full message before parse_loop runs.
+			$this->message = $this->markdown_parser->calloutTags($this->message);
 		}
 
 		// Allow addons access before entering the main parse loop
@@ -673,6 +676,12 @@ class BBCParser
 	 */
 	protected function alternateQuoteStyle(array &$tag): void
 	{
+		// Callout boxes ([quote box=...]) use a <div> structure; skip the blockquote wrapper logic entirely
+		if (str_contains($tag[Codes::ATTR_BEFORE], 'bbc_callout'))
+		{
+			return;
+		}
+
 		// Start with a standard
 		$quote_alt = false;
 		$first_quote = 0;
