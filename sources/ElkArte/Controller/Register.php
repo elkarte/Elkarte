@@ -61,13 +61,8 @@ class Register extends AbstractController
 	{
 		global $modSettings;
 
-		// Check if the administrator has it disabled.
-		if (empty($modSettings['registration_method']))
-		{
-			return;
-		}
-
-		if ((int) $modSettings['registration_method'] !== 3)
+		// Check if the administrator has it disabled and that the user has cookies enabled
+		if (!empty($_COOKIE) && (int) $modSettings['registration_method'] !== 3)
 		{
 			return;
 		}
