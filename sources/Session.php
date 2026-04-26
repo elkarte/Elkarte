@@ -33,9 +33,7 @@ function loadSession()
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
-	@ini_set('session.use_only_cookies', false);
 	@ini_set('url_rewriter.tags', '');
-	@ini_set('session.use_trans_sid', false);
 	@ini_set('arg_separator.output', '&amp;');
 	// @todo admin panel setting?
 	@ini_set('session.cookie_samesite', 'Lax');
@@ -56,7 +54,6 @@ function loadSession()
 		}
 	}
 
-	// @todo Set the session cookie path?
 	// If it's already been started... probably best to skip this.
 	if ((ini_get('session.auto_start') === '1' && !empty($modSettings['databaseSession_enable'])) || session_id() === '')
 	{
@@ -96,7 +93,7 @@ function loadSession()
 			 * Avoid unexpected side effects from the way PHP
 			 * internally destroys objects on shutdown.
 			 *
-			 * See notes on http://php.net/manual/en/function.session-set-save-handler.php
+			 * See notes on https://php.net/manual/en/function.session-set-save-handler.php
 			 */
 			register_shutdown_function('session_write_close');
 		}

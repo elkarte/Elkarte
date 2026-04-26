@@ -429,7 +429,7 @@ function template_subject_list()
 									', $message['is_replied_to'] ? '<i class="icon i-reply"><s>' . $txt['pm_replied'] . '</s></i>' : '<i class="icon i-comment-blank"></i>', '</td>
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
-									$context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : '',
+									$context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<i class="icon i-eye"></i>' : '',
 									$message['is_unread'] ? '<a href="' . $discussion_url . '#msg_' . $message['id'] . '" class="new_posts">' . $txt['new'] . '</a>' : '', '
 									<a href="', $discussion_url, '#msg_', $message['id'], '">
 										', $message['subject'], '

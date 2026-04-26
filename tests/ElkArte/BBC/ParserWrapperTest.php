@@ -323,6 +323,11 @@ Should be an empty line in between.',
 				'<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote"><cite>Quote from: [quoted author]</cite>This is a quote</blockquote></div>',
 			),
 			array(
+				'Quoting is a pain 14 - callout box note',
+				'[quote box=note]This is a note[/quote]',
+				'<div class="bbc_callout bbc_callout_note" role="note"><p class="bbc_callout_title">Note</p>This is a note</div>',
+			),
+			array(
 				'Right tag',
 				'[right]ElkArte[/right]',
 				'<div style="text-align: right;">ElkArte</div>',

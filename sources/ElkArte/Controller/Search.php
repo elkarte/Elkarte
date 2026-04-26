@@ -142,6 +142,12 @@ class Search extends AbstractController
 			throw new Exception('loadavg_search_disabled', false);
 		}
 
+		// You cannot search with cookies disabled when captcha is required for guest searches
+		if (empty($_COOKIE) && !empty($modSettings['search_enable_captcha']))
+		{
+			throw new Exception('generic_cookie_error', false);
+		}
+
 		Txt::load('Search');
 
 		// Don't load this in XML mode.

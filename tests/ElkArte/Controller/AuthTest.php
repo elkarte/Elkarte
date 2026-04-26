@@ -57,7 +57,7 @@ class AuthTest extends ElkArteCommonSetupTest
 		$controller->action_login2();
 
 		// We should fail
-		$this->assertEquals('That username does not exist.', $context['login_errors'][0]);
+		$this->assertEquals('You were unable to login.  Please check your cookie settings.', $context['login_errors'][0]);
 	}
 
 	/**

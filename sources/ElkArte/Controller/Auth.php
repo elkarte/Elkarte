@@ -62,6 +62,7 @@ class Auth extends AbstractController
 			'logout' => [$this, 'action_logout'],
 			'maintenance_mode' => [$this, 'action_maintenance_mode'],
 			'kickguest' => [$this, 'action_kickguest'],
+			'check' => [$this, 'action_check'],
 		];
 
 		// We like action, so let's get ready for some
@@ -163,8 +164,13 @@ class Auth extends AbstractController
 		}
 
 		// Are you guessing with a script?
-		checkSession();
-		validateToken('login');
+		if (!empty($_COOKIE))
+		{
+			// Without a cookie, these checks will fail
+			checkSession();
+			validateToken('login');
+		}
+
 		spamProtection('login');
 
 		// Set the login_url if it's not already set (but careful not to send us to an attachment).
@@ -185,9 +191,8 @@ class Auth extends AbstractController
 			$modSettings['cookieTime'] = 3153600;
 		}
 
-		Txt::load('Login');
-
 		// Load the template stuff
+		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
 		$context['sub_template'] = 'login';
 
@@ -203,6 +208,15 @@ class Auth extends AbstractController
 			'url' => getUrl('action', ['action' => 'auth', 'sa' => 'login']),
 			'name' => $txt['login'],
 		];
+
+		// Cookies are required for logging in, so if they are disabled, we can't let them log in.
+		if (empty($_COOKIE))
+		{
+			Txt::load('Errors');
+			$context['login_errors'] = [$txt['login_cookie_error']];
+
+			return false;
+		}
 
 		// You forgot to type your username, dummy!
 		if (!isset($_POST['user']) || $_POST['user'] === '')
@@ -689,7 +703,7 @@ class Auth extends AbstractController
 		if ($this->user->is_guest === false)
 		{
 			// Strike!  You're outta there!
-			if ($_GET['member'] != $this->user->id)
+			if ((int) $_GET['member'] !== $this->user->id)
 			{
 				throw new Exception('login_cookie_error', false);
 			}

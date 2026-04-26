@@ -653,7 +653,6 @@ function monthlyActivity()
 	while (($row = $result->fetch_assoc()))
 	{
 		$id_month = $row['stats_year'] . sprintf('%02d', $row['stats_month']);
-		$expanded = !empty($_SESSION['expanded_stats'][$row['stats_year']]) && in_array($row['stats_month'], $_SESSION['expanded_stats'][$row['stats_year']]);
 
 		if (!isset($context['yearly'][$row['stats_year']]))
 		{
@@ -671,15 +670,12 @@ function monthlyActivity()
 			];
 		}
 
-		$href = getUrl('action', ['action' => 'stats', ($expanded ? 'collapse' : 'expand') => $id_month]) . '#m' . $id_month;
 		$context['yearly'][$row['stats_year']]['months'][(int) $row['stats_month']] = [
 			'id' => $id_month,
 			'date' => [
 				'month' => sprintf('%02d', $row['stats_month']),
 				'year' => $row['stats_year']
 			],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $txt['months'][(int) $row['stats_month']] . ' ' . $row['stats_year'] . '</a>',
 			'month' => $txt['months'][(int) $row['stats_month']],
 			'year' => $row['stats_year'],
 			'new_topics' => comma_format($row['topics']),
@@ -689,7 +685,6 @@ function monthlyActivity()
 			'hits' => comma_format($row['hits']),
 			'num_days' => $row['num_days'],
 			'days' => [],
-			'expanded' => $expanded
 		];
 
 		$context['yearly'][$row['stats_year']]['new_topics'] += $row['topics'];
@@ -697,7 +692,6 @@ function monthlyActivity()
 		$context['yearly'][$row['stats_year']]['new_members'] += $row['registers'];
 		$context['yearly'][$row['stats_year']]['hits'] += $row['hits'];
 		$context['yearly'][$row['stats_year']]['num_months']++;
-		$context['yearly'][$row['stats_year']]['expanded'] |= $expanded;
 		$context['yearly'][$row['stats_year']]['most_members_online'] = max($context['yearly'][$row['stats_year']]['most_members_online'], $row['most_on']);
 	}
 

@@ -71,15 +71,12 @@ function JavaScriptEscape($string)
 }
 
 /**
- * Rewrite URLs to include the session ID.
+ * Rewrite URLs in the output buffer for debugging purposes.
  *
  * What it does:
  *
- * - Rewrites the URLs outputted to have the session ID, if the user
- *   is not accepting cookies and is using a standard web browser.
- * - Handles rewriting URLs for the queryless URLs option.
- * - Can be turned off entirely by setting $scripturl to an empty
- *   string, ''. (it would not work well like that anyway.)
+ * - Almost nothing, but it does rewrite URLs to add ?debug to them, so that you can
+ * easily use template debug mode.
  *
  * @param string $buffer The unmodified output buffer
  *
@@ -89,24 +86,12 @@ function ob_sessrewrite($buffer)
 {
 	global $scripturl;
 
-	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
-	if ($scripturl === '' || !defined('SID'))
+	// If $scripturl is set to nothing, or not debugging, just return.
+	if (!isset($_GET['debug']) || $scripturl === '')
 	{
 		return $buffer;
 	}
 
-	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().
-	if (empty($_COOKIE) && SID !== '' && empty(User::$info->possibly_robot))
-	{
-		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
-	}
-
 	// Debugging templates, are we?
-	elseif (isset($_GET['debug']))
-	{
-		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '\\??/', '"' . $scripturl . '?debug;', $buffer);
-	}
-
-	// Return the changed buffer.
-	return $buffer;
+	return preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '\\??/', '"' . $scripturl . '?debug;', $buffer);
 }

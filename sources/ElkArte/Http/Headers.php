@@ -72,13 +72,8 @@ class Headers
 			$setLocation = $scripturl . ($setLocation !== '' ? '?' . $setLocation : '');
 		}
 
-		// Put the session ID in.
-		if (empty($_COOKIE) && defined('SID') && !empty(SID))
-		{
-			$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', $scripturl . '?' . SID . ';', $setLocation);
-		}
 		// Keep that debug in there for template debugging!
-		elseif (isset($this->req->debug))
+		if (isset($this->req->debug))
 		{
 			$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
 		}

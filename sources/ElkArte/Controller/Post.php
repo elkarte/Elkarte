@@ -171,8 +171,7 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		Txt::load('Post');
-		Txt::load('Errors');
+		Txt::load(['Post', 'Errors']);
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
@@ -206,6 +205,12 @@ class Post extends AbstractController
 		if (empty($board) && !$context['make_event'])
 		{
 			throw new Exception('no_board', false);
+		}
+
+		// No one may post with cookies disabled
+		if (empty($_COOKIE))
+		{
+			throw new Exception('generic_cookie_error', false);
 		}
 
 		// All those wonderful modifiers and attachments
