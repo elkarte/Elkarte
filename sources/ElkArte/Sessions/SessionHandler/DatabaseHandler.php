@@ -46,12 +46,23 @@ class DatabaseHandler extends \SessionHandler
 	}
 
 	/**
+	 * Validates a session ID against the expected format.
+	 *
+	 * @param string $sessionId
+	 * @return bool
+	 */
+	protected function isValidSessionId(string $sessionId): bool
+	{
+		return preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) === 1;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function destroy($sessionId): bool
 	{
 		// Better safe than sorry
-		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) !== 1)
+		if (!$this->isValidSessionId($sessionId))
 		{
 			return false;
 		}
@@ -96,7 +107,7 @@ class DatabaseHandler extends \SessionHandler
 	 */
 	public function read($sessionId): string
 	{
-		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) !== 1)
+		if (!$this->isValidSessionId($sessionId))
 		{
 			return '';
 		}
@@ -122,7 +133,13 @@ class DatabaseHandler extends \SessionHandler
 	 */
 	public function write($sessionId, $data): bool
 	{
-		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) !== 1)
+		// Don't bother writing the session data if cookies are disabled
+		if (empty($_COOKIE))
+		{
+			return true;
+		}
+
+		if (!$this->isValidSessionId($sessionId))
 		{
 			return false;
 		}
