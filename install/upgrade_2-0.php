@@ -922,6 +922,7 @@ class UpgradeInstructions_upgrade_2_0
 						'pwa_large_icon' => '{BOARDDIR}/themes/default/images/logos/icon_pwa_large.png',
 						'apple_touch_icon' => '{BOARDDIR}/themes/default/images/logos/apple-touch-icon.png',
 						'url_format' => 'standard',
+						'emoji_selection' => 'no-emoji',
 					));
 				}
 			)

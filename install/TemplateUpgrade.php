@@ -75,7 +75,7 @@ function template_chmod()
 				{
 					new elk_Popup({
 						heading: "Warning",
-						content: "<div class=\'windowbg description\'><h4>The following files needs to be made writable to continue:</h4><p>', implode('<br />', $upcontext['chmod']['files']), '</p></div>",
+						content: "<div class=\'description\'><h4>The following files needs to be made writable to continue:</h4><p>', implode('<br />', $upcontext['chmod']['files']), '</p></div>",
 						icon: "i-warning"
 					});
 				}
@@ -100,48 +100,46 @@ function template_chmod()
 	}
 
 	echo '
-			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
+			<table class="chmod_table">
 				<tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox">
+					<td class="textbox grid25">
 						<label for="ftp_server">', $txt['ftp_server'], ':</label>
 					</td>
 					<td>
-						<div style="float: right; margin-right: 1px;">
+						<div style="float: ', empty($txt['lang_rtl']) ? 'right' : 'left', '; margin-', empty($txt['lang_rtl']) ? 'right' : 'left', ': 1px;">
 							<label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label>
-							<input type="text" size="3" name="ftp_port" id="ftp_port" value="', htmlspecialchars($upcontext['chmod']['port'] ?? '21', ENT_QUOTES, 'UTF-8'), '" class="input_text" aria-describedby="ftp_server_info" inputmode="numeric" pattern="[0-9]*" />
+ 							<input type="text" size="3" name="ftp_port" id="ftp_port" value="', $incontext['ftp']['port'], '" class="input_text" />
 						</div>
-						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', htmlspecialchars($upcontext['chmod']['server'] ?? 'localhost', ENT_QUOTES, 'UTF-8'), '" style="width: 70%;" class="input_text" aria-describedby="ftp_server_info" autocapitalize="none" spellcheck="false" />
-						<div class="notes" style="font-size: smaller; margin-bottom: 2ex;" id="ftp_server_info">', $txt['ftp_server_info'], '</div>
+						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $incontext['ftp']['server'], '" style="width: 70%;" class="input_text" />
+						<div class="notes">', $txt['ftp_server_info'], '</div>
 					</td>
-				</tr><tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox">
-						<label for="ftp_username">', $txt['ftp_username'], ':</label>
-					</td>
+				</tr>
+				<tr>
+					<td class="textbox grid25"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
 					<td>
-						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', htmlspecialchars($upcontext['chmod']['username'] ?? '', ENT_QUOTES, 'UTF-8'), '" style="width: 99%;" class="input_text" aria-describedby="ftp_username_info" autocomplete="username" autocapitalize="none" spellcheck="false" />
-						<div class="notes" style="font-size: smaller; margin-bottom: 2ex;" id="ftp_username_info">', $txt['ftp_username_info'], '</div>
+						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $incontext['ftp']['username'], '" style="width: 99%;" class="input_text" />
+						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
 					</td>
-				</tr><tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox">
-						<label for="ftp_password">', $txt['ftp_password'], ':</label>
-					</td>
+				</tr>
+				<tr>
+					<td class="textbox grid25"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
 					<td>
-						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" aria-describedby="ftp_password_info" autocomplete="current-password" />
-						<div class="notes" style="font-size: smaller; margin-bottom: 3ex;" id="ftp_password_info">', $txt['ftp_password_info'], '</div>
+						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
+						<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
 					</td>
-				</tr><tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox">
+				</tr>
+				<tr>
+					<td class="textbox grid25">
 						<label for="ftp_path">', $txt['ftp_path'], ':</label>
 					</td>
 					<td style="padding-bottom: 1ex;">
-						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', htmlspecialchars($upcontext['chmod']['path'] ?? '', ENT_QUOTES, 'UTF-8'), '" style="width: 99%;" class="input_text" aria-describedby="ftp_path_info" autocapitalize="none" spellcheck="false" />
-						<div class="notes" style="font-size: smaller; margin-bottom: 2ex;" id="ftp_path_info">', empty($upcontext['chmod']['path']) ? $txt['ftp_path_info'] : $txt['ftp_path_found_info'], '</div>
+						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $incontext['ftp']['path'], '" style="width: 99%;" class="input_text" />
+						<div style="font-size: smaller; margin-bottom: 2ex;">', $incontext['ftp']['path_msg'], '</div>
 					</td>
 				</tr>
 			</table>
-	
-			<div class="righttext" style="margin: 1ex;">
-				<input type="submit" value="', $txt['ftp_connect'], '" class="button_submit" />
+			<div style="margin: 1ex;text-align: ', empty($txt['lang_rtl']) ? 'right' : 'left', ';">
+				<input type="submit" value="', $txt['ftp_connect'], '" onclick="return submitThisOnce(this);" class="button_submit" />
 			</div>
 		</div>';
 
@@ -172,7 +170,8 @@ function template_upgrade_above()
 		<script>
 			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/ext/jquery-3.7.1.min.js"><\/script>\');
 		</script>
-		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script src="../themes/default/scripts/script.js"></script>
+		<script src="../themes/default/scripts/script_elk.js"></script>
 		<script>
 			let elk_scripturl = \'', $upgradeurl, '\',
 				elk_charset = \'UTF-8\',
@@ -681,10 +680,14 @@ function template_welcome_message()
  */
 function template_upgrade_options()
 {
-	global $upcontext, $modSettings, $db_prefix, $mmessage, $mtitle, $db_type;
+	global $upcontext, $modSettings, $db_prefix, $mmessage, $mtitle, $db_type, $db_name;
 
 	echo '
 			<h3>Before the upgrade gets underway please review the options below - and hit continue when you\'re ready to begin.</h3>
+			<br />
+			<div class="infobox" role="presentation">
+				You are about to make changes to the database named: <strong>' . $db_name . '</strong> as defined by your Settings.php file.
+			</div>
 			<form action="', $upcontext['form_url'], '" method="post" name="upform" id="upform">';
 
 	// Warning message?
