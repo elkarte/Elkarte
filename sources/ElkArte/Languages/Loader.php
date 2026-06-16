@@ -183,23 +183,20 @@ class Loader
 	{
 		global $txt;
 
-		if ($file === '')
+		if ($file === '' || $file === 'Addons')
 		{
 			return;
 		}
 
-		if ($file !== 'Addons')
-		{
-			// Could have failed to load the index language file!
-			$message = $txt['theme_language_error'] ?? 'Unable to load the \'%1$s\' language file.';
-			Errors::instance()->log_error(
-				sprintf(
-					$message,
-					$file . '.' . $this->language,
-					'template'
-				)
-			);
-		}
+		// Could have failed to load the index language file!
+		$message = $txt['theme_language_error'] ?? 'Unable to load the \'%1$s\' language file.';
+		Errors::instance()->log_error(
+			sprintf(
+				$message,
+				$file . '.' . $this->language,
+				'template'
+			)
+		);
 
 		if ($found_fallback === false)
 		{

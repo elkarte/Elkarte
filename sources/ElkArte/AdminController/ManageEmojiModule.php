@@ -90,7 +90,8 @@ abstract class ManageEmojiModule extends AbstractController
 		{
 			$destination = BOARDDIR . '/smileys/' . $req->post->emoji_selection;
 			$unzip = new UnZip(file_get_contents($source), $destination);
-			if ($unzip->read_zip_data())
+			$result = $unzip->read_zip_data();
+			if ($result !== false)
 			{
 				return true;
 			}
@@ -109,7 +110,7 @@ abstract class ManageEmojiModule extends AbstractController
 		global $modSettings;
 
 		// Saved but did not change ...
-		if ($modSettings['emoji_selection'] === $req->post->emoji_selection)
+		if (empty($modSettings['emoji_selection']) || $modSettings['emoji_selection'] === $req->post->emoji_selection)
 		{
 			return true;
 		}
@@ -146,7 +147,7 @@ abstract class ManageEmojiModule extends AbstractController
 		global $modSettings;
 
 		// Saved but did not change ...
-		if ($modSettings['emoji_selection'] === $req->post->emoji_selection)
+		if (!empty($modSettings['emoji_selection']) && $modSettings['emoji_selection'] === $req->post->emoji_selection)
 		{
 			return true;
 		}
