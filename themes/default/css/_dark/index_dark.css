@@ -54,6 +54,12 @@
  * ---------------
  */
 :root {
+	/* Let the browser render form controls and scrollbars to match the variant */
+	color-scheme: dark;
+
+	/* Native checkboxes, radios, progress etc pick up the link color */
+	accent-color: #9D8860; /* matches --links */
+
 	--html_background: #0B0B0B; /* HTML & footer Background */
 	--body_grad_1: #0B0B0B; /* Body Gradient */
 	--body_grad_2: #E0E0E0; /* Body Gradient */
@@ -1075,8 +1081,17 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--strong_text);
 }
 
+/* Row hover for easier scanning of the board index */
+.board_row:hover {
+	background: color-mix(in srgb, #FFFFFF 6%, var(--content_background));
+}
+
 .childboards {
 	border-top-color: var(--primary_border_top);
+}
+
+.childboards li:nth-child(n+2) {
+	border-color: var(--primary_border);
 }
 
 .childboard_row h4, .board_new_posts {
@@ -1417,6 +1432,11 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--contrast_text);
 	border-color: var(--menu_border_hover_top);
 	background: var(--action_available);
+}
+
+/* Background for the sticky top page navigation in topics */
+nav.pagesection:has(+ #forumposts) {
+	background: var(--content_background);
 }
 
 /* -------------------------------------------------------
@@ -2170,3 +2190,4 @@ ul.cf_icons {
 		border-top-color: var(--primary_border);
 	}
 }
+

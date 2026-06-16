@@ -125,7 +125,7 @@ function template_list_boards(array $boards, $id)
 		elseif ($board['is_redirect'])
 		{
 			echo '
-							<s>', $txt['redirect_board_to'], '</s>
+							<s>', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '</s>
 							<span class="i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 		}
 
@@ -144,7 +144,7 @@ function template_list_boards(array $boards, $id)
 						<h3 class="board_name">
 							<a href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
 
-		// Has it outstanding posts for approval? @todo - Might change presentation here.
+		// Does it have outstanding posts for approval?
 		if ($board['can_approve_posts'] && ($board['unapproved_posts'] || $board['unapproved_topics']))
 		{
 			echo '
@@ -196,7 +196,7 @@ function template_list_boards(array $boards, $id)
 		echo '
 					</div>
 					<div class="board_stats">
-							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
+						', $board['is_redirect'] ? comma_format($board['posts']) . ' ' . $txt['redirects'] : comma_format($board['topics']) . ' ' . $txt['board_topics'] . '<br /> ' . comma_format($board['posts']) . ' ' . $txt['posts'], '
 					</div>';
 
 		// Show the "Sub-boards: ". (there's a link_children, but we're going to bold the new ones...)

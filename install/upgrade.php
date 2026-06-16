@@ -85,41 +85,119 @@ if (str_starts_with($sourcedir, '.') && substr($sourcedir, 1, 1) !== '.')
 	$sourcedir = TMP_BOARDDIR . substr($sourcedir, 1);
 }
 
-// Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/bootstrap.php'))
+// Detect when the upgrade is running from a different directory than what Settings.php declares.
+// This happens when doing an upgrade from a copied/subdirectory install. If TMP_BOARDDIR differs
+// from $boarddir but a valid forum root (bootstrap.php) exists at TMP_BOARDDIR, rebase all paths.
+$normalise_path = static function (string $path): string {
+	return rtrim(str_replace('\\', '/', $path), '/');
+};
+
+$tmp_board_norm = $normalise_path(TMP_BOARDDIR);
+$settings_board_norm = $normalise_path($boarddir ?? '');
+
+$running_from_different_dir = ($tmp_board_norm !== $settings_board_norm) && file_exists(TMP_BOARDDIR . '/bootstrap.php');
+if ($running_from_different_dir)
 {
+	// Rebase all paths to the actual running directory, ignoring what Settings.php says.
 	$boarddir = TMP_BOARDDIR;
-}
+	$sourcedir = TMP_BOARDDIR . '/sources';
+	$cachedir = TMP_BOARDDIR . '/cache';
+	$extdir = TMP_BOARDDIR . '/sources/ext';
+	$languagedir = TMP_BOARDDIR . '/sources/ElkArte/Languages';
+	$upcontext['rebased_paths'] = true;
 
-if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
-{
-	$sourcedir = $boarddir . '/sources';
-}
+	// Compute the corrected boardurl by mapping the filesystem path change onto the URL path.
+	//
+	// Three cases:
+	//   Subdir:   /var/www/elk20  -> /var/www/elk20/test  => append /test
+	//   Sibling:  /var/www/forum1 -> /var/www/forum2      => replace /forum1 suffix with /forum2
+	//   Unrelated paths: leave boardurl unchanged (admin must fix manually)
+	$rebased_boardurl = rtrim($boardurl ?? '', '/');
 
-// This may be an SMF installation we are upgrading
-if (!file_exists($sourcedir . '/controllers'))
+	if (!empty($settings_board_norm))
+	{
+		// Find the longest common ancestor path between the two directories.
+		$old_parts = explode('/', ltrim($settings_board_norm, '/'));
+		$new_parts = explode('/', ltrim($tmp_board_norm, '/'));
+		$common_len = 0;
+		$min_len = min(count($old_parts), count($new_parts));
+		for ($i = 0; $i < $min_len; $i++)
+		{
+			if ($old_parts[$i] === $new_parts[$i])
+			{
+				$common_len++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		// Old suffix  = parts of old path after common ancestor  e.g. "forum1"
+		// New suffix  = parts of new path after common ancestor  e.g. "forum2" or "elk20/test"
+		$old_suffix = '/' . implode('/', array_slice($old_parts, $common_len));
+		$new_suffix = '/' . implode('/', array_slice($new_parts, $common_len));
+
+		// Replace the old URL path suffix with the new one (case-insensitive for Windows compat).
+		if ($old_suffix !== '/' && str_ends_with(strtolower($rebased_boardurl), strtolower($old_suffix)))
+		{
+			$rebased_boardurl = substr($rebased_boardurl, 0, strlen($rebased_boardurl) - strlen($old_suffix)) . $new_suffix;
+		}
+		elseif ($old_suffix === $new_suffix || $old_suffix === '/')
+		{
+			// Paths share the same suffix or old was root — nothing to change.
+		}
+		else
+		{
+			// Subdir case: new path starts with old path => just append the extra segments.
+			if (str_starts_with($tmp_board_norm, $settings_board_norm . '/'))
+			{
+				$rebased_boardurl .= substr($tmp_board_norm, strlen($settings_board_norm));
+			}
+			// Otherwise paths are too different to auto-correct; leave url as-is.
+		}
+	}
+
+	$upcontext['rebased_boardurl'] = $rebased_boardurl;
+}
+else
 {
-	$sourcedir = str_replace('/Sources', '/sources', $sourcedir);
-	if (!file_exists($sourcedir . '/controllers') && file_exists($boarddir . '/sources'))
+	// Make sure the paths are correct... at least try to fix them.
+	if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/bootstrap.php'))
+	{
+		$boarddir = TMP_BOARDDIR;
+	}
+
+	if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	{
 		$sourcedir = $boarddir . '/sources';
 	}
-}
 
-// Check that directories which didn't exist in past releases are initialized.
-if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
-{
-	$cachedir = $boarddir . '/cache';
-}
+	// This may be an SMF installation we are upgrading
+	if (!file_exists($sourcedir . '/controllers'))
+	{
+		$sourcedir = str_replace('/Sources', '/sources', $sourcedir);
+		if (!file_exists($sourcedir . '/controllers') && file_exists($boarddir . '/sources'))
+		{
+			$sourcedir = $boarddir . '/sources';
+		}
+	}
 
-if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
-{
-	$extdir = $sourcedir . '/ext';
-}
+	// Check that directories which didn't exist in past releases are initialized.
+	if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+	{
+		$cachedir = $boarddir . '/cache';
+	}
 
-if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/ElkArte/Languages'))
-{
-	$languagedir = $sourcedir . '/ElkArte/Languages';
+	if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	{
+		$extdir = $sourcedir . '/ext';
+	}
+
+	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/ElkArte/Languages'))
+	{
+		$languagedir = $sourcedir . '/ElkArte/Languages';
+	}
 }
 
 // Time to forget about variables and go with constants!
@@ -241,7 +319,7 @@ if (isset($_GET['data']))
 	$support_js = $upcontext['upgrade_status']['js'];
 
 	// Load the language.
-	if (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/'. $upcontext['language'] . '.php'))
+	if (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
 	{
 		require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
 	}
@@ -599,7 +677,7 @@ function action_welcomeLogin()
 		&& @file_exists(__DIR__ . '/upgrade_' . DB_SCRIPT_VERSION . '.php');
 
 	// This needs to exist!
-	if (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/'. $upcontext['language'] . '.php'))
+	if (file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
 	{
 		require_once(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
 	}
@@ -657,7 +735,7 @@ function action_welcomeLogin()
 	// What absolutely needs to be writable?
 	$writable_files = [
 		BOARDDIR . '/Settings.php',
-		BOARDDIR . '/Settings_bak.php',
+		BOARDDIR . '/db_last_error.txt',
 	];
 
 	// Check the cache directory.
@@ -673,7 +751,7 @@ function action_welcomeLogin()
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 	}
 
-	if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/'. $upcontext['language'] . '.php'))
+	if (!file_exists(BOARDDIR . '/sources/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
 	{
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	}
@@ -712,6 +790,7 @@ function action_welcomeLogin()
 	// We're going to check that their board dir setting is right in case they've been moving stuff around.
 	if (strtr(BOARDDIR, ['/' => '', '\\' => '']) !== strtr(TMP_BOARDDIR, ['/' => '', '\\' => '']))
 	{
+		// This should not normally happen as the path rebasing above handles it, but warn just in case.
 		$upcontext['warning'] = '
 			It looks as if your board directory settings <em>might</em> be incorrect. Your board directory is currently set to &quot;' . BOARDDIR . '&quot; but should probably be &quot;' . TMP_BOARDDIR . '&quot;. Settings.php currently lists your paths as:<br />
 			<ul>
@@ -720,6 +799,16 @@ function action_welcomeLogin()
 				<li>Cache Directory: ' . $CACHEDIR_temp . '</li>
 			</ul>
 			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the ElkArte website before continuing.';
+	}
+	elseif (!empty($upcontext['rebased_paths']))
+	{
+		// Paths were auto-corrected because the upgrade is running from a different directory than Settings.php declared.
+		$rebased_url_note = !empty($upcontext['rebased_boardurl'])
+			? ' The board URL will also be updated to &quot;' . $upcontext['rebased_boardurl'] . '&quot;.'
+			: '';
+		$upcontext['warning'] = '
+			The upgrader detected it is running from a different directory than your Settings.php declares and has automatically adjusted all paths to use the current location &quot;' . TMP_BOARDDIR . '&quot;.' . $rebased_url_note . '<br />
+			If you are performing a test upgrade from a copy of your forum this is expected. Otherwise verify your Settings.php paths are correct before proceeding.';
 	}
 
 	// Either we're logged in or we're going to present the login.
@@ -945,16 +1034,6 @@ function action_upgradeOptions()
 	// Get hold of our db
 	$db = load_database();
 
-	// No one opts in, so why collect incomplete stats
-	$db->skip_next_error();
-	$db->query('', '
-		DELETE FROM {db_prefix}settings
-		WHERE variable = {string:allow_sm_stats}',
-		[
-			'allow_sm_stats' => 'allow_sm_stats',
-		]
-	);
-
 	// Clean up all the hooks (we are upgrading, so better have everything cleaned up)
 	$db->skip_next_error();
 	$db->query('', '
@@ -1006,20 +1085,46 @@ function action_upgradeOptions()
 	// Back up the current one first.
 	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
-	// Fix some old paths.
-	if (str_starts_with(BOARDDIR, '.'))
+	// If paths were rebased because the upgrade is running from a different directory than Settings.php
+	// declared, write the corrected absolute paths back into Settings.php now.
+	if (!empty($upcontext['rebased_paths']))
 	{
-		$changes['boarddir'] = "'" . fixRelativePath(BOARDDIR) . "'";
-	}
+		$changes['boarddir'] = "'" . addslashes(BOARDDIR) . "'";
+		$changes['sourcedir'] = "'" . addslashes(SOURCEDIR) . "'";
+		$changes['cachedir'] = "'" . addslashes(CACHEDIR) . "'";
+		if (defined('EXTDIR'))
+		{
+			$changes['extdir'] = "'" . addslashes(EXTDIR) . "'";
+		}
 
-	if (str_starts_with(SOURCEDIR, '.'))
-	{
-		$changes['sourcedir'] = "'" . fixRelativePath(SOURCEDIR) . "'";
-	}
+		if (defined('LANGUAGEDIR'))
+		{
+			$changes['languagedir'] = "'" . addslashes(LANGUAGEDIR) . "'";
+		}
 
-	if (!defined('CACHEDIR') || str_starts_with(CACHEDIR, '.'))
+		// Update boardurl to reflect the subdirectory the upgrade is running from.
+		if (!empty($upcontext['rebased_boardurl']))
+		{
+			$changes['boardurl'] = "'" . addslashes($upcontext['rebased_boardurl']) . "'";
+		}
+	}
+	else
 	{
-		$changes['cachedir'] = "'" . fixRelativePath(BOARDDIR) . "/cache'";
+		// Fix some old relative paths.
+		if (str_starts_with(BOARDDIR, '.'))
+		{
+			$changes['boarddir'] = "'" . fixRelativePath(BOARDDIR) . "'";
+		}
+
+		if (str_starts_with(SOURCEDIR, '.'))
+		{
+			$changes['sourcedir'] = "'" . fixRelativePath(SOURCEDIR) . "'";
+		}
+
+		if (!defined('CACHEDIR') || str_starts_with(CACHEDIR, '.'))
+		{
+			$changes['cachedir'] = "'" . fixRelativePath(BOARDDIR) . "/cache'";
+		}
 	}
 
 	// Not had the database type added before?
@@ -1708,8 +1813,11 @@ function loadEssentialFunctions()
 	{
 		function text2words($text, $max_chars = 20)
 		{
+			// Step 0: prepare numbers so they are good for search & index 1000.45 -> 1000_45
+			$words = preg_replace('~([\d]+)[.-/]+(?=[\d])~u', '$1_', $text);
+
 			// Step 1: Remove entities/things we don't consider words:
-			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, ['<br />' => ' ']));
+			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($words, ['<br />' => ' ']));
 
 			// Step 2: Entities we left to letters, where applicable, lowercase.
 			$words = un_htmlspecialchars(Util::strtolower($words));

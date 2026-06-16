@@ -229,7 +229,6 @@ function template_topic_listing()
 			// The subject/poster section
 			echo '
 				<div class="topic_info">
-
 					<div class="topic_name" ', (empty($topic['quick_mod']['modify']) ? '' : 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . "', '" . $topic['first_post']['id'] . '\');"'), '>
 						<h4>';
 
@@ -248,7 +247,23 @@ function template_topic_listing()
 			}
 
 			echo '
-							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+							<span class="preview" title="', $topic['default_preview'], '">
+								<span id="msg_' . $topic['first_post']['id'] . '">';
+
+			if ($topic['new'] && $context['user']['is_logged'])
+			{
+				echo '
+									<a href="', $topic['new_href'], '">' . $topic['first_post']['subject'] . '</a>';
+			}
+			else
+			{
+				echo
+									$topic['first_post']['link'];
+			}
+
+			echo '
+								</span>			
+							</span>
 						</h4>
 					</div>
 					<div class="topic_starter">
@@ -279,26 +294,18 @@ function template_topic_listing()
 			}
 
 			echo '
+					<span class="topic_latest_info">
+						<span>', $topic['last_post']['html_time'], '</span>
+						<span>', $txt['by'], ' ', $topic['last_post']['member']['link'], '</span>
+					</span>
 					<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
-					', $topic['last_post']['html_time'], '<br />
-					', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 				</div>';
 
 			// The stats section
 			echo '
 				<div class="topic_stats">
-					', $topic['replies'], ' ', $txt['replies'], '<br />
-					', $topic['views'], ' ', $txt['views'];
-
-			// Show likes?
-			if (!empty($modSettings['likes_enabled']))
-			{
-				echo '
-					<br />
-						', $topic['likes'], ' ', $txt['likes'];
-			}
-
-			echo '
+					<span class="stat-item">', $topic['replies'], ' ', $txt['replies'], '</span>
+					<span class="stat-item">', $topic['views'], ' ', $txt['views'], '</span>
 				</div>';
 
 			// Show the quick moderation options?
@@ -576,7 +583,7 @@ function template_quicktopic_above()
 }
 
 /**
- * Adds needed JS to show the quick topic area
+ * Adds JS to show/hide the quick topic area
  */
 function quickTopicToggle()
 {
@@ -589,5 +596,29 @@ function quickTopicToggle()
 			{
 				quicktopicbox.slideDown();
 			}
-		};', true);
+		};
+
+		document.addEventListener("click", function(e) {
+			let form = document.getElementById("postmodify");
+			let quicktopicbox = document.getElementById("quicktopicbox");
+
+			if (!form || !quicktopicbox)
+			{
+				return;
+			}
+
+			let isVisible = quicktopicbox.style.display !== "none" && quicktopicbox.offsetHeight !== 0;
+
+			if (isVisible && !form.contains(e.target))
+			{
+				let subject = document.getElementById("quicktopic_subject");
+				let hasContent = (subject && subject.value.trim() !== "");
+				
+				/* If the subject is empty, hide the quick topic box */
+				if (!hasContent)
+				{
+					quicktopicbox.slideUp();
+				}
+			}
+		});', true);
 }

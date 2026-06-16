@@ -90,6 +90,16 @@
 	--quote_height: 19rem;
 	--max_width: 160rem;
 	--button_height: 1.8;
+
+	/* Font stacks.
+
+	   Set a font-body stack starting with system-ui which should use the existing OS font
+       Then -apple-system, BlinkMacSystemFont which are equivalent to system-ui, but used for OSx browsers that lack support
+       Then Windows (Segoe UI), Android (Roboto), and *nix running KDE, Ubuntu, Gnome
+       Followed by fallbacks droid specific, Helvetica Neue, Arial, sans-serif) */
+	--font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+	--font-heading: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+	--font-mono: SFMono-Regular, ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, Consolas, "DejaVu Sans Mono", monospace;
 }
 
 /* -------------------------------------------------------
@@ -156,12 +166,7 @@ a:hover, a.new_win:hover {
 }
 
 body, input, button, select, textarea, .editor {
-	/* Set a font-family stack
-	   Start with system-ui which should use the existing OS font
-	   Then -apple-system, BlinkMacSystemFont which are equivalent to system-ui, but used for OSx browsers that lack support
-	   Then Windows (Segoe UI), Android (Roboto), and *nix running KDE, Ubuntu, Gnome
-	   Followed by fallbacks droid specific, Helvetica Neue, Arial, sans-serif) */
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+	font-family: var(--font-body);
 }
 
 /* Use a specific demi bold font weight for some areas, less jarring then 700/bold,
@@ -169,7 +174,7 @@ body, input, button, select, textarea, .editor {
 .codeheader, .quoteheader, .expand_pages, .table_head > th, .topic_sorting_row > h3, .topic_name h4 a,
 .poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar, .bbc_quote > cite,
 #creator dt strong, .settings label, .popup_heading {
-	font-family: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+	font-family: var(--font-heading);
 	font-weight: 600;
 	/* Apple specific fixes */
 	-webkit-font-smoothing: antialiased;
@@ -179,7 +184,7 @@ body, input, button, select, textarea, .editor {
 /* Tables should show empty cells. */
 table {
 	empty-cells: show;
-	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+	font: 90%/130% var(--font-body);
 }
 
 /* Default most presentational elements to 1em (not rem) allows parent container to set the size
@@ -445,7 +450,7 @@ button[disabled], button[disabled]:hover {
 
 /* The new "button" */
 .topic_name h4 .new_posts, .new_posts, .require_approval {
-	font-family: verdana, sans-serif;
+	font-family: var(--font-body);
 	font-size: var(--font11);
 	font-weight: bold;
 	padding: .1rem .4rem .2rem .4rem;
@@ -593,9 +598,15 @@ em, .em {
 .category_header, .forum_category .category_header {
 	font-size: var(--font18);
 	line-height: 1.8;
+	letter-spacing: -0.01em;
+	text-wrap: balance;
 	padding: .2rem .8rem;
 	border: 1px solid;
 	border-radius: .4rem .4rem 0 0;
+}
+
+h1, h2, h3 {
+	text-wrap: balance;
 }
 
 .forum_category .category_header {
@@ -736,7 +747,7 @@ h2.hdicon {
 
 /* Set a consistent monospace font */
 .bbc_code, .bbc_tt, .bbc_pre, .tt, .bbc_code_inline {
-	font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+	font-family: var(--font-mono);
 	font-variant-numeric: tabular-nums;
 }
 
@@ -1309,7 +1320,7 @@ a.bbc_link {
 }
 
 #footer_section .copyright {
-	font-family: Verdana, Arial, sans-serif;
+	font-family: var(--font-body);
 	font-size: var(--font13);
 	display: inline;
 	visibility: visible;
@@ -2067,6 +2078,24 @@ button[type="submit"].quick_quote_button.hide {
 	margin: 0 .4rem 0 0;
 }
 
+/* Keep the topic's top page navigation visible while scrolling long topics.
+   Background color comes from the theme variant files. */
+nav.pagesection:has(+ #forumposts) {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	margin-top: 0;
+	padding-block: .4rem;
+}
+
+/* When the top header is collapsed (#top_section.th_collapse) it is itself sticky,
+   so the page navigation must stick just below it.  The exact height is measured
+   by JS (index.template.php) into --collapsed_header_height; the fallback is a
+   close approximation of the collapsed header height. */
+body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
+	top: var(--collapsed_header_height, 7rem);
+}
+
 /* Button list in a page section (flexbox), "float" right */
 .pagesection .buttonlist {
 	margin-left: auto;
@@ -2350,7 +2379,7 @@ button[type="submit"].quick_quote_button.hide {
 .category_boards .board_row {
 	display: grid;
 	min-height: 9rem;
-	grid-template-columns: [bicon] 7.5rem [info] 1fr [avatar] 6.5rem [latest] 30% [stats] minmax(8rem, 12rem) [end];
+	grid-template-columns: [bicon] 7.5rem [info] 1fr [avatar] 6.5rem [latest] 30% [stats] minmax(8rem, 12rem) [col-end];
 	grid-template-rows: [primary] auto [children] auto;
 }
 
@@ -2358,7 +2387,7 @@ button[type="submit"].quick_quote_button.hide {
 .category_boards .board_icon, .category_boards .board_info, .category_boards .board_avatar,
 .category_boards .board_latest, .category_boards .board_stats {
 	height: 100%;
-	padding: 1rem 0 .4rem 0;
+	padding: 1.2rem 0 .6rem 0;
 }
 
 .category_boards .board_icon {
@@ -2370,7 +2399,7 @@ button[type="submit"].quick_quote_button.hide {
 .category_boards .board_info {
 	grid-column: info;
 	grid-row-start: primary;
-	padding: 1rem .4rem .4rem 0;
+	padding: 1.2rem .4rem .6rem 0;
 }
 
 .category_boards .board_avatar {
@@ -2395,6 +2424,7 @@ button[type="submit"].quick_quote_button.hide {
 
 .category_boards .board_lastposter {
 	display: block;
+	margin-top: .25rem;
 }
 
 .category_boards .board_stats {
@@ -2402,12 +2432,18 @@ button[type="submit"].quick_quote_button.hide {
 	justify-content: center;
 	grid-column: stats;
 	grid-row-start: primary;
+	text-align: right;
+}
+
+/* Tabular figures keep the count / date columns from jittering in width */
+.board_stats, .topic_stats, .lastpost, .board_lasttime, .html_time {
+	font-variant-numeric: tabular-nums;
 }
 
 .childboard_row {
 	font-size: var(--font13);
 	grid-column-start: info;
-	grid-column-end: end;
+	grid-column-end: col-end;
 	grid-row-start: children;
 }
 
@@ -2427,6 +2463,30 @@ button[type="submit"].quick_quote_button.hide {
 
 .board_name {
 	font-size: var(--font17);
+}
+
+/* Stretched link: make the board name link cover the entire info cell so the
+   row hover has a matching, generous click target.  The containing block is
+   the .board_info cell (position: relative); any other links in the cell
+   (moderators, description, unapproved links) are lifted above the overlay. */
+.category_boards .board_info {
+	position: relative;
+}
+
+.category_boards .board_info a {
+	position: relative;
+	z-index: 1;
+}
+
+.category_boards .board_name > a:first-child {
+	position: static;
+}
+
+.category_boards .board_name > a:first-child::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 0;
 }
 
 .moderators {
@@ -2458,7 +2518,7 @@ button[type="submit"].quick_quote_button.hide {
 }
 
 .board_lasttime {
-	display: block;
+	display: inline;
 }
 
 .board_row,
@@ -2469,10 +2529,13 @@ button[type="submit"].quick_quote_button.hide {
 
 .board_row {
 	margin-bottom: .2rem;
+	transition: background-color .2s ease-in-out;
 }
 
-.childboards li:nth-child(n+3)::before {
-	content: " - ";
+/* Strengthen the unread/new-post board title */
+.board_row:has(.i-board-sub) .board_name a,
+.board_row:has(.i-board-new) .board_name a {
+	font-weight: 600;
 }
 
 .childboards {
@@ -2484,6 +2547,13 @@ button[type="submit"].quick_quote_button.hide {
 .childboards > li {
 	display: inline-block;
 	padding: .6rem .8rem .4rem .8rem;
+	margin: 0 .2rem;
+}
+
+.childboards li:nth-child(n+2) {
+	padding: .2rem .8rem;
+	border: 1px solid;
+	border-radius: 1rem;
 }
 
 .childboard_row h4, .board_new_posts {
@@ -2680,7 +2750,7 @@ button[type="submit"].quick_quote_button.hide {
 
 /* Container, holds the topic icon and fred */
 .topic_icons {
-	/* To keep an icon with fred aligned */
+	position: relative;
 	padding: 0 .5rem;
 	grid-column-start: topic_icon;
 	place-self: center start;
@@ -2690,11 +2760,14 @@ button[type="submit"].quick_quote_button.hide {
 	max-width: 1.8rem;
 }
 
-/* Indicator if you posted in this topic */
+/* Indicator if you posted in this topic — absolutely positioned as a small badge */
+.fred {
+	position: absolute;
+	bottom: 1.5rem;
+	right: -0.75rem;
+}
+
 .fred::before {
-	position: relative;
-	top: -1.4rem;
-	right: .2rem;
 	max-width: 1.2rem;
 }
 
@@ -2712,39 +2785,69 @@ button[type="submit"].quick_quote_button.hide {
 }
 
 .topic_starter {
-	font-size: var(--font14);
+	font-size: var(--font13);
+	opacity: .7;
+	line-height: 1.4;
 }
 
 /* Container, Holds last poster and time, link to end */
 .topic_latest {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
 	font-size: var(--font14);
 	height: 100%;
-	padding: .8rem 0;
-	white-space: nowrap;
+	padding: .4rem .8rem;
+	overflow: hidden;
 	grid-column-start: topic_latest;
 }
 
 .topic_latest .board_avatar {
-	float: left;
-	margin: 0 .8rem;
+	flex-shrink: 0;
+}
+
+/* Text block holding timestamp and poster name */
+.topic_latest_info {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	line-height: 1.5;
+}
+
+.topic_latest_info > span {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .topic_latest.relative {
-	margin: 0 .8rem;
+	padding: .4rem .8rem;
 }
 
 .topic_latest .i-last_post {
-	float: right;
-	padding-top: .4rem;
+	flex-shrink: 0;
+	margin-left: auto;
 }
 
 /* Container, Holds the message stats */
 .topic_stats {
 	font-size: var(--font13);
 	line-height: 1.4;
-	text-align: right;
 	grid-column-start: topic_stats;
 	place-self: center end;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: .25rem;
+	padding-right: .8rem;
+}
+
+.stat-item {
+	display: flex;
+	align-items: center;
+	gap: .3rem;
+	white-space: nowrap;
 }
 
 /* Container, holds moderation checkbox or icons */
@@ -3254,6 +3357,10 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	border-top: 1px solid;
 	grid-area: messageContent;
 	overflow-wrap: break-word;
+	/* Reading content gets a taller line-height than UI chrome */
+	line-height: 1.55;
+	/* Keep the measure (line length) comfortable on wide screens
+	max-width: 120ch; */
 }
 
 /* Area below the message, holds attachments, quick buttons, signature */
@@ -3288,6 +3395,15 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	width: 22rem;
 	margin: 0 .4rem 1.6rem 0;
 	text-align: center;
+}
+
+/* Reset default browser margins on figure elements used for image attachments */
+figure.attachment_block {
+	margin: 0 .4rem 1.6rem 0;
+}
+
+figure.attachment_block figcaption {
+	display: block;
 }
 
 /* Auto scaling of images in that attachment block */
@@ -3610,6 +3726,10 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	top: 1px;
 }
 
+.new_post_anchor {
+	scroll-margin-top: 6rem;
+}
+
 /* The overall video container, holds header and video divs */
 .elk_video_container {
 	max-width: 64rem;
@@ -3693,6 +3813,23 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 #display_jump_to {
 	margin-left: auto;
 	white-space: nowrap;
+}
+
+/* Guest name/email fields in quick reply */
+.guest_fields {
+	margin-bottom: .8rem;
+}
+
+.guest_fields .form_row {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	margin-bottom: .4rem;
+}
+
+.guest_fields .form_row label {
+	min-width: 5rem;
+	text-align: right;
 }
 
 /* Container for the quick reply area., holds header and editor areas */
@@ -4275,7 +4412,7 @@ dl.merge_topic dd {
 }
 
 .action_viewquery .explain {
-	font-family: serif;
+	font-family: var(--font-body);
 	width: 70%;
 	margin-bottom: 1.6rem;
 	empty-cells: show;
@@ -6037,7 +6174,7 @@ div.labels {
 
 @media screen and (max-width: 64em) {
 	.category_boards .board_row {
-		grid-template-columns: [bicon] 6rem [info] 1fr [avatar] 6.5rem [latest] 40% [end];
+		grid-template-columns: [bicon] 6rem [info] 1fr [avatar] 6.5rem [latest] 40% [col-end];
 	}
 
 	.category_boards .board_stats, .topic_stats {
