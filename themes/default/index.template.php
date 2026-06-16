@@ -643,6 +643,22 @@ function template_menu()
 
 	// Define the upper_section toggle in javascript.
 	theme()->themeJs()->addInlineJavascript('
+		// Keep --collapsed_header_height in sync with the sticky collapsed header,
+		// so other sticky elements (e.g. topic page navigation) can sit below it.
+		function setCollapsedHeaderHeight() {
+			window.requestAnimationFrame(function () {
+				let header = document.getElementById(\'top_section\'),
+					menu = document.getElementById(\'menu_nav\');
+				if (header && menu && header.classList.contains(\'th_collapse\'))
+				{
+					// Collapsed header shows only the menu bar, plus the 4px top/bottom borders
+					document.documentElement.style.setProperty(\'--collapsed_header_height\', (menu.offsetHeight + 8) + \'px\');
+				}
+			});
+		}
+		window.addEventListener(\'load\', setCollapsedHeaderHeight);
+		window.addEventListener(\'resize\', setCollapsedHeaderHeight);
+
 		var oMainHeaderToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
@@ -673,6 +689,7 @@ function template_menu()
 				let header = document.getElementById(\'top_section\');
 				header.classList.add(\'th_collapse\');
 				header.classList.remove(\'th_expand\');
+				setCollapsedHeaderHeight();
 			},
 			funcOnBeforeExpand: function () {
 				let header = document.getElementById(\'top_section\');

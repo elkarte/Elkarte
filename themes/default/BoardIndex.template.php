@@ -74,7 +74,7 @@ function template_boardindex_outer_above()
 {
 	global $context, $settings, $txt;
 
-	// Show some statistics if info centre stats is off.
+	// Show some statistics if info center stats are off.
 	if (!$settings['show_stats_index'])
 	{
 		echo '
