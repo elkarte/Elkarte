@@ -62,7 +62,7 @@ function template_messages_informations_above()
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
-				<span id="whoisviewing">';
+				<span id="whoisviewing" aria-live="polite" aria-atomic="true">';
 
 			// Show just numbers...?
 			if ($settings['display_who_viewing'] == 1)
@@ -91,11 +91,11 @@ function template_messages_informations_above()
 	}
 
 	echo '
-				<span class="nextlinks">',
+				<nav class="nextlinks" aria-label="', $txt['previous_next_back'], ' / ', $txt['previous_next_forward'], '">',
 					empty($context['links']['go_prev']) ? '' : '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>',
 					empty($context['links']['go_next']) ? '' : ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>',
 					empty($context['links']['derived_from']) ? '' : ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], empty($modSettings['subject_length']) ? 32 : $modSettings['subject_length'])) . '</em></a>', '
-				</span>
+				</nav>
 			</header>
 			<section>
 			<form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave() : false">';
@@ -138,7 +138,7 @@ function template_messages()
 		if (($message['id'] != $context['first_message']) && $message['first_new'])
 		{
 			echo '
-				<a id="new">&nbsp;</a>
+				<span id="new" class="new_post_anchor" aria-label="', $txt['new'], '"></span>
 				<hr class="new_post_separator" />';
 		}
 
@@ -146,7 +146,8 @@ function template_messages()
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' : '';
 
 		echo '
-				<article class="post_wrapper', empty($options['hide_poster_area']) ? '' : '2', ' forumposts', $message['classes'], $message['approved'] ? '' : ' approvebg', '">';
+				<article class="post_wrapper', empty($options['hide_poster_area']) ? '' : '2', ' forumposts', $message['classes'], $message['approved'] ? '' : ' approvebg', '"
+					aria-labelledby="post_subject_', $message['id'], '">';
 
 		if (!empty($settings['show_keyinfo_above']))
 		{
@@ -425,14 +426,16 @@ function template_quickreply_below()
 		if ($context['user']['is_guest'])
 		{
 			echo '
-						<dl>
-							<dt>
-								<label for="guestname">', $txt['name'], ':</label> <input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
-							</dd>
-							<dt>
-								<label for="email">', $txt['email'], ':</label> <input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
-							</dd>
-						</dl>';
+						<div class="guest_fields">
+							<div class="form_row">
+								<label for="guestname">', $txt['name'], ':</label>
+								<input type="text" name="guestname" id="guestname" value="', $context['name'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+							</div>
+							<div class="form_row">
+								<label for="email">', $txt['email'], ':</label>
+								<input type="text" name="email" id="email" value="', $context['email'], '" size="25" class="input_text" tabindex="', $context['tabindex']++, '" />
+							</div>
+						</div>';
 		}
 
 		// Is visual verification enabled?
@@ -813,7 +816,7 @@ function template_display_attachments($message, $ignoring)
 		}
 
 		echo '
-									<div class="attachment_block">';
+									', ($attachment['is_image'] ? '<figure' : '<div'), ' class="attachment_block">';
 
 		if ($attachment['is_image'])
 		{
@@ -821,25 +824,28 @@ function template_display_attachments($message, $ignoring)
 			{
 				echo '
 											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
-												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" loading="lazy" />
+												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="', Util::htmlspecialchars($attachment['name']), '" id="thumb_', $attachment['id'], '" loading="lazy" />
 											</a>';
 			}
 			else
 			{
 				echo '
-											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" loading="lazy"/>';
+											<img class="attachment_image" src="', $attachment['href'], ';image" alt="', Util::htmlspecialchars($attachment['name']), '" style="max-width:100%; max-height:', $attachment['height'], 'px;" loading="lazy"/>';
 			}
+
+			echo '
+										<figcaption>';
 		}
 		elseif (!empty($modSettings['attachmentShowImages']))
 		{
-			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" loading="lazy" />';
+			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="', Util::htmlspecialchars($attachment['name']), '" style="max-width:', $modSettings['attachmentThumbWidth'], 'px; max-height:', $modSettings['attachmentThumbHeight'], 'px;" loading="lazy" />';
 		}
 
 		echo '
 											<a href="', $attachment['href'], '" class="attachment_name">
-												<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['name'] . '
+												<i class="icon icon-small i-paperclip"></i>&nbsp;', $attachment['name'], '
 											</a>
-											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'], $attachment['downloads'])) . '</span>';
+											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '</span>';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
 		{
@@ -847,8 +853,17 @@ function template_display_attachments($message, $ignoring)
 											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
 		}
 
-		echo '
-										</div>';
+		if ($attachment['is_image'])
+		{
+			echo '
+										</figcaption>
+									</figure>';
+		}
+		else
+		{
+			echo '
+									</div>';
+		}
 	}
 
 	// If we had unapproved attachments clean up.
