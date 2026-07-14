@@ -87,12 +87,12 @@
 	--font28: 2.8rem;
 	--font29: 2.9rem;
 	--font30: 3.0rem;
+
 	--quote_height: 19rem;
-	--max_width: 160rem;
+	--max_width: 132rem;
 	--button_height: 1.8;
 
 	/* Font stacks.
-
 	   Set a font-body stack starting with system-ui which should use the existing OS font
        Then -apple-system, BlinkMacSystemFont which are equivalent to system-ui, but used for OSx browsers that lack support
        Then Windows (Segoe UI), Android (Roboto), and *nix running KDE, Ubuntu, Gnome

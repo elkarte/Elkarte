@@ -116,45 +116,40 @@ if ($running_from_different_dir)
 
 	if (!empty($settings_board_norm))
 	{
-		// Find the longest common ancestor path between the two directories.
-		$old_parts = explode('/', ltrim($settings_board_norm, '/'));
-		$new_parts = explode('/', ltrim($tmp_board_norm, '/'));
-		$common_len = 0;
-		$min_len = min(count($old_parts), count($new_parts));
-		for ($i = 0; $i < $min_len; $i++)
+		// Subdir case: new path starts with old path => just append the extra segments.
+		if (str_starts_with($tmp_board_norm, $settings_board_norm . '/'))
 		{
-			if ($old_parts[$i] === $new_parts[$i])
-			{
-				$common_len++;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		// Old suffix  = parts of old path after common ancestor  e.g. "forum1"
-		// New suffix  = parts of new path after common ancestor  e.g. "forum2" or "elk20/test"
-		$old_suffix = '/' . implode('/', array_slice($old_parts, $common_len));
-		$new_suffix = '/' . implode('/', array_slice($new_parts, $common_len));
-
-		// Replace the old URL path suffix with the new one (case-insensitive for Windows compat).
-		if ($old_suffix !== '/' && str_ends_with(strtolower($rebased_boardurl), strtolower($old_suffix)))
-		{
-			$rebased_boardurl = substr($rebased_boardurl, 0, strlen($rebased_boardurl) - strlen($old_suffix)) . $new_suffix;
-		}
-		elseif ($old_suffix === $new_suffix || $old_suffix === '/')
-		{
-			// Paths share the same suffix or old was root — nothing to change.
+			$rebased_boardurl .= substr($tmp_board_norm, strlen($settings_board_norm));
 		}
 		else
 		{
-			// Subdir case: new path starts with old path => just append the extra segments.
-			if (str_starts_with($tmp_board_norm, $settings_board_norm . '/'))
+			// Find the longest common ancestor path between the two directories.
+			$old_parts = explode('/', ltrim($settings_board_norm, '/'));
+			$new_parts = explode('/', ltrim($tmp_board_norm, '/'));
+			$common_len = 0;
+			$min_len = min(count($old_parts), count($new_parts));
+			for ($i = 0; $i < $min_len; $i++)
 			{
-				$rebased_boardurl .= substr($tmp_board_norm, strlen($settings_board_norm));
+				if ($old_parts[$i] === $new_parts[$i])
+				{
+					$common_len++;
+				}
+				else
+				{
+					break;
+				}
 			}
-			// Otherwise paths are too different to auto-correct; leave url as-is.
+
+			// Old suffix  = parts of old path after common ancestor  e.g. "forum1"
+			// New suffix  = parts of new path after common ancestor  e.g. "forum2" or "elk20/test"
+			$old_suffix = '/' . implode('/', array_slice($old_parts, $common_len));
+			$new_suffix = '/' . implode('/', array_slice($new_parts, $common_len));
+
+			// Replace the old URL path suffix with the new one (case-insensitive for Windows compat).
+			if ($old_suffix !== '/' && str_ends_with(strtolower($rebased_boardurl), strtolower($old_suffix)))
+			{
+				$rebased_boardurl = substr($rebased_boardurl, 0, strlen($rebased_boardurl) - strlen($old_suffix)) . $new_suffix;
+			}
 		}
 	}
 
@@ -798,7 +793,7 @@ function action_welcomeLogin()
 				<li>Source Directory: ' . SOURCEDIR . '</li>
 				<li>Cache Directory: ' . $CACHEDIR_temp . '</li>
 			</ul>
-			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the ElkArte website before continuing.';
+			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/elkarte/tools">Repair Settings</a> tool from the ElkArte website before continuing.';
 	}
 	elseif (!empty($upcontext['rebased_paths']))
 	{
