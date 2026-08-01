@@ -718,7 +718,7 @@ class ManageAttachments extends AbstractController
 
 		if (!empty($_SESSION['results']))
 		{
-			$context['results'] = implode('<br />', $this->_req->session->results);
+			$context['results'] = implode('<br />', $_SESSION['results']);
 			unset($_SESSION['results']);
 		}
 	}
