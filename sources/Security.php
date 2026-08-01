@@ -445,6 +445,7 @@ function is_not_banned($forceCheck = false)
 		}
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
+		Txt::load('Index');
 		$old_name = (string) User::$info->name !== '' ? User::$info->name : $txt['guest_title'];
 		User::logOutUser(true);
 		loadUserContext();
