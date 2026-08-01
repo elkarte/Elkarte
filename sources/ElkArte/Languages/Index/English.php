@@ -522,6 +522,8 @@ $txt['more_stats'] = '[More Stats]';
 
 $txt['code'] = 'Code';
 $txt['code_select'] = '[Select]';
+$txt['code_copy'] = '[Copy]';
+$txt['code_copied'] = 'Copied!';
 $txt['quote_from'] = 'Quote from';
 $txt['quote'] = 'Quote';
 $txt['quick_quote'] = 'Quote Selected';

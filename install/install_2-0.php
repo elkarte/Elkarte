@@ -169,6 +169,15 @@ class InstallInstructions_install_2_0
 		);
 	}
 
+	/**
+	 * Insert board permissions.
+	 *
+	 * array(id_group, id_profile, permission)
+	 *
+	 * id_group: -1 for guests, 0 for regular members, 1 for admins, 2 for global mods, etc.
+	 * id_profile: 1 for default, 2 for no polls, 3 for reply only, 4 for read only.
+	 * permission: the permission name being allowed.
+	 */
 	public function insert_board_permissions()
 	{
 		return $this->db->insert('ignore',
@@ -2088,6 +2097,14 @@ class InstallInstructions_install_2_0
 		);
 	}
 
+	/**
+	 * Insert general permissions.
+	 *
+	 * array(id_group, permission)
+	 *
+	 * id_group: -1 for guests, 0 for regular members, 1 for admins, 2 for global mods, etc.
+	 * permission: the permission name being allowed.
+	 */
 	public function insert_permissions()
 	{
 		return $this->db->insert('ignore',

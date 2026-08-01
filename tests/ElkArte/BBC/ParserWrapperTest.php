@@ -78,12 +78,12 @@ class ParserWrapperTest extends TestCase
 			array(
 				'Unparsed code',
 				'[code]This is some code[/code]',
-				'<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
+    '<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="[Copy]" data-copied="Copied!" data-select="[Select]">[Copy]</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
 			),
 			array(
 				'Unparsed equals code',
 				'[code=unparsed text]This is some code[/code]',
-				'<div class="codeheader">Code: (unparsed text) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
+				'<div class="codeheader">Code: (unparsed text) <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="[Copy]" data-copied="Copied!" data-select="[Select]">[Copy]</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
 			),
 			array(
 				'Inline code',
@@ -150,7 +150,7 @@ Should be an empty line in between.',
 			array(
 				'Footnote and code',
 				'Footnote inside a code block[code][footnote]Footnote[/footnote][/code] and one outside.[footnote]Footnote[/footnote]',
-				'Footnote inside a code block<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">&#91;footnote&#93;Footnote&#91;/footnote&#93;</pre> and one outside.<sup class="bbc_footnotes"><a class="target" href="#fn1_4" id="ref1_4">[1]</a></sup><div class="bbc_footnotes"><div class="target" id="fn1_4"><sup>1&nbsp;</sup>Footnote<a class="footnote_return" href="#ref1_4">&crarr;</a></div></div>',
+				'Footnote inside a code block<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="[Copy]" data-copied="Copied!" data-select="[Select]">[Copy]</a></div><pre class="bbc_code prettyprint">&#91;footnote&#93;Footnote&#91;/footnote&#93;</pre> and one outside.<sup class="bbc_footnotes"><a class="target" href="#fn1_4" id="ref1_4">[1]</a></sup><div class="bbc_footnotes"><div class="target" id="fn1_4"><sup>1&nbsp;</sup>Footnote<a class="footnote_return" href="#ref1_4">&crarr;</a></div></div>',
 			),
 			array(
 				'Font parsed',
@@ -569,12 +569,12 @@ Should be an empty line in between.',
 			array(
 				'ListCode1',
 				'[list][li]Test[/li][li]More [code]Some COde[/code][/li][/list]',
-				'<ul class="bbc_list"><li>Test</li><li>More <div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">Some COde</pre></li></ul>'
+				'<ul class="bbc_list"><li>Test</li><li>More <div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="[Copy]" data-copied="Copied!" data-select="[Select]">[Copy]</a></div><pre class="bbc_code prettyprint">Some COde</pre></li></ul>'
 			),
 			array(
 				'ListCode2',
 				'some list[code][list][li]one[/list][/code]',
-				'some list<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">&#91;list&#93;&#91;li&#93;one&#91;/list&#93;</pre>'
+				'some list<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="[Copy]" data-copied="Copied!" data-select="[Select]">[Copy]</a></div><pre class="bbc_code prettyprint">&#91;list&#93;&#91;li&#93;one&#91;/list&#93;</pre>'
 			),
 			array(
 				'emptyQuote',
@@ -584,7 +584,7 @@ Should be an empty line in between.',
 			array(
 				'openCode',
 				'something[code]without a closing tag',
-				'something<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">without a closing tag</pre>'
+				'something<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="[Copy]" data-copied="Copied!" data-select="[Select]">[Copy]</a></div><pre class="bbc_code prettyprint">without a closing tag</pre>'
 			),
 			array(
 				'openList',

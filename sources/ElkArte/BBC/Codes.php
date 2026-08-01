@@ -316,7 +316,7 @@ class Codes
 			[
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
-				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
+				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="' . $txt['code_copy'] . '" data-copied="' . $txt['code_copied'] . '" data-select="' . $txt['code_select'] . '">' . $txt['code_copy'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : static function (&$data) {
 					$data = tabToHtmlTab(strtr($data, ['[' => '&#91;', ']' => '&#93;']));
 				},
@@ -327,7 +327,7 @@ class Codes
 			[
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS_CONTENT,
-				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
+				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="javascript:void(0);" onclick="return elkCopyText(this);" class="codeoperation" data-copy="' . $txt['code_copy'] . '" data-copied="' . $txt['code_copied'] . '" data-select="' . $txt['code_select'] . '">' . $txt['code_copy'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : static function (&$data) {
 					$data[0] = tabToHtmlTab(strtr($data[0], ['[' => '&#91;', ']' => '&#93;']));
 				},
