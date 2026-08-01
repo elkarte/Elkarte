@@ -1474,6 +1474,88 @@ function elkSelectText (oCurElement, bActOnElement)
 	curRange.selectNodeContents(oCodeArea);
 	oCurSelection.removeAllRanges();
 	oCurSelection.addRange(curRange);
+
+	return false;
+}
+
+/**
+ * Copy the text in a code tag to the clipboard
+ *
+ * @param {object} oCurElement
+ * @param {boolean} bActOnElement the passed element contains the code
+ */
+function elkCopyText (oCurElement, bActOnElement)
+{
+	// Use the new clipboard API if available, otherwise fallback to elkSelectText
+	if (!navigator.clipboard)
+	{
+		// Ensure the link text says [Select] if we're in fallback mode
+		if (oCurElement.innerText === oCurElement.getAttribute('data-copy'))
+		{
+			oCurElement.innerText = oCurElement.getAttribute('data-select');
+		}
+
+		return elkSelectText(oCurElement, bActOnElement);
+	}
+
+	let oCodeArea;
+
+	// The place we're looking for is one div up, and next door - if it's auto-detect.
+	if (typeof (bActOnElement) === 'boolean' && bActOnElement)
+	{
+		oCodeArea = document.getElementById(oCurElement);
+	}
+	else
+	{
+		oCodeArea = oCurElement.parentNode.nextSibling;
+	}
+
+	// Did not find it, bail
+	if (typeof (oCodeArea) !== 'object' || oCodeArea === null)
+	{
+		return false;
+	}
+
+	let text = oCodeArea.innerText || oCodeArea.textContent;
+
+	// If we have innerText, we might have some unwanted artifacts from pretty print
+	if (text !== '' && oCodeArea.innerText)
+	{
+		// Replace non-breaking spaces with tabs (if they were tabs)
+		text = text.replace(/^\u00A0/gm, '\t');
+	}
+
+	navigator.clipboard.writeText(text);
+
+	// Visual feedback, it shows the user that the command completed successfully
+	oCodeArea.classList.add('copied');
+	let sOriginalText = oCurElement.innerText;
+	oCurElement.innerText = oCurElement.getAttribute('data-copied');
+
+	setTimeout(function() {
+		oCodeArea.classList.remove('copied');
+		oCurElement.innerText = sOriginalText;
+	}, 1500);
+
+	return false;
+}
+
+/**
+ * Initialization for code copy buttons.
+ * Switches button text to [Select] if clipboard API is not supported.
+ */
+function elk_initCodeButtons ()
+{
+	if (navigator.clipboard)
+	{
+		return;
+	}
+
+	let codeLinks = document.querySelectorAll('.codeoperation[data-select]');
+	for (let i = 0; i < codeLinks.length; i++)
+	{
+		codeLinks[i].innerText = codeLinks[i].getAttribute('data-select');
+	}
 }
 
 /**

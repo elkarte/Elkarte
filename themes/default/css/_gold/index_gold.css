@@ -540,6 +540,11 @@ input[type=checkbox].quote-show-more {
 	background: var(--content_background);
 }
 
+/* The visual feedback for the "copy to clipboard" button. */
+.bbc_code.copied {
+	background: var(--user_highlight) !important;
+}
+
 /* Styling for BBC tags */
 .bbc_link:link, .bbc_link:visited {
 	color: var(--bbclinks);

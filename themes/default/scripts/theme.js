@@ -99,6 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			element.nextElementSibling.children[0].slideToggle(250);
 		});
 	});
+
+	// Code blocks, set the correct [Select] or [Copy] button text based on the user's browser
+	if (typeof elk_initCodeButtons === 'function')
+	{
+		elk_initCodeButtons();
+	}
 });
 
 // Jquery document ready

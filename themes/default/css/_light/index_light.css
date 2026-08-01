@@ -526,6 +526,11 @@ strong {
 	background: var(--primary_content_background);
 }
 
+/* The visual feedback for the "copy to clipboard" button. */
+.bbc_code.copied {
+	background: var(--user_highlight) !important;
+}
+
 /* Special box-shadow - gradient end-stop must match the quote background */
 input[type=checkbox].quote-show-more {
 	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--quote_background, var(--news_background)) 90%);

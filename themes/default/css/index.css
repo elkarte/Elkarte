@@ -770,7 +770,7 @@ h2.hdicon {
 	border-bottom: none;
 }
 
-/* [Select] link to copy code. */
+/* [Select] or [Copy] link to copy code. */
 .codeoperation {
 	font-weight: normal;
 }
@@ -785,6 +785,11 @@ h2.hdicon {
 	padding: .5rem 1rem;
 	border: 1px solid;
 	border-top: none;
+}
+
+/* The visual feedback for the "copy to clipboard" button. */
+.bbc_code.copied {
+	transition: background 0.5s ease-out;
 }
 
 .bbc_code_inline {
@@ -3092,6 +3097,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 
 .poster .name {
 	font-size: var(--font17);
+	line-height: 1.2;
 	overflow: hidden;
 	/* Enough room for a two line name, truncated ... */
 	max-height: 4.5rem;
