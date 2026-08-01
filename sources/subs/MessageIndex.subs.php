@@ -99,41 +99,37 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], ['memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first']);
 			$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], ['LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)']);
 		}
-
-		$request = $db->fetchQuery('
-			SELECT
-				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
-				' . ($id_member == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from,
-				t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic, t.id_first_msg,
-				ml.poster_time AS last_poster_time, ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
-				ml.poster_name AS last_member_name, ml.id_member AS last_id_member, ml.smileys_enabled AS last_smileys,
-				COALESCE(meml.real_name, ml.poster_name) AS last_display_name,
-				mf.poster_time AS first_poster_time, mf.subject AS first_subject, mf.icon AS first_icon,
-				mf.poster_name AS first_member_name, mf.id_member AS first_id_member, mf.smileys_enabled AS first_smileys,
-				COALESCE(memf.real_name, mf.poster_name) AS first_display_name
-				' . (!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
-				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)' . ($id_member == 0 ? '' : '
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') .
-			(!empty($indexOptions['custom_joins']) ? implode("\n\t\t\t\t", $indexOptions['custom_joins']) : '') . '
-			WHERE t.id_topic IN ({array_int:topic_list})',
-			[
-				'current_board' => $id_board,
-				'current_member' => $id_member,
-				'topic_list' => $topics === [] ? [0] : array_keys($topics),
-			]
-		);
-		// Now we fill the above array, maintaining the index association.
-		while (($row = $request->fetch_assoc()))
-		{
-			$topics[$row['id_topic']] = $row;
-		}
-		$request->free_result();
 	}
+
+	$request = $db->fetchQuery('
+		SELECT
+			t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
+			' . ($id_member == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from,
+			t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic, t.id_first_msg,
+			ml.poster_time AS last_poster_time, ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
+			ml.poster_name AS last_member_name, ml.id_member AS last_id_member, ml.smileys_enabled AS last_smileys,
+			COALESCE(meml.real_name, ml.poster_name) AS last_display_name,
+			mf.poster_time AS first_poster_time, mf.subject AS first_subject, mf.icon AS first_icon,
+			mf.poster_name AS first_member_name, mf.id_member AS first_id_member, mf.smileys_enabled AS first_smileys,
+			COALESCE(memf.real_name, mf.poster_name) AS first_display_name
+			' . (!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
+			LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
+			LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)' . ($id_member == 0 ? '' : '
+			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') .
+		(!empty($indexOptions['custom_joins']) ? implode("\n\t\t\t\t", $indexOptions['custom_joins']) : '') . '
+		WHERE t.id_topic IN ({array_int:topic_list})',
+		[
+			'current_board' => $id_board,
+			'current_member' => $id_member,
+			'topic_list' => $topics === [] ? [0] : array_keys($topics),
+		]
+	);
+	$topics = $request->fetch_all();
+	$request->free_result();
 
 	return $topics;
 }
