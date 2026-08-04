@@ -41,8 +41,8 @@
 				document.querySelectorAll('.sceditor-button-source').forEach((elem) => {elem.style.display = 'none';});
 			}
 
-			// Move the editor into view
-			if (document.getElementById('dropdown_menu_1') !== null || document.getElementById('preview_section') !== null)
+			// Move the editor into view, unless we are jumping to a specific post
+			if (window.location.hash === '' && (document.getElementById('dropdown_menu_1') !== null || document.getElementById('preview_section') !== null))
 			{
 				// Do not scroll this menu off-screen when present
 				document.getElementById('skipnav').scrollIntoView();
