@@ -7028,6 +7028,24 @@ div.labels {
 		border-radius: 0;
 	}
 
+	/* Post options area, 2 columns */
+	ul.post_options li {
+		width: 50%;
+	}
+
+	.statusbar .insertoverlay {
+		right: 0;
+	}
+
+	.statusbar .insertoverlay .button {
+		top: -4.5rem;
+		padding: 0 1rem;
+	}
+
+	.statusbar .insertoverlay label {
+		padding-top: 0.8rem;
+	}
+
 	/* Drag and drop area */
 	#postAttachment2 dt {
 		width: 100% !important;
@@ -7354,34 +7372,13 @@ div.labels {
 		width: 50%;
 	}
 
-	.statusbar .ila_container {
-		display: inline-block;
-	}
-
 	.ila_container .icon.ila {
-		width: 3rem;
+		width: 4rem;
 	}
 
 	.postattach_thumb img {
 		width: 7.5rem;
 		height: 5rem;
-	}
-
-	.statusbar .insertoverlay {
-		margin-left: -13rem;
-	}
-
-	.statusbar .insertoverlay .ila_container {
-		position: relative;
-	}
-
-	.statusbar .insertoverlay label {
-		padding-top: 0.8rem;
-	}
-
-	.statusbar .insertoverlay .ila_container input {
-		display: block;
-		float: none;
 	}
 
 	/* Forum Stats */
