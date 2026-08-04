@@ -133,12 +133,11 @@ class ParserWrapperTest extends TestCase
 			array(
 				'Footnote 2',
 				'footnote[footnote]footnote :)[/footnote]something',
-				'footnote<sup class="bbc_footnotes"><a class="target" href="#fn1_1" id="ref1_1">[1]</a></sup>something<div class="bbc_footnotes"><div class="target" id="fn1_1"><sup>1&nbsp;</sup>footnote <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" /><a class="footnote_return" href="#ref1_1">&crarr;</a></div></div>',
-			),
+				'footnote<sup class="bbc_footnotes"><a class="target" href="#fn1_1" id="ref1_1">[1]</a></sup>something<div class="bbc_footnotes"><div class="target" id="fn1_1"><sup>1&nbsp;</sup>footnote <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" width=48 height=48 /><a class="footnote_return" href="#ref1_1">&crarr;</a></div></div>'			),
 			array(
 				'Footnote 3',
 				'footnote :)[footnote][b]footnote[/b] :)[/footnote]something :)',
-				'footnote <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" /><sup class="bbc_footnotes"><a class="target" href="#fn1_2" id="ref1_2">[1]</a></sup>something <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" /><div class="bbc_footnotes"><div class="target" id="fn1_2"><sup>1&nbsp;</sup><strong class="bbc_strong">footnote</strong> <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" /><a class="footnote_return" href="#ref1_2">&crarr;</a></div></div>',
+				'footnote <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" width=48 height=48 /><sup class="bbc_footnotes"><a class="target" href="#fn1_2" id="ref1_2">[1]</a></sup>something <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" width=48 height=48 /><div class="bbc_footnotes"><div class="target" id="fn1_2"><sup>1&nbsp;</sup><strong class="bbc_strong">footnote</strong> <img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" width=48 height=48 /><a class="footnote_return" href="#ref1_2">&crarr;</a></div></div>'
 			),
 			array(
 				'Footnote end-of-line',
@@ -335,7 +334,7 @@ Should be an empty line in between.',
 			array(
 				'Smiley',
 				':)',
-				'<img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" />',
+				'<img src="http://127.0.0.1/smileys/default/smiley.svg" alt="&#58;&#41;" title="Smiley" class="smiley" width=48 height=48 />',
 			),
 			array(
 				'Strike',
