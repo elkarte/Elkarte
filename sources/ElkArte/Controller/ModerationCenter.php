@@ -1012,13 +1012,14 @@ class ModerationCenter extends AbstractController
 
 			// Clicked on remove or using checkboxes to multi-delete
 			$toDelete = [];
-			if ($this->_req->hasQuery('delete'))
+			if ($this->_req->hasQuery('delete', true))
 			{
 				$toDelete[] = $this->_req->getQuery('delete', 'intval', 0);
 			}
 			else
 			{
-				$toDelete = array_map('intval', $this->_req->post->delete);
+				$delete_list = $this->_req->getPost('delete', null, []);
+				$toDelete = is_array($delete_list) ? array_map('intval', $delete_list) : [];
 			}
 
 			if (!empty($toDelete))

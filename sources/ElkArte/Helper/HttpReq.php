@@ -197,22 +197,24 @@ class HttpReq
 	 * Checks if a POST value was sent
 	 *
 	 * @param string $name The key name to check in POST data
+	 * @param bool $hasValue If true, checks if the value is not empty
 	 * @return bool Returns true if the POST value exists, false otherwise
 	 */
-	public function hasPost($name): bool
+	public function hasPost($name, $hasValue = false): bool
 	{
-		return isset($this->post->{$name});
+		return $hasValue ? !empty($this->post->{$name}) : isset($this->post->{$name});
 	}
 
 	/**
 	 * Checks if a GET value was sent
 	 *
 	 * @param string $name The key name to check in POST data
+	 * @param bool $hasValue If true, checks if the value is not empty
 	 * @return bool Returns true if the POST value exists, false otherwise
 	 */
-	public function hasQuery($name): bool
+	public function hasQuery($name, $hasValue = false): bool
 	{
-		return isset($this->query->{$name});
+		return $hasValue ? !empty($this->query->{$name}) : isset($this->query->{$name});
 	}
 
 	/**
