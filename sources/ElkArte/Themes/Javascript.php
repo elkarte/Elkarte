@@ -309,10 +309,12 @@ class Javascript
 	 */
 	public function addInlineJavascript($javascript, $defer = false): void
 	{
-		if (!empty($javascript))
+		if (empty($javascript))
 		{
-			$this->js_inline[(empty($defer) ? self::STANDARD : self::DEFERRED)][] = $javascript;
+			return;
 		}
+
+		$this->js_inline[(empty($defer) ? self::STANDARD : self::DEFERRED)][md5($javascript)] = $javascript;
 	}
 
 	/**
