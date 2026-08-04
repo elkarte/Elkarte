@@ -176,7 +176,7 @@ function template_select()
 			</div>
 			<div class="submitbutton clear_right">
 				<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-				<input type="submit" value="', $txt['split_topic'], '" />
+				<input type="submit" style="flex: 0 0 100%;" value="', $txt['split_topic'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</form>
