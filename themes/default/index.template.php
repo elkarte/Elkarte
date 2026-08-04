@@ -239,19 +239,15 @@ function template_body_above()
 		</aside>
 		<section id="header" class="wrapper', empty($settings['header_layout']) ? '' : ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader'), empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
-				<a class="forumlink" href="', getUrl('boardindex', []), '">', $context['forum_name'], '</a>';
-
-	echo '
+				<a class="forumlink" href="', getUrl('boardindex', []), '">', $context['forum_name'], '</a>
 				<span id="logobox">
 					<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name_html_safe'], '" title="', $context['forum_name_html_safe'], '" />', empty($settings['site_slogan']) ? '' : '
 					<span id="siteslogan">' . $settings['site_slogan'] . '</span>', '
 				</span>
-			</h1>';
-
-	// Show the menu here, according to the menu sub template.
-	echo '
+			</h1>
 		</section>';
 
+	// Show the menu here, according to the menu sub template.
 	template_menu();
 
 	echo '
