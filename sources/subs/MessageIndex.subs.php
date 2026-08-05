@@ -128,7 +128,11 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			'topic_list' => $topics === [] ? [0] : array_keys($topics),
 		]
 	);
-	$topics = $request->fetch_all();
+	// Now we fill the above array, maintaining the index order.
+	while (($row = $request->fetch_assoc()))
+	{
+		$topics[$row['id_topic']] = $row;
+	}
 	$request->free_result();
 
 	return $topics;
@@ -171,7 +175,8 @@ function topicsParticipation($id_member, $topic_ids)
 	$topics = [];
 
 	$db->fetchQuery('
-		SELECT DISTINCT id_topic
+		SELECT 
+			DISTINCT id_topic
 		FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topic_list})
 			AND id_member = {int:current_member}',

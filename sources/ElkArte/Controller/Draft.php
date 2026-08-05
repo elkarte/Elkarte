@@ -189,7 +189,7 @@ class Draft extends Post
 
 		// Let's see what we have been sent, one or many to delete
 		$toDelete = [];
-		if ($this->_req->hasQuery('delete'))
+		if ($this->_req->hasQuery('delete', true))
 		{
 			$toDelete[] = $this->_req->getQuery('delete', 'intval', 0);
 		}

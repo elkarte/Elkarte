@@ -1052,7 +1052,16 @@ function loadAssetFile($filenames, $params = [], $id = '')
 			if (!empty($filename))
 			{
 				$this_build[$this_id] = ['filename' => $filename, 'options' => $params];
-				$context[$params['index_name']][$this_id] = $this_build[$this_id];
+
+				// If it is already loaded, we want to make sure we don't overwrite it with fewer options
+				if (isset($context[$params['index_name']][$this_id]))
+				{
+					$context[$params['index_name']][$this_id]['options'] = array_merge($context[$params['index_name']][$this_id]['options'], $params);
+				}
+				else
+				{
+					$context[$params['index_name']][$this_id] = $this_build[$this_id];
+				}
 
 				if ($db_show_debug === true)
 				{

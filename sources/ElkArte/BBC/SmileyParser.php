@@ -222,7 +222,7 @@ class SmileyParser
 				$specialChars = htmlspecialchars($smileysFrom_i, ENT_QUOTES);
 
 				// Either a smiley :) or emoji :smile: with a defined image
-				$smileyCode = '<img src="' . $this->path . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysDescriptions[$i]), $replace) . '" class="smiley" />';
+				$smileyCode = '<img src="' . $this->path . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysDescriptions[$i]), $replace) . '" class="smiley" width=48 height=48 />';
 				$this->replace[$smileysFrom_i] = $smileyCode;
 
 				// An annoyance where test???? or test ???? would render ??? with a dangling '?'
