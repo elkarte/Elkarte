@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\PreparseMail;
 
 /**
  * Used to handle announce topic functionality.
@@ -161,9 +162,10 @@ class Announce extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($topic, 'message');
 
-		// Prepare a plain text (Markdown) body for email use, does the censoring as well
-		require_once(SUBSDIR . '/MaillistPost.subs.php');
-		pbe_prepare_text($topic_info['body'], $topic_info['subject']);
+		// Prepare an HTML body for email use, does the censoring as well
+		$mailPreparse = new PreparseMail();
+		$topic_info['body'] = $mailPreparse->preparseHtml($topic_info['body']);
+		$topic_info['subject'] = $mailPreparse->preparseSubject($topic_info['subject']);
 
 		// We need this to be able to send emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -263,7 +265,7 @@ class Announce extends AbstractController
 					'TOPICLINK' => getUrl('topic', ['topic' => $topic_info['id_topic'], 'start' => '0', 'subject' => $topic_info['subject']]),
 				];
 
-				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
+				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language, true);
 
 				$announcements[$cur_language] = [
 					'subject' => $emaildata['subject'],
@@ -279,7 +281,7 @@ class Announce extends AbstractController
 		// For each language send a different mail - low priority...
 		foreach ($announcements as $mail)
 		{
-			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, false, 5);
+			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, true, 5);
 		}
 	}
 }
