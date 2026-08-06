@@ -202,9 +202,9 @@ class ManageFeatures extends AbstractController
 			// Statistics.
 			['check', 'trackStats'],
 			['check', 'hitStats'],
+			['check', 'metadata_enabled'],
 			'',
 			// Option-ish things... miscellaneous sorta.
-			['check', 'metadata_enabled'],
 			['check', 'allow_disableAnnounce'],
 			['check', 'disallow_sendBody'],
 			['select', 'enable_contactform', ['disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu']]],
