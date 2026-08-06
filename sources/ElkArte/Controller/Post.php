@@ -202,7 +202,7 @@ class Post extends AbstractController
 		global $topic, $modSettings, $board, $context;
 
 		// You must be posting to *some* board.
-		if (empty($board) && !$context['make_event'])
+		if (empty($board) && empty($context['make_event']))
 		{
 			throw new Exception('no_board', false);
 		}

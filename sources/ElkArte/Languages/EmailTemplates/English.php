@@ -205,7 +205,7 @@ $txt['admin_register_immediate_body'] = 'Thank you for registering at {FORUMNAME
 $txt['new_announcement_subject'] = 'New announcement: {TOPICSUBJECT}';
 $txt['new_announcement_body'] = '{MESSAGE}
 
-To unsubscribe from these announcements, login to the forum and uncheck "Receive forum announcements and important notifications by email." in your profile.
+To unsubscribe from these announcements, login to the forum and uncheck "Receive site newsletters and announcements by email" in your profile notifications.
 
 You can view the full announcement by following this link:
 {TOPICLINK}
@@ -1054,68 +1054,96 @@ $txt['notify_html_email_body'] = '<!DOCTYPE html>
 	@description: A message sent to members on their birthday.
 */
 
-$txtBirthdayEmails['happy_birthday_subject'] = 'Happy birthday from {FORUMNAME}.';
+$txtBirthdayEmails['happy_birthday_subject'] = 'Happy Birthday, {REALNAME}!';
 $txtBirthdayEmails['happy_birthday_body'] = 'Dear {REALNAME},
 
-We here at {FORUMNAME} would like to wish you a happy birthday.  May this day and the year to follow be full of joy.
+Everyone at {FORUMNAME} would like to wish you a very happy birthday!
+
+Thank you for being part of our community. Whether you visit every day or stop by from time to time, we appreciate having you with us.
+
+We hope your birthday brings plenty of reasons to smile and that the year ahead is filled with good health, happiness, and new adventures.
+
+Enjoy your special day!
 
 {REGARDS}';
-$txtBirthdayEmails['happy_birthday_author'] = '<a href="http://www.simplemachines.org/community/?action=profile;u=2676">Thantos</a>';
 
-$txtBirthdayEmails['karlbenson1_subject'] = 'On your Birthday...';
-$txtBirthdayEmails['karlbenson1_body'] = 'We could have sent you a birthday card.  We could have sent you some flowers or a cake.
+$txtBirthdayEmails['greeting1_subject'] = 'Celebrating You Today!';
+$txtBirthdayEmails['greeting1_body'] = 'Happy Birthday, {REALNAME}!
 
-But we didn\'t.
+Today is all about celebrating you.
 
-We could have even sent you one of those automatically generated messages to wish you happy birthday where we don\'t even have to replace INSERT NAME.
+Your contributions, conversations, and presence help make {FORUMNAME} the welcoming community it is, and we\'re grateful you\'re part of it.
 
-But we didn\'t
+We hope your day is filled with laughter, good company, and maybe even a little cake.
 
-We wrote this birthday greeting just for you.
-
-We would like to wish you a very special birthday.
-
-{REGARDS}
-
-//:: This message was automatically generated :://';
-$txtBirthdayEmails['karlbenson1_author'] = '<a href="http://www.simplemachines.org/community/?action=profile;u=63186">karlbenson</a>';
-
-$txtBirthdayEmails['nite0859_subject'] = 'Happy Birthday!';
-$txtBirthdayEmails['nite0859_body'] = 'Your friends at {FORUMNAME} would like to take a moment of your time to wish you a happy birthday, {REALNAME}. If you have not done so recently, please visit our community in order for others to have the opportunity to pass along their warm regards.
-
-Even though today is your birthday, {REALNAME}, we would like to remind you that your membership in our community has been the best gift to us thus far.
-
-Best Wishes,
-The Staff of {FORUMNAME}';
-$txtBirthdayEmails['nite0859_author'] = '<a href="http://www.simplemachines.org/community/?action=profile;u=46625">nite0859</a>';
-
-$txtBirthdayEmails['zwaldowski_subject'] = 'Birthday Wishes to {REALNAME}';
-$txtBirthdayEmails['zwaldowski_body'] = 'Dear {REALNAME},
-
-Another year in your life has passed.  We at {FORUMNAME} hope it has been filled with happiness, and wish you luck in the coming one.
+Have a wonderful birthday and an amazing year ahead!
 
 {REGARDS}';
-$txtBirthdayEmails['zwaldowski_author'] = '<a href="http://www.simplemachines.org/community/?action=profile;u=72038">zwaldowski</a>';
 
-$txtBirthdayEmails['geezmo_subject'] = 'Happy birthday, {REALNAME}!';
-$txtBirthdayEmails['geezmo_body'] = 'Do you know who\'s having a birthday today, {REALNAME}?
+$txtBirthdayEmails['greeting2_subject'] = 'Best Wishes on Your Birthday!';
+$txtBirthdayEmails['greeting2_body'] = 'Happy Birthday, {REALNAME}!
 
-We know... YOU!
+Just a quick note from everyone at {FORUMNAME} to wish you a fantastic day.
 
-Happy birthday!
+May the coming year bring good fortune, memorable moments, and plenty of reasons to celebrate.
 
-You\'re now a year older but we hope you\'re a lot happier than last year.
-
-Enjoy your day today, {REALNAME}!
-
-- From your {FORUMNAME} family';
-$txtBirthdayEmails['geezmo_author'] = '<a href="http://www.simplemachines.org/community/?action=profile;u=48671">geezmo</a>';
-
-$txtBirthdayEmails['karlbenson2_subject'] = 'Your Birthday Greeting';
-$txtBirthdayEmails['karlbenson2_body'] = 'We hope your birthday is the best ever cloudy, sunny or whatever the weather.
-Have lots of birthday cake and fun, and tell us what you have done.
-
-We hope this message brought you cheer, and make it last, until same time same place, next year.
+Thanks for being part of our community!
 
 {REGARDS}';
-$txtBirthdayEmails['karlbenson2_author'] = '<a href="http://www.simplemachines.org/community/?action=profile;u=63186">karlbenson</a>';
+
+$txtBirthdayEmails['greeting3_subject'] = 'Happy Birthday from Your Friends at {FORUMNAME}';
+$txtBirthdayEmails['greeting3_body'] = 'Dear {REALNAME},
+
+Birthdays are a wonderful reminder to celebrate the people who make a community special.
+
+Thank you for being one of those people.
+
+We hope today is filled with happiness, laughter, and time spent with those who matter most. Here\'s to another year of great memories and new opportunities.
+
+Happy Birthday!
+
+{REGARDS}';
+
+$txtBirthdayEmails['greeting4_subject'] = 'It\'s Your Day!';
+$txtBirthdayEmails['greeting4_body'] = 'Hi {REALNAME},
+
+Someone has a birthday today...
+
+It\'s you!
+
+Everyone at {FORUMNAME} hopes your day is packed with smiles, good food, great company, and just the right amount of cake.
+
+Thanks for being part of our community. We look forward to seeing you around for another fantastic year.
+
+Happy Birthday!
+
+{REGARDS}';
+
+$txtBirthdayEmails['greeting5_subject'] = 'Another Great Year Begins Today';
+$txtBirthdayEmails['greeting5_body'] = 'Dear {REALNAME},
+
+From all of us at {FORUMNAME}, happy birthday!
+
+Communities are built by the people who participate in them, and we\'re glad you\'re one of ours.
+
+We hope today gives you time to relax, celebrate, and enjoy the people and things that make you happiest.
+
+Here\'s wishing you a wonderful birthday and a year filled with success, good health, and happiness.
+
+{REGARDS}';
+
+$txtBirthdayEmails['greeting6_subject'] = 'Achievement Unlocked: +1 Year';
+$txtBirthdayEmails['greeting6_body'] = 'Congratulations, {REALNAME}!
+
+You\'ve successfully completed another trip around the sun and unlocked a brand-new level.
+
+Your rewards include:
+  - Experience points
+  - Birthday wishes from everyone at {FORUMNAME}
+  - Permission to enjoy an extra slice of cake
+
+We hope your day is full of laughter and that the year ahead is your best one yet.
+
+Happy Birthday!
+
+{REGARDS}';

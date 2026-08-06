@@ -17,8 +17,10 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\PreparseMail;
 
 /**
  * Used to handle announce topic functionality.
@@ -64,8 +66,18 @@ class Announce extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Accessed by action=announce: action_selectgroup function.
-		$this->action_selectgroup();
+		// Add the sub-action array to dispatch accordingly
+		$subActions = [
+			'send' => [$this, 'action_send', 'permission' => 'announce_topic'],
+			'selectgroup' => [$this, 'action_selectgroup', 'permission' => 'announce_topic'],
+		];
+
+		// Set up the action handler
+		$action = new Action('announce');
+		$subAction = $action->initialize($subActions, 'selectgroup');
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -101,8 +113,8 @@ class Announce extends AbstractController
 		$context['topic_subject'] = censor($context['topic_subject']);
 
 		// Prepare for the template
-		$context['move'] = $this->_req->hasQuery('move') ? 1 : 0;
-		$context['go_back'] = $this->_req->hasQuery('goback') ? 1 : 0;
+		$context['move'] = $this->_req->hasQuery('move', true) ? 1 : 0;
+		$context['go_back'] = $this->_req->hasQuery('goback', true) ? 1 : 0;
 		$context['sub_template'] = 'announce';
 	}
 
@@ -142,16 +154,18 @@ class Announce extends AbstractController
 		// Make sure all membergroups are integers and can access the board of the announcement.
 		foreach ($_who as $id => $mg)
 		{
-			$who[$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
+			$mg = (int) $mg;
+			$who[$id] = in_array($mg, $groups) ? $mg : 0;
 		}
 
 		// Get the topic details that we are going to send
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($topic, 'message');
 
-		// Prepare a plain text (Markdown) body for email use, does the censoring as well
-		require_once(SUBSDIR . '/Maillist.subs.php');
-		pbe_prepare_text($topic_info['body'], $topic_info['subject']);
+		// Prepare an HTML body for email use, does the censoring as well
+		$mailPreparse = new PreparseMail();
+		$topic_info['body'] = $mailPreparse->preparseHtml($topic_info['body']);
+		$topic_info['subject'] = $mailPreparse->preparseSubject($topic_info['subject']);
 
 		// We need this to be able to send emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -163,8 +177,7 @@ class Announce extends AbstractController
 			'member_greater' => $context['start'],
 			'group_list' => $who,
 			'order_by' => 'id_member',
-			// @todo interface for this
-			'limit' => empty($modSettings['mail_queue']) ? 25 : 500,
+			'limit' => empty($modSettings['mail_queue']) ? 25 : 100,
 		];
 
 		// Have we allowed members to opt out of announcements?
@@ -180,11 +193,11 @@ class Announce extends AbstractController
 		{
 			logAction('announce_topic', ['topic' => $topic], 'user');
 
-			if ($this->_req->hasPost('move') && allowedTo('move_any'))
+			if ($this->_req->hasPost('move', true) && allowedTo('move_any'))
 			{
 				redirectexit('action=movetopic;topic=' . $topic . '.0' . ($this->_req->hasPost('goback') ? ';goback' : ''));
 			}
-			elseif ($this->_req->hasPost('goback'))
+			elseif ($this->_req->hasPost('goback', true))
 			{
 				redirectexit('topic=' . $topic . '.new;boardseen#new');
 			}
@@ -207,8 +220,8 @@ class Announce extends AbstractController
 		}
 
 		// Prepare for the template
-		$context['move'] = $this->_req->hasPost('move') ? 1 : 0;
-		$context['go_back'] = $this->_req->hasPost('goback') ? 1 : 0;
+		$context['move'] = $this->_req->hasPost('move', true) ? 1 : 0;
+		$context['go_back'] = $this->_req->hasPost('goback', true) ? 1 : 0;
 		$context['membergroups'] = implode(',', $who);
 		$context['topic_subject'] = $topic_info['subject'];
 		$context['sub_template'] = 'announcement_send';
@@ -252,7 +265,7 @@ class Announce extends AbstractController
 					'TOPICLINK' => getUrl('topic', ['topic' => $topic_info['id_topic'], 'start' => '0', 'subject' => $topic_info['subject']]),
 				];
 
-				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
+				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language, true);
 
 				$announcements[$cur_language] = [
 					'subject' => $emaildata['subject'],
@@ -268,7 +281,7 @@ class Announce extends AbstractController
 		// For each language send a different mail - low priority...
 		foreach ($announcements as $mail)
 		{
-			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, false, 5);
+			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, true, 5);
 		}
 	}
 }

@@ -158,7 +158,7 @@ class ManageMail extends AbstractController
 
 		// Build a little JS so the birthday mail can be seen
 		$javascript = '
-			var bDay = {';
+			let bDay = {';
 
 		$i = 0;
 		foreach ($processedBirthdayEmails as $index => $email)
@@ -176,7 +176,7 @@ class ManageMail extends AbstractController
 		
 		function fetch_birthday_preview()
 		{
-			var index = document.getElementById(\'birthday_email\').value;
+			let index = document.getElementById(\'birthday_email\').value;
 
 			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
 			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
@@ -233,8 +233,8 @@ class ManageMail extends AbstractController
 			['text', 'smtp_username'],
 			['password', 'smtp_password'],
 			'',
-			['select', 'birthday_email', $emails, 'value' => ['subject' => $subject, 'body' => $body], 'javascript' => 'onchange="fetch_birthday_preview()"'],
-			'birthday_subject' => ['var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3],
+			['select', 'birthday_email', $emails, 'javascript' => 'onchange="fetch_birthday_preview()"'],
+			'birthday_subject' => ['var_message', 'birthday_subject', 'message' => $subject, 'disabled' => true, 'size' => strlen($subject) + 3],
 			'birthday_body' => ['var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)],
 		];
 
