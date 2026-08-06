@@ -63,6 +63,7 @@ class Movetopic extends AbstractController
 		$subActions = [
 			'movetopic' => [$this, 'action_movetopic'],
 			'movetopic2' => [$this, 'action_movetopic2'],
+			'none' => [$this, 'action_none'],
 		];
 
 		// Without anything it throws an error, so redirect somewhere
@@ -75,6 +76,14 @@ class Movetopic extends AbstractController
 		$subAction = $action->initialize($subActions, 'none');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Default action, redirects to the board index
+	 */
+	public function action_none(): void
+	{
+		redirectexit();
 	}
 
 	/**
