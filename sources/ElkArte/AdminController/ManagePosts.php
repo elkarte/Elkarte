@@ -104,11 +104,10 @@ class ManagePosts extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		checkSession();
-
 		if ($this->_req->hasPost('save_censor'))
 		{
 			// Make sure censoring is something they can do.
+			checkSession();
 			validateToken('admin-censor');
 
 			$censored_vulgar = [];
@@ -171,6 +170,8 @@ class ManagePosts extends AbstractController
 		$pre_censor = '';
 		if ($this->_req->hasPost('censortest'))
 		{
+			checkSession();
+
 			require_once(SUBSDIR . '/Post.subs.php');
 			$raw = (string) $this->_req->getPost('censortest', null, '');
 			$censorText = htmlspecialchars($raw, ENT_QUOTES, 'UTF-8');
