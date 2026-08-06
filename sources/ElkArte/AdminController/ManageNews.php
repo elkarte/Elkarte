@@ -773,8 +773,11 @@ class ManageNews extends AbstractController
 			}
 
 			// Always respect user notification preferences
-			$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
-			$sendParams['notify_announcements'] = 1;
+			if (!empty($modSettings['allow_disableAnnounce']))
+			{
+				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
+				$sendParams['notify_announcements'] = 1;
+			}
 
 			// We need some functions for this.
 			require_once(SUBSDIR . '/News.subs.php');

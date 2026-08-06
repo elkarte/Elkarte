@@ -50,6 +50,13 @@ class Birthdayemails implements ScheduledTaskInterface
 		$month = date('n'); // Month without leading zeros.
 		$day = date('j'); // Day without leading zeros.
 
+		$extra = '';
+		if (!empty($modSettings['allow_disableAnnounce']))
+		{
+			// If they don't want to receive birthday greetings, don't send them.
+			$extra = ' AND notify_announcements = {int:notify_announcements}';
+		}
+
 		// So who are the lucky ones?  Don't include those who are banned and those who don't want them.
 		$birthdays = [];
 		$db->fetchQuery('
@@ -59,8 +66,7 @@ class Birthdayemails implements ScheduledTaskInterface
 			WHERE is_activated < 10
 				AND MONTH(birthdate) = {int:month}
 				AND DAYOFMONTH(birthdate) = {int:day}
-				AND notify_announcements = {int:notify_announcements}
-				AND YEAR(birthdate) > {int:year}',
+				AND YEAR(birthdate) > {int:year}' . $extra,
 			[
 				'notify_announcements' => 1,
 				'year' => 1,
@@ -82,7 +88,7 @@ class Birthdayemails implements ScheduledTaskInterface
 		);
 
 		// Send out the greetings!
-		foreach ($birthdays as $lang => $recps)
+		foreach ($birthdays as $lang => $recipients)
 		{
 			// We need to do some shuffling to make this work properly.
 			$mtxt = [];
@@ -91,15 +97,15 @@ class Birthdayemails implements ScheduledTaskInterface
 			$txt['happy_birthday_subject'] = $mtxt[$greeting . '_subject'];
 			$txt['happy_birthday_body'] = $mtxt[$greeting . '_body'];
 
-			foreach ($recps as $recp)
+			foreach ($recipients as $user)
 			{
 				$replacements = [
-					'REALNAME' => $recp['name'],
+					'REALNAME' => $user['name'],
 				];
 
 				$emaildata = loadEmailTemplate('happy_birthday', $replacements, $lang, false, false);
 
-				sendmail($recp['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 4);
+				sendmail($user['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 4);
 
 				// Try to stop a timeout, this would be bad...
 				detectServer()->setTimeLimit(300);

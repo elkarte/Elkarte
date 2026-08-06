@@ -826,7 +826,22 @@ function template_action_notification()
 				', $txt['notifications'], '
 			</h2>
 			<p class="description">', $txt['notification_settings_info'], '</p>
-			<div class="content">
+			<div class="content">';
+
+	// Allow notification on announcements/birthday/newletters to be disabled?
+	if (!empty($modSettings['allow_disableAnnounce']))
+	{
+		echo '
+					<dt>
+						<label for="notify_announcements">', $txt['notify_important_email'], '</label>
+					</dt>
+					<dd>
+						<input type="hidden" name="notify_announcements" value="0" />
+						<input type="checkbox" id="notify_announcements" name="notify_announcements"', empty($context['member']['notify_announcements']) ? '' : ' checked="checked"', ' />
+					</dd>';
+	}
+
+	echo'
 				<dl>
 					<dt>
 						<label for="notify_from">', $txt['notify_from'], '</label>
@@ -840,7 +855,7 @@ function template_action_notification()
 						</select>
 					</dd>
 				</dl>
-				
+
 				<dl>';
 
 	foreach ($context['mention_types'] as $type => $mention_methods)
@@ -854,7 +869,7 @@ function template_action_notification()
 					<dt>
 						<label for="notify_', $type, '">', $txt['notify_type_' . $type], '</label>
 					</dt>
-					<dd>	
+					<dd>
 						<label for="notify_', $type, '_default">', $txt['notify_method_use_default'], '</label>
 						<input id="notify_', $type, '_default" name="', $mention_methods['default_input_name'], '" class="toggle_notify" type="checkbox" value="1" ', $mention_methods['value'] ? '' : 'checked="checked"', '/>
 						<select class="select_multiple" multiple="multiple" id="notify_', $type, '" name="', $mention_methods['user_input_name'], '[]">';
@@ -880,19 +895,6 @@ function template_action_notification()
 			<div class="content">
 				<dl>';
 
-	// Allow notification on announcements to be disabled?
-	if (!empty($modSettings['allow_disableAnnounce']))
-	{
-		echo '
-					<dt>
-						<label for="notify_announcements">', $txt['notify_important_email'], '</label>
-					</dt>
-					<dd>
-						<input type="hidden" name="notify_announcements" value="0" />
-						<input type="checkbox" id="notify_announcements" name="notify_announcements"', empty($context['member']['notify_announcements']) ? '' : ' checked="checked"', ' />
-					</dd>';
-	}
-
 	// Auto notification when you reply / start a topic?
 	echo '
 					<dt>
@@ -901,7 +903,6 @@ function template_action_notification()
 					<dd>
 						<input type="hidden" name="default_options[auto_notify]" value="0" />
 						<input type="checkbox" id="auto_notify" name="default_options[auto_notify]" value="1"', empty($context['member']['options']['auto_notify']) ? '' : ' checked="checked"', ' />
-						', (empty($modSettings['maillist_enabled']) ? '' : $txt['auto_notify_pbe_post']), '
 					</dd>';
 
 	// Can the body of the post be sent, PBE will ensure it can
@@ -953,7 +954,7 @@ function template_action_notification()
 						</select>
 					</dd>
 				</dl>
-				
+
 				<div class="submitbutton">
 					<input id="notify_submit" name="notify_submit" type="submit" value="', $txt['notify_save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', empty($context['token_check']) ? '' : '
