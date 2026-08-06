@@ -1040,12 +1040,14 @@ function pbe_disable_user_notify($email_message)
 		[$id_member] = $request->fetch_row();
 		$request->free_result();
 
-		// Once we have the member's ID, we can turn off board/topic notifications
-		// by setting notify_regularity->99 ("Never")
+		// Once we have the member's ID, we can turn off board/topic notifications, announcements, and PM email notifications. This is done
+		// by setting notify_regularity->99 ("Never") and notify_announcements->0 ("No") and pm_email_notify->0 ("No").
 		$db->query('', '
 			UPDATE {db_prefix}members
 			SET
-				notify_regularity = 99
+				notify_regularity = 99,
+				notify_announcements = 0,
+				pm_email_notify = 0
 			WHERE id_member = {int:id_member}',
 			[
 				'id_member' => $id_member
