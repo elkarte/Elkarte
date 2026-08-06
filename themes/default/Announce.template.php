@@ -36,7 +36,9 @@ function template_announce()
 	{
 		echo '
 					<li>
-						<label for="who_', $group['id'], '"><input type="checkbox" name="who[', $group['id'], ']" id="who_', $group['id'], '" value="', $group['id'], '" checked="checked" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
+						<label for="who_', $group['id'], '">
+							<input type="checkbox" name="who[', $group['id'], ']" id="who_', $group['id'], '" value="', $group['id'], '" checked="checked" /> ', $group['name'], '
+						</label> <em>(', $group['member_count'], ')</em>
 					</li>';
 	}
 

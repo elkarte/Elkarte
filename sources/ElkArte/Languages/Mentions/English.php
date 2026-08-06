@@ -29,7 +29,7 @@ $txt['mention_likemsg'] = 'Liked your message {msg_link}';
 $txt['mention_rlikemsg'] = 'Unliked your message {msg_link}';
 $txt['mention_buddy'] = 'Added you to their buddy list.';
 $txt['mention_quotedmem'] = 'Quoted a message of yours in {msg_link}';
-$txt['mention_mailfail'] = 'Disabled email notification due to delivery failure';
+$txt['mention_mailfail'] = 'Disabled all email notifications due to delivery failure';
 $txt['mention_watchedtopic'] = 'Posted a new message in {msg_link}';
 $txt['mention_watchedboard'] = 'Started a new topic "{topic_link}" on the "{board}" board.';
 

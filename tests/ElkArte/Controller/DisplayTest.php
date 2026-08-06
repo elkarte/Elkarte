@@ -36,7 +36,7 @@ class DisplayTest extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test getting the group list for an announcement
+	 * Test getting various data from the Display controller
 	 */
 	public function testActionDisplay()
 	{

@@ -34,7 +34,7 @@ class AttachmentTest extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test getting the group list for an announcement
+	 * Test getting the controller
 	 */
 	public function testNeedTheme()
 	{
