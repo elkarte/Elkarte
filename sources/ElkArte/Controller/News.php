@@ -604,6 +604,7 @@ class News extends AbstractController
 		$message = str_replace('<br />', "\n", $message);
 
 		// Convert bbc [quotes] before we go to parsebbc
+		Txt::load('Maillist');
 		$message = preg_replace_callback('~\[quote[^]]*?]~iu', fn(array $matches): string => $this->quoteCallback($matches), $message);
 		$message = str_replace('[/quote]', '</blockquote>', $message);
 
