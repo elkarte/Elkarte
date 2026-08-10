@@ -283,10 +283,10 @@
 			// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
 			// http://youtu.be/lLOE3fBZcUU?t=97 when you right-click on a video and choose "Copy video URL at current time"
 			// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
-			let startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/),
+			let startAt = path.match(/t=(?:([0-9]{1,2})h)?(?:([0-9]{1,2})m)?(?:([0-9]+)s?)?/),
 				startAtPar = '';
 
-			if (startAt)
+			if (startAt && (startAt[1] || startAt[2] || startAt[3]))
 			{
 				let startAtSeconds = 0;
 
