@@ -911,7 +911,7 @@ function template_callback_question_answer_list()
 			foreach ($context['languages'] as $lang)
 			{
 				echo '
-					<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
+					<option value="', $lang['name'], '"', $lang['name'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
 			}
 
 			echo '
@@ -943,15 +943,15 @@ function template_callback_question_answer_list()
 		foreach ($context['languages'] as $lang)
 		{
 			$lang_dropdown .= '
-				<option value="' . $lang['filename'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
+				<option value="' . $lang['name'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
 		}
 
 		$lang_dropdown .= '
 			</select>';
 	}
 
-	// Some blank ones.
-	for ($count = 0; $count < 3; $count++)
+	// Some a blank one.
+	for ($count = 0; $count < 1; $count++)
 	{
 		echo '
 			<dt class="questions">
