@@ -217,7 +217,6 @@ class Questions implements ControlInterface
 		}
 
 		// Need to load the valueContainer this way
-		//$sessionVal['q'] = [];
 		$sessionVal['q'] = $value;
 
 		return [
@@ -342,13 +341,13 @@ class Questions implements ControlInterface
 
 		$languages = getLanguages();
 
-		// Languages dropdown only if we have more than a lang installed, otherwise is plain useless
+		// Language dropdown only if we have more than a language installed, otherwise is plain useless
 		if (count($languages) > 1)
 		{
 			$context['languages'] = $languages;
 			foreach ($context['languages'] as &$lang)
 			{
-				if ($lang['filename'] === $language)
+				if ($lang['name'] === $language)
 				{
 					$lang['selected'] = true;
 				}
@@ -399,6 +398,8 @@ class Questions implements ControlInterface
 		// Handle verification questions.
 		$questionInserts = [];
 		$count_questions = 0;
+
+		$languages = getLanguages();
 
 		foreach ($save_question as $id => $question)
 		{
@@ -497,7 +498,6 @@ class Questions implements ControlInterface
 			[
 				'id' => $id,
 				'question' => $question,
-				// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
 				'answer' => serialize($answers),
 				'language' => $language,
 			]

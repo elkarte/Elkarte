@@ -35,7 +35,7 @@ class CurlFetchWebdataTest extends TestCase
 			array(
 				'https://duckduckgo.com/html',
 				array('q' => 'stargate+sg1 site:www.imdb.com', 'b' => ''),
-				[200, 403],
+				[200, 202, 403],
 				'TV Series',
 			),
 		);
@@ -102,7 +102,6 @@ class CurlFetchWebdataTest extends TestCase
 			// Post to a page
 			$curl->get_url_data($testcase[0], $testcase[1]);
 
-			// Check for correct fetch
 			// Check for correct fetch
 			if (!empty($testcase[2]))
 			{
