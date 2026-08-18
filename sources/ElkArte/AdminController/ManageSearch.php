@@ -743,6 +743,7 @@ class ManageSearch extends AbstractController
 			'manticore_data_path' => rtrim($this->_req->post->manticore_data_path, '/'),
 			'manticore_log_path' => rtrim($this->_req->post->manticore_log_path, '/'),
 			'manticore_stopword_path' => $this->_req->getPost('manticore_stopword_path', 'trim', ''),
+			'manticore_wordform_path' => $this->_req->getPost('manticore_wordform_path', 'trim', ''),
 			'manticore_indexer_mem' => $this->_req->getPost('manticore_indexer_mem', 'intval', 128),
 			'manticore_searchd_server' => $this->_req->getPost('manticore_searchd_server', 'trim', 'localhost'),
 			'manticore_searchd_port' => $this->_req->getPost('manticore_searchd_port', 'intval', 0),
@@ -751,7 +752,7 @@ class ManageSearch extends AbstractController
 	}
 
 	/**
-	 * Attempt to connect to Sphinx using the preferred QL way
+	 * Attempt to connect to Manticore Daemon
 	 */
 	public function connectManticore(): void
 	{

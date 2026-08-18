@@ -249,7 +249,7 @@ class Search extends AbstractController
 					$txt['error_string_too_long'] = sprintf($txt['error_string_too_long'], $context['search_string_limit']);
 				}
 
-				$context['search_errors']['messages'][] = $txt['error_' . $search_error];
+				$context['search_errors']['messages'][] = $txt['error_' . $search_error] ?? ($txt[$search_error] ?? $search_error);
 			}
 		}
 
