@@ -432,7 +432,7 @@ class ManageServer extends AbstractController
 			$settingsForm->save();
 
 			// we need to save the $cache_enable to $modSettings as well
-			updateSettings(['cache_enable' => (int) $this->_req->post->cache_enable]);
+			updateSettings(['cache_enable' => (int) $this->_req->post->cache_enable], true);
 
 			// exit so we reload our new settings on the page
 			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);

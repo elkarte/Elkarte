@@ -224,10 +224,12 @@ class SettingsFormTest extends TestCase
 
 		$this->configVars = array(
 			array('mtitle', 'maintenance_subject', 'file', 'text', 36),
+			array('cachedir', 'cachedir', 'file', 'text', 36),
 			array('enableCompressedOutput', 'enableCompressedOutput', 'db', 'check', null, 'enableCompressedOutput'),
 		);
 		$this->configValues = array(
 			'mtitle' => 'value',
+			'cachedir' => '/var/www/cache',
 			'enableCompressedOutput' => '1'
 		);
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
@@ -236,12 +238,13 @@ class SettingsFormTest extends TestCase
 		$settingsForm->save();
 
 		// Reload
-		global $mtitle;
+		global $mtitle, $cachedir;
 		require(BOARDDIR . '/Settings.php');
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->prepare();
 		$this->assertSame('value', $mtitle);
+		$this->assertSame('/var/www/cache', $cachedir);
 		$this->assertSame('value', $context['config_vars'][$this->configVars[0][0]]['value']);
-		$this->assertEquals(1, $context['config_vars'][$this->configVars[1][0]]['value']);
+		$this->assertEquals(1, $context['config_vars'][$this->configVars[2][0]]['value']);
 	}
 }

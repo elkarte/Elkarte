@@ -221,13 +221,14 @@ class ManageSmileys extends AbstractController
 			if (preg_match('~:[\w-]{2,}:~u', $smile['code'], $match) === 1)
 			{
 				// If the emoji IS an image file in the currently selected set
-				$filename = $context['smiley_dir'] . $smile['filename'] . '.' . $context['smiley_extension'];
+				$imageFile = getSmileyImageFilename($smile['filename'], $context['smiley_dir'], $context['smiley_extension']);
+				$filename = $context['smiley_dir'] . $imageFile;
 				if ($fileFunc->fileExists($filename))
 				{
 					$custom[] = [
 						'name' => trim($smile['code'], ':'),
-						'key' => $smile['filename'],
-						'type' => $context['smiley_extension']
+						'key' => pathinfo($imageFile, PATHINFO_FILENAME),
+						'type' => pathinfo($imageFile, PATHINFO_EXTENSION),
 					];
 				}
 			}
@@ -1109,7 +1110,7 @@ class ManageSmileys extends AbstractController
 						'data' => [
 							'function' => static fn($rowData) => '
 								<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '']) . $rowData['id_smiley'] . '">
-									<img class="smiley" src="' . $context['smiley_path'] . $rowData['filename'] . '.' . $context['smiley_extension'] . '" alt="' . $rowData['description'] . '" id="smiley' . $rowData['id_smiley'] . '" />
+									<img class="smiley" src="' . $context['smiley_path'] . $rowData['image'] . '" alt="' . $rowData['description'] . '" id="smiley' . $rowData['id_smiley'] . '" />
 									<input type="hidden" name="smileys[' . $rowData['id_smiley'] . '][filename]" value="' . $rowData['filename'] . '" />
 								</a>'
 						],
@@ -1169,11 +1170,12 @@ class ManageSmileys extends AbstractController
 								$found_replacement = '';
 								foreach ($context['smiley_sets'] as $smiley_set)
 								{
-									$filename = $rowData['filename'] . '.' . $smiley_set['ext'];
-									if (!$fileFunc->fileExists($modSettings['smileys_dir'] . '/' . $smiley_set['path'] . '/' . $filename))
+									$setDir = $modSettings['smileys_dir'] . '/' . $smiley_set['path'];
+									$filename = getSmileyImageFilename($rowData['filename'], $setDir, $smiley_set['ext']);
+									if (!$fileFunc->fileExists($setDir . '/' . $filename))
 									{
 										$missing_sets[] = $smiley_set['path'];
-										if (possibleSmileEmoji($rowData, $modSettings['smileys_dir'] . '/' . $smiley_set['path'], $smiley_set['ext']))
+										if (possibleSmileEmoji($rowData, $setDir, $smiley_set['ext']))
 										{
 											$found_replacement = $rowData['emoji'] . '.svg';
 										}
@@ -1289,8 +1291,14 @@ class ManageSmileys extends AbstractController
 			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code'], ENT_COMPAT, 'UTF-8');
 			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename'], ENT_COMPAT, 'UTF-8');
 			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description'], ENT_COMPAT, 'UTF-8');
+			$context['current_smiley']['image'] = getSmileyImageFilename($context['current_smiley']['filename'], $context['smileys_dir'] . '/' . $modSettings['smiley_sets_default'], $context['smiley_extension']);
 
-			if (isset($context['filenames'][strtolower($context['current_smiley']['filename'])]))
+			$key = strtolower(pathinfo($context['current_smiley']['filename'], PATHINFO_FILENAME));
+			if (isset($context['filenames'][$key]))
+			{
+				$context['filenames'][$key]['selected'] = true;
+			}
+			elseif (isset($context['filenames'][strtolower($context['current_smiley']['filename'])]))
 			{
 				$context['filenames'][strtolower($context['current_smiley']['filename'])]['selected'] = true;
 			}

@@ -585,7 +585,7 @@ function template_manage_manticore()
 						<span class="smalltext">', $txt['manticore_stop_word_path_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="manticore_stopword_path" id="manticore_stopword_path_input" value="', $modSettings['manticore_wordform_path'] ?? '', '" size="65" />
+						<input type="text" name="manticore_stopword_path" id="manticore_stopword_path_input" value="', $modSettings['manticore_stopword_path'] ?? '', '" size="65" />
 					</dd>
 					<dt>
 						<label for="manticore_wordform_path_input">', $txt['manticore_word_form_path'], '</label><br />

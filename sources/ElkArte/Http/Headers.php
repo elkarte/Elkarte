@@ -84,6 +84,7 @@ class Headers
 		// Set the location header and code
 		$this
 			->header('Location', $setLocation)
+			->header('Cache-Control', 'no-store, no-cache, must-revalidate')
 			->httpCode = $httpCode ?? 302;
 
 		return $this;

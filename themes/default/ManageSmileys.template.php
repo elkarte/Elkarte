@@ -142,7 +142,7 @@ function template_modifysmiley()
 						<label>', $txt['smiley_preview'], ': </label>
 					</dt>
 					<dd>
-						<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['filename'] . '.' . $context['smiley_extension'], '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <select id="set" name="set" onchange="updatePreview();">';
+						<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['current_smiley']['image'] ?? ($context['current_smiley']['filename'] . '.' . $context['smiley_extension']), '" id="preview" alt="" /> (', $txt['smiley_preview_using'], ': <select id="set" name="set" onchange="updatePreview();">';
 
 	foreach ($context['smiley_sets'] as $smiley_set)
 	{
@@ -252,7 +252,7 @@ function template_addsmiley()
 							<label for="set">', $txt['smiley_sets_preview'], '</label>
 						</dt>
 						<dd>
-							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $context['filenames'][0]['id'] . '.' . $context['smiley_extension'], '" id="preview" alt="" />
+							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', !empty($context['filenames'][0]['id']) ? getSmileyImageFilename($context['filenames'][0]['id'], $context['smileys_dir'] . '/' . $modSettings['smiley_sets_default'], $context['smiley_extension']) : '', '" id="preview" alt="" />
 							', $txt['smiley_preview_using'], ': 
 							<select id="set" name="set" onchange="updatePreview();selectMethod(\'existing\');">';
 
@@ -419,8 +419,10 @@ function template_setorder()
 				}
 				else
 				{
+					$image = (isset($smiley['emoji']) ? $context['emoji_path'] : $context['smiley_path']) . $smiley['filename'];
+
 					echo '
-					<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" />
+					<img src="', $image, '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" />
 					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '">
 						<i class="icon i-arrow-down"></i>
 					</a>';

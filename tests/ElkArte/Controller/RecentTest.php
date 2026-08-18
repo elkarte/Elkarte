@@ -46,4 +46,24 @@ class RecentTest extends ElkArteCommonSetupTest
 		$this->assertEquals('Welcome to ElkArte!', $context['posts'][1]['subject']);
 		$this->assertEquals('recent', $context['sub_template']);
 	}
+
+	/**
+	 * Test that posts in the recycle board are not listed in recent posts
+	 */
+	public function testRecentRecycleBoard()
+	{
+		global $context, $modSettings;
+
+		$modSettings['recycle_enable'] = 1;
+		$modSettings['recycle_board'] = 1;
+
+		$controller = new Recent(new EventManager());
+		$controller->setUser(User::$info);
+		$controller->pre_dispatch();
+		$controller->action_recent();
+
+		$this->assertNotNull($context);
+		$this->assertEmpty($context['posts']);
+		$this->assertEquals('recent', $context['sub_template']);
+	}
 }
