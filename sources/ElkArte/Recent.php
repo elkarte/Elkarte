@@ -102,7 +102,7 @@ class Recent
 
 		if (!empty($recycle))
 		{
-			$this->_query_parameters['recycle_board'] = $msg_id;
+			$this->_query_parameters['recycle_board'] = $recycle;
 		}
 
 		$this->_query_parameters['max_id_msg'] = $msg_id;
