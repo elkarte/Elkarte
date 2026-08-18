@@ -195,6 +195,9 @@ class File extends Db
 			'language',
 			'mbname',
 			'boardurl',
+			'boarddir',
+			'sourcedir',
+			'cachedir',
 			'cookiename',
 			'webmaster_email',
 			'db_name',
@@ -572,7 +575,7 @@ class File extends Db
 			if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
 				((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, (string) ini_get('opcache.restrict_api')) !== 0)))
 			{
-				opcache_invalidate(BOARDDIR . '/Settings.php');
+				opcache_invalidate(BOARDDIR . '/Settings.php', true);
 			}
 		}
 	}

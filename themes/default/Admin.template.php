@@ -473,7 +473,7 @@ function template_show_settings()
 
 	echo '
 	<div id="', $context['current_subaction'] ?? 'admincenter', '" class="admincenter">
-		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', empty($context['force_form_onsubmit']) ? '' : ' onsubmit="' . $context['force_form_onsubmit'] . '"', '>';
+		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', empty($context['force_form_onsubmit']) ? '' : ' onsubmit="' . $context['force_form_onsubmit'] . '"', ' autocomplete="off">';
 
 	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
