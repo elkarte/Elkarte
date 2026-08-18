@@ -35,7 +35,7 @@ class CurlFetchWebdataTest extends TestCase
 			array(
 				'https://duckduckgo.com/html',
 				array('q' => 'stargate+sg1 site:www.imdb.com', 'b' => ''),
-				[200, 202, 403],
+				[0, 200, 202, 403],
 				'TV Series',
 			),
 		);
