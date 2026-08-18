@@ -208,6 +208,8 @@ class SmileyParser
 	 */
 	protected function setSearchReplace($smileysFrom, $smileysTo, $smileysDescriptions): void
 	{
+		require_once(SUBSDIR . '/Smileys.subs.php');
+
 		$searchParts = [];
 		$fileFunc = FileFunctions::instance();
 		$replace = [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;'];
@@ -216,13 +218,14 @@ class SmileyParser
 		{
 			// If an :emoji: tag, from smiles ACP, does not have an img file, leave it for emoji parsing
 			$possibleEmoji = isset($smileysFrom_i[3]) && $smileysFrom_i[0] === ':' && str_ends_with($smileysFrom_i, ':');
-			$filename = $this->dir . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'];
+			$imageFile = getSmileyImageFilename($smileysTo[$i], $this->dir, $GLOBALS['context']['smiley_extension'] ?? 'svg');
+			$filename = $this->dir . $imageFile;
 			if (!$possibleEmoji || $fileFunc->fileExists($filename))
 			{
 				$specialChars = htmlspecialchars($smileysFrom_i, ENT_QUOTES);
 
 				// Either a smiley :) or emoji :smile: with a defined image
-				$smileyCode = '<img src="' . $this->path . $smileysTo[$i] . '.' . $GLOBALS['context']['smiley_extension'] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysDescriptions[$i]), $replace) . '" class="smiley" width=48 height=48 />';
+				$smileyCode = '<img src="' . $this->path . $imageFile . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysDescriptions[$i]), $replace) . '" class="smiley" width=48 height=48 />';
 				$this->replace[$smileysFrom_i] = $smileyCode;
 
 				// An annoyance where test???? or test ???? would render ??? with a dangling '?'

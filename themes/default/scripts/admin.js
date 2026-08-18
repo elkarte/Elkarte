@@ -721,11 +721,18 @@ function updatePreview ()
 {
 	let currentImage = document.getElementById('preview'),
 		selected = document.getElementById('set'),
-		ext;
+		ext,
+		filename;
 
 	ext = selected.options[selected.selectedIndex].getAttribute('data-ext');
+	filename = document.forms.smileyForm.smiley_filename.value;
 
-	currentImage.src = elk_smiley_url + '/' + document.forms.smileyForm.set.value + '/' + document.forms.smileyForm.smiley_filename.value + '.' + ext;
+	if (!/\.(jpg|gif|jpeg|png|webp|svg)$/i.test(filename))
+	{
+		filename = filename + '.' + ext;
+	}
+
+	currentImage.src = elk_smiley_url + '/' + document.forms.smileyForm.set.value + '/' + filename;
 	currentImage.alt = '☒';
 }
 
@@ -771,6 +778,7 @@ function changeSet (newSet)
 		i,
 		n,
 		ext,
+		filename,
 		knownSmileys = [],
 		selected = document.getElementById('set');
 
@@ -790,8 +798,14 @@ function changeSet (newSet)
 	for (i = 0; i < knownSmileys.length; i++)
 	{
 		currentImage = document.getElementById('smiley' + knownSmileys[i]);
+		filename = document.forms.smileyForm['smileys[' + knownSmileys[i] + '][filename]'].value;
 
-		currentImage.src = elk_smiley_url + '/' + newSet + '/' + document.forms.smileyForm['smileys[' + knownSmileys[i] + '][filename]'].value + '.' + ext;
+		if (!/\.(jpg|gif|jpeg|png|webp|svg)$/i.test(filename))
+		{
+			filename = filename + '.' + ext;
+		}
+
+		currentImage.src = elk_smiley_url + '/' + newSet + '/' + filename;
 	}
 }
 

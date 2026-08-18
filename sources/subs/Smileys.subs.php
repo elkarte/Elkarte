@@ -217,7 +217,7 @@ function getSmiley($id)
 			$current_smiley = [
 				'id' => $row['id'],
 				'code' => $row['code'],
-				'filename' => pathinfo($row['filename'], PATHINFO_FILENAME),
+				'filename' => $row['filename'],
 				'description' => $row['description'],
 				'row' => $row['smiley_row'],
 				'is_new' => 0,
@@ -384,7 +384,7 @@ function getSmileys()
 			global $context;
 
 			$location = empty($row['hidden']) ? 'postform' : 'popup';
-			$filename = pathinfo($row['filename'], PATHINFO_FILENAME) . '.' . $context['smiley_extension'];
+			$filename = getSmileyImageFilename($row['filename'], $context['smiley_dir'] ?? null, $context['smiley_extension'] ?? 'svg');
 			if (possibleSmileEmoji($row))
 			{
 				$filename = $row['emoji'] . '.svg';
@@ -573,6 +573,8 @@ function list_getNumSmileySets()
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {
+	global $context;
+
 	$db = database();
 
 	$result = [];
@@ -584,11 +586,13 @@ function list_getSmileys($start, $items_per_page, $sort)
 		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		[]
 	)->fetch_callback(
-		function($row) use(&$result) {
+		function($row) use(&$result, $context) {
+			$imageFile = getSmileyImageFilename($row['filename'], $context['smiley_dir'] ?? null, $context['smiley_extension'] ?? 'svg');
 			$result[] = [
 				'id_smiley' => $row['id_smiley'],
 				'code' => $row['code'],
-				'filename' => pathinfo($row['filename'], PATHINFO_FILENAME),
+				'filename' => $row['filename'],
+				'image' => $imageFile,
 				'description' => $row['description'],
 				'smiley_row' => $row['smiley_row'],
 				'smiley_order' => $row['smiley_order'],
@@ -686,6 +690,57 @@ function getFirstImageExtensionInDir(string $dir): ?string
 
 
 /**
+ * Resolves the actual filename (with extension) of a smiley in a given directory or set.
+ *
+ * @param string $filename Smiley filename from database (with or without extension)
+ * @param string|null $dir Absolute directory path of the smiley set
+ * @param string|null $defaultExt Default extension of the smiley set (e.g. svg)
+ * @return string Resolved filename with extension
+ */
+function getSmileyImageFilename(string $filename, ?string $dir = null, ?string $defaultExt = 'svg'): string
+{
+	$fileFunc = FileFunctions::instance();
+	$base = pathinfo($filename, PATHINFO_FILENAME);
+	$fileExt = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+	$defaultExt = $defaultExt ?: 'svg';
+	$allowed = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
+
+	if (!empty($dir))
+	{
+		$dir = rtrim($dir, '/\\') . DIRECTORY_SEPARATOR;
+
+		// If filename already has an extension and exists on disk
+		if ($fileExt !== '' && in_array($fileExt, $allowed, true) && $fileFunc->fileExists($dir . $filename))
+		{
+			return $filename;
+		}
+
+		// If base with default extension exists on disk
+		if ($fileFunc->fileExists($dir . $base . '.' . $defaultExt))
+		{
+			return $base . '.' . $defaultExt;
+		}
+
+		// If base with any allowed extension exists on disk
+		foreach ($allowed as $type)
+		{
+			if ($fileFunc->fileExists($dir . $base . '.' . $type))
+			{
+				return $base . '.' . $type;
+			}
+		}
+	}
+
+	// Fallback when not checking disk or file not found on disk
+	if ($fileExt !== '' && in_array($fileExt, $allowed, true))
+	{
+		return $filename;
+	}
+
+	return $base . '.' . $defaultExt;
+}
+
+/**
  * Fetch and prepare the smileys for use in the post-editor
  *
  * What it does:
@@ -716,7 +771,7 @@ function getEditorSmileys()
 		[]
 	)->fetch_callback(
 		function ($row) use (&$smileys, $context) {
-			$filename = $row['filename'] . '.' . $context['smiley_extension'];
+			$filename = getSmileyImageFilename($row['filename'], $context['smiley_dir'] ?? null, $context['smiley_extension'] ?? 'svg');
 			if (possibleSmileEmoji($row))
 			{
 				$filename = $row['emoji'] . '.svg';
@@ -756,18 +811,47 @@ function possibleSmileEmoji(&$row, $path = null, $ext = null)
 	// At least 4 characters long, starts and ends with :  -- Marginally faster than preg_match
 	$possibleEmoji = isset($row['code'][3]) && $row['code'][0] === ':' && str_ends_with($row['code'], ':');
 
-	// If this is possibly an emoji and the image does not exist in the smile set
-	if ($possibleEmoji && !FileFunctions::instance()->fileExists($path . $row['filename'] . '.' . $ext))
+	if ($possibleEmoji)
 	{
-		$emoji = Emoji::instance();
+		$fileFunc = FileFunctions::instance();
+		$baseName = pathinfo($row['filename'], PATHINFO_FILENAME);
+		$fileExt = strtolower(pathinfo($row['filename'], PATHINFO_EXTENSION));
 
-		// Check if we have an emoji image for this smiley code
-		$test = preg_replace_callback('~(:([-+\w]+):)~u', [$emoji, 'emojiToImage'], $row['code']);
-		if ($test !== $row['filename'] && preg_match('~data-emoji-code=["\'](.*?)["\']~', $test, $result))
+		$exists = false;
+		if ($fileExt !== '' && $fileFunc->fileExists($path . $row['filename']))
 		{
-			// Valid emoji, set the filename to the proper emoji file and type
-			$row['emoji'] =  $result[1];
-			return true;
+			$exists = true;
+		}
+		elseif ($fileFunc->fileExists($path . $baseName . '.' . $ext))
+		{
+			$exists = true;
+		}
+		else
+		{
+			$types = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
+			foreach ($types as $type)
+			{
+				if ($fileFunc->fileExists($path . $baseName . '.' . $type))
+				{
+					$exists = true;
+					break;
+				}
+			}
+		}
+
+		// If this is possibly an emoji and the image does not exist in the smile set
+		if (!$exists)
+		{
+			$emoji = Emoji::instance();
+
+			// Check if we have an emoji image for this smiley code
+			$test = preg_replace_callback('~(:([-+\w]+):)~u', [$emoji, 'emojiToImage'], $row['code']);
+			if ($test !== $row['filename'] && preg_match('~data-emoji-code=["\'](.*?)["\']~', $test, $result))
+			{
+				// Valid emoji, set the filename to the proper emoji file and type
+				$row['emoji'] =  $result[1];
+				return true;
+			}
 		}
 	}
 
