@@ -39,7 +39,7 @@ class ManageSmileys extends AbstractController
 	private array $_smiley_context = [];
 
 	/** @var string[] allowed extensions for smiles */
-	private array $_smiley_types = ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	private array $_smiley_types = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
 
 	/**
 	 * This is the dispatcher of smileys administration.
@@ -475,13 +475,13 @@ class ManageSmileys extends AbstractController
 					}
 
 					// Determine the set type
-					$setPath = $modSettings['smileys_dir'] . '/' . $setPath;
-					$ext = getFirstImageExtensionInDir($setPath);
+					$setFullPath = $modSettings['smileys_dir'] . '/' . $this->_req->getPost('smiley_sets_path', 'trim', '');
+					$ext = getFirstImageExtensionInDir($setFullPath);
 
 					updateSettings([
 						'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . $this->_req->getPost('smiley_sets_path', 'trim', ''),
 						'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $this->_req->getpost('smiley_sets_name', 'trim', ''),
-						'smiley_sets_extensions' => $modSettings['smiley_sets_extensions'] . ',' . $ext ?? 'gif',
+						'smiley_sets_extensions' => $modSettings['smiley_sets_extensions'] . ',' . ($ext ?? 'gif'),
 						'smiley_sets_default' => empty($this->_req->post->smiley_sets_default) ? $modSettings['smiley_sets_default'] : $this->_req->getPost('smiley_sets_path', 'trim', ''),
 					]);
 				}
@@ -502,9 +502,19 @@ class ManageSmileys extends AbstractController
 
 					$set_paths[$set] = $this->_req->post->smiley_sets_path;
 					$set_names[$set] = $this->_req->post->smiley_sets_name;
+					$set_extensions = isset($modSettings['smiley_sets_extensions'])
+						? explode(',', $modSettings['smiley_sets_extensions'])
+						: explode(',', setSmileyExtensionArray());
+					$setFullPath = $modSettings['smileys_dir'] . '/' . $this->_req->post->smiley_sets_path;
+					$ext = getFirstImageExtensionInDir($setFullPath);
+					if (!empty($ext))
+					{
+						$set_extensions[$set] = $ext;
+					}
 					updateSettings([
 						'smiley_sets_known' => implode(',', $set_paths),
 						'smiley_sets_names' => implode("\n", $set_names),
+						'smiley_sets_extensions' => implode(',', $set_extensions),
 						'smiley_sets_default' => empty($this->_req->post->smiley_sets_default) ? $modSettings['smiley_sets_default'] : $this->_req->post->smiley_sets_path
 					]);
 				}
@@ -1884,9 +1894,12 @@ class ManageSmileys extends AbstractController
 		{
 			foreach ($context['actions'] as $action)
 			{
+				$setDir = $modSettings['smileys_dir'] . '/' . basename($action['action']);
+				$ext = getFirstImageExtensionInDir($setDir) ?? 'svg';
 				updateSettings([
 					'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . basename($action['action']),
 					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' . (empty($action['description']) ? basename($action['action']) : Util::htmlspecialchars($action['description'])) : ''),
+					'smiley_sets_extensions' => ($modSettings['smiley_sets_extensions'] ?? '') . ',' . $ext,
 				]);
 			}
 
@@ -1937,7 +1950,7 @@ class ManageSmileys extends AbstractController
 		$set_names = explode("\n", $modSettings['smiley_sets_names']);
 		$set_exts = isset($modSettings['smiley_sets_extensions'])
 			? explode(',', $modSettings['smiley_sets_extensions'])
-			: setSmileyExtensionArray();
+			: explode(',', setSmileyExtensionArray());
 
 		foreach ($set_paths as $i => $set)
 		{
