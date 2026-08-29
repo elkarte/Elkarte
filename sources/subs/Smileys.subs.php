@@ -806,3 +806,22 @@ function possibleSmileEmoji(&$row, $path = null, $ext = null)
 
 	return false;
 }
+
+/**
+ * Retrieve the file extension type of the current smiley set based on its index or default smiley set.
+ *
+ * @param int|null $index The index of the smiley set. If null, the default smiley set is used.
+ * @return string The file extension of the smiley set (e.g., 'svg'). Returns 'svg'
+ * if the index is invalid or not found.
+ */
+function getCurrentSmileySetType($index = null)
+{
+	global $modSettings;
+
+	$known = explode(',', $modSettings['smiley_sets_known']);
+	$extensions = explode(',', $modSettings['smiley_sets_extensions']);
+
+	$index = $index ?? array_search($modSettings['smiley_sets_default'], $known, true);
+
+	return ($index !== false && isset($extensions[$index])) ? $extensions[$index] : 'svg';
+}

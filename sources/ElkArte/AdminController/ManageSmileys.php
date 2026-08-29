@@ -427,7 +427,7 @@ class ManageSmileys extends AbstractController
 			{
 				$set = [$set];
 			}
-			if ( !empty($set) && $this->_req->hasPost('delete_set'))
+			if (!empty($set) && $this->_req->hasPost('delete_set'))
 			{
 				$set_paths = explode(',', $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -480,7 +480,7 @@ class ManageSmileys extends AbstractController
 
 					updateSettings([
 						'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . $this->_req->getPost('smiley_sets_path', 'trim', ''),
-						'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $this->_req->getpost('smiley_sets_name', 'trim', ''),
+						'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $this->_req->getPost('smiley_sets_name', 'trim', ''),
 						'smiley_sets_extensions' => $modSettings['smiley_sets_extensions'] . ',' . ($ext ?? 'gif'),
 						'smiley_sets_default' => empty($this->_req->post->smiley_sets_default) ? $modSettings['smiley_sets_default'] : $this->_req->getPost('smiley_sets_path', 'trim', ''),
 					]);
@@ -500,12 +500,12 @@ class ManageSmileys extends AbstractController
 						throw new Exception('smiley_set_path_already_used', false);
 					}
 
-					$set_paths[$set] = $this->_req->post->smiley_sets_path;
-					$set_names[$set] = $this->_req->post->smiley_sets_name;
+					$set_paths[$set] = $this->_req->getPost('smiley_sets_path', 'trim', '');
+					$set_names[$set] = $this->_req->getPost('smiley_sets_name', 'trim', '');
 					$set_extensions = isset($modSettings['smiley_sets_extensions'])
 						? explode(',', $modSettings['smiley_sets_extensions'])
 						: explode(',', setSmileyExtensionArray());
-					$setFullPath = $modSettings['smileys_dir'] . '/' . $this->_req->post->smiley_sets_path;
+					$setFullPath = $modSettings['smileys_dir'] . '/' . $this->_req->getPost('smiley_sets_path', 'trim', '');
 					$ext = getFirstImageExtensionInDir($setFullPath);
 					if (!empty($ext))
 					{
@@ -599,8 +599,10 @@ class ManageSmileys extends AbstractController
 
 			// Get the name and extension
 			$filename = pathinfo($smile['filename'], PATHINFO_FILENAME);
-			if (in_array(strtolower(pathinfo($smile['filename'], PATHINFO_EXTENSION)), $this->_smiley_types, true))
+			$extension = strtolower(pathinfo($smile['filename'], PATHINFO_EXTENSION));
+			if (in_array($extension, $this->_smiley_types, true))
 			{
+				$filename .= ($extension === 'svg' ? '' : '.' . $extension);
 				$smileys[strtolower($filename)] = $filename;
 			}
 		}
@@ -1303,14 +1305,15 @@ class ManageSmileys extends AbstractController
 			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description'], ENT_COMPAT, 'UTF-8');
 			$context['current_smiley']['image'] = getSmileyImageFilename($context['current_smiley']['filename'], $context['smileys_dir'] . '/' . $modSettings['smiley_sets_default'], $context['smiley_extension']);
 
-			$key = strtolower(pathinfo($context['current_smiley']['filename'], PATHINFO_FILENAME));
-			if (isset($context['filenames'][$key]))
+			$rawFilename = strtolower($context['current_smiley']['filename']);
+			$baseKey = strtolower(pathinfo($context['current_smiley']['filename'], PATHINFO_FILENAME));
+			if (isset($context['filenames'][$rawFilename]))
 			{
-				$context['filenames'][$key]['selected'] = true;
+				$context['filenames'][$rawFilename]['selected'] = true;
 			}
-			elseif (isset($context['filenames'][strtolower($context['current_smiley']['filename'])]))
+			elseif (isset($context['filenames'][$baseKey]))
 			{
-				$context['filenames'][strtolower($context['current_smiley']['filename'])]['selected'] = true;
+				$context['filenames'][$baseKey]['selected'] = true;
 			}
 		}
 	}
@@ -1966,15 +1969,16 @@ class ManageSmileys extends AbstractController
 
 	/**
 	 * Perhaps a longer name for the function would better describe what this does. So it will
-	 * search group of directories and return just the unique filenames, dis-regarding the extension.
-	 * This allows us to match by name across sets that have different extensions
+	 * search group of directories and return just the unique filenames.
+	 * If a file's extension matches the set's base extension, only the filename without extension is used.
+	 * If a file's extension differs from the set's base extension, the full filename with extension is retained.
 	 *
 	 * @param array $smiley_sets array of smiley sets (end directory names) to search
 	 * @return array of unique smiley names across one or many "sets"
 	 */
 	public function getAllPossibleFilenamesForTheSmileys(array $smiley_sets): array
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
 		$filenames = [];
 		$fileFunc = FileFunctions::instance();
@@ -1987,7 +1991,8 @@ class ManageSmileys extends AbstractController
 
 		foreach ($smiley_sets as $smiley_set)
 		{
-			$smiles = $fileFunc->listTree($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
+			$setExt = !empty($smiley_set['ext']) ? strtolower($smiley_set['ext']) : 'svg';
+			$smiles = $fileFunc->listTree($smileys_dir . '/' . un_htmlspecialchars($smiley_set['path']));
 			foreach ($smiles as $smile)
 			{
 				if (in_array($smile['filename'], ['.', '..', '.htaccess', 'index.php'], true))
@@ -1995,19 +2000,23 @@ class ManageSmileys extends AbstractController
 					continue;
 				}
 
-				$key = strtolower(pathinfo($smile['filename'], PATHINFO_FILENAME));
-				if (in_array($key, $filenames, true))
+				$fileExt = strtolower(pathinfo($smile['filename'], PATHINFO_EXTENSION));
+				if (!in_array($fileExt, $this->_smiley_types, true))
 				{
 					continue;
 				}
 
-				if (!in_array(strtolower(pathinfo($smile['filename'], PATHINFO_EXTENSION)), $this->_smiley_types, true))
+				$base = pathinfo($smile['filename'], PATHINFO_FILENAME);
+				$name = ($fileExt === $setExt) ? $base : $smile['filename'];
+				$key = strtolower($name);
+
+				if (isset($filenames[$key]))
 				{
 					continue;
 				}
 
-				$filenames[strtolower($key)] = [
-					'id' => Util::htmlspecialchars($key),
+				$filenames[$key] = [
+					'id' => Util::htmlspecialchars($name),
 					'selected' => false,
 				];
 			}
