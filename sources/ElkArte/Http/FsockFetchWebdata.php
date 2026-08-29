@@ -246,9 +246,9 @@ class FsockFetchWebdata
 		$request .= 'Host: ' . $this->_url['host_raw'] . "\r\n";
 		$request .= $this->_keepAlive();
 		$request .= 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' . "\r\n";
-		$request .= 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8' . "\r\n";
+		$request .= 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . "\r\n";
 		$request .= 'Accept-Language: en-US,en;q=0.9' . "\r\n";
-		$request .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
+		$request .= (!empty($this->_post_data)) ? 'Content-Type: application/x-www-form-urlencoded' . "\r\n" : '';
 
 		if (!empty($this->_content_length))
 		{
@@ -262,7 +262,7 @@ class FsockFetchWebdata
 		}
 		else
 		{
-			$request .= "\r\n\r\n";
+			$request .= "\r\n";
 		}
 
 		// Make the request and read the first line of the server response, ending at the first CRLF

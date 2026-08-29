@@ -56,7 +56,7 @@ class CurlFetchWebdata
 		CURLOPT_SSL_VERIFYHOST => 2, // Allow cURL to verify the peer's host
 		CURLOPT_POST => false, // no post-data unless it's passed
 		CURLOPT_HTTPHEADER => [
-			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'Accept-Language: en-US,en;q=0.9',
 		], // standard browser headers to prevent 403 blocks
 	];

@@ -157,29 +157,31 @@ class StreamFetchWebdata
 					'protocol_version' => 1.1,
 					'follow_location' => 1,
 					'timeout' => 10,
-					'header' => [
-						'Connection: ' . ($this->_keep_alive ? 'Keep-Alive' : 'close'),
-						'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-						'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-						'Accept-Language: en-US,en;q=0.9',
-						'Content-Type: application/x-www-form-urlencoded',
-					],
 				]
 		];
 
-		// Try to limit the body of the response?
+		$headers = [
+			'Connection: ' . ($this->_keep_alive ? 'Keep-Alive' : 'close'),
+			'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			'Accept-Language: en-US,en;q=0.9',
+		];
+
 		if (!empty($this->_user_options['max_length']))
 		{
 			$this->_content_length = (int) $this->_user_options['max_length'];
-			$this->_options['http']['header'][] = 'Range: bytes=0-' . ($this->_content_length - 1);
+			$headers[] = 'Range: bytes=0-' . ($this->_content_length - 1);
 		}
 
 		if (!empty($this->_post_data))
 		{
-			$this->_options['http']['method'] = 'POST';
-			$this->_options['http']['header'][] = 'Content-Length: ' . strlen($this->_post_data);
+			$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+			$headers[] = 'Content-Length: ' . strlen($this->_post_data);
 			$this->_options['http']['content'] = $this->_post_data;
+			$this->_options['http']['method'] = 'POST';
 		}
+
+		$this->_options['http']['header'] = $headers;
 	}
 
 	/**
