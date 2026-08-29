@@ -33,9 +33,8 @@ function loadSession()
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
-	@ini_set('url_rewriter.tags', '');
+	@ini_set('session.use_only_cookies', true);
 	@ini_set('arg_separator.output', '&amp;');
-	// @todo admin panel setting?
 	@ini_set('session.cookie_samesite', 'Lax');
 
 	// Secure PHPSESSIONID
@@ -80,33 +79,15 @@ function loadSession()
 			@ini_set('session.gc_probability', '1');
 
 			$handler = new DatabaseHandler(database());
-			session_set_save_handler(
-				[$handler, 'open'],
-				[$handler, 'close'],
-				static fn(string $sessionId): string => $handler->read($sessionId),
-				static fn(string $sessionId, string $data): bool => $handler->write($sessionId, $data),
-				static fn(string $sessionId): bool => $handler->destroy($sessionId),
-				static fn(int $maxLifetime): int|bool => $handler->gc($maxLifetime)
-			);
+			session_set_save_handler($handler, true);
 
-			/*
-			 * Avoid unexpected side effects from the way PHP
-			 * internally destroys objects on shutdown.
-			 *
-			 * See notes on https://php.net/manual/en/function.session-set-save-handler.php
-			 */
+			// Avoid unexpected side effects from the way PHP internally destroys objects on shutdown.
+			// See notes on https://php.net/manual/en/function.session-set-save-handler.php
 			register_shutdown_function('session_write_close');
 		}
 		elseif (ini_get('session.gc_maxlifetime') <= 1440 && !empty($modSettings['databaseSession_lifetime']))
 		{
 			@ini_set('session.gc_maxlifetime', max($modSettings['databaseSession_lifetime'], 60));
-
-			// APC destroys static class members before sessions can be written.  To work around this, we
-			// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
-			if (extension_loaded('apc') && ini_get('apc.enabled') && !extension_loaded('apcu'))
-			{
-				register_shutdown_function('session_write_close');
-			}
 		}
 
 		// Start the session
