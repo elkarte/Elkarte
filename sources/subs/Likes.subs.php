@@ -769,7 +769,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 
 	$db = database();
 
-	// The most liked topics by sum of likes and distinct likers
+	// The most liked topics by sum of likes AND distinct likers With a minimum of 1 reply (some engagement)
 	$mostLikedTopics = [];
 	$db->fetchQuery('
 		SELECT
@@ -782,6 +782,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 			INNER JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 		WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
+			AND t.num_replies >= 1
 		GROUP BY t.id_topic, t.num_replies, t.id_board
 		ORDER BY distinct_likers DESC
 		LIMIT {int:limit}',
@@ -797,14 +798,20 @@ function dbMostLikedTopic($board = null, $limit = 10)
 			$row['num_messages_liked'] = (int) $row['num_messages_liked'];
 			$mostLikedTopics[$row['id_topic']] = $row;
 
-			$log = log($row['like_count'] / ($row['num_replies'] + ($row['num_replies'] === 0 || $row['like_count'] === $row['num_replies'] ? 1 : 0)));
-			$distinct_likers = max(1,
-				min($row['distinct_likers'],
-					1 / ($log === 0 ? 1 : $log)));
+			$num_messages_liked = max(1, $row['num_messages_liked']);
+			$total_posts = max(1, $row['num_replies'] + 1);
 
-			$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
-				$row['distinct_likers'] / $row['num_messages_liked'] +
-				$distinct_likers;
+			// 1. More unique members that like a thread increases popularity (distinct_likers)
+			// 2. Rewards threads that generate distinct likers in fewer posts (likers_per_liked_msg)
+			// 3. Adds weight to threads with posts with many likes vs many posts with single likes (likes_per_liked_msg + density)
+			$likers_per_liked_msg = $row['distinct_likers'] / $num_messages_liked;
+			$likes_per_liked_msg = $row['like_count'] / $num_messages_liked;
+			$like_density = log(1 + ($row['like_count'] / $total_posts));
+
+			$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers']
+				+ $likers_per_liked_msg
+				+ $likes_per_liked_msg
+				+ $like_density;
 		}
 	);
 
@@ -832,14 +839,14 @@ function dbMostLikedTopic($board = null, $limit = 10)
 /**
  * Helper function to sort by topic like relevance
  *
- * @param float $a
- * @param float $b
+ * @param array $a
+ * @param array $b
  *
  * @return mixed
  */
 function sort_by_relevance($a, $b)
 {
-	return $b['relevance'] - $a['relevance'];
+	return $b['relevance'] <=> $a['relevance'];
 }
 
 /**
