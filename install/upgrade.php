@@ -546,6 +546,7 @@ function loadEssentialData()
 		require_once(EXTDIR . '/ClassLoader.php');
 
 		$loader = new ClassLoader();
+		$loader->setPsr4('ElkArte\\ext\\', EXTDIR);
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
