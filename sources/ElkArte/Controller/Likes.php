@@ -776,10 +776,10 @@ class Likes extends AbstractController
 		$key = md5($this->user->query_wanna_see_board ?? '');
 
 		// Let's get the statistics!
-		if (Cache::instance()->getVar($data, 'likestats_message:' . $key, 900) === false)
+		if (Cache::instance()->getVar($data, 'likestats_message:' . $key, 1800) === false)
 		{
 			$data = dbMostLikedMessage();
-			Cache::instance()->put('likestats_message:' . $key, $data, 900);
+			Cache::instance()->put('likestats_message:' . $key, $data, 1800);
 		}
 
 		// Set the response
@@ -811,10 +811,10 @@ class Likes extends AbstractController
 		$data = null;
 		$key = md5($this->user->query_wanna_see_board ?? '');
 
-		if (Cache::instance()->getVar($data, 'likestats_topic:' . $key, 900) === false)
+		if (Cache::instance()->getVar($data, 'likestats_topic:' . $key, 1800) === false)
 		{
 			$data = dbMostLikedTopic();
-			Cache::instance()->put('likestats_topic:' . $key, $data, 900);
+			Cache::instance()->put('likestats_topic:' . $key, $data, 1800);
 		}
 
 		if (!empty($data))
@@ -869,10 +869,10 @@ class Likes extends AbstractController
 		$data = null;
 		$key = md5($this->user->query_wanna_see_board ?? '');
 
-		if (Cache::instance()->getVar($data, 'likestats_most_received:' . $key, 900) === false)
+		if (Cache::instance()->getVar($data, 'likestats_most_received:' . $key, 1800) === false)
 		{
 			$data = dbMostLikesReceivedUser();
-			Cache::instance()->put('likestats_most_received:' . $key, $data, 900);
+			Cache::instance()->put('likestats_most_received:' . $key, $data, 1800);
 		}
 
 		if (!empty($data))
@@ -899,10 +899,10 @@ class Likes extends AbstractController
 		$data = null;
 		$key = md5($this->user->query_wanna_see_board ?? '');
 
-		if (Cache::instance()->getVar($data, 'likestats_most_given:' . $key, 900) === false)
+		if (Cache::instance()->getVar($data, 'likestats_most_given:' . $key, 1800) === false)
 		{
 			$data = dbMostLikesGivenUser();
-			Cache::instance()->put('likestats_most_given:' . $key, $data, 900);
+			Cache::instance()->put('likestats_most_given:' . $key, $data, 1800);
 		}
 
 		if (!empty($data))

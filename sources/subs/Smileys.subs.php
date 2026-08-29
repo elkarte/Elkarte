@@ -355,7 +355,7 @@ function updateSmileyOrder($id, $order)
 /**
  * Get a list of all visible smileys.
  *
- * Hidden = 0 is post form, 1 is hidden, 2 is popup.
+ * Col hidden is keyed as: 0 => post form, 1 => hidden, 2 => popup.
  */
 function getSmileys()
 {
@@ -633,7 +633,7 @@ function setSmileyExtensionArray()
 {
 	global $modSettings;
 
-	$smiley_types =  ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	$smiley_types = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
 	$smileys_dir = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 	$fileFunc = FileFunctions::instance();
 	$extensionTypes = [];
@@ -670,7 +670,7 @@ function setSmileyExtensionArray()
  */
 function getFirstImageExtensionInDir(string $dir): ?string
 {
-	$allowed =  ['jpg', 'gif', 'jpeg', 'png', 'webp', 'svg'];
+	$smiley_types = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
 	$extensionType = null;
 
 	$fileFunc = FileFunctions::instance();
@@ -678,7 +678,7 @@ function getFirstImageExtensionInDir(string $dir): ?string
 	foreach ($smiles as $smile)
 	{
 		$temp = pathinfo($smile['filename'], PATHINFO_EXTENSION);
-		if (in_array($temp, $allowed, true))
+		if (in_array($temp, $smiley_types, true))
 		{
 			$extensionType = $temp;
 			break;
@@ -692,52 +692,25 @@ function getFirstImageExtensionInDir(string $dir): ?string
 /**
  * Resolves the actual filename (with extension) of a smiley in a given directory or set.
  *
+ * For homogeneous smiley sets, extensionless filenames from the database inherit the set's default extension.
+ * Mixed/custom smileys stored with an explicit extension retain their extension.
+ *
  * @param string $filename Smiley filename from database (with or without extension)
- * @param string|null $dir Absolute directory path of the smiley set
- * @param string|null $defaultExt Default extension of the smiley set (e.g. svg)
+ * @param string|null $dir Absolute directory path of the smiley set (optional/unused for homogeneous resolution)
+ * @param string|null $defaultExt Default extension of the smiley set (e.g. svg, gif)
  * @return string Resolved filename with extension
  */
 function getSmileyImageFilename(string $filename, ?string $dir = null, ?string $defaultExt = 'svg'): string
 {
-	$fileFunc = FileFunctions::instance();
-	$base = pathinfo($filename, PATHINFO_FILENAME);
 	$fileExt = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-	$defaultExt = $defaultExt ?: 'svg';
-	$allowed = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
+	$smiley_types = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
 
-	if (!empty($dir))
-	{
-		$dir = rtrim($dir, '/\\') . DIRECTORY_SEPARATOR;
-
-		// If filename already has an extension and exists on disk
-		if ($fileExt !== '' && in_array($fileExt, $allowed, true) && $fileFunc->fileExists($dir . $filename))
-		{
-			return $filename;
-		}
-
-		// If base with default extension exists on disk
-		if ($fileFunc->fileExists($dir . $base . '.' . $defaultExt))
-		{
-			return $base . '.' . $defaultExt;
-		}
-
-		// If base with any allowed extension exists on disk
-		foreach ($allowed as $type)
-		{
-			if ($fileFunc->fileExists($dir . $base . '.' . $type))
-			{
-				return $base . '.' . $type;
-			}
-		}
-	}
-
-	// Fallback when not checking disk or file not found on disk
-	if ($fileExt !== '' && in_array($fileExt, $allowed, true))
+	if ($fileExt !== '' && in_array($fileExt, $smiley_types, true))
 	{
 		return $filename;
 	}
 
-	return $base . '.' . $defaultExt;
+	return $filename . '.' . ($defaultExt ?: 'svg');
 }
 
 /**
@@ -813,34 +786,10 @@ function possibleSmileEmoji(&$row, $path = null, $ext = null)
 
 	if ($possibleEmoji)
 	{
-		$fileFunc = FileFunctions::instance();
-		$baseName = pathinfo($row['filename'], PATHINFO_FILENAME);
-		$fileExt = strtolower(pathinfo($row['filename'], PATHINFO_EXTENSION));
-
-		$exists = false;
-		if ($fileExt !== '' && $fileFunc->fileExists($path . $row['filename']))
-		{
-			$exists = true;
-		}
-		elseif ($fileFunc->fileExists($path . $baseName . '.' . $ext))
-		{
-			$exists = true;
-		}
-		else
-		{
-			$types = ['svg', 'png', 'gif', 'webp', 'jpg', 'jpeg'];
-			foreach ($types as $type)
-			{
-				if ($fileFunc->fileExists($path . $baseName . '.' . $type))
-				{
-					$exists = true;
-					break;
-				}
-			}
-		}
+		$filename = getSmileyImageFilename($row['filename'], $path, $ext);
 
 		// If this is possibly an emoji and the image does not exist in the smile set
-		if (!$exists)
+		if (!FileFunctions::instance()->fileExists($path . $filename))
 		{
 			$emoji = Emoji::instance();
 
@@ -856,4 +805,23 @@ function possibleSmileEmoji(&$row, $path = null, $ext = null)
 	}
 
 	return false;
+}
+
+/**
+ * Retrieve the file extension type of the current smiley set based on its index or default smiley set.
+ *
+ * @param int|null $index The index of the smiley set. If null, the default smiley set is used.
+ * @return string The file extension of the smiley set (e.g., 'svg'). Returns 'svg'
+ * if the index is invalid or not found.
+ */
+function getCurrentSmileySetType($index = null)
+{
+	global $modSettings;
+
+	$known = explode(',', $modSettings['smiley_sets_known']);
+	$extensions = explode(',', $modSettings['smiley_sets_extensions']);
+
+	$index = $index ?? array_search($modSettings['smiley_sets_default'], $known, true);
+
+	return ($index !== false && isset($extensions[$index])) ? $extensions[$index] : 'svg';
 }

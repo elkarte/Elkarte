@@ -146,7 +146,7 @@ class ThemeLoader
 		$themeFile = $settings['theme_dir'] . '/Theme.php';
 		if (!file_exists($themeFile))
 		{
-			Errors::instance()->log_error('The theme "%s" is missing its Theme.php file. Falling back to the default theme ' . $themeName, 'template');
+			Errors::instance()->log_error('The theme "' . $themeName . '" is missing its Theme.php file. Falling back to the default theme.', 'template');
 			$themeFile = $themeData[0]['default_theme_dir'] . '/Theme.php';
 			$themeName = 'DefaultTheme';
 		}

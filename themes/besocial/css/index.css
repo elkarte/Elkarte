@@ -422,7 +422,7 @@ button[type="button"]:hover, .linkbutton:hover {
 }
 
 .linkbutton.w_icon {
-    padding-top: 3px;
+    padding-top: 0;
 }
 
 /* Don't show disabled buttons as active on hover */

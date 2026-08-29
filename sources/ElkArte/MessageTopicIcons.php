@@ -154,6 +154,7 @@ class MessageTopicIcons extends ValuesContainer
 		{
 			$this->data[$key]['url'] = $this->data[$this->_default_icon]['url'];
 			$this->data[$key]['value'] = $this->_default_icon;
+			$this->data[$key]['name'] = $this->data[$this->_default_icon]['name'];
 		}
 	}
 

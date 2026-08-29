@@ -236,16 +236,16 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 
 		$key = md5($this->user->query_wanna_see_board ?? '');
 
-		if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . $key, 1800) === false)
+		if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . $key, 1740) === false)
 		{
 			$context['likestats']['topics'] = dbMostLikedTopic(null, 5);
-			Cache::instance()->put('ic_likestats_topic:' . $key, $context['likestats']['topics'], 1800);
+			Cache::instance()->put('ic_likestats_topic:' . $key, $context['likestats']['topics'], 1740);
 		}
 
-		if (Cache::instance()->getVar($context['likestats']['boards'], 'ic_likestats_board:' . $key, 1800) === false)
+		if (Cache::instance()->getVar($context['likestats']['boards'], 'ic_likestats_board:' . $key, 3600) === false)
 		{
 			$context['likestats']['boards'] = dbMostLikedBoard(3);
-			Cache::instance()->put('ic_likestats_board:' . $key, $context['likestats']['boards'], 1800);
+			Cache::instance()->put('ic_likestats_board:' . $key, $context['likestats']['boards'], 3600);
 		}
 
 		if (Cache::instance()->getVar($context['likestats']['messages'], 'ic_likestats_message:' . $key, 1800) === false)

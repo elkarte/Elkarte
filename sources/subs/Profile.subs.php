@@ -2384,5 +2384,5 @@ function isUniqueEmail($memID, $email)
 			'selected_member' => $memID,
 			'email_address' => $email,
 		]
-	)->hasResults();
+	)->num_rows() === 0;
 }

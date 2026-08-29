@@ -58,6 +58,10 @@
 		"myclabs/deep-copy": "1.13.*"
     },
 	"autoload": {
-		"psr-4": { "ElkArte\\": ["sources/ElkArte"] }
+		"psr-4": {
+			"ElkArte\\": ["sources/ElkArte"],
+			"ElkArte\\ext\\": ["sources/ext"],
+			"Addons\\": ["Addons"]
+		}
 	}
 }

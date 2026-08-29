@@ -245,8 +245,10 @@ class FsockFetchWebdata
 		$request = (empty($this->_post_data) ? 'GET ' : 'POST ') . $this->_url['path'] . ' HTTP/1.1' . "\r\n";
 		$request .= 'Host: ' . $this->_url['host_raw'] . "\r\n";
 		$request .= $this->_keepAlive();
-		$request .= 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931' . "\r\n";
-		$request .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
+		$request .= 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' . "\r\n";
+		$request .= 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . "\r\n";
+		$request .= 'Accept-Language: en-US,en;q=0.9' . "\r\n";
+		$request .= (!empty($this->_post_data)) ? 'Content-Type: application/x-www-form-urlencoded' . "\r\n" : '';
 
 		if (!empty($this->_content_length))
 		{
@@ -260,7 +262,7 @@ class FsockFetchWebdata
 		}
 		else
 		{
-			$request .= "\r\n\r\n";
+			$request .= "\r\n";
 		}
 
 		// Make the request and read the first line of the server response, ending at the first CRLF
@@ -338,8 +340,8 @@ class FsockFetchWebdata
 	 */
 	private function _checkRedirect(): string
 	{
-		// Redirect in case this location is permanently or temporarily moved (301, 302, 307)
-		if ($this->_current_redirect < $this->_max_redirect && preg_match('~^HTTP/\S+\s+(30[127])~i', $this->_server_response, $code) === 1)
+		// Redirect in case this location is permanently or temporarily moved (301, 302, 303, 307, 308)
+		if ($this->_current_redirect < $this->_max_redirect && preg_match('~^HTTP/\S+\s+(30[12378])~i', $this->_server_response, $code) === 1)
 		{
 			// Maintain our status responses
 			$this->_response['code'] = (int) $code[1];

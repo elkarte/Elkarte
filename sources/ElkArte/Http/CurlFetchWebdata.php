@@ -47,7 +47,7 @@ class CurlFetchWebdata
 		CURLOPT_RETURNTRANSFER => true, // Get the returned value as a string (don't output it)
 		CURLOPT_HEADER => true, // We need the headers to do our own redirect
 		CURLOPT_FOLLOWLOCATION => false, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
-		CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931', // set a normal-looking user agent
+		CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36', // set a normal-looking user agent
 		CURLOPT_CONNECTTIMEOUT => 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT => 20, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS => 3, // stop after this many redirects
@@ -55,7 +55,10 @@ class CurlFetchWebdata
 		CURLOPT_SSL_VERIFYPEER => true, // Allow cURL to verify the peer's certificate
 		CURLOPT_SSL_VERIFYHOST => 2, // Allow cURL to verify the peer's host
 		CURLOPT_POST => false, // no post-data unless it's passed
-		CURLOPT_HTTPHEADER => ['Accept-Encoding: gzip,compress,identity'], // no special headers unless supplied
+		CURLOPT_HTTPHEADER => [
+			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			'Accept-Language: en-US,en;q=0.9',
+		], // standard browser headers to prevent 403 blocks
 	];
 
 	/** @var int Holds the passed or default value for redirects */
@@ -281,7 +284,7 @@ class CurlFetchWebdata
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
 		if (!empty($this->_headers['location'])
 			&& $this->_current_redirect <= $this->_max_redirect
-			&& preg_match('~30[127]~', $curl_info['http_code']) === 1)
+			&& preg_match('~30[12378]~', (string) $curl_info['http_code']) === 1)
 		{
 			$this->_current_redirect++;
 			$this->_redirect(
@@ -292,6 +295,7 @@ class CurlFetchWebdata
 
 		return true;
 	}
+
 
 	/**
 	 * Used if being redirected to ensure we have a fully qualified address
@@ -309,14 +313,33 @@ class CurlFetchWebdata
 		$last_url_parse = parse_url($last_url);
 		$new_url_parse = parse_url($new_url);
 
+		if ($new_url_parse === false)
+		{
+			return $last_url;
+		}
+
+		if (!empty($new_url_parse['scheme']) && !empty($new_url_parse['host']))
+		{
+			return $new_url;
+		}
+
 		// Redirect headers are often incomplete / relative, so we need to make sure they are fully qualified
-		$new_url_parse['path'] = $new_url_parse['path'] ?? (isset($new_url_parse['host']) ? '' : $last_url_parse['path']);
-		$new_url_parse['scheme'] = $new_url_parse['scheme'] ?? $last_url_parse['scheme'];
-		$new_url_parse['host'] = $new_url_parse['host'] ?? $last_url_parse['host'];
-		$new_url_parse['query'] = $new_url_parse['query'] ?? '';
+		$scheme = $new_url_parse['scheme'] ?? ($last_url_parse['scheme'] ?? 'http');
+		$host = $new_url_parse['host'] ?? ($last_url_parse['host'] ?? '');
+		$port = isset($new_url_parse['port']) ? ':' . $new_url_parse['port'] : (isset($last_url_parse['port']) ? ':' . $last_url_parse['port'] : '');
+
+		$path = $new_url_parse['path'] ?? '';
+		if ($path === '' || $path[0] !== '/')
+		{
+			$last_path = $last_url_parse['path'] ?? '/';
+			$last_dir = substr($last_path, 0, (int) strrpos($last_path, '/') + 1);
+			$path = $last_dir . $path;
+		}
+
+		$query = !empty($new_url_parse['query']) ? '?' . $new_url_parse['query'] : '';
 
 		// Build the new URL that was in the http header
-		return $new_url_parse['scheme'] . '://' . $new_url_parse['host'] . $new_url_parse['path'] . (empty($new_url_parse['query']) ? '' : '?' . $new_url_parse['query']);
+		return $scheme . '://' . $host . $port . $path . $query;
 	}
 
 	/**
@@ -348,7 +371,7 @@ class CurlFetchWebdata
 	 *
 	 * @return string
 	 */
-	public function result($area = ''): string
+	public function result($area = '')
 	{
 		$max_result = count($this->_response) - 1;
 

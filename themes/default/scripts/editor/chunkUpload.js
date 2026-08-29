@@ -93,7 +93,6 @@ class chunkUpload
 			})
 			.then(response => {
 				this._eventEmitter.emit('done',  response);
-
 			})
 			.catch(error => {
 				this._eventEmitter.emit('error', error.message);

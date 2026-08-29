@@ -33,6 +33,7 @@ require_once(EXTDIR . '/ClassLoader.php');
 
 // Register our paths to the loader
 $loader = new ClassLoader();
+$loader->setPsr4('ElkArte\\ext\\', EXTDIR);
 $loader->setPsr4('ElkArte\\', BOARDDIR . '/sources/ElkArte');
 $loader->setPsr4('BBC\\', BOARDDIR . '/sources/ElkArte/BBC');
 // Not needed, just being complete
@@ -261,6 +262,7 @@ class ElkTestingSetup
 		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		$loader = new ClassLoader();
+		$loader->setPsr4('ElkArte\\ext\\', EXTDIR);
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();

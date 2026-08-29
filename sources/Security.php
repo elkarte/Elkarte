@@ -920,7 +920,9 @@ function createToken($action, $type = 'post')
 
 	// We need a user agent and the client IP
 	$req = Request::instance();
-	$csrf_hash = hash('sha1', $token . $req->client_ip() . $req->user_agent());
+	$secret = $_SESSION['session_value'] ?? session_id();
+	$secret = $secret === '' ? $req->client_ip() . $req->user_agent() : $secret;
+	$csrf_hash = hash_hmac('sha256', $token . $req->client_ip() . $req->user_agent(), $secret);
 
 	// Save the session token and make it available to the forms
 	$_SESSION['token'][$type . '-' . $action] = [$token_var, $csrf_hash, time(), $token];
@@ -974,19 +976,30 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 		return false;
 	}
 
+	// Check if this token has now expired
+	if (isset($_SESSION['token'][$token_index][4]) && $_SESSION['token'][$token_index][4] < time())
+	{
+		unset($_SESSION['token'][$token_index]);
+		return false;
+	}
+
 	// We need the user agent and client IP
 	$req = Request::instance();
+	$secret = $_SESSION['session_value'] ?? session_id();
+	$secret = $secret === '' ? $req->client_ip() . $req->user_agent() : $secret;
 
 	// Shortcut
 	$passed_token_var = $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] ?? null;
-	$csrf_hash = hash('sha1', $passed_token_var . $req->client_ip() . $req->user_agent());
+	$csrf_hash = hash_hmac('sha256', (string) $passed_token_var . $req->client_ip() . $req->user_agent(), $secret);
 
 	// Checked what was passed in combination with the user agent
-	if (isset($passed_token_var)
-		&& $csrf_hash === $_SESSION['token'][$token_index][1])
+	if ($passed_token_var !== null && (hash_equals($_SESSION['token'][$token_index][1], $csrf_hash)))
 	{
-		// Consume the token, let them pass
-		unset($_SESSION['token'][$token_index]);
+		// Soft-expire the token (allow a 60-second grace period for back navigation or retries)
+		if (!isset($_SESSION['token'][$token_index][4]))
+		{
+			$_SESSION['token'][$token_index][4] = time() + 60;
+		}
 
 		return true;
 	}
@@ -1041,8 +1054,9 @@ function cleanTokens($complete = false, $suffix = '')
 	foreach ($_SESSION['token'] as $key => $data)
 	{
 		$force = empty($suffix) ? $complete : $complete || strpos($key, $suffix);
+		$soft_expired = isset($data[4]) && $data[4] < time();
 
-		if ($data[2] + 10800 < time() || $force)
+		if ($data[2] + 10800 < time() || $soft_expired || $force)
 		{
 			unset($_SESSION['token'][$key]);
 		}

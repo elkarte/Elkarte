@@ -1257,7 +1257,6 @@ class BBCParser
 			Codes::TYPE_PARSED_EQUALS, Codes::TYPE_UNPARSED_EQUALS => $this->handleEquals($tag),
 			default => false,
 		};
-
 	}
 
 	/**

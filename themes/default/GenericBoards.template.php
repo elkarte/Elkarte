@@ -241,10 +241,11 @@ function template_list_boards(array $boards, $id)
 					</ul>
 				</div>';
 		}
+		echo '
+				</li>';
 	}
 
 	echo '
-				</li>
 			</ul>';
 }
 
