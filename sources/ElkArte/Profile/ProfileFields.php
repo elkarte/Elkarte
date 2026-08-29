@@ -1116,9 +1116,7 @@ class ProfileFields
 		}
 
 		// Email addresses should be and stay unique.
-		$num = isUniqueEmail($memID, $email);
-
-		return ($num > 0) ? 'email_taken' : true;
+		return (isUniqueEmail($memID, $email)) ? true : 'email_taken';
 	}
 
 	/**
