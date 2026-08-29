@@ -159,7 +159,9 @@ class StreamFetchWebdata
 					'timeout' => 10,
 					'header' => [
 						'Connection: ' . ($this->_keep_alive ? 'Keep-Alive' : 'close'),
-						'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931',
+						'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+						'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+						'Accept-Language: en-US,en;q=0.9',
 						'Content-Type: application/x-www-form-urlencoded',
 					],
 				]
