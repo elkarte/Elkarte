@@ -973,6 +973,7 @@ dl.themes_list dd {
 #error_log {
 	width: 100%;
 	border-top: 1px solid;
+	table-layout: fixed;
 }
 
 #error_log tr {
@@ -980,9 +981,14 @@ dl.themes_list dd {
 	padding: .8rem;
 }
 
+#error_log td div {
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
 #error_log .checkbox_column {
-	width: 1.4rem;
-	text-align: center;
+	text-align: right;
 	vertical-align: top;
 }
 
