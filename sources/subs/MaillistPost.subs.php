@@ -170,7 +170,7 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 	$body = preg_replace('~>' . $txt['to'] . '(.*)@(.*?)(?:\n|\[br])~i', '', $body);
 	$body = preg_replace('~\b\s?[a-z0-9._%+-]+@[a-zZ0-9.-]+\.[a-z]{2,4}\b.?' . $txt['email_wrote'] . ':\s?~i', '', $body);
 	$body = preg_replace('~<(.*?)>(.*@.*?)(?:\n|\[br])~', '$1' . "\n", $body);
-	$body = preg_replace('~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email]).*?@.*?(?:>|&gt;|\[\/email]):~i', '', $body);
+	$body = preg_replace('~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email]).*?@.*?(?:>|&gt;|\[/email]):~i', '', $body);
 
 	// Remove multiple sequential blank lines, again
 	$body = preg_replace('~(\n\s?){3,}~i', "\n\n", $body);
@@ -566,7 +566,7 @@ function pbe_fix_client_quotes($body)
 	// quoting: John Smith on stuffz at 10:10:23 AM
 	$regex[] = '~' . $txt['email_quotefrom'] . ': (.*) ' . $txt['email_on'] . ' .* ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}:\d{1,2} [AP]M~';
 	// quoting John Smith <johnsmith@tardis.com>
-	$regex[] = '~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i';
+	$regex[] = '~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[\/email\]):~i';
 	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
 	$regex[] = '~---\s.*?"(.*)"\s+' . $txt['email_wrote'] . ':\s(\[quote\])?~i';
 	// --- in some@group.name John Smith wrote
@@ -706,10 +706,12 @@ function pbe_emailError($error, $email_message)
 	$subject = pbe_clean_email_subject($subject);
 	$subject = ($subject === '' ? $txt['no_subject'] : $subject);
 
-	// Start off with what we know about the security key, even if it's nothing
-	$message_key = $email_message->message_key;
-	$message_type = $email_message->message_type;
-	$message_id = $email_message->message_id;
+	// Normalize nullable parser values so db placeholder replacement always has concrete keys/values.
+	$message_key = $email_message->message_key ?? '';
+	$message_type = $email_message->message_type ?? '';
+	$message_id = $email_message->message_id ?? 0;
+	$email_from = $email_message->email['from'] ?? '';
+	$raw_message = $email_message->raw_message ?? '';
 	$board_id = -1;
 
 	// First up is the old, wrong email address, let's see who this should have come from if
@@ -720,7 +722,7 @@ function pbe_emailError($error, $email_message)
 		if (!empty($key_owner))
 		{
 			// Valid key so show who should have sent this key in? email aggravaters :P often messes this up
-			$email_message->email['from'] .= ' => ' . $key_owner;
+			$email_from .= ' => ' . $key_owner;
 		}
 	}
 
@@ -731,7 +733,7 @@ function pbe_emailError($error, $email_message)
 		if (!empty($key_owner))
 		{
 			// Valid key so show who should have sent this key in
-			$email_message->email['from'] = $key_owner . ' => ' . $email_message->email['from'];
+			$email_from = $key_owner . ' => ' . $email_from;
 		}
 	}
 
@@ -746,7 +748,7 @@ function pbe_emailError($error, $email_message)
 		}
 
 		// Find all keys sent to this user, sorted by date
-		$user_keys = query_user_keys($email_message->email['from']);
+		$user_keys = query_user_keys($email_from);
 
 		// While we have keys to look at, see if we can match up this lost message on subjects
 		foreach ($user_keys as $user_key)
@@ -758,7 +760,7 @@ function pbe_emailError($error, $email_message)
 			// If we know/suspect it's an "m,t or p", then use that to avoid a match on a wrong type; that would be bad ;)
 			// Look up this message/topic/pm and see if the subjects match ... if they do, then tada!
 			if (((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
-				&& query_load_subject($message, $type, $email_message->email['from']) === $subject)
+				&& query_load_subject($message, $type, $email_from) === $subject)
 			{
 				// This email has a subject that matches the subject of a message that was sent to them
 				$message_key = $key;
@@ -786,7 +788,7 @@ function pbe_emailError($error, $email_message)
 		[
 			$id, $error, $message_key,
 			$subject, $message_id, $board_id,
-			$email_message->email['from'], $message_type, $email_message->raw_message],
+			$email_from, $message_type, $raw_message],
 		['id_email']
 	);
 
