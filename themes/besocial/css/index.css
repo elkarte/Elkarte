@@ -270,7 +270,7 @@ a img {
 }
 
 /* The following is necessary. */
-extarea, .editor {
+textarea, .editor {
     line-height: 1.4;
     border: 1px solid;
     border-radius: .4rem;
@@ -2355,7 +2355,7 @@ button[type="submit"].quick_quote_button.hide {
     display: grid;
     min-height: 9rem;
     grid-template-rows: [primary] auto [children] auto;
-    grid-template-columns: [bicon] 8.5rem [info] auto [stats] minmax(8rem, 12.5rem) [avatar] 6.5rem [latest] 25% [end];
+    grid-template-columns: [bicon] 8.5rem [info] auto [stats] minmax(8rem, 12.5rem) [avatar] 6.5rem [latest] 25% [col-end];
 }
 
 /* Place the padding and height inside the grid cells to allow per cell background fill */
@@ -2411,7 +2411,7 @@ button[type="submit"].quick_quote_button.hide {
 .childboard_row {
     font-size: var(--font13);
     grid-column-start: info;
-    grid-column-end: end;
+    grid-column-end: col-end;
     grid-row-start: children;
 }
 
@@ -4358,7 +4358,6 @@ dl.merge_topic dd {
 /* Adjust recent activity areas */
 .ui-tabs .ui-tabs-panel {
     clear: both;
-    padding-top: .8rem;
     border: 1px solid;
     padding: 0 !important;
     border-color: var(--transparent);
@@ -5683,7 +5682,6 @@ div.labels {
 
 /* Make room for the little icon */
 .warningbox, .successbox, .infobox, .errorbox {
-    padding-left: 4rem !important;
     background-position: .4rem 50% !important;
     background-size: 2.4rem 2.4rem !important;
     padding: 1rem 4rem;
@@ -6046,7 +6044,7 @@ div.labels {
 
 @media screen and (max-width: 64em) {
     .category_boards .board_row {
-        grid-template-columns: [bicon] 6rem [info] 1fr [avatar] 6.5rem [latest] 40% [end];
+        grid-template-columns: [bicon] 6rem [info] 1fr [avatar] 6.5rem [latest] 40% [col-end];
     }
 
     .category_boards .board_stats, .topic_stats {
@@ -6085,7 +6083,7 @@ div.labels {
     }
 
     .category_boards .board_row {
-        grid-template-columns: [bicon] 8.5rem [info] auto [avatar] 6.5rem [latest] 40% [end];
+        grid-template-columns: [bicon] 8.5rem [info] auto [avatar] 6.5rem [latest] 40% [col-end];
     }
 }
 
@@ -7069,7 +7067,7 @@ div.labels {
     /* Main menu, smaller icons to fit 7 across */
     #main_menu {
         flex-wrap: wrap;
-        gap: .2rem .6rem
+        gap: .2rem .6rem;
     }
 
     .listlevel1#button_profile {
