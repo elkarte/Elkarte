@@ -247,8 +247,14 @@ function stickyMenu ()
 
 	if (menu)
 	{
-		let offset = menu.getBoundingClientRect().y;
-		window.onscroll = function() {
+		let offset = menu.getBoundingClientRect().top + window.scrollY;
+
+		let checkSticky = function() {
+			if (!menu.classList.contains('sticky'))
+			{
+				offset = menu.getBoundingClientRect().top + window.scrollY;
+			}
+
 			if (window.scrollY > offset - 5)
 			{
 				menu.classList.add('sticky');
@@ -258,5 +264,11 @@ function stickyMenu ()
 				menu.classList.remove('sticky');
 			}
 		};
+
+		window.addEventListener('scroll', checkSticky, {passive: true});
+		window.addEventListener('resize', checkSticky);
+
+		// Run once on load to handle pre-scrolled page refreshes
+		checkSticky();
 	}
 }

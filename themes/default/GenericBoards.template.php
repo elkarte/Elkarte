@@ -140,7 +140,7 @@ function template_list_boards(array $boards, $id)
 		echo '
 						</a>
 					</div>
-					<div class="board_info">
+					<div class="board_row_contain">
 						<h3 class="board_name">
 							<a href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
 

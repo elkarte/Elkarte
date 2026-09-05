@@ -2432,6 +2432,11 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	margin-top: .25rem;
 }
 
+.category_boards .board_lasttime::before {
+	content: "•";
+	margin-right: 0.5rem;
+}
+
 .category_boards .board_stats {
 	display: flex;
 	justify-content: center;
@@ -7204,7 +7209,7 @@ div.labels {
 	/* Main menu, smaller icons to fit 7 across */
 	#main_menu {
         flex-wrap: wrap;
-        gap: .2rem .6rem
+        gap: .2rem .6rem;
 	}
 
 	.listlevel1#button_profile {

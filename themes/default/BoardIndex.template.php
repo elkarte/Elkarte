@@ -40,7 +40,6 @@ function template_boards_list()
 		}
 
 		echo '
-		
 		<header class="category_header boardindex">';
 
 		// If this category even can collapse, show a link to collapse it.

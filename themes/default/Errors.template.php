@@ -60,6 +60,11 @@ function template_error_log()
 
 	echo '
 			<table class="table_grid" id="error_log">
+				<colgroup>
+					<col style="width: 60%;" />
+					<col style="width: 35%;" />
+					<col style="width: 5%;" />
+				</colgroup>
 				<tr>
 					<td colspan="3">
 						&nbsp;&nbsp;', $txt['apply_filter_of_type'], ':';
@@ -107,7 +112,7 @@ function template_error_log()
 	{
 		echo '
 				<tr>
-					<td class="grid60">
+					<td>
 						<div>
 							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] === 'down' ? ';desc' : '', ';filter=error_type;value=', $error['error_type']['type'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_type'], '" class="nosel icon i-search"></a>
 							', $txt['error_type'], ': ', $error['error_type']['name'], '
@@ -131,7 +136,7 @@ function template_error_log()
 			if (!empty($error['backtrace']))
 			{
 				echo '
-							<i class="icon i-bug"></i>', $error['backtrace']['link'];
+							<br /><i class="icon i-bug"></i>', $error['backtrace']['link'];
 			}
 
 			echo '

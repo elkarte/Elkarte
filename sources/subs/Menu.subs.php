@@ -203,7 +203,7 @@ function loadDefaultMenuButtons()
 		]
 	];
 
-	// Will change title correctly if user is either a mod or an admin.
+	// Will change the title correctly if the user is either a mod or an admin.
 	// Button highlighting works properly too (see current action stuffz).
 	if ($context['allow_admin'])
 	{
@@ -317,39 +317,6 @@ function loadDefaultMenuButtons()
 	}
 
 	$buttons += [
-		'profile' => [
-			'title' => !empty($modSettings['displayMemberNames']) ? User::$info->name : $txt['account_short'],
-			'href' => getUrl('profile', ['action' => 'profile', 'u' => User::$info->id, 'name' => User::$info->name]),
-			'data-icon' => 'i-menu-profile',
-			'show' => $context['allow_edit_profile'],
-			'sub_buttons' => [
-				'account' => [
-					'title' => $txt['account'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => allowedTo(['profile_identity_any', 'profile_identity_own', 'manage_membergroups']),
-				],
-				'drafts' => [
-					'title' => $txt['mydrafts'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']),
-				],
-				'forumprofile' => [
-					'title' => $txt['forumprofile'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => allowedTo(['profile_extra_any', 'profile_extra_own']),
-				],
-				'theme' => [
-					'title' => $txt['theme'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => allowedTo(['profile_extra_any', 'profile_extra_own', 'profile_extra_any']),
-				],
-				'logout' => [
-					'title' => $txt['logout'],
-					'href' => getUrl('action', ['action' => 'auth', 'sa' => 'logout']),
-					'show' => User::$info->is_guest === false,
-				],
-			],
-		],
 		'pm' => [
 			'title' => $txt['pm_short'],
 			'counter' => 'unread_messages',
@@ -406,6 +373,39 @@ function loadDefaultMenuButtons()
 			'href' => getUrl('action', ['action' => 'register']),
 			'data-icon' => 'i-menu-register',
 			'show' => User::$info->is_guest && $context['can_register'],
+		],
+		'profile' => [
+			'title' => !empty($modSettings['displayMemberNames']) ? User::$info->name : $txt['account_short'],
+			'href' => getUrl('profile', ['action' => 'profile', 'u' => User::$info->id, 'name' => User::$info->name]),
+			'data-icon' => 'i-menu-profile',
+			'show' => $context['allow_edit_profile'],
+			'sub_buttons' => [
+				'account' => [
+					'title' => $txt['account'],
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => User::$info->id, 'name' => User::$info->name]),
+					'show' => allowedTo(['profile_identity_any', 'profile_identity_own', 'manage_membergroups']),
+				],
+				'drafts' => [
+					'title' => $txt['mydrafts'],
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
+					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']),
+				],
+				'forumprofile' => [
+					'title' => $txt['forumprofile'],
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => User::$info->id, 'name' => User::$info->name]),
+					'show' => allowedTo(['profile_extra_any', 'profile_extra_own']),
+				],
+				'theme' => [
+					'title' => $txt['theme'],
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => User::$info->id, 'name' => User::$info->name]),
+					'show' => allowedTo(['profile_extra_any', 'profile_extra_own', 'profile_extra_any']),
+				],
+				'logout' => [
+					'title' => $txt['logout'],
+					'href' => getUrl('action', ['action' => 'auth', 'sa' => 'logout']),
+					'show' => User::$info->is_guest === false,
+				],
+			],
 		],
 	];
 
