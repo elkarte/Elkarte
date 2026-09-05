@@ -37,7 +37,7 @@
 
 /**
  * Start off the template by loading some helpers like
- * quick buttons, page index, etc
+ * quick buttons, page index, etc.
  */
 function template_Index_init()
 {
@@ -546,20 +546,6 @@ function template_menu()
 	// Add any additional menu buttons from addons
 	call_template_callbacks('mb', $context['theme_header_callbacks']);
 
-	// This defines the start of right-aligned buttons, set your button order > 10
-	echo '
-						<li id="button_none" class="listlevel1" role="none">
-							<a role="none"></a>
-						</li>';
-
-	// The upshrink image.
-	echo '
-						<li id="collapse_button" class="listlevel1" role="none">
-							<a class="linklevel1 panel_toggle" role="menuitem">
-								<i id="upshrink" class="hide main-menu-icon i-chevron-up" title="', $txt['upshrink_description'], '"></i>
-							</a>
-						</li>';
-
 	// Now all the buttons from menu.subs
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
@@ -575,7 +561,7 @@ function template_menu()
 						<li id="button_', $act, '" class="listlevel1', empty($button['sub_buttons']) ? '"' : ' subsections"', ' role="none">
 							<a ', $class, $href, $target, $ally, $onclick, ' role="menuitem"', empty($button['sub_buttons']) ? '' : ' aria-haspopup="true"', '>',
 								(empty($button['data-icon']) ? '' : '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (empty($button['active_button']) ? '' : ' enabled') . '" ' . $altTitle . '></i> '),
-								'<span class="button_title" aria-hidden="', (empty($button['sub_buttons']) ? 'false' : 'true'), '">', $button['title'], '</span>
+								'<span class="button_title" aria-hidden="', (empty($button['sub_buttons']) ? 'true' : 'false'), '">', $button['title'], '</span>
 							</a>';
 
 		// Any 2nd level menus?
@@ -623,6 +609,20 @@ function template_menu()
 		echo '
 						</li>';
 	}
+
+	// This defines the start of right-aligned buttons, set your button order > 10
+	echo '
+						<li id="button_none" class="listlevel1" role="none">
+							<a role="none"></a>
+						</li>';
+
+	// The upshrink image.
+	echo '
+						<li id="collapse_button" class="listlevel1" role="none">
+							<a class="linklevel1 panel_toggle" role="menuitem">
+								<i id="upshrink" class="hide main-menu-icon i-chevron-up" title="', $txt['upshrink_description'], '"></i>
+							</a>
+						</li>';
 
 	echo '
 						
