@@ -329,7 +329,7 @@ class SearchParams extends ValuesContainer
 		// Searching for a specific topic?
 		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
 		{
-			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : ($params['sd_topic'] ?? '');
+			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) ($params['topic'] ?? 0) : (int) ($params['sd_topic'] ?? 0);
 			$this->_search_params['show_complete'] = true;
 		}
 	}
@@ -466,6 +466,8 @@ class SearchParams extends ValuesContainer
 		// Searching by topic means the board is set as well.
 		if (!empty($this->_search_params['topic']))
 		{
+			$topic_id = (int) $this->_search_params['topic'];
+
 			$request = $this->_db->query('', '
 				SELECT
 					b.id_board
@@ -476,7 +478,7 @@ class SearchParams extends ValuesContainer
 					AND t.approved = {int:is_approved_true}' : '') . '
 				LIMIT 1',
 				[
-					'search_topic_id' => $this->_search_params['topic'],
+					'search_topic_id' => $topic_id,
 					'is_approved_true' => 1,
 				]
 			);
@@ -527,7 +529,7 @@ class SearchParams extends ValuesContainer
 	{
 		if (count($this->_search_params['brd']) !== 0)
 		{
-			array_map('intval', $this->_search_params['brd']);
+			$this->_search_params['brd'] = array_map('intval', $this->_search_params['brd']);
 
 			// If we've selected all boards, this parameter can be left empty.
 			require_once(SUBSDIR . '/Boards.subs.php');
