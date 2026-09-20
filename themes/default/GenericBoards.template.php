@@ -36,7 +36,7 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 	{
 		$groups[$current_group][] = $cat;
 		// The +1 here are to take in consideration category headers
-		// that visuallt account for about one additional board
+		// that visually account for about one additional board
 		$group_totals[$current_group] += $boards_count + 1;
 		$current_streak += $boards_count + 1;
 
@@ -140,7 +140,7 @@ function template_list_boards(array $boards, $id)
 		echo '
 						</a>
 					</div>
-					<div class="board_row_contain">
+					<div class="board_info">
 						<h3 class="board_name">
 							<a href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
 
