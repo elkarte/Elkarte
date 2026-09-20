@@ -247,7 +247,7 @@ class ThemeLoader
 		elseif (!allowedTo('admin_forum'))
 		{
 			//  Verify the id_theme... no foul play.
-			$themes = explode(',', $modSettings['knownThemes']);
+			$themes = array_map('intval', explode(',', $modSettings['knownThemes']));
 			if ((!empty($ssi_theme) && $this->id !== (int) $ssi_theme)
 				|| !in_array($this->id, $themes, true))
 			{
