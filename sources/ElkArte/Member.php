@@ -183,7 +183,7 @@ class Member extends ValuesContainer
 					'title' => $this->data['website_title'],
 					'url' => $this->data['website_url'],
 				],
-				'birth_date' => empty($this->data['birthdate']) || $this->data['birthdate'] === '0001-01-01'
+				'birth_date' => empty($this->data['birthdate']) || $this->data['birthdate'] === '0001-01-01' || $this->data['birthdate'] === '0000-01-01'
 					? '0000-00-00'
 					: (str_starts_with($this->data['birthdate'], '0004')
 						? '0000' . substr($this->data['birthdate'], 4)

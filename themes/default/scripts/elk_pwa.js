@@ -17,6 +17,9 @@ const elkPwa = (opt) => {
 
 	let settings = Object.assign({}, defaults, opt);
 
+	/**
+	 * Initializes the service worker.
+	 */
 	function init ()
 	{
 		if (!isEnabled())
@@ -59,6 +62,12 @@ const elkPwa = (opt) => {
 		}
 	}
 
+	/**
+	 * Get the scope of the service worker based on the provided URL or the current page URL.
+	 *
+	 * @param {string} checkUrl - The URL to check for the service worker scope. Defaults to the current page URL.
+	 * @returns {string} The scope of the service worker.
+	 */
 	function getScope (checkUrl = '')
 	{
 		const url = new URL(checkUrl || elk_board_url);
@@ -66,6 +75,11 @@ const elkPwa = (opt) => {
 		return url.pathname === '' ? '/' : '/' + url.pathname.replace(/^\/|\/$/g, '');
 	}
 
+	/**
+	 * Checks if the service worker is enabled.
+	 *
+	 * @returns {boolean} True if the service worker is enabled, false otherwise.
+	 */
 	function isEnabled ()
 	{
 		if (settings.isEnabled === null)
@@ -76,7 +90,12 @@ const elkPwa = (opt) => {
 		return settings.isEnabled;
 	}
 
-	// Service Workers don’t take control of the page immediately but on subsequent page loads
+	/**
+	 * Sends a message to the service worker.
+	 *
+	 * @param {string} command - The command to send.
+	 * @param {Object} opts - Additional options for the command.
+	 */
 	function sendMessage (command, opts = {})
 	{
 		if (navigator.serviceWorker.controller)
@@ -85,31 +104,30 @@ const elkPwa = (opt) => {
 		}
 	}
 
+	/**
+	 * Removes the service worker.
+	 */
 	function removeServiceWorker()
 	{
-		// Remove a service worker if found
-		function removeServiceWorker ()
+		// Remove service worker if found
+		if ('serviceWorker' in navigator)
 		{
-			// Remove service worker if found
-			if ('serviceWorker' in navigator)
-			{
-				navigator.serviceWorker.getRegistrations()
-					.then(allRegistrations => {
-						let scope = getScope();
+			navigator.serviceWorker.getRegistrations()
+				.then(allRegistrations => {
+					let scope = getScope();
 
-						Object.values(allRegistrations).forEach(async registration => {
-							if (getScope(registration.scope) === scope)
+					Object.values(allRegistrations).forEach(async registration => {
+						if (getScope(registration.scope) === scope)
+						{
+							sendMessage('clearAllCache');
+							await registration.unregister();
+							if ('console' in window && console.info)
 							{
-								sendMessage('clearAllCache');
-								await registration.unregister();
-								if ('console' in window && console.info)
-								{
-									console.info('[Info] Service worker removed: ', registration.scope);
-								}
+								console.info('[Info] Service worker removed: ', registration.scope);
 							}
-						});
+						}
 					});
-			}
+				});
 		}
 	}
 

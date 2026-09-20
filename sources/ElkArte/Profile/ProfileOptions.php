@@ -534,7 +534,7 @@ class ProfileOptions extends AbstractController
 	 * What it does:
 	 *
 	 * - Uses the Themes template. (pick sub template.)
-	 * - Accessed with ?action=admin;area=themes;sa=pick and ?action=profile;area=pick
+	 * - Can be accessed with ?action=admin;area=themes;sa=pick and ?action=profile;area=pick
 	 * - Requires the profile_extra_any permission.
 	 * - Allows the user to pick a theme from a list of those that are available.
 	 * - Saves the theme and variant in the session.

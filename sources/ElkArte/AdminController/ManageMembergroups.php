@@ -601,18 +601,30 @@ class ManageMembergroups extends AbstractController
 				'group_inherit' => 'intval',
 				'icon_count' => 'intval',
 				'icon_image' => 'trim|Util::htmlspecialchars',
-				'online_color' => 'trim|valid_color',
+				'online_color' => 'trim',
 			]);
 			$validator->input_processing([
 				'boardaccess' => 'array',
 			]);
 			$validator->validation_rules([
 				'boardaccess' => 'contains[allow,ignore,deny]',
+				'online_color' => 'valid_color',
 			]);
 			$validator->validate($this->_req->post);
 
 			// Insert the clean data
 			$our_post = array_replace((array) $this->_req->post, $empty_post, $validator->validation_data());
+
+			// Keep only values that pass validation checks.
+			if ($validator->validation_errors('online_color'))
+			{
+				$our_post['online_color'] = '';
+			}
+
+			if ($validator->validation_errors('boardaccess'))
+			{
+				$our_post['boardaccess'] = [];
+			}
 
 			// Can they really inherit from this group?
 			$inherit_type = [];

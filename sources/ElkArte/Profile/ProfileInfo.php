@@ -299,7 +299,7 @@ class ProfileInfo extends AbstractController
 		global $context, $txt;
 
 		// Set the age...
-		if (empty($context['member']['birth_date']))
+		if (empty($context['member']['birth_date']) || $context['member']['birth_date'] === '0000-01-01' || $context['member']['birth_date'] === '0001-01-01')
 		{
 			$context['member']['age'] = $txt['not_applicable'];
 			$context['member']['today_is_birthday'] = false;

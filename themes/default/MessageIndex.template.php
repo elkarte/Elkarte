@@ -599,17 +599,17 @@ function quickTopicToggle()
 		};
 
 		document.addEventListener("click", function(e) {
-			let form = document.getElementById("postmodify");
+			let container = document.getElementById("quicktopic") || document.getElementById("postmodify");
 			let quicktopicbox = document.getElementById("quicktopicbox");
 
-			if (!form || !quicktopicbox)
+			if (!container || !quicktopicbox)
 			{
 				return;
 			}
 
 			let isVisible = quicktopicbox.style.display !== "none" && quicktopicbox.offsetHeight !== 0;
 
-			if (isVisible && !form.contains(e.target))
+			if (isVisible && !container.contains(e.target))
 			{
 				let subject = document.getElementById("quicktopic_subject");
 				let hasContent = (subject && subject.value.trim() !== "");

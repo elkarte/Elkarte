@@ -10,8 +10,10 @@
  */
 
 /**
- * This file contains javascript associated with the user profile
+ * This file contains JavaScript associated with the user profile
  */
+
+/** global: files, cat, file, selavatar, avatardir, refuse_too_large, maxHeight, maxWidth */
 
 /**
  * Profile tabs (summary, recent, buddy), for use with jqueryUI
@@ -240,7 +242,27 @@ function ajax_getSignaturePreview (showPreview)
 }
 
 /**
- * Allows previewing of server stored avatars.
+ * Initializes the avatar selection interface.
+ * If an avatar is selected from the gallery, it loads the selected avatar.
+ * It also shows the appropriate interface for the selected avatar type.
+ * Called by the ProfileOptions template.
+ */
+function init_avatars ()
+{
+	var avatar = document.getElementById('avatar');
+
+	// If we are using an avatar from the gallery, let's load it
+	if (avatar !== null)
+	{
+		changeSel(selavatar);
+	}
+
+	// And now show the proper interface for the selected avatar type
+	swap_avatar();
+}
+
+/**
+ * Allows previewing of server-stored avatars.
  *
  * @param {string} selected
  */
@@ -308,21 +330,11 @@ function changeSel (selected)
 	}
 }
 
-function init_avatars ()
-{
-	var avatar = document.getElementById('avatar');
-
-	// If we are using an avatar from the gallery, let's load it
-	if (avatar !== null)
-	{
-		changeSel(selavatar);
-	}
-
-	// And now show the proper interface for the selected avatar type
-	swap_avatar();
-}
-
-// Show the right avatar based on what radio button they just selected
+/**
+ * Shows the appropriate avatar selection interface based on the selected avatar type.
+ * It hides all other avatar selection interfaces and displays only the one corresponding to the selected type.
+ * Called by the ProfileOptions template.
+ */
 function swap_avatar ()
 {
 	let nodeList = document.querySelectorAll('#avatar_choices input'),
@@ -400,6 +412,8 @@ function previewExternalAvatar (src)
 
 /**
  * Allows for the previewing of an uploaded avatar
+ * onchange event for the file input in ProfileOptions template.  It uses the FileReader API
+ * to read the selected file and display it as a preview.
  *
  * @param {object} src
  */
@@ -415,9 +429,20 @@ function previewUploadedAvatar (src)
 				current_avatar_new = document.getElementById('current_avatar_new'),
 				current_avatar_new_preview = document.getElementById('current_avatar_new_preview');
 
-			current_avatar_new_preview.src = String(reader.result);
-			current_avatar_new.classList.remove('hide');
-			current_avatar.classList.add('hide');
+			if (current_avatar_new_preview !== null)
+			{
+				current_avatar_new_preview.src = String(reader.result);
+			}
+
+			if (current_avatar_new !== null)
+			{
+				current_avatar_new.classList.remove('hide');
+			}
+
+			if (current_avatar !== null)
+			{
+				current_avatar.classList.add('hide');
+			}
 		};
 	}
 }

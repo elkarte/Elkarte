@@ -2475,29 +2475,6 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	font-size: var(--font17);
 }
 
-/* Stretched link: make the board name link cover the entire info cell so the
-   row hover has a matching, generous click target.  The containing block is
-   the .board_info cell (position: relative); any other links in the cell
-   (moderators, description, unapproved links) are lifted above the overlay. */
-.category_boards .board_info {
-	position: relative;
-}
-
-.category_boards .board_info a {
-	position: relative;
-	z-index: 1;
-}
-
-.category_boards .board_name > a:first-child {
-	position: static;
-}
-
-.category_boards .board_name > a:first-child::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 0;
-}
 
 .moderators {
 	font-size: var(--font14);

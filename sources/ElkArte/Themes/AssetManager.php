@@ -273,10 +273,10 @@ class AssetManager
 	}
 
 	/**
-	 * Progressive Web App initialization
+	 * Progressive Web App / Service Worker initialization
 	 *
 	 * What it does:
-	 *  - Sets up the necessary configurations for the Progressive Web App (PWA).
+	 *  - Sets up the necessary configurations for Progressive Web App (PWA) and Push Notifications.
 	 *  - Adds JavaScript variables, loads necessary JavaScript files, and adds inline JavaScript code.
 	 *
 	 * @return void
@@ -290,8 +290,12 @@ class AssetManager
 		]);
 		loadJavascriptFile('elk_pwa.js', ['defer' => false]);
 
-		// Not enabled, let's be sure to remove it should it exist
-		if (empty($modSettings['pwa_enabled']))
+		$ssl = detectServer()->supportsSSL();
+		$pwa_enabled = !empty($modSettings['pwa_enabled']) && $ssl;
+		$push_enabled = !empty($modSettings['usernotif_desktop_enable']) && $ssl;
+
+		// If neither PWA nor desktop push notifications are enabled, remove any existing service worker
+		if (!$pwa_enabled && !$push_enabled)
 		{
 			$this->javascript->addInlineJavascript('
 				elkPwa().removeServiceWorker();
@@ -304,23 +308,29 @@ class AssetManager
 		$theme_scope = $this->getScopeFromUrl($settings['actual_theme_url']);
 		$default_theme_scope = $this->getScopeFromUrl($settings['default_theme_url']);
 		$sw_scope = $this->getScopeFromUrl($boardurl);
+		$cache_stale = defined('CACHE_STALE') ? CACHE_STALE : '';
+		$cache_id = $modSettings['elk_pwa_cache_stale'] ?? '';
+
+		$pwa_post_init = $pwa_enabled ? '
+				elkPwaInstance.sendMessage("deleteOldCache", {cache_id: ' . JavaScriptEscape($cache_id) . '});
+				elkPwaInstance.sendMessage("pruneCache");' : '';
+
 		$this->javascript->addInlineJavascript('
 			document.addEventListener("DOMContentLoaded", function() {
 				let myOptions = {
 					swUrl: "elkServiceWorker.js",
 					swOpt: {
-						cache_stale: ' . JavaScriptEscape(CACHE_STALE) . ',
-						cache_id: ' . JavaScriptEscape($modSettings['elk_pwa_cache_stale']) . ',
+						pwa_enabled: ' . ($pwa_enabled ? '1' : '0') . ',
+						cache_stale: ' . JavaScriptEscape($cache_stale) . ',
+						cache_id: ' . JavaScriptEscape($cache_id) . ',
 						theme_scope: ' . JavaScriptEscape($theme_scope) . ',
 						default_theme_scope: ' . JavaScriptEscape($default_theme_scope) . ',
 						sw_scope: ' . JavaScriptEscape($sw_scope) . ',
 					}
 				};
-	
+
 				let elkPwaInstance = elkPwa(myOptions);
-				elkPwaInstance.init();
-				elkPwaInstance.sendMessage("deleteOldCache", {cache_id: ' . JavaScriptEscape($modSettings['elk_pwa_cache_stale']) . '});
-				elkPwaInstance.sendMessage("pruneCache");
+				elkPwaInstance.init();' . $pwa_post_init . '
 			});'
 		);
 	}

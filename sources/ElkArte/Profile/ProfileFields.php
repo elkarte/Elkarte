@@ -1081,8 +1081,8 @@ class ProfileFields
 			$id_theme = $req->getPost('id_theme', 'intval', $old_profile['id_theme']);
 			makeThemeChanges($context['id_member'], (int) $id_theme);
 
-			// Apply custom field changes for the active subaction (usually in query string)
-			$sa = $req->getQuery('sa', null, '');
+			// Apply custom field changes for the active subaction (usually in post data)
+			$sa = $req->getRequest('sa', null, '');
 			if (!empty($sa))
 			{
 				makeCustomFieldChanges($context['id_member'], $sa, false);
