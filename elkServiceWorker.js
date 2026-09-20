@@ -12,31 +12,40 @@
  */
 
 const OFFLINE = 'index.php?action=offline';
+const SW_PARAMS = new URL(location);
+const CID = SW_PARAMS.searchParams.get('cache_id') || 'elk20b1';
 
-let STATIC_CACHE_NAME = 'elk_sw_cache_static',
-	PAGES_CACHE_NAME = 'elk_sw_cache_pages',
-	IMAGES_CACHE_NAME = 'elk_sw_cache_images',
-	CACHE_ID = null,
-	SW_SCOPE = '/';
+let CACHE_ID = '::' + CID,
+	STATIC_CACHE_NAME = 'elk_sw_cache_static' + CACHE_ID,
+	PAGES_CACHE_NAME = 'elk_sw_cache_pages' + CACHE_ID,
+	IMAGES_CACHE_NAME = 'elk_sw_cache_images' + CACHE_ID,
+	SW_SCOPE = SW_PARAMS.searchParams.get('sw_scope') || '/';
 
-// On sw installation cache some defined ASSETS and the OFFLINE page
+/**
+ * Checks if PWA caching is enabled from the service worker query string
+ *
+ * @returns {boolean}
+ */
+function isPwaEnabled ()
+{
+	return SW_PARAMS.searchParams.get('pwa_enabled') !== '0';
+}
+
+/**
+ * The install event is triggered when the service worker is installed.
+ * It caches the defined assets and the offline page for offline access.
+ */
 self.addEventListener('install', event => {
 	self.skipWaiting();
 
-	let passedParam = new URL(location);
+	if (!isPwaEnabled())
+	{
+		return;
+	}
 
-	// Use a cache id, so we can do pruning/resets from elk_pwa.js messages
-	const cid = passedParam.searchParams.get('cache_id') || 'elk20b1';
-
-	CACHE_ID = '::' + cid;
-	STATIC_CACHE_NAME += CACHE_ID;
-	PAGES_CACHE_NAME += CACHE_ID;
-	IMAGES_CACHE_NAME += CACHE_ID;
-	SW_SCOPE = passedParam.searchParams.get('sw_scope') || '/';
-
-	const themeScope = passedParam.searchParams.get('theme_scope') || '/themes/default/',
-		defaultThemeScope = passedParam.searchParams.get('default_theme_scope') || '/themes/default/',
-		cache_stale = passedParam.searchParams.get('cache_stale') || '?R20B1',
+	const themeScope = SW_PARAMS.searchParams.get('theme_scope') || '/themes/default/',
+		defaultThemeScope = SW_PARAMS.searchParams.get('default_theme_scope') || '/themes/default/',
+		cache_stale = SW_PARAMS.searchParams.get('cache_stale') || '?R20B1',
 		ASSETS = defineAssets(themeScope, cache_stale, defaultThemeScope);
 
 	event.waitUntil(
@@ -68,6 +77,14 @@ self.addEventListener('install', event => {
  * Delete any caches that do not match our current version.
  */
 self.addEventListener('activate', event => {
+	if (!isPwaEnabled())
+	{
+		event.waitUntil(
+			clearAllCache().then(() => self.clients.claim())
+		);
+		return;
+	}
+
 	event.waitUntil(
 		deleteOldCache().then(() => self.clients.claim())
 	);
@@ -75,6 +92,11 @@ self.addEventListener('activate', event => {
 
 // When the browser makes a request for a resource, determine if its actionable
 self.addEventListener('fetch', event => {
+	if (!isPwaEnabled())
+	{
+		return;
+	}
+
 	let request = event.request,
 		accept = request.headers.get('Accept') || null;
 
@@ -127,7 +149,11 @@ self.addEventListener('fetch', event => {
 	event.respondWith(fetchWithOfflineFallback(event.request));
 });
 
-// Message handler, provides a way to interact with the service worker
+/**
+ * Handles messages sent to the service worker.
+ *
+ * @param {MessageEvent} event - The message event containing the command and options.
+ */
 self.addEventListener('message', function(event) {
 	let command = event.data.command || '',
 		opts = event.data.opts || {};
@@ -146,6 +172,9 @@ self.addEventListener('message', function(event) {
 		if (opts.cache_id && '::' + opts.cache_id !== CACHE_ID)
 		{
 			CACHE_ID = '::' + opts.cache_id;
+			STATIC_CACHE_NAME = 'elk_sw_cache_static' + CACHE_ID;
+			PAGES_CACHE_NAME = 'elk_sw_cache_pages' + CACHE_ID;
+			IMAGES_CACHE_NAME = 'elk_sw_cache_images' + CACHE_ID;
 		}
 
 		return deleteOldCache();
@@ -385,11 +414,16 @@ async function pruneCache (maxItems, cache_name)
  */
 function deleteOldCache ()
 {
+	if (!CACHE_ID)
+	{
+		return Promise.resolve([]);
+	}
+
 	return caches.keys()
 		.then(function(keys) {
 			return Promise.all(keys
 				.filter(function(key) {
-					return key.indexOf(CACHE_ID) === -1;
+					return key.startsWith('elk_sw_cache_') && key.indexOf(CACHE_ID) === -1;
 				})
 				.map(function(key) {
 					return caches.delete(key);
