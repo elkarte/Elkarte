@@ -1375,7 +1375,7 @@ function template_profile_avatar_select()
 							</dt>
 							<dd>';
 
-	// If users are allowed to choose avatars stored on the server show the selection boxes to choose them.
+	// If users are allowed to choose avatars stored on the server, show the selection boxes to choose them.
 	if (!empty($context['member']['avatar']['allow_server_stored']))
 	{
 		echo '
@@ -1428,7 +1428,7 @@ function template_profile_avatar_select()
 								</div>';
 	}
 
-	// If the user is able to upload avatars to the server show them an upload box.
+	// If the user is able to upload avatars to the server, show them an upload box.
 	if (!empty($context['member']['avatar']['allow_upload']))
 	{
 		echo '
@@ -1437,11 +1437,11 @@ function template_profile_avatar_select()
 									', ($context['member']['avatar']['id_attach'] > 0 ? '
 									<br /><br />
 									<img id="current_avatar" class="avatar avatarresize" src="' . $context['member']['avatar']['href'] . (!str_contains($context['member']['avatar']['href'], '?') ? '?' : '&') . 'time=' . time() . '" alt="" />
+									<input type="hidden" name="id_attach" value="' . $context['member']['avatar']['id_attach'] . '" />' : ''), '
 									<div id="current_avatar_new" class="hide">
 										<img id="current_avatar_new_preview" class="avatar avatarresize border_error" style="vertical-align: middle" alt="" src="" />
 										<span>' . $txt['preview'] . '</span>
 									</div>
-									<input type="hidden" name="id_attach" value="' . $context['member']['avatar']['id_attach'] . '" />' : ''), '
 								</div>';
 	}
 
