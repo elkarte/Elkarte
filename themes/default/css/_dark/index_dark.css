@@ -108,11 +108,11 @@
 	--input_submit_background_hover: #00214C; /* background */
 
 	/* Main Menu Active Button */
-	--menu_button_active: #0266E9; /* Link, list, breadcrumb active/hover colors (gradient and color) */
+	--menu_button_active: #0266E9; /* Link, list active/hover colors (gradient and color) */
 	--menu_button_active_2: #006FFF; /* Compliment gradient color for above */
 	--menu_button_border_active: #0266E9; /* Active border color */
 	--menu_button_border_active_top: #0266E9; /* Active top border */
-	--menu_button_active_hover: #1A7DFF; /* Link, list, breadcrumb active/hover colors (gradient and color) */
+	--menu_button_active_hover: #1A7DFF; /* Link, list active/hover colors (gradient and color) */
 	--menu_button_active_hover_2: #1A7DFF; /* Compliment gradient color for above */
 	--menu_border_active_hover_top: #1A7DFF; /* Active menu border color top */
 	--menu_border_active_hover_left: #1A7DFF; /* Active menu border color left */
@@ -131,6 +131,11 @@
 	--menu_dropdown_indicator: #566450; /* dropdown menu indicator */
 	--icon_menu_hover: #0B0B0B; /* Icon menu (small screen) hover background */
 	--icon_menu_hover_border: #232323;
+
+	/* Breadcrumbs */
+	--breadcrumb_active: #0266E9; /* Breadcrumb active/hover colors (gradient and color) */
+	--breadcrumb_active_2: #006FFF; /* Compliment gradient color for above */
+	--breadcrumb_background: #0B0B0B; /* Breadcrumb background */
 
 	/* Category Headers */
 	--category_header_text: #9D8860; /* Text in the category bars */
@@ -894,11 +899,11 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .breadcrumb .crumb {
 	color: var(--menu_text);
-	background: var(--primary_content_background);
+	background: var(--breadcrumb_background);
 }
 
 .breadcrumb .crumb.active, .breadcrumb .crumb:hover, .breadcrumb .crumb:last-child:hover {
-	background-image: linear-gradient(0deg, var(--menu_button_active_2), var(--menu_button_active));
+	background-image: linear-gradient(0deg, var(--breadcrumb_active_2), var(--breadcrumb_active));
 }
 
 .breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
@@ -907,11 +912,11 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active:after, .breadcrumb .crumb:hover:after, .breadcrumb .crumb:last-child {
-	background-image: linear-gradient(135deg, var(--menu_button_active), var(--menu_button_active_2));
+	background-image: linear-gradient(135deg, var(--breadcrumb_active), var(--breadcrumb_active_2));
 }
 
 .breadcrumb .crumb:after {
-	background: var(--primary_content_background);
+	background: var(--breadcrumb_background);
 	/* Arrow using box shadow on our rotated box */
 	box-shadow: 1px -1px 0 1px var(--emphasize_text), 2px -2px 0 1px var(--html_background);
 }
@@ -1084,11 +1089,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .board_latest strong {
 	color: var(--strong_text);
-}
-
-/* Row hover for easier scanning of the board index */
-.board_row:hover {
-	background: color-mix(in srgb, #FFFFFF 6%, var(--content_background));
 }
 
 .childboards {

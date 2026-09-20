@@ -118,7 +118,7 @@ body {
  */
 
 .breadcrumb .crumb.active:after, .breadcrumb .crumb:hover:after, .breadcrumb .crumb:last-child {
-	background-image: linear-gradient(0deg, var(--menu_button_active), var(--menu_button_active_2));
+	background-image: linear-gradient(0deg, var(--breadcrumb_active), var(--breadcrumb_active_2));
 }
 
 /* -------------------------------------------------------
