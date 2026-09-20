@@ -13,7 +13,7 @@
  */
 
 /**
- * We need some trick to proprerly display things
+ * We need some trick to properly display things
  */
 function template_Profile_init()
 {

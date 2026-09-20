@@ -2030,8 +2030,7 @@ function obStart($use_compression = false)
 /**
  * Returns a URL based on the parameters passed and the selected generator
  *
- * @param string $type The type of the URL (depending on the type, the
- *                     generator can act differently
+ * @param string $type The type of the URL (depending on the type, the generator can act differently
  * @param array $params All the parameters of the URL
  *
  * @return string An URL
@@ -2051,8 +2050,7 @@ function getUrl($type, $params)
 /**
  * Returns the query part of a URL based on the parameters passed and the selected generator
  *
- * @param string $type The type of the URL (depending on the type, the
- *                     generator can act differently
+ * @param string $type The type of the URL (depending on the type, the generator can act differently
  * @param array $params All the parameters of the URL
  *
  * @return string The query part of a URL
