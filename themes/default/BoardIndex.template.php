@@ -101,12 +101,12 @@ function template_boardindex_outer_below()
 	if ($context['user']['is_logged'])
 	{
 		echo '
-			<p title="', $txt['new_posts'], '"><i class="icon i-board-new"></i>', $txt['new_posts'], '</p>';
+			<p><i class="icon i-board-new"></i>', $txt['new_posts'], '</p>';
 	}
 
 	echo '
-			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
-			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>';
+			<p><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
+			<p><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>';
 
 	// Show the mark all as read button?
 	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
@@ -322,8 +322,8 @@ function template_ic_show_stats()
 						</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
-					', $context['common_stats']['boardindex_total_posts'], '', empty($settings['show_latest_member']) ? '' : ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
-					', (empty($context['latest_post']) ? '' : $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )'), ' - <a href="', getUrl('action', ['action' => 'recent']), '">', $txt['recent_view'], '</a>
+					', $context['common_stats']['boardindex_total_posts'], '', empty($settings['show_latest_member']) ? '' : '<br />' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>', '<br />', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
+					', (empty($context['latest_post']) ? '' : $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )'), '
 				</p>
 			</li>';
 }
@@ -347,7 +347,7 @@ function template_ic_show_likestats()
 	{
 		echo '
 				<p class="inline">
-					<span class="event">', $txt['like_post_tab_mlt'], ':</span> ';
+					<span class="event bbc_strong">', $txt['like_post_tab_mlt'], ':</span> ';
 
 		$topics = [];
 		foreach ($context['likestats']['topics'] as $topic)
@@ -363,7 +363,7 @@ function template_ic_show_likestats()
 	{
 		echo '
 				<p class="inline">
-					<span class="event">', $txt['like_post_tab_mlm'], ':</span> ';
+					<span class="event bbc_strong">', $txt['like_post_tab_mlm'], ':</span> ';
 
 		$messages = [];
 		foreach ($context['likestats']['messages'] as $msg)
@@ -379,7 +379,7 @@ function template_ic_show_likestats()
 	{
 		echo '
 				<p class="inline">
-					<span class="event">', $txt['like_post_tab_mlb'], ':</span> ';
+					<span class="event bbc_strong">', $txt['like_post_tab_mlb'], ':</span> ';
 
 		$boards = [];
 		foreach ($context['likestats']['boards'] as $board)
@@ -439,13 +439,13 @@ function template_ic_show_users()
 	{
 		echo '
 				<p class="inline">', sprintf($txt['users_active'], $modSettings['lastActive']), ': ', implode(', ', $context['list_users_online']), '</p>';
+	}
 
-		// Showing membergroups?
-		if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
-		{
-			echo '
+	// Showing membergroups?
+	if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
+	{
+		echo '
 				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
-		}
 	}
 
 	echo '

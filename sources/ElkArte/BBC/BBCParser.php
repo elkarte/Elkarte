@@ -706,7 +706,7 @@ class BBCParser
 		// </div>
 		if ($first_quote === 0)
 		{
-			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" aria-label="show" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
 			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
 		}
 		// Add a class to every other blockquote to style alternating blockquotes
