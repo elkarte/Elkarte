@@ -119,6 +119,11 @@ function template_options()
 			'default' => true,
 		],
 		[
+			'id' => 'display_quick_topic',
+			'label' => $txt['display_quick_topic'],
+			'default' => true,
+		],
+		[
 			'id' => 'display_quick_mod',
 			'label' => $txt['display_quick_mod'],
 			'default' => true,

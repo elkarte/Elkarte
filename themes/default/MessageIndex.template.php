@@ -296,7 +296,7 @@ function template_topic_listing()
 			echo '
 					<span class="topic_latest_info">
 						<span>', $topic['last_post']['html_time'], '</span>
-						<span>', $txt['by'], ' ', $topic['last_post']['member']['link'], '</span>
+						<span>', $txt['by'], ' ', empty($topic['last_post']['member']['avatar']) ? $topic['last_post']['member']['link'] : $topic['last_post']['member']['name'], '</span>
 					</span>
 					<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 				</div>';
@@ -507,11 +507,11 @@ function template_quicktopic_above()
 	global $context, $options, $txt, $modSettings, $settings;
 
 	// Using  quick topic, and you can start a new topic?
-	if ($context['can_post_new'] && !empty($options['display_quick_reply']) && !$context['user']['is_guest'])
+	if ($context['can_post_new'] && !empty($options['display_quick_topic']) && !$context['user']['is_guest'])
 	{
 		echo '
 		<form  id="postmodify" action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" onsubmit="submitonce(this);', (empty($modSettings['mentions_enabled']) ? '' : "revalidateMentions('postmodify', '" . $context['post_box_name'] . "');"), '">
-		<ul id="quicktopic" class="topic_listing" >
+		<ul id="quicktopic" class="topic_listing">
 			<li class="basic_row">
 				<div class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-xx' : '', '">';
 

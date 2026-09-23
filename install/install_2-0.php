@@ -2963,6 +2963,7 @@ class InstallInstructions_install_2_0
 			array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
 			array(
 				array(-1, 1, 'display_quick_reply', '2'),
+				array(-1, 1, 'display_quick_topic', '2'),
 				array(-1, 1, 'view_newest_pm_first', '1'),
 				array(-1, 1, 'return_to_post', '1'),
 			),

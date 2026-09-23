@@ -838,7 +838,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		global $txt, $modSettings, $context, $options;
 
 		// Quick topic enabled?
-		if ($context['can_post_new'] && !empty($options['display_quick_reply']))
+		if ($context['can_post_new'] && !empty($options['display_quick_topic']))
 		{
 			$this->prepareQuickTopic();
 
@@ -879,7 +879,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			];
 
 			// Trigger the prepare_context event for modules that have tied in to it
-			$this->_events->trigger('prepare_context', ['editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])]);
+			$this->_events->trigger('prepare_context', ['editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_topic'])]);
 
 			create_control_richedit($editorOptions);
 
@@ -894,7 +894,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	{
 		global $options, $context, $modSettings;
 
-		if (empty($options['hide_poster_area']) && $options['display_quick_reply'])
+		if (empty($options['hide_poster_area']) && $options['display_quick_topic'])
 		{
 			if ($this->user->is_guest)
 			{

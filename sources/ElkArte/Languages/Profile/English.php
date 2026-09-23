@@ -327,6 +327,7 @@ $txt['hide_poster_area'] = 'Hide the poster information area.';
 $txt['per_page_default'] = 'forum default';
 $txt['calendar_start_day'] = 'First day of the week on the calendar:';
 $txt['display_quick_reply'] = 'Use quick reply on topic display: ';
+$txt['display_quick_topic'] = 'Use quick topic on message index: ';
 $txt['display_quick_mod'] = 'Show quick-moderation checkboxes';
 
 $txt['whois_title'] = 'Look up IP on a regional whois-server';

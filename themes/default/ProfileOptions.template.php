@@ -804,6 +804,13 @@ function template_profile_theme_settings()
 								<input type="checkbox" name="default_options[display_quick_reply]" id="display_quick_reply" value="1"', empty($context['member']['options']['display_quick_reply']) ? '' : ' checked="checked"', ' />
 							</dd>
 							<dt>
+								<label for="display_quick_topic">', $txt['display_quick_topic'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[display_quick_topic]" value="0" />
+								<input type="checkbox" name="default_options[display_quick_topic]" id="display_quick_topic" value="1"', empty($context['member']['options']['display_quick_topic']) ? '' : ' checked="checked"', ' />
+							</dd>
+							<dt>
 								<label for="display_quick_mod">', $txt['display_quick_mod'], '</label>
 							</dt>
 							<dd>
