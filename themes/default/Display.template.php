@@ -23,7 +23,7 @@ function template_Display_init()
 }
 
 /**
- * Show a status block above the report to staff page
+ * Show a status block above the report-to-staff page
  */
 function template_report_sent_above()
 {
@@ -47,7 +47,7 @@ function template_messages_informations_above()
 	echo '
 		<main id="forumposts">
 			<header id="topic_header" class="category_header">
-				<i class="hdicon ', $context['class'], '"></i>
+				<i class="hdicon ', $context['class'], '"', !empty($context['can_modify']) ? ' id="msg_icon_' . $context['topic_first_message'] . '"' : '', '></i>
 				<span id="topic_subject">', $context['subject'], '</span>
 				<span class="stats_text">
 					<i class="icon icon-small i-user"></i>', sprintf($txt['topic_started_by'], $context['topic_starter_name']), '
@@ -227,7 +227,7 @@ function template_messages()
 
 							</div>';
 
-		// Start of grid-row: signature seen as "<footer> .signature" in css
+		// Start of grid-row: signature seen as "<footer> .signature" in CSS
 		// This could use some cleanup, but the idea is to prevent multiple borders in this grid area
 		// It should just have a division line and then likes, custom fields, signature (any or none may be present)
 		// or no line if there are no items
@@ -312,7 +312,7 @@ function template_messages()
  */
 function template_keyinfo($message, $ignoring, $above = false)
 {
-	global $context, $settings, $options, $txt;
+	global $context, $options, $txt;
 
 	echo '
 						<header class="keyinfo', ($above ? ' above' : ''), '">
@@ -343,7 +343,7 @@ function template_keyinfo($message, $ignoring, $above = false)
 
 	echo '
 							<h2 id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</h2>
-							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
+							<span id="messageicon_', $message['id'], '" class="messageicon', ($context['class'] !== 'i-' . $message['icon'] && $message['icon'] !== 'xx') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
 							<h3 id="info_', $message['id'], '">', empty($message['counter']) ? '' : '
@@ -444,8 +444,7 @@ function template_quickreply_below()
 			template_verification_controls($context['visual_verification_id'], '<strong>' . $txt['verification'] . ':</strong>', '<br />');
 		}
 
-		echo '
-						', template_control_richedit($context['post_box_name']);
+		template_control_richedit($context['post_box_name']);
 
 		echo '
 						', $context['is_locked'] ? '<p class="warningbox smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
@@ -584,7 +583,7 @@ function template_quickreply_below()
 }
 
 /**
- * Used to display a polls / poll results
+ * Used to display polls / poll results
  */
 function template_display_poll_above()
 {
@@ -866,7 +865,7 @@ function template_display_attachments($message, $ignoring)
 		}
 	}
 
-	// If we had unapproved attachments clean up.
+	// If we had unapproved attachments, clean up.
 	if ($last_approved_state == 0)
 	{
 		echo '

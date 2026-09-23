@@ -1369,7 +1369,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = [], $tables = []
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
-			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($members_table ? ',
+			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.icon, ms.approved as msg_approved' : '') . ($members_table ? ',
 			COALESCE(mem.real_name, ms.poster_name) AS poster_name' : '') . ($logs_table ? ',
 			' . (User::$info->is_guest ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '

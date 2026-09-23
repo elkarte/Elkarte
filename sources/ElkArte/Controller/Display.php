@@ -652,9 +652,12 @@ class Display extends AbstractController
 		$context['is_very_hot'] = $this->topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $this->topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $this->topicinfo['approved'];
+		$context['start_icon'] = $this->topicinfo['icon'];
 
 		// Set the class of the current topic, Hot, not so hot, locked, sticky
 		determineTopicClass($context);
+
+		$context['can_modify'] = (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $context['topic_starter_id'] == $this->user->id && (empty($modSettings['edit_disable_time']) || !$this->topicinfo['approved'] || $this->topicinfo['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())));
 
 		// Set the topic's information for the template.
 		$context['subject'] = $this->topicinfo['subject'];

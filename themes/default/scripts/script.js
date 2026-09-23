@@ -1248,12 +1248,11 @@ function IconList (oOptions)
 
 // Replace all message icons by icons with hoverable and clickable div's.
 IconList.prototype.initIcons = function() {
-	for (let i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
+	let icons = document.querySelectorAll('[id^="' + this.opt.sIconIdPrefix + '"]');
+	for (let i = icons.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 	{
-		if (document.images[i].id.substring(0, iPrefixLength) === this.opt.sIconIdPrefix)
-		{
-			setOuterHTML(document.images[i], '<span class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substring(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" /></span>');
-		}
+		let icon = icons[i];
+		setOuterHTML(icon, '<span class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + icon.id.substring(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)">' + icon.outerHTML + '</span>');
 	}
 };
 
@@ -1288,6 +1287,11 @@ IconList.prototype.openPopup = function(oDiv, iMessageId) {
 
 	if (this.bListLoaded)
 	{
+		this.aPos = elk_itemPos(oDiv);
+		if (this.opt.bRTL)
+		{
+			this.aPos[0] -= this.oContainerDiv.getBoundingClientRect().width - 24;
+		}
 		this.oContainerDiv.style.top = (this.aPos[1] + oDiv.offsetHeight) + 'px';
 		this.oContainerDiv.style.left = (this.aPos[0] - 1) + 'px';
 		this.oContainerDiv.style.display = 'flex';
@@ -1310,12 +1314,13 @@ IconList.prototype.onIconsReceived = function(oXMLDoc) {
 	this.oContainerDiv.style.display = 'flex';
 	this.bListLoaded = true;
 
-	this.aPos = elk_itemPos(this.oDiv);
+	let oTarget = this.oClickedIcon || this.oDiv;
+	this.aPos = elk_itemPos(oTarget);
 	if (this.opt.bRTL)
 	{
 		this.aPos[0] -= this.oContainerDiv.getBoundingClientRect().width - 24;
 	}
-	this.oContainerDiv.style.top = (this.aPos[1] + this.oDiv.offsetHeight) + 'px';
+	this.oContainerDiv.style.top = (this.aPos[1] + oTarget.offsetHeight) + 'px';
 	this.oContainerDiv.style.left = (this.aPos[0] - 1) + 'px';
 
 	ajax_indicator(false);
@@ -1340,6 +1345,8 @@ IconList.prototype.onItemHover = function(oDiv, bMouseOver) {
 
 // Event handler for clicking on one of the icons.
 IconList.prototype.onItemMouseDown = function(oDiv, sNewIcon) {
+	this.sCurIcon = sNewIcon;
+
 	if (this.iCurMessageId !== 0)
 	{
 		ajax_indicator(true);
@@ -1352,7 +1359,17 @@ IconList.prototype.onItemMouseDown = function(oDiv, sNewIcon) {
 	}
 	else
 	{
-		this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
+		let img = this.oClickedIcon.getElementsByTagName('img')[0];
+		if (img)
+		{
+			img.src = oDiv.getElementsByTagName('img')[0].src;
+		}
+
+		let iTag = this.oClickedIcon.getElementsByTagName('i')[0] || (this.oClickedIcon.tagName === 'I' ? this.oClickedIcon : null);
+		if (iTag)
+		{
+			iTag.className = iTag.className.replace(/\bi-[^\s]+/g, 'i-' + sNewIcon);
+		}
 		if ('sLabelIconBox' in this.opt)
 		{
 			document.getElementById(this.opt.sLabelIconBox).value = sNewIcon;
@@ -1378,7 +1395,17 @@ IconList.prototype.onIconResponse = function(oXMLDoc) {
 		}
 
 		// Swap the icon
-		this.oClickedIcon.getElementsByTagName('img')[0].src = this.oDiv.getElementsByTagName('img')[0].src;
+		let img = this.oClickedIcon.getElementsByTagName('img')[0];
+		if (img)
+		{
+			img.src = this.oDiv.getElementsByTagName('img')[0].src;
+		}
+
+		let iTag = this.oClickedIcon.getElementsByTagName('i')[0] || (this.oClickedIcon.tagName === 'I' ? this.oClickedIcon : null);
+		if (iTag)
+		{
+			iTag.className = iTag.className.replace(/\bi-[^\s]+/g, 'i-' + this.sCurIcon);
+		}
 	}
 };
 
