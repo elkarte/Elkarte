@@ -668,6 +668,10 @@ legend::before, .i-caret-down::before {
 	--hexcode: #555555;
 }
 
+.i-spgroup::before, .i-picture::before,
+.i-menu-unread::before,
+.i-menu-unreadreplies::before,
+.i-menu-register::before,
 .i-menu-admin::before,
 .i-menu-profile::before, .i-menu-profile.enabled::before,
 .i-menu-pm-on.enabled::before, .i-menu-pm-off::before,

@@ -663,6 +663,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #forumtitle > a {
 	color: var(--transparent);
 	background: linear-gradient(95deg, var(--title-compliment), var(--title));
+	-webkit-background-clip: text;
 }
 
 #forumtitle {
