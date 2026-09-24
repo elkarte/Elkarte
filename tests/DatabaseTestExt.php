@@ -167,7 +167,7 @@ class TestDatabase extends TestCase
 			'settings' => 246,
 			'smileys' => 56,
 			'spiders' => 57,
-			'themes' => 25,
+			'themes' => 26,
 			'topics' => 1,
 		];
 

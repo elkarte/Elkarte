@@ -751,6 +751,7 @@ InTopicModeration.prototype.init = function() {
 		oCheckbox.name = 'msgs[]';
 		oCheckbox.value = messageID;
 		oCheckbox.title = 'checkbox ' + messageID;
+		oCheckbox.setAttribute('aria-label', 'checkbox ' + messageID);
 		oCheckbox.onclick = this.handleClick.bind(this, oCheckbox);
 
 		// Append it to the container

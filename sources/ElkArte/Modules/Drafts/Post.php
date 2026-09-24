@@ -353,7 +353,7 @@ class Post extends AbstractModule
 			'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
 			'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
 			'subject' => strtr($subject, ["\r" => '', "\n" => '', "\t" => '']),
-			'body' => Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true),
+			'body' => Util::htmlspecialchars($message, ENT_QUOTES),
 			'id_member' => $this->user->id,
 			'is_usersaved' => (int) empty($_REQUEST['autosave']),
 		];

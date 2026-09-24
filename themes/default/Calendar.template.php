@@ -51,7 +51,7 @@ function template_show_calendar()
 					</select>
 					<select name="year">';
 
-	// Show a link for every year.....
+	// Show a link for every year...
 	for ($year = $context['cal_minyear']; $year <= $context['cal_maxyear']; $year++)
 	{
 		echo '
@@ -73,9 +73,9 @@ function template_unlinked_event_post()
 {
 	global $context, $txt, $modSettings;
 
-	// Start the javascript for drop down boxes...
+	// Start the JavaScript for drop-down boxes...
 	echo '
-		<form action="', getUrl('action', ['action' => 'calendar', 'sa' => 'post']), '" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);elk_saveEntities(\'postevent\', [\'evtitle\']);">';
+		<form action="', getUrl('action', ['action' => 'calendar', 'sa' => 'post']), '" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);">';
 
 	if (!empty($context['event']['new']))
 	{
@@ -94,7 +94,7 @@ function template_unlinked_event_post()
 				<div class="errorbox">
 					<dl class="event_error">
 						<dt>
-							', $context['error_type'] == 'serious' ? '<strong>' . $txt['error_while_submitting'] . '</strong>' : '', '
+							', $context['error_type'] === 'serious' ? '<strong>' . $txt['error_while_submitting'] . '</strong>' : '', '
 						</dt>
 						<dt class="error">
 							', implode('<br />', $context['post_error']['messages']), '
@@ -152,7 +152,7 @@ function template_unlinked_event_post()
 					<ul class="event_options">';
 	}
 
-	// If events can span more than one day then allow the user to select how long it should last.
+	// If events can span more than one day, then allow the user to select how long it should last.
 	if (!empty($modSettings['cal_allowspan']))
 	{
 		echo '
@@ -171,7 +171,7 @@ function template_unlinked_event_post()
 						</li>';
 	}
 
-	// If this is a new event let the user specify which board they want the linked post to be put into.
+	// If this is a new event, let the user specify which board they want the linked post to be put into.
 	if ($context['event']['new'])
 	{
 		echo '
@@ -332,7 +332,7 @@ function template_show_month_grid($grid_name)
 				}
 
 				// Is this the first day of the week? (and are we showing week numbers?)
-				if ($day['is_first_day'] && $calendar_data['size'] != 'small')
+				if ($day['is_first_day'] && $calendar_data['size'] !== 'small')
 				{
 					echo ' - <a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'day' => $day['day'], 'viewweek']), '">', $txt['calendar_week'], ' ', $week['number'], '</a>';
 				}
@@ -394,7 +394,7 @@ function template_show_month_grid($grid_name)
 					// title, href, is_last, can_edit (are they allowed to?), and modify_href.
 					foreach ($day['events'] as $event)
 					{
-						// If they can edit the event, show an icon they can click on....
+						// If they can edit the event, show an icon they can click on...
 						if ($event['can_edit'])
 						{
 							echo '

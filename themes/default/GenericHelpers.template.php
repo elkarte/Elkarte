@@ -181,10 +181,12 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 		// This little button goes in a dropdown
 		if (!empty($buttonParameters['submenu']))
 		{
+			$subLiClass = 'class="listlevel2 ' . ($buttonParameters['class'] ?? $buttonName) . '"';
+			$subLinkClass = 'class="linklevel2 ' . (empty($buttonParameters['active']) ? '' : 'active ') . (empty($buttonParameters['linkclass']) ? 'button_strip_' . $buttonName : $buttonParameters['linkclass']) . '"';
 			$subMenu[] = '
-						<li ' . $liClass . ' role="none">
-							<a href="' . $url . '" class="linklevel2 button_strip_' . $buttonName . '" ' . ($buttonParameters['custom'] ?? '') . '>
-							' . $icon . $txt[$buttonParameters['text']] . '
+						<li ' . $subLiClass . ' role="none">
+							<a ' . $id . ' ' . $subLinkClass . ' role="menuitem" href="' . $url . '" ' . ($buttonParameters['custom'] ?? '') . '>
+							' . $counter . $icon . $txt[$buttonParameters['text']] . '
 							</a>
 						</li>';
 			continue;

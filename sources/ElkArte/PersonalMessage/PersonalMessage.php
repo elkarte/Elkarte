@@ -1322,7 +1322,7 @@ class PersonalMessage extends AbstractController
 		{
 			// Set everything up to be displayed.
 			$context['preview_subject'] = Util::htmlspecialchars($this->_req->getPost('subject', 'trim|strval', ''));
-			$context['preview_message'] = Util::htmlspecialchars($this->_req->getPost('message', 'trim|strval',''),ENT_QUOTES, 'UTF-8', true);
+			$context['preview_message'] = Util::htmlspecialchars($this->_req->getPost('message', 'trim|strval',''),ENT_QUOTES);
 			preparsecode($context['preview_message'], true);
 
 			// Parse out the BBC if it is enabled.

@@ -2566,10 +2566,20 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 }
 
 /* Styles for the info center on the board index. */
+#upshrinkHeaderIC {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+#upshrinkHeaderIC .basic_row:last-child:nth-child(odd) {
+	flex-basis: 100%;
+}
+
 #upshrinkHeaderIC .basic_row {
 	margin-top: .1rem;
 	padding: .8rem 1.3rem;
 	border: 1px solid;
+	flex: 0 0 50%;
 }
 
 /* Upshrink image in the general category headers */
@@ -2588,6 +2598,10 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	font-size: var(--font13);
 	width: 95%;
 	margin: 0 auto;
+}
+
+#ic_recentposts {
+	width: 100%;
 }
 
 #ps_recentposts .norecent, #ps_recenttopics .norecent {
@@ -2773,7 +2787,7 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 
 .topic_starter {
 	font-size: var(--font13);
-	opacity: .7;
+	opacity: .85;
 	line-height: 1.4;
 }
 
@@ -3498,10 +3512,6 @@ figure.attachment_block figcaption {
 	place-items: center center;
 	grid-area: hdicon;
 	height: 2.5rem;
-}
-
-#topic_header .hdicon::before {
-	vertical-align: initial;
 }
 
 #topic_header #topic_subject, #boarddescription {
@@ -6199,6 +6209,11 @@ div.labels {
 	.wrapper {
 		min-width: 98%;
 	}
+
+	/* Info center */
+	#upshrinkHeaderIC .basic_row {
+		flex: 0 0 100%;
+	}
 }
 
 /* At approximately 960px we change to menu icons, if you do not ADD any top menu items (portal/gallery/etc.)
@@ -6806,8 +6821,7 @@ div.labels {
 	}
 
 	/* Topic Listing */
-	#unread.topic_listing > li,
-	.topic_listing > li {
+	#unread.topic_listing > li,	.topic_listing > li {
 		margin-bottom: .8rem;
 		border: 1px solid;
 		grid-template-columns: 1fr;

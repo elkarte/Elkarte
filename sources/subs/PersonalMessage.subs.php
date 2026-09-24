@@ -672,7 +672,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message', [&$recipients, &$from, &$subject, &$message]);
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES);
 	preparsecode($htmlmessage);
 	$htmlsubject = strtr(Util::htmlspecialchars($subject), ["\r" => '', "\n" => '', "\t" => '']);
 	if (Util::strlen($htmlsubject) > 100)

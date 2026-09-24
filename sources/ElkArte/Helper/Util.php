@@ -15,7 +15,6 @@ namespace ElkArte\Helper;
 
 /**
  * Utility functions, such as to handle multibyte strings
- * Note: some of these might be deprecated or removed in the future.
  */
 class Util
 {
@@ -42,6 +41,51 @@ class Util
 	}
 
 	/**
+	 * Sanitizes numeric character entities if entity checking is enabled.
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	public static function entity_check($string): string
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['disableEntityCheck']) || empty($string))
+		{
+			return (string) $string;
+		}
+
+		return preg_replace_callback(self::$_entity_check_reg, [self::class, 'entity_fix_callback'], $string) ?? (string) $string;
+	}
+
+	/**
+	 * Callback for numeric entity validation.
+	 *
+	 * @param array $matches
+	 *
+	 * @return string
+	 */
+	public static function entity_fix_callback(array $matches): string
+	{
+		return isset($matches[2]) ? self::entity_fix($matches[2]) : '';
+	}
+
+	/**
+	 * Returns the entity regex pattern for string measurement operations.
+	 *
+	 * @return string
+	 */
+	public static function entity_list(): string
+	{
+		global $modSettings;
+
+		return empty($modSettings['disableEntityCheck'])
+			? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);'
+			: '&(#021|quot|amp|lt|gt|nbsp);';
+	}
+
+	/**
 	 * Performs a htmlspecialchars on a string, using UTF-8 character set
 	 * Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
@@ -52,18 +96,11 @@ class Util
 	 *
 	 * @return string|null
 	 */
-	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false): ?string
+	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = true): ?string
 	{
-		global $modSettings;
-
 		if (empty($string))
 		{
 			return $string;
-		}
-
-		if (empty($modSettings['disableEntityCheck']))
-		{
-			return preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', htmlspecialchars($string, $quote_style, $charset, $double));
 		}
 
 		return htmlspecialchars($string, $quote_style, $charset, $double);
@@ -112,8 +149,6 @@ class Util
 	 */
 	public static function htmltrim($string): string
 	{
-		global $modSettings;
-
 		if ($string === '' || $string === null)
 		{
 			return '';
@@ -122,11 +157,7 @@ class Util
 		// Preg_replace for any kind of whitespace or invisible separator
 		// and invisible control characters and unused code points
 		$space_chars = '\p{Z}\p{C}';
-
-		if (empty($modSettings['disableEntityCheck']))
-		{
-			return preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
-		}
+		$string = self::entity_check($string);
 
 		return preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', $string);
 	}
@@ -178,10 +209,9 @@ class Util
 	 */
 	public static function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
-		global $modSettings;
-
-		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $haystack) : $haystack;
-		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$haystack_check = self::entity_check($haystack);
+		$ent_list = self::entity_list();
+		$haystack_arr = preg_split('~(' . $ent_list . '|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		$count = 0;
 
 		// From the right side, like mb_strrpos instead
@@ -199,8 +229,8 @@ class Util
 			return is_int($result) ? ($right ? $count - ($result + $offset) : $result + $offset) : false;
 		}
 
-		$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $needle) : $needle;
-		$needle_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$needle_check = self::entity_check($needle);
+		$needle_arr = preg_split('~(' . $ent_list . '|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
 
 		$needle_size = count($needle_arr);
@@ -254,15 +284,8 @@ class Util
 	 */
 	public static function truncate($string, $length): string
 	{
-		global $modSettings;
-
-		// Set a list of common functions.
-		$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
-
-		if (empty($modSettings['disableEntityCheck']))
-		{
-			$string = preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string);
-		}
+		$string = self::entity_check($string);
+		$ent_list = self::entity_list();
 
 		preg_match('~^(' . $ent_list . '|.){' . self::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
 		$string = $matches[0];
@@ -283,27 +306,14 @@ class Util
 	 */
 	public static function strlen($string): int
 	{
-		global $modSettings;
-
 		if (empty($string))
 		{
 			return 0;
 		}
 
-		if (empty($modSettings['disableEntityCheck']))
-		{
-			$ent_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
-			if (function_exists('mb_strlen'))
-			{
-				$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
-				return $check === null ? 0 : mb_strlen($check, 'UTF-8');
-			}
+		$string = self::entity_check($string);
+		$ent_list = self::entity_list();
 
-			$check = preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
-			return $check === null ? 0 : strlen($check);
-		}
-
-		$ent_list = '&(#021|quot|amp|lt|gt|nbsp);';
 		$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
 
 		return $check === null ? 0 : strlen($check);
@@ -377,16 +387,9 @@ class Util
 	 */
 	public static function substr($string, $start, $length = null): string
 	{
-		global $modSettings;
-
-		if (empty($modSettings['disableEntityCheck']))
-		{
-			$ent_arr = preg_split('~(&#\d{1,7};|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		}
-		else
-		{
-			$ent_arr = preg_split('~(&#021;|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		}
+		$string = self::entity_check($string);
+		$ent_list = self::entity_list();
+		$ent_arr = preg_split('~(' . $ent_list . '|.)~u', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 		return $length === null ? implode('', array_slice($ent_arr, $start)) : implode('', array_slice($ent_arr, $start, $length));
 	}

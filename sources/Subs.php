@@ -772,7 +772,8 @@ function setOldUrl($index = 'old_url'): void
  */
 function determineTopicClass(&$topic_context)
 {
-	$topic_context['class'] = empty($topic_context['is_poll']) ? 'i-normal' : 'i-poll';
+	$topic_context['class'] = isset($topic_context['start_icon']) ? 'i-' . $topic_context['start_icon'] : 'i-normal';
+	$topic_context['class'] = empty($topic_context['is_poll']) ? $topic_context['class'] : 'i-poll';
 
 	// Set a topic class depending on locked status and number of replies.
 	if ($topic_context['is_very_hot'])

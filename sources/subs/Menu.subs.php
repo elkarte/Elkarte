@@ -343,18 +343,12 @@ function loadDefaultMenuButtons()
 			'data-icon' => ($context['user']['mentions'] ? 'i-menu-mentions-on' : 'i-menu-mentions-off'),
 			'show' => User::$info->is_guest === false && !empty($modSettings['mentions_enabled']),
 		],
-		// The old language string made no sense and was too long.
-		// "New posts" is better because there is probably a pile
-		// of old unread posts, and they won't be reached from this button.
 		'unread' => [
 			'title' => $txt['view_unread_category'],
 			'href' => getUrl('action', ['action' => 'unread']),
 			'data-icon' => 'i-menu-unread',
 			'show' => User::$info->is_guest === false,
 		],
-		// The old language string made no sense and was too long.
-		// "New replies" is better because there are "updated topics"
-		// that the user has never posted in and doesn't care about.
 		'unreadreplies' => [
 			'title' => $txt['view_replies_category'],
 			'href' => getUrl('action', ['action' => 'unreadreplies']),

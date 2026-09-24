@@ -432,7 +432,7 @@ class BoardsList
 		if ($row_board['subject'] !== '')
 		{
 			$this_last_post['href'] = getUrl('topic', ['topic' => $row_board['id_topic'], 'start' => 'msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']), 'subject' => $row_board['subject'], 0 => empty($row_board['is_read']) ? 'boardseen' : '']) . '#new';
-			$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . Util::htmlspecialchars($row_board['subject']) . '">' . $row_board['short_subject'] . '</a>';
+			$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '">' . $row_board['short_subject'] . '</a>';
 			$this_last_post['last_post_message'] = sprintf($txt['last_post_message'], $this_last_post['member']['link'], $this_last_post['link'], $this_last_post['html_time']);
 		}
 		else

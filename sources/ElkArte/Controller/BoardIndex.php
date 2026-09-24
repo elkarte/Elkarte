@@ -108,7 +108,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 			$context['membergroups'] = Cache::instance()->quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', []);
 		}
 
-		// Track most online statistics? (subs/Members.subs.phpOnline.php)
+		// Track most online statistics?
 		if (!empty($modSettings['trackStats']))
 		{
 			trackStatsUsersOnline($context['num_guests'] + $context['num_users_online']);
@@ -234,8 +234,8 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 			'messages' => [],
 		];
 
+		// Use a unique key based on the user's view permissions to cache the like statistics for topics, boards, and messages.
 		$key = md5($this->user->query_wanna_see_board ?? '');
-
 		if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . $key, 1740) === false)
 		{
 			$context['likestats']['topics'] = dbMostLikedTopic(null, 5);

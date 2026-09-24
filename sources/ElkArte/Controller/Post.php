@@ -488,7 +488,7 @@ class Post extends AbstractController
 
 		// Set up the inputs for the form.
 		$this->_form_subject = strtr(Util::htmlspecialchars($subject), ["\r" => '', "\n" => '', "\t" => '']);
-		$this->_form_message = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+		$this->_form_message = Util::htmlspecialchars($message, ENT_QUOTES);
 
 		// Make sure the subject isn't too long - taking into account special characters.
 		if (Util::strlen($this->_form_subject) > 100)
@@ -1214,7 +1214,7 @@ class Post extends AbstractController
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$message = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+			$message = Util::htmlspecialchars($message, ENT_QUOTES);
 
 			// Preparse code. (Zef)
 			if ($this->user->is_guest)
@@ -1705,7 +1705,7 @@ class Post extends AbstractController
 			}
 			else
 			{
-				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 
 				$this->preparse->preparsecode($_POST['message']);
 				$bbc_parser = ParserWrapper::instance();
@@ -1845,7 +1845,6 @@ class Post extends AbstractController
 
 				$context['message']['subject'] = censor($context['message']['subject']);
 				$context['message']['body'] = censor($context['message']['body']);
-
 				$context['message']['body'] = $bbc_parser->parseMessage($context['message']['body'], $row['smileys_enabled']);
 			}
 			// Topic?
