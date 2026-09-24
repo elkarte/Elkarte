@@ -77,11 +77,14 @@ class UtilTest extends TestCase
 	public function test_htmlspecialchars()
 	{
 		$string = 'Some string &amp;#8238; with "special" chars like & and &gt;';
-		$actual1 = 'Some string &amp;#8238; with &quot;special&quot; chars like &amp; and &gt;';
-		$actual2 = 'Some string &amp;amp;#8238; with &quot;special&quot; chars like &amp; and &amp;gt;';
+		$double_false = 'Some string &amp;#8238; with &quot;special&quot; chars like &amp; and &gt;';
+		$double_true  = 'Some string &amp;amp;#8238; with &quot;special&quot; chars like &amp; and &amp;gt;';
 
-		$this->assertEquals(Util::htmlspecialchars($string), $actual1);
-		$this->assertEquals(Util::htmlspecialchars($string, ENT_COMPAT), $actual2);
+		// Default call should double-encode (& => &amp;)
+		$this->assertEquals($double_true, Util::htmlspecialchars($string));
+
+		// Explicitly passing $double = false should skip pre-existing entities
+		$this->assertEquals($double_false, Util::htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false));
 	}
 
 	/**
