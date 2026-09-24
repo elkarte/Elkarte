@@ -1587,6 +1587,7 @@ function elk_initCodeButtons ()
 
 /**
  * A function needed to discern HTML entities from non-western characters.
+ * Deprecated: No longer used in UTF-8 environment, left empty call to prevent addon issues
  *
  * @param {string} sFormName
  * @param {Array.} aElementNames
@@ -1594,35 +1595,9 @@ function elk_initCodeButtons ()
  */
 function elk_saveEntities (sFormName, aElementNames, sMask)
 {
-	let i = 0,
-		n = 0;
-
-	if (typeof (sMask) === 'string')
+	if (console && console.error)
 	{
-		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
-		{
-			if (document.forms[sFormName].elements[i].id.substring(0, sMask.length) === sMask)
-			{
-				aElementNames[aElementNames.length] = document.forms[sFormName].elements[i].name;
-			}
-		}
-	}
-
-	for (i = 0, n = aElementNames.length; i < n; i++)
-	{
-		if (aElementNames[i] in document.forms[sFormName])
-		{
-			// Handle the editor.
-			if (typeof post_box_name !== 'undefined' && aElementNames[i] === post_box_name && $editor_data[post_box_name] !== undefined)
-			{
-				document.forms[sFormName][aElementNames[i]].value = $editor_data[post_box_name].val().replace(/&#/g, '&#38;#');
-				$editor_data[post_box_name].val(document.forms[sFormName][aElementNames[i]].value);
-			}
-			else
-			{
-				document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
-			}
-		}
+		console.error('elk_saveEntities is deprecated');
 	}
 }
 

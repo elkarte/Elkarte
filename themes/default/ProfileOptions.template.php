@@ -1146,7 +1146,6 @@ function template_groupMembership()
 		// Javascript for the selector stuff.
 		echo '
 		<script>
-		console.log("bas");
 			var prevClass = "",
 				prevDiv = "";';
 

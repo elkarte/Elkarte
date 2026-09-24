@@ -506,7 +506,7 @@ function template_quicktopic_above()
 {
 	global $context, $options, $txt, $modSettings, $settings;
 
-	// Using  quick topic, and you can start a new topic?
+	// Using quick topic, and you can start a new topic?
 	if ($context['can_post_new'] && !empty($options['display_quick_topic']) && !$context['user']['is_guest'])
 	{
 		echo '
