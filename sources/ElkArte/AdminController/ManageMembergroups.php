@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Controller\Groups;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Permissions;
 use ElkArte\SettingsForm\SettingsForm;
@@ -725,7 +726,7 @@ class ManageMembergroups extends AbstractController
 				// Get all the usernames from the string
 				if (!empty($moderator_string))
 				{
-					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string, ENT_QUOTES, 'UTF-8')), ['&quot;' => '"']);
+					$moderator_string = strtr(Util::htmlspecialchars($moderator_string, ENT_QUOTES), ['&quot;' => '"']);
 					preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 					$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
 					$moderators = array_filter(array_map('trim', $moderators));

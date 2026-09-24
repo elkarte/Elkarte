@@ -85,9 +85,6 @@ class PreparseCode
 		// Clean out control characters
 		$this->message = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $this->message);
 
-		// This line makes all languages *theoretically* work even with the wrong charset ;).
-		$this->message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $this->message);
-
 		// Clean up after nobbc ;).
 		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', fn($matches) => $this->_preparsecode_nobbc_callback($matches), $this->message);
 
