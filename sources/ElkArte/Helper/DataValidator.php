@@ -1419,6 +1419,6 @@ class DataValidator
 	 */
 	protected function _sanitation_cleanhtml($input): ?string
 	{
-		return Util::htmlspecialchars($input, ENT_QUOTES, 'UTF-8', true);
+		return Util::htmlspecialchars($input, ENT_QUOTES);
 	}
 }

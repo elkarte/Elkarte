@@ -1923,7 +1923,7 @@ function pbe_load_text($email_message, $pbe)
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
-		$text = Util::htmlspecialchars($text, ENT_QUOTES, 'UTF-8', true);
+		$text = Util::htmlspecialchars($text, ENT_QUOTES);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}

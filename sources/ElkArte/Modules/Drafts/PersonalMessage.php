@@ -310,7 +310,7 @@ class PersonalMessage extends AbstractModule
 			$draft = [
 				'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
 				'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
-				'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
+				'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES),
 				'subject' => strtr(Util::htmlspecialchars($_POST['subject']), ["\r" => '', "\n" => '', "\t" => '']),
 				'id_member' => $this->user->id,
 				'is_usersaved' => (int) empty($_REQUEST['autosave']),
