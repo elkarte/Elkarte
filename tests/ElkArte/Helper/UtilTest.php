@@ -39,20 +39,49 @@ class UtilTest extends TestCase
 	}
 
 	/**
+	 * Entity check tests
+	 */
+	public function test_entity_check()
+	{
+		global $modSettings;
+
+		// Valid entity is preserved
+		$this->assertEquals('&#9829;', Util::entity_check('&#9829;'));
+
+		// Invalid entity is stripped
+		$this->assertEquals('', Util::entity_check('&#8237;'));
+
+		// When entity check is disabled, string is untouched
+		$modSettings['disableEntityCheck'] = true;
+		$this->assertEquals('&#8237;', Util::entity_check('&#8237;'));
+		unset($modSettings['disableEntityCheck']);
+	}
+
+	/**
+	 * Entity list regex tests
+	 */
+	public function test_entity_list()
+	{
+		global $modSettings;
+
+		$this->assertEquals('&(#\d{1,7}|quot|amp|lt|gt|nbsp);', Util::entity_list());
+
+		$modSettings['disableEntityCheck'] = true;
+		$this->assertEquals('&(#021|quot|amp|lt|gt|nbsp);', Util::entity_list());
+		unset($modSettings['disableEntityCheck']);
+	}
+
+	/**
 	 * various htmlspecialchars tests
 	 */
 	public function test_htmlspecialchars()
 	{
-		global $modSettings;
-
 		$string = 'Some string &amp;#8238; with "special" chars like & and &gt;';
-		$actual1 = 'Some string  with &quot;special&quot; chars like &amp; and &gt;';
+		$actual1 = 'Some string &amp;#8238; with &quot;special&quot; chars like &amp; and &gt;';
 		$actual2 = 'Some string &amp;amp;#8238; with &quot;special&quot; chars like &amp; and &amp;gt;';
 
 		$this->assertEquals(Util::htmlspecialchars($string), $actual1);
-
-		$modSettings['disableEntityCheck'] = true;
-		$this->assertEquals(Util::htmlspecialchars($string, ENT_COMPAT, 'UTF-8', true), $actual2);
+		$this->assertEquals(Util::htmlspecialchars($string, ENT_COMPAT), $actual2);
 	}
 
 	/**
