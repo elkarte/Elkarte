@@ -36,6 +36,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 {
 	$db = database();
 
+	$topic_ids = [];
 	$topics = [];
 	$indexOptions = array_merge([
 		'include_sticky' => true,
@@ -70,8 +71,8 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			'maxindex' => $items_per_page,
 		]
 	)->fetch_callback(
-		function ($row) use (&$topics) {
-			$topics[$row['id_topic']] = [];
+		function ($row) use (&$topic_ids) {
+			$topic_ids[] = (int) $row['id_topic'];
 		}
 	);
 
@@ -125,7 +126,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 		[
 			'current_board' => $id_board,
 			'current_member' => $id_member,
-			'topic_list' => $topics === [] ? [0] : array_keys($topics),
+			'topic_list' => $topic_ids === [] ? [0] : $topic_ids,
 		]
 	);
 	// Now we fill the above array, maintaining the index order.
@@ -135,7 +136,19 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 	}
 	$request->free_result();
 
-	return $topics;
+	$orderedTopics = [];
+
+	foreach ($topic_ids as $topic_id)
+	{
+		if (!isset($topics[$topic_id]))
+		{
+			continue;
+		}
+
+		$orderedTopics[$topic_id] = $topics[$topic_id];
+	}
+
+	return $orderedTopics;
 }
 
 /**
