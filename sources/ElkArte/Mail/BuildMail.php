@@ -59,7 +59,7 @@ class BuildMail extends BaseMail
 
 		$priority = (int) $priority;
 
-		// Use maillist styles ?
+		// Use maillist styles?
 		$this->setMailList($from_wrapper, $message_id, $priority);
 
 		// Set line breaks as required by OS and Transport
@@ -68,15 +68,12 @@ class BuildMail extends BaseMail
 		// If the recipient list isn't an array, make it one.
 		$to_array = is_array($to) ? $to : [$to];
 
-		// Get rid of entities in the subject line
-		$subject = un_htmlspecialchars($subject);
-
 		// Support Basic DMARC Compliance when in MLM mode
 		$from = $this->setDMARCFrom($from, $from_wrapper);
 
 		// Take care of from / subject encodings
 		$from_name = $this->setFromName($from);
-		[$subject] = $this->mimeSpecialChars($subject);
+		$subject = $this->getValidUTF8String($subject, false);
 
 		// Construct from / replyTo mail headers, based on if we show a users name
 		$this->setFromHeaders($from, $from_name, $from_wrapper, $reference);
@@ -266,12 +263,12 @@ class BuildMail extends BaseMail
 	 * @param $string
 	 * @return string
 	 */
-	public function getValidUTF8String($string): string
+	public function getValidUTF8String($string, $convert = true): string
 	{
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
 		// Replace any HTML entities, in a valid utf-8 range, with their character
-		if (preg_match('~&#(\d{3,7});~', $string) !== 0)
+		if ($convert && preg_match('~&#(\d{3,7});~', $string) !== 0)
 		{
 			return preg_replace_callback('~&#(\d{3,7});~', 'fixchar__callback', $string);
 		}
