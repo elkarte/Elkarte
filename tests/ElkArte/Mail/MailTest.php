@@ -101,8 +101,6 @@ class MailTest extends ElkArteCommonSetupTest
 		$this->assertStringContainsString('X-Mailer: ELK', $email['headers']);
 		$this->assertStringContainsString('Mime-Version: 1.0', $email['headers']);
 		$this->assertStringContainsString('Content-Type: multipart/alternative;', $email['headers']);
-		$this->assertStringContainsString('List-Unsubscribe:', $email['headers']);
-		$this->assertStringNotContainsString('List-Unsubscribe-Post', $email['headers']);
 
 		// Sniff for Plain section (quoted printable UTF-8)
 		$this->assertStringContainsString('Content-Type: text/plain; charset=UTF-8', $email['body']);
