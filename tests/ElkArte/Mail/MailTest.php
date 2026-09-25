@@ -158,4 +158,54 @@ class MailTest extends ElkArteCommonSetupTest
 
 		$this->assertSame($css1, $css2);
 	}
+
+	/**
+	 * Test MIME special characters encoding
+	 */
+	public function testMimeSpecialChars()
+	{
+		$sendMail = new BuildMail();
+
+		// ASCII string should remain 7bit
+		list($asciiResult, $encoding) = $sendMail->mimeSpecialChars('Simple Subject');
+		$this->assertEquals('Simple Subject', $asciiResult);
+		$this->assertEquals('7bit', $encoding);
+
+		// UTF-8 string with multibyte characters should be base64 encoded
+		list($utf8Result, $encodingUtf8) = $sendMail->mimeSpecialChars('Sujet avec accent éè');
+		$this->assertStringStartsWith('=?UTF-8?B?', $utf8Result);
+		$this->assertStringEndsWith('?=', $utf8Result);
+		$this->assertEquals('base64', $encodingUtf8);
+	}
+
+	/**
+	 * Test conversion of HTML to plain text in BuildMail
+	 */
+	public function testGetPlainFromHTML()
+	{
+		$sendMail = new BuildMail();
+
+		$html = '<p>Hello <strong>World</strong>!</p><br /><*> First item<br /><*> Second item';
+		$plain = $sendMail->getPlainFromHTML($html);
+
+		$this->assertStringContainsString('Hello', $plain);
+		$this->assertStringContainsString('World', $plain);
+		$this->assertStringContainsString('[*] First item', $plain);
+		$this->assertStringNotContainsString('<strong>', $plain);
+	}
+
+	/**
+	 * Test setting From and Reply-To headers
+	 */
+	public function testSetFromHeaders()
+	{
+		global $webmaster_email;
+
+		$sendMail = new BuildMail();
+		$sendMail->headers = [];
+		$sendMail->setFromHeaders('user@example.com', 'Test User');
+
+		$this->assertContains('From: Test User <' . $webmaster_email . '>', $sendMail->headers);
+		$this->assertContains('Reply-To: <user@example.com>', $sendMail->headers);
+	}
 }
