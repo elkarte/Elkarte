@@ -100,14 +100,62 @@ class MailTest extends ElkArteCommonSetupTest
 		// Sniff the Headers
 		$this->assertStringContainsString('X-Mailer: ELK', $email['headers']);
 		$this->assertStringContainsString('Mime-Version: 1.0', $email['headers']);
+		$this->assertStringContainsString('Content-Type: multipart/alternative;', $email['headers']);
+		$this->assertStringContainsString('List-Unsubscribe:', $email['headers']);
+		$this->assertStringNotContainsString('List-Unsubscribe-Post', $email['headers']);
 
-		// Sniff for Plain section
-		$this->assertStringContainsString('We need **some** cruft&#128516;here so we can `test \[b\]not bold\[/b\]` test', $email['body']);
-
-		// Sniff for base64 section
-		$this->assertStringContainsString('V2UgbmVlZCAqKnNvbWUqKiBjcnVmdPCfmIRoZXJlIHNvIHdlIGNhbiBgdGVzdCBcW2JcXW5vdCBi', $email['body']);
+		// Sniff for Plain section (quoted printable UTF-8)
+		$this->assertStringContainsString('Content-Type: text/plain; charset=UTF-8', $email['body']);
+		$this->assertStringContainsString('Content-Transfer-Encoding: Quoted-Printable', $email['body']);
 
 		// Sniff HTML Quoted Printable Section
+		$this->assertStringContainsString('Content-Type: text/html; charset=UTF-8', $email['body']);
 		$this->assertStringContainsString('s=3D"bbc_strong">some</strong> cruft&#x1f604;here so we can <span class=3D"=', $email['body']);
+	}
+
+	/**
+	 * Test building plain text only email (no multipart container)
+	 */
+	public function testBuildMailPlainText()
+	{
+		global $modSettings;
+
+		$modSettings['mail_queue'] = 1;
+
+		$sendMail = new BuildMail();
+		$sendMail->buildEmail(
+			'a@a.com',
+			'Plain Subject',
+			'This is a plain text message.',
+			null,
+			'm124',
+			false);
+
+		AddMailQueue(true);
+
+		list($id, $email) = emailsInfo(1);
+		$email = $email[0];
+
+		// Headers for single part plain text
+		$this->assertStringContainsString('Content-Type: text/plain; charset=UTF-8', $email['headers']);
+		$this->assertStringContainsString('Content-Transfer-Encoding: Quoted-Printable', $email['headers']);
+		$this->assertStringNotContainsString('multipart/alternative', $email['headers']);
+
+		// Body contains only plain text quoted-printable
+		$this->assertStringContainsString('This is a plain text message.', $email['body']);
+		$this->assertStringNotContainsString('Content-Type: text/html', $email['body']);
+	}
+
+	/**
+	 * Test CSS caching in BuildMail
+	 */
+	public function testEmailCssCaching()
+	{
+		BuildMail::resetEmailCss();
+		$sendMail = new BuildMail();
+		$css1 = $sendMail->getEmailCss();
+		$css2 = $sendMail->getEmailCss();
+
+		$this->assertSame($css1, $css2);
 	}
 }
