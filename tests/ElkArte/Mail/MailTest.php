@@ -43,6 +43,24 @@ class MailTest extends ElkArteCommonSetupTest
 		$lang->load('EmailTemplates+MaillistTemplates');
 
 		$modSettings['maillist_enabled'] = true;
+
+		// Clean up any existing queued items for test isolation
+		$db = database();
+		$db->query('', '
+			DELETE FROM {db_prefix}mail_queue',
+			[]
+		);
+	}
+
+	protected function tearDown(): void
+	{
+		$db = database();
+		$db->query('', '
+			DELETE FROM {db_prefix}mail_queue',
+			[]
+		);
+
+		parent::tearDown();
 	}
 
 	public function testPreParse()
@@ -109,6 +127,9 @@ class MailTest extends ElkArteCommonSetupTest
 		// Sniff HTML Quoted Printable Section
 		$this->assertStringContainsString('Content-Type: text/html; charset=UTF-8', $email['body']);
 		$this->assertStringContainsString('s=3D"bbc_strong">some</strong> cruft&#x1f604;here so we can <span class=3D"=', $email['body']);
+
+		// Cleanup queue item
+		deleteMailQueueItems($id);
 	}
 
 	/**
@@ -142,6 +163,9 @@ class MailTest extends ElkArteCommonSetupTest
 		// Body contains only plain text quoted-printable
 		$this->assertStringContainsString('This is a plain text message.', $email['body']);
 		$this->assertStringNotContainsString('Content-Type: text/html', $email['body']);
+
+		// Cleanup queue item
+		deleteMailQueueItems($id);
 	}
 
 	/**
