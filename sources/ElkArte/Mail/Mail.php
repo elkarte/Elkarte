@@ -174,7 +174,7 @@ class Mail extends BaseMail
 		}
 
 		// Fix the message for any lines beginning with a period! (the first is ignored, you see.)
-		$message = strtr($message, ["\r\n" . '.' => "\r\n" . '..']);
+		$message = preg_replace('/^\./m', '..', $message);
 
 		$mid = strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@');
 		$this->setReturnPath();
