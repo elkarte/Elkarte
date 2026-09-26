@@ -36,5 +36,6 @@
 
   <php>
       <const name="DBTYPE" value="MySQL"/>
+      <ini name="sendmail_path" value="/bin/true"/>
   </php>
 </phpunit>

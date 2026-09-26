@@ -36,6 +36,7 @@
 
   <php>
       <const name="DBTYPE" value="PostgreSQL"/>
+      <ini name="sendmail_path" value="/bin/true"/>
   </php>
 
 </phpunit>

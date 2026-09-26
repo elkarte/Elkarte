@@ -19,6 +19,7 @@ namespace ElkArte\Helper;
 class Util
 {
 	protected static $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+	protected static $_entity_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
 
 	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
@@ -49,9 +50,7 @@ class Util
 	 */
 	public static function entity_check($string): string
 	{
-		global $modSettings;
-
-		if (!empty($modSettings['disableEntityCheck']) || empty($string))
+		if (empty($string))
 		{
 			return (string) $string;
 		}
@@ -69,20 +68,6 @@ class Util
 	public static function entity_fix_callback(array $matches): string
 	{
 		return isset($matches[2]) ? self::entity_fix($matches[2]) : '';
-	}
-
-	/**
-	 * Returns the entity regex pattern for string measurement operations.
-	 *
-	 * @return string
-	 */
-	public static function entity_list(): string
-	{
-		global $modSettings;
-
-		return empty($modSettings['disableEntityCheck'])
-			? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);'
-			: '&(#021|quot|amp|lt|gt|nbsp);';
 	}
 
 	/**
@@ -210,8 +195,7 @@ class Util
 	public static function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
 		$haystack_check = self::entity_check($haystack);
-		$ent_list = self::entity_list();
-		$haystack_arr = preg_split('~(' . $ent_list . '|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$haystack_arr = preg_split('~(' . self::$_entity_list . '|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		$count = 0;
 
 		// From the right side, like mb_strrpos instead
@@ -230,7 +214,7 @@ class Util
 		}
 
 		$needle_check = self::entity_check($needle);
-		$needle_arr = preg_split('~(' . $ent_list . '|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$needle_arr = preg_split('~(' . self::$_entity_list . '|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
 
 		$needle_size = count($needle_arr);
@@ -285,13 +269,12 @@ class Util
 	public static function truncate($string, $length): string
 	{
 		$string = self::entity_check($string);
-		$ent_list = self::entity_list();
 
-		preg_match('~^(' . $ent_list . '|.){' . self::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
+		preg_match('~^(' . self::$_entity_list . '|.){' . self::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
 		$string = $matches[0];
 		while (strlen($string) > $length)
 		{
-			$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
+			$string = preg_replace('~(?:' . self::$_entity_list . '|.)$~u', '', $string);
 		}
 
 		return $string;
@@ -312,9 +295,8 @@ class Util
 		}
 
 		$string = self::entity_check($string);
-		$ent_list = self::entity_list();
 
-		$check = preg_replace('~' . $ent_list . '|.~u', '_', $string);
+		$check = preg_replace('~' . self::$_entity_list . '|.~u', '_', $string);
 
 		return $check === null ? 0 : strlen($check);
 	}
@@ -388,8 +370,7 @@ class Util
 	public static function substr($string, $start, $length = null): string
 	{
 		$string = self::entity_check($string);
-		$ent_list = self::entity_list();
-		$ent_arr = preg_split('~(' . $ent_list . '|.)~u', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$ent_arr = preg_split('~(' . self::$_entity_list . '|.)~u', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 		return $length === null ? implode('', array_slice($ent_arr, $start)) : implode('', array_slice($ent_arr, $start, $length));
 	}

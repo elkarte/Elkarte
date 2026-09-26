@@ -217,8 +217,6 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 			&& !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $row['warning'])
 		{
 			$email_perm = false;
-
-			return false;
 		}
 
 		if (!isset($board_profile[$row['id_board']]))
@@ -231,8 +229,6 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 		if (count(array_intersect($board_profile[$row['id_board']]['allowed'], $member_in_groups)) === 0)
 		{
 			$email_perm = false;
-
-			return false;
 		}
 
 		// And not specifically denied?
@@ -243,7 +239,9 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 		}
 	}
 
-	return $email_perm;
+	// Reaching here means the member can access the board; email_perm only controls
+	// if maillist/PBE-style message handling can be used.
+	return true;
 }
 
 /**

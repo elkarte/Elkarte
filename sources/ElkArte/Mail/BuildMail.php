@@ -26,6 +26,9 @@ class BuildMail extends BaseMail
 	/** @var array Optional method to allow template replacements array insertion */
 	public $replacements = [];
 
+	/** @var string|null Cached CSS string for email templates */
+	protected static ?string $emailCss = null;
+
 	/**
 	 * This function builds an email and its headers.
 	 *
@@ -56,7 +59,7 @@ class BuildMail extends BaseMail
 
 		$priority = (int) $priority;
 
-		// Use maillist styles ?
+		// Use maillist styles?
 		$this->setMailList($from_wrapper, $message_id, $priority);
 
 		// Set line breaks as required by OS and Transport
@@ -65,15 +68,12 @@ class BuildMail extends BaseMail
 		// If the recipient list isn't an array, make it one.
 		$to_array = is_array($to) ? $to : [$to];
 
-		// Get rid of entities in the subject line
-		$subject = un_htmlspecialchars($subject);
-
 		// Support Basic DMARC Compliance when in MLM mode
 		$from = $this->setDMARCFrom($from, $from_wrapper);
 
 		// Take care of from / subject encodings
 		$from_name = $this->setFromName($from);
-		[$subject] = $this->mimeSpecialChars($subject);
+		$subject = $this->getValidUTF8String($subject, false);
 
 		// Construct from / replyTo mail headers, based on if we show a users name
 		$this->setFromHeaders($from, $from_name, $from_wrapper, $reference);
@@ -98,14 +98,21 @@ class BuildMail extends BaseMail
 			return false;
 		}
 
-		// The mime boundary separates the different alternative versions, like plain text, base64, html
+		// The mime boundary separates the different alternative versions, like plain text, HTML
 		// For strict compliance we keep this line to 78 charters, (one could flow the headers too)
 		$mime_boundary = 'ELK-' . substr(md5(uniqid(mt_rand(), true) . microtime()), 0, 28);
 
-		// Using mime, as it allows sending a plain unencoded alternative.
 		$this->headers[] = 'Mime-Version: 1.0';
-		$this->headers[] = 'Content-Type: multipart/alternative; boundary="' . $mime_boundary . '"';
-		$this->headers[] = 'Content-Transfer-Encoding: 7bit';
+		if ($send_html)
+		{
+			$this->headers[] = 'Content-Type: multipart/alternative; boundary="' . $mime_boundary . '"';
+			$this->headers[] = 'Content-Transfer-Encoding: 7bit';
+		}
+		else
+		{
+			$this->headers[] = 'Content-Type: text/plain; charset=UTF-8';
+			$this->headers[] = 'Content-Transfer-Encoding: Quoted-Printable';
+		}
 
 		// Generate our completed `standard` header string
 		$headers = implode($this->lineBreak, $this->headers);
@@ -113,7 +120,7 @@ class BuildMail extends BaseMail
 		// Now build our message with various encodings
 		$message = $this->getMessage($send_html, $mime_boundary, $message, $subject);
 
-		// Are we using the mail queue?, if so, this is where we butt in...
+		// Are we using the mail queue? if so, this is where we butt in...
 		if (!empty($modSettings['mail_queue']) && $priority !== 0)
 		{
 			return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
@@ -256,12 +263,12 @@ class BuildMail extends BaseMail
 	 * @param $string
 	 * @return string
 	 */
-	public function getValidUTF8String($string): string
+	public function getValidUTF8String($string, $convert = true): string
 	{
 		$string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
 
 		// Replace any HTML entities, in a valid utf-8 range, with their character
-		if (preg_match('~&#(\d{3,7});~', $string) !== 0)
+		if ($convert && preg_match('~&#(\d{3,7});~', $string) !== 0)
 		{
 			return preg_replace_callback('~&#(\d{3,7});~', 'fixchar__callback', $string);
 		}
@@ -340,30 +347,37 @@ class BuildMail extends BaseMail
 			$listId = str_replace('@', '.', $listId);
 			$this->headers[] = 'List-Id: Notifications <' . $listId . '>';
 
-			// List-Unsubscribe: <https://www.forumsite.tld/index.php?action=profile;area=notification>
-			$this->headers[] = 'List-Unsubscribe: <' . $boardurl . '/index.php?action=profile;area=notification>';
+			// RFC 2369 List-Unsubscribe header pointing to notification preferences
+			// List-Unsubscribe: <https://www.forumsite.tld/index.php?action=profile;area=notification>, <mailto:...>
+			$unsubscribe_url = $boardurl . '/index.php?action=profile;area=notification';
+			$unsubscribe_email = (!empty($modSettings['maillist_sitename_help'])
+				? $modSettings['maillist_sitename_help']
+				: (empty($modSettings['maillist_mail_from'])
+					? $webmaster_email
+					: $modSettings['maillist_mail_from']));
+
+			$unsubscribe_header = '<' . $unsubscribe_url . '>';
+			if (!empty($unsubscribe_email))
+			{
+				$unsubscribe_header .= ', <mailto:' . $unsubscribe_email . '?subject=unsubscribe>';
+			}
+
+			$this->headers[] = 'List-Unsubscribe: ' . $unsubscribe_header;
 
 			// List-Owner: <mailto:help@forumsite.tld> (Site Name)
-			$this->headers[] = 'List-Owner: <mailto:' . (!empty($modSettings['maillist_sitename_help'])
-					? $modSettings['maillist_sitename_help']
-					: (empty($modSettings['maillist_mail_from'])
-						? $webmaster_email
-						: $modSettings['maillist_mail_from'])) . '> (' . (!empty($modSettings['maillist_sitename'])
+			$this->headers[] = 'List-Owner: <mailto:' . $unsubscribe_email . '> (' . (!empty($modSettings['maillist_sitename'])
 					? $modSettings['maillist_sitename']
 					: $mbname) . ')';
 		}
 	}
 
 	/**
-	 * Creates 3 complete message sections
+	 * Creates the email message body.
 	 *
-	 * - Plain Ascii text.  Characters >127 are converted to entities &#123; All control characters are removed. Any
-	 * HTML tags are stripped.
-	 * - Base64 encoded.  Control characters (<31) are dropped.  Entities are converted to utf-8 characters.
-	 * The result is base64-encoded and chunk split for email compliance.
-	 * - Quoted-Printable encoded.  Control characters (<31) are dropped.  Entities are converted
-	 * to utf-8 characters.  The result is then encoded with quoted printable which does the necessary line
-	 * flowing.  This will be marked as text/plain or text/html based on $send_html flag
+	 * - If $send_html is true, creates a 2-part multipart/alternative message consisting of:
+	 *   1. Plain text version (quoted-printable UTF-8)
+	 *   2. HTML version (quoted-printable UTF-8)
+	 * - If $send_html is false, creates a single plain text body (quoted-printable UTF-8).
 	 *
 	 * @param bool $send_html
 	 * @param string $mime_boundary
@@ -373,35 +387,36 @@ class BuildMail extends BaseMail
 	 */
 	public function getMessage($send_html, $mime_boundary, $orig_message, $subject): string
 	{
-		$boundary = '--' . $mime_boundary . $this->lineBreak;
+		if ($send_html)
+		{
+			$plain_text = $this->getPlainFromHTML($orig_message);
+			$plain_message = $this->getQuotedPrintableVersion($plain_text);
 
-		$plain_text = $send_html ? $this->getPlainFromHTML($orig_message) : $orig_message;
-		$ascii_message = $this->get7bitVersion($plain_text);
+			$html_message = $this->getEmailWrapper($orig_message, $subject);
+			$html_message = $this->getQuotedPrintableVersion($html_message);
 
-		// This is the plain text version.  Even if no one sees it, we need it for spam checkers.
-		$message = $boundary;
-		$message .= 'Content-Type: text/plain; charset=us-ascii' . $this->lineBreak;
-		$message .= 'Content-Transfer-Encoding: 7bit' . $this->lineBreak . $this->lineBreak;
-		$message .= $ascii_message . $this->lineBreak . $boundary;
+			$boundary = '--' . $mime_boundary . $this->lineBreak;
 
-		// This is a base64 message, more accurate than plain as it true UTF-8
-		$mine_message = $this->getBase64Version($plain_text);
-		$message .= 'Content-Type: text/plain; charset=UTF-8' . $this->lineBreak;
-		$message .= 'Content-Transfer-Encoding: base64' . $this->lineBreak . $this->lineBreak;
-		$message .= $mine_message . $this->lineBreak . $boundary;
+			$message = $boundary;
+			$message .= 'Content-Type: text/plain; charset=UTF-8' . $this->lineBreak;
+			$message .= 'Content-Transfer-Encoding: Quoted-Printable' . $this->lineBreak . $this->lineBreak;
+			$message .= $plain_message . $this->lineBreak . $boundary;
 
-		// This is the actual HTML message, prim and proper.
-		$html_message = $send_html ? $this->getEmailWrapper($orig_message, $subject) : $orig_message;
-		$html_message = $this->getQuotedPrintableVersion($html_message);
-		$message .= 'Content-Type: text/' . ($send_html ? 'html' : 'plain') . '; charset=UTF-8' . $this->lineBreak;
-		$message .= 'Content-Transfer-Encoding: Quoted-Printable' . $this->lineBreak . $this->lineBreak;
+			$message .= 'Content-Type: text/html; charset=UTF-8' . $this->lineBreak;
+			$message .= 'Content-Transfer-Encoding: Quoted-Printable' . $this->lineBreak . $this->lineBreak;
+			$message .= $html_message . $this->lineBreak . '--' . $mime_boundary . '--';
 
-		return $message . ($html_message . $this->lineBreak . '--' . $mime_boundary . '--');
+			return $message;
+		}
+
+		return $this->getQuotedPrintableVersion($orig_message);
 	}
 
 	/**
 	 * All characters will be represented with 7 bits (ASCII characters 0-127) and thus don’t need to
 	 * be encoded. This is fine for the simplest of emails.
+	 *
+	 * @deprecated since 2.0.0, use getQuotedPrintableVersion() instead
 	 *
 	 * @param string $string
 	 * @return string
@@ -530,17 +545,43 @@ class BuildMail extends BaseMail
 	 */
 	public function getEmailWrapper($message, $subject): string
 	{
-		global $settings;
-
 		$replacements = [
 			'TOPICSUBJECT' => $subject,
 			'MESSAGE' => $message,
-			'EMAILCSS' => file_get_contents($settings['default_theme_dir'] . '/css/email.css'),
+			'EMAILCSS' => $this->getEmailCss(),
 		] + $this->replacements;
 
 		$emaildata = loadEmailTemplate('notify_html_email', $replacements, $this->language);
 
 		return $emaildata['body'];
+	}
+
+	/**
+	 * Returns the cached stylesheet for HTML emails.
+	 *
+	 * @return string
+	 */
+	public function getEmailCss(): string
+	{
+		if (self::$emailCss === null)
+		{
+			global $settings;
+
+			$css_file = ($settings['default_theme_dir'] ?? '') . '/css/email.css';
+			self::$emailCss = file_exists($css_file) ? (string) file_get_contents($css_file) : '';
+		}
+
+		return self::$emailCss;
+	}
+
+	/**
+	 * Reset the cached email CSS (useful for testing or theme changes).
+	 *
+	 * @return void
+	 */
+	public static function resetEmailCss(): void
+	{
+		self::$emailCss = null;
 	}
 
 	/**
