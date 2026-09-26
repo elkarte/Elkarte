@@ -654,7 +654,7 @@ class PostNotifications extends AbstractModel
 		$this->sendSiteBoardNotifications($topicData, $board_index, $boards);
 
 		// Now the ones who want it via Email
-		$this->sendEmailBoardNotifications($topicData,$board_index, $boards);
+		$this->sendEmailBoardNotifications($topicData, $board_index, $boards);
 
 		$lang_loader = new Loader(null, $txt, database());
 		$lang_loader->load('index', false);
@@ -712,9 +712,11 @@ class PostNotifications extends AbstractModel
 	}
 
 	/**
-	 * @param $topicData
-	 * @param $board_index
-	 * @param $boards
+	 * Sends email notifications to users subscribed to specified boards when new topics or replies are made.
+	 *
+	 * @param array $topicData An associative array containing information about the topics or posts being notified about.
+	 * @param array $board_index An indexed array containing the list of board IDs that are being checked for notifications.
+	 * @param array $boards A multidimensional array mapping board IDs to lists of topics or posts that require notifications.
 	 * @return void
 	 */
 	public function sendEmailBoardNotifications($topicData, $board_index, $boards): void

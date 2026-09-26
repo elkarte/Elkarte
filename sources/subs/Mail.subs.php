@@ -592,11 +592,13 @@ function updateFailedQueue($failed_emails)
 
 	$db = database();
 
+	$modSettings['mail_failed_attempts'] = empty($modSettings['mail_failed_attempts']) ? 1 : ++$modSettings['mail_failed_attempts'];
+
 	// Update the failed attempts check.
 	$db->replace(
 		'{db_prefix}settings',
 		['variable' => 'string', 'value' => 'string'],
-		['mail_failed_attempts', empty($modSettings['mail_failed_attempts']) ? 1 : ++$modSettings['mail_failed_attempts']],
+		['mail_failed_attempts', $modSettings['mail_failed_attempts']],
 		['variable']
 	);
 

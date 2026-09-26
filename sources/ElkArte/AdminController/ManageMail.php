@@ -230,6 +230,7 @@ class ManageMail extends AbstractController
 			['text', 'smtp_client'],
 			['text', 'smtp_port'],
 			['check', 'smtp_starttls'],
+			['check', 'smtp_ssl_verify'],
 			['text', 'smtp_username'],
 			['password', 'smtp_password'],
 			'',

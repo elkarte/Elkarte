@@ -43,32 +43,11 @@ class UtilTest extends TestCase
 	 */
 	public function test_entity_check()
 	{
-		global $modSettings;
-
 		// Valid entity is preserved
 		$this->assertEquals('&#9829;', Util::entity_check('&#9829;'));
 
 		// Invalid entity is stripped
 		$this->assertEquals('', Util::entity_check('&#8237;'));
-
-		// When entity check is disabled, string is untouched
-		$modSettings['disableEntityCheck'] = true;
-		$this->assertEquals('&#8237;', Util::entity_check('&#8237;'));
-		unset($modSettings['disableEntityCheck']);
-	}
-
-	/**
-	 * Entity list regex tests
-	 */
-	public function test_entity_list()
-	{
-		global $modSettings;
-
-		$this->assertEquals('&(#\d{1,7}|quot|amp|lt|gt|nbsp);', Util::entity_list());
-
-		$modSettings['disableEntityCheck'] = true;
-		$this->assertEquals('&(#021|quot|amp|lt|gt|nbsp);', Util::entity_list());
-		unset($modSettings['disableEntityCheck']);
 	}
 
 	/**

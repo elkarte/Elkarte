@@ -62,7 +62,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached, imagick
           coverage: xdebug
           tools: composer:v2
-          ini-values: error_log=/tmp/php_errors.log, error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, auto_prepend_file="/usr/share/php/prepend.php", auto_append_file="/usr/share/php/append.php"
+          ini-values: error_log=/tmp/php_errors.log, error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, auto_prepend_file="/usr/share/php/prepend.php", auto_append_file="/usr/share/php/append.php", sendmail_path="/bin/true"
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
@@ -132,7 +132,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, gd, exif, iconv
           coverage: none
           tools: composer:v2
-          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, sendmail_path="/bin/true"
 
       - name: Setup Server Environment
         env:
@@ -214,7 +214,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached, imagick
           coverage: xdebug
           tools: composer:v2
-          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1, sendmail_path="/bin/true"
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
@@ -301,7 +301,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pgsql, imagick, exif, iconv, apcu, memcached, imagick
           coverage: xdebug
           tools: composer:v2
-          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1, sendmail_path="/bin/true"
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"

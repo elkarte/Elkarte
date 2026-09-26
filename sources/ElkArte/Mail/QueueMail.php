@@ -89,9 +89,12 @@ class QueueMail
 		// We have some to send, let's send them!
 		$failed_emails = [];
 		$mail = new Mail();
+		$mail->setKeepAlive(true);
+
 		foreach ($emails as $email)
 		{
 			// Enable PBE processing if this is a maillist mailing
+			$mail->mailList = false;
 			if (!empty($modSettings['maillist_enabled'])
 				&& $email['message_id'] !== null
 				&& str_contains($email['headers'], 'List-Id:'))
@@ -108,6 +111,8 @@ class QueueMail
 				$failed_emails[] = [time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']];
 			}
 		}
+
+		$mail->closeSMTP();
 
 		// Clear out the stat cache.
 		trackStats();
@@ -159,7 +164,7 @@ class QueueMail
 				return 5;
 			}
 
-			// A per period limit but no defined batch size?  Determine a batch size
+			// A per-period limit but no defined batch size?  Determine a batch size
 			// based on the number of times we will potentially be called each minute
 			// as set in updateNextSendTime()
 			$delay = empty($modSettings['mail_queue_delay'])
@@ -171,7 +176,7 @@ class QueueMail
 			return ($batch_size === 1 && $modSettings['mail_period_limit'] > 1) ? 2 : $batch_size;
 		}
 
-		return 0;
+		return (int) $batch_size;
 	}
 
 	/**
@@ -205,7 +210,7 @@ class QueueMail
 	 * Tracks what we have sent in this time period, ensuring we do not go over our
 	 * per minute quota.  If time limit is running out will adjust batch limit up
 	 * to fill the allowed quota.  This is necessary as we cannot rely on the scheduled
-	 * task trigger period, it is based on traffic, not traffic, no trigger
+	 * task trigger period, it is based on traffic, no traffic, no trigger
 	 *
 	 * @param bool $override_limit
 	 * @param int $batch_size

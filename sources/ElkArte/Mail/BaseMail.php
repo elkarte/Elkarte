@@ -61,7 +61,7 @@ abstract class BaseMail
 	{
 		if (empty($language))
 		{
-			$language = $GLOBALS['language'];
+			$language = $GLOBALS['language'] ?? 'English';
 		}
 
 		$this->language = $language;

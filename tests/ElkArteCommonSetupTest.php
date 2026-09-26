@@ -31,7 +31,7 @@ abstract class ElkArteCommonSetupTest extends TestCase
 		$modSettings['smiley_sets_known'] = 'none';
 		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
 		$modSettings['default_forum_action'] = [];
-		$settings['default_theme_dir'] = '/var/www/themes/default';
+		$settings['default_theme_dir'] = BOARDDIR . '/themes/default';
 
 		$userData = [
 			'id' => 1,
