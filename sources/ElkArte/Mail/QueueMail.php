@@ -176,7 +176,7 @@ class QueueMail
 			return ($batch_size === 1 && $modSettings['mail_period_limit'] > 1) ? 2 : $batch_size;
 		}
 
-		return 0;
+		return (int) $batch_size;
 	}
 
 	/**
@@ -210,7 +210,7 @@ class QueueMail
 	 * Tracks what we have sent in this time period, ensuring we do not go over our
 	 * per minute quota.  If time limit is running out will adjust batch limit up
 	 * to fill the allowed quota.  This is necessary as we cannot rely on the scheduled
-	 * task trigger period, it is based on traffic, not traffic, no trigger
+	 * task trigger period, it is based on traffic, no traffic, no trigger
 	 *
 	 * @param bool $override_limit
 	 * @param int $batch_size
