@@ -10,6 +10,7 @@ $txt['smtp_host'] = 'SMTP server';
 $txt['smtp_client'] = 'SMTP client';
 $txt['smtp_port'] = 'SMTP port';
 $txt['smtp_starttls'] = 'STARTTLS';
+$txt['smtp_ssl_verify'] = 'Verify SSL certificate';
 $txt['smtp_username'] = 'SMTP username';
 $txt['smtp_password'] = 'SMTP password';
 

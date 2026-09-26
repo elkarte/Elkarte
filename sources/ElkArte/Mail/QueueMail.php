@@ -89,9 +89,12 @@ class QueueMail
 		// We have some to send, let's send them!
 		$failed_emails = [];
 		$mail = new Mail();
+		$mail->setKeepAlive(true);
+
 		foreach ($emails as $email)
 		{
 			// Enable PBE processing if this is a maillist mailing
+			$mail->mailList = false;
 			if (!empty($modSettings['maillist_enabled'])
 				&& $email['message_id'] !== null
 				&& str_contains($email['headers'], 'List-Id:'))
@@ -108,6 +111,8 @@ class QueueMail
 				$failed_emails[] = [time(), $email['to'], $email['body'], $email['subject'], $email['headers'], $email['send_html'], $email['priority'], $email['private'], $email['message_id']];
 			}
 		}
+
+		$mail->closeSMTP();
 
 		// Clear out the stat cache.
 		trackStats();
@@ -159,7 +164,7 @@ class QueueMail
 				return 5;
 			}
 
-			// A per period limit but no defined batch size?  Determine a batch size
+			// A per-period limit but no defined batch size?  Determine a batch size
 			// based on the number of times we will potentially be called each minute
 			// as set in updateNextSendTime()
 			$delay = empty($modSettings['mail_queue_delay'])

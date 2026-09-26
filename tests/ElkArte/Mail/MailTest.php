@@ -230,4 +230,59 @@ class MailTest extends ElkArteCommonSetupTest
 		$this->assertContains('From: Test User <' . $webmaster_email . '>', $sendMail->headers);
 		$this->assertContains('Reply-To: <user@example.com>', $sendMail->headers);
 	}
+
+	/**
+	 * Test Mail keep-alive settings and connection lifecycle methods
+	 */
+	public function testMailKeepAlive()
+	{
+		$mail = new Mail();
+
+		$this->assertFalse($mail->isKeepAlive());
+		$this->assertFalse($mail->isConnected());
+
+		$mail->setKeepAlive(true);
+		$this->assertTrue($mail->isKeepAlive());
+
+		$mail->closeSMTP();
+		$this->assertFalse($mail->isConnected());
+
+		$mail->setKeepAlive(false);
+		$this->assertFalse($mail->isKeepAlive());
+	}
+
+	/**
+	 * Test QueueMail queue processing with keep-alive
+	 */
+	public function testQueueMailProcessing()
+	{
+		global $modSettings;
+
+		$modSettings['mail_queue'] = 1;
+
+		$sendMail = new BuildMail();
+		$sendMail->buildEmail(
+			'test1@example.com',
+			'Queued Subject 1',
+			'Message body 1',
+			null,
+			'm125',
+			false);
+		$sendMail->buildEmail(
+			'test2@example.com',
+			'Queued Subject 2',
+			'Message body 2',
+			null,
+			'm126',
+			false);
+
+		AddMailQueue(true);
+
+		$queueMail = new QueueMail();
+		// Force send bypassing schedule ts checks
+		$result = $queueMail->reduceMailQueue(10, true, true);
+
+		// With default PHP mail or mock, queue reduction executes
+		$this->assertTrue($result);
+	}
 }
