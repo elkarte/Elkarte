@@ -47,7 +47,11 @@ function loadSession()
 	{
 		$parsed_url = parse_url($boardurl);
 
-		if (preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) !== 1 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) === 1)
+		if (!empty($modSettings['globalCookiesDomain']) && str_contains($boardurl, $modSettings['globalCookiesDomain']))
+		{
+			@ini_set('session.cookie_domain', '.' . ltrim((string) $modSettings['globalCookiesDomain'], '.'));
+		}
+		elseif (isset($parsed_url['host']) && preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) !== 1 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) === 1)
 		{
 			@ini_set('session.cookie_domain', '.' . $parts[1]);
 		}
