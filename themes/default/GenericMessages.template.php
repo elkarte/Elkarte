@@ -129,16 +129,11 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 
 		// Any custom fields to show as or above icons?
-		if (!empty($message['member']['custom_fields']))
+		if (!empty($message['member']['custom_fields']['above_icons']))
 		{
 			// Show above-icon placement (replacing personal text and gender)
-			foreach ($message['member']['custom_fields'] as $custom)
+			foreach ($message['member']['custom_fields']['above_icons'] as $custom)
 			{
-				if ((int) $custom['placement'] !== 3)
-				{
-					continue;
-				}
-
 				if (empty($custom['value']))
 				{
 					continue;
@@ -150,9 +145,9 @@ function template_build_poster_div($message, $ignoring = false)
 
 			// Icon placement.
 			$shown = false;
-			foreach ($message['member']['custom_fields'] as $custom)
+			foreach ($message['member']['custom_fields']['with_icons'] as $custom)
 			{
-				if ((int) $custom['placement'] !== 1 || empty($custom['value']))
+				if (empty($custom['value']))
 				{
 					continue;
 				}
@@ -206,11 +201,11 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 
 		// Any custom fields for standard placement?
-		if (!empty($message['member']['custom_fields']))
+		if (!empty($message['member']['custom_fields']['standard']))
 		{
-			foreach ($message['member']['custom_fields'] as $custom)
+			foreach ($message['member']['custom_fields']['standard'] as $custom)
 			{
-				if (empty($custom['placement']) || empty($custom['value']))
+				if (!empty($custom['value']))
 				{
 					$poster_div .= '
 							<li class="listlevel2 custom">' . $custom['title'] . ': ' . $custom['value'] . '</li>';

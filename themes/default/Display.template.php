@@ -233,7 +233,7 @@ function template_messages()
 		// or no line if there are no items
 		$has_top_border = ($message['likes_enabled'] && !empty($message['like_counter']))
 			|| (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
-			|| (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled']);
+			|| (!empty($message['member']['custom_fields']['above_signature']) && empty($options['show_no_signatures']) && $context['signature_enabled']);
 
 		echo '
 							<div class="signature' . ($has_top_border ? '' : ' without_top_border') . '">';
@@ -256,12 +256,12 @@ function template_messages()
 
 		// Are there any custom profile fields for above the signature?
 		// Show them if signatures are enabled, and you want to see them.
-		if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
+		if (!empty($message['member']['custom_fields']['above_signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			$shown = false;
-			foreach ($message['member']['custom_fields'] as $custom)
+			foreach ($message['member']['custom_fields']['above_signature'] as $custom)
 			{
-				if ($custom['placement'] != 2 || empty($custom['value']))
+				if (empty($custom['value']))
 				{
 					continue;
 				}

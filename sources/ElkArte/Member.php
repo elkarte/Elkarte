@@ -235,7 +235,12 @@ class Member extends ValuesContainer
 					)
 				),
 				'local_time' => standardTime(time() + ($this->data['time_offset'] - User::$info->time_offset) * 3600, false),
-				'custom_fields' => [],
+				'custom_fields' => [
+					'standard' => [],
+					'with_icons' => [],
+					'above_signature' => [],
+					'above_icons' => [],
+				],
 			]);
 		}
 	}
@@ -291,12 +296,23 @@ class Member extends ValuesContainer
 				$value = strtr($custom['enclose'], $replacements);
 			}
 
-			$this->data['custom_fields'][] = [
+			$placement = empty($custom['placement']) ? 0 : (int) $custom['placement'];
+			$custom_field = [
 				'title' => $custom['title'],
 				'colname' => $custom['colname'],
 				'value' => $value,
-				'placement' => empty($custom['placement']) ? 0 : $custom['placement'],
+				'placement' => $placement,
 			];
+			// Add a new placement key with a meaningful name
+			$field_key = match ($placement)
+			{
+				1 => 'with_icons',
+				2 => 'above_signature',
+				3 => 'above_icons',
+				default => 'standard',
+			};
+
+			$this->data['custom_fields'][$field_key][] = $custom_field;
 		}
 	}
 
