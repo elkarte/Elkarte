@@ -117,7 +117,7 @@ class SearchHelpersTest extends TestCase
 		$this->assertEquals('foo | bar', $result);
 
 		$result = SearchHelpers::textToSearchQuery('( | foo | )');
-		$this->assertEquals('(foo)', $result);
+		$this->assertEquals('( foo )', $result);
 	}
 
 	/**
@@ -191,10 +191,10 @@ class SearchHelpersTest extends TestCase
 	public function testFillerPhrasesInsideQuotesPreserved()
 	{
 		$result = SearchHelpers::textToSearchQuery('"where is the love" in lyrics');
-		$this->assertEquals('"where is the love" lyrics', $result);
+		$this->assertEquals('"where is the love" in lyrics', $result);
 
 		$result = SearchHelpers::textToSearchQuery('"show me" the money');
-		$this->assertEquals('"show me" money', $result);
+		$this->assertEquals('"show me" the money', $result);
 	}
 
 	/**

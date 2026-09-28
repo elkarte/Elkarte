@@ -247,6 +247,9 @@ class SearchHelpers
 	 */
 	public static function cleanString(string $string): string
 	{
+		// Strip HTML tags first
+		$string = strip_tags($string);
+
 		// Decode entities first
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
