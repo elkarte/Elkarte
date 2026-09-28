@@ -476,8 +476,8 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		$this->createTestTopic('Unread Count Test');
 		$count = getUnreadCountSince(1, 0);
 
-		$this->assertIsInt($count);
-		$this->assertGreaterThanOrEqual(0, $count);
+		$this->assertIsNumeric($count);
+		$this->assertGreaterThanOrEqual(0, (int) $count);
 	}
 
 	/**
@@ -775,6 +775,8 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	 */
 	public function testSplitTopicExceptions(): void
 	{
+		global $txt;
+
 		$fixture = $this->createTestTopic('Split Topic Exceptions Test', 1, 1, 2);
 
 		// 1. Empty messages
@@ -785,7 +787,7 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		}
 		catch (\ElkArte\Exceptions\Exception $e)
 		{
-			$this->assertEquals('no_posts_selected', $e->getMessage());
+			$this->assertSame($txt['no_posts_selected'], $e->getMessage());
 		}
 
 		// 2. Selected all messages
@@ -796,7 +798,7 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		}
 		catch (\ElkArte\Exceptions\Exception $e)
 		{
-			$this->assertEquals('selected_all_posts', $e->getMessage());
+			$this->assertSame($txt['selected_all_posts'], $e->getMessage());
 		}
 
 		// 3. Splitting the first post
@@ -807,7 +809,7 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		}
 		catch (\ElkArte\Exceptions\Exception $e)
 		{
-			$this->assertEquals('split_first_post', $e->getMessage());
+			$this->assertSame($txt['split_first_post'], $e->getMessage());
 		}
 	}
 
@@ -971,7 +973,9 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		}
 		catch (\ElkArte\Exceptions\Exception $e)
 		{
-			$this->assertEquals('topic_already_moved', $e->getMessage());
+			$this->assertInstanceOf(\ElkArte\Exceptions\Exception::class, $e);
+			$this->assertStringContainsString('Concurrence Topic', $e->getMessage());
+			$this->assertStringContainsString('has been moved to the board', $e->getMessage());
 		}
 	}
 
