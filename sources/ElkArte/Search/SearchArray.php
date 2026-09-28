@@ -181,94 +181,27 @@ class SearchArray extends AbstractModel
 	}
 
 	/**
-	 * Constructs a binary mode query to pass back to a search API
+	 * Constructs a complex/extended boolean mode query to pass back to a search API
 	 *
-	 * Understands the use of OR | AND & as search modifiers
-	 * Currently used by the sphinx API
+	 * Understands the use of OR | AND & as search modifiers, negations, and phrases.
 	 *
 	 * @return string
 	 */
 	public function searchArrayExtended(): string
 	{
-		$keywords = ['include' => [], 'exclude' => []];
+		$query = SearchHelpers::textToSearchQuery($this->_search_string, $this->_blocklist_words);
 
-		// Split our search string and return an empty string if no matches
-		if (!preg_match_all('~(-?)("[^"]+"|[^" ]+)~', $this->_search_string, $tokens, PREG_SET_ORDER))
+		if ($query === '')
 		{
+			if (!empty($this->_blocklist_words) && trim($this->_search_string) !== '')
+			{
+				$this->_foundBlockListedWords = true;
+			}
+
 			return $this->_searchArray[] = '';
 		}
 
-		// First, we split our string into included and excluded words and phrases
-		$or_part = false;
-		foreach ($tokens as $token)
-		{
-			$phrase = false;
-
-			// Strip the quotes off of a phrase
-			if ($token[2][0] === '"')
-			{
-				$token[2] = substr($token[2], 1, -1);
-				$phrase = true;
-			}
-
-			// Prepare this token
-			$cleanWords = $this->cleanString($token[2]);
-
-			// Explode the cleanWords again in case the cleaning puts more spaces into it
-			$addWords = $phrase ? ['"' . $cleanWords . '"'] : preg_split('~\s+~u', $cleanWords, -1, PREG_SPLIT_NO_EMPTY);
-
-			// Excluding this word?
-			if ($token[1] === '-')
-			{
-				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
-			}
-			// OR'd keywords (we only do this if we have something to OR with)
-			elseif (($token[2] === 'OR' || $token[2] === '|') && count($keywords['include']))
-			{
-				$last = array_pop($keywords['include']);
-				$keywords['include'][] = is_array($last) ? $last : [$last];
-				$or_part = true;
-				continue;
-			}
-			// AND is implied in a Sphinx Search
-			elseif ($token[2] === 'AND' || $token[2] === '&' || trim($cleanWords) === '')
-			{
-				continue;
-			}
-			elseif ($or_part)
-			{
-				// If this was part of an OR branch, add it to the proper section
-				$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
-			}
-			else
-			{
-				$keywords['include'] = array_merge($keywords['include'], $addWords);
-			}
-
-			// Start fresh on this...
-			$or_part = false;
-		}
-
-		// Let's make sure they're not canceling each other out
-		$results = array_diff(array_map('serialize', $keywords['include']), array_map('serialize', $keywords['exclude']));
-		if (array_map('unserialize', $results) === [])
-		{
-			return $this->_searchArray[] = '';
-		}
-
-		// Now we compile our arrays into a valid search string
-		$query_parts = [];
-		foreach ($keywords['include'] as $keyword)
-		{
-			$query_parts[] = is_array($keyword) ? '(' . implode(' | ', $keyword) . ')' : $keyword;
-		}
-
-		foreach ($keywords['exclude'] as $keyword)
-		{
-			$query_parts[] = '-' . $keyword;
-		}
-
-		return $this->_searchArray[] = implode(' ', $query_parts);
+		return $this->_searchArray[] = $query;
 	}
 
 	/**
@@ -280,17 +213,7 @@ class SearchArray extends AbstractModel
 	 */
 	public function cleanString($string): string
 	{
-		// Decode the entities first
-		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
-
-		// Lowercase string
-		$string = Util::strtolower($string);
-
-		// Fix numbers so they search easier (decimals, SSN, dates) 123-45-6789 => 123_45_6789
-		$string = preg_replace('~([\d]+)[-./]+(?=[\d])~u', '$1_', $string);
-
-		// Last but not least, strip everything out that's not alphanumeric
-		return preg_replace('~[^\pL\pN_"-]+~u', ' ', $string);
+		return SearchHelpers::cleanString($string);
 	}
 
 	/**
