@@ -865,11 +865,11 @@ function approvePosts($msgs, $approve = true)
 			$msgInserts[] = [$msg];
 		}
 
-		$db->insert('ignore',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			['id_msg' => 'int'],
 			$msgInserts,
-			['id_msg']
+			[]
 		);
 	}
 
