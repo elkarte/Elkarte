@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Functions concerned with viewing queries, and is used for debugging.
+ * Functions concerned with viewing queries and is used for debugging.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -40,7 +40,7 @@ class AdminDebug extends AbstractController
 	 */
 	public function action_index()
 	{
-		// what to do first... viewquery! What, it'll work or it won't.
+		// what to do first... viewquery! What, it'll work, or it won't.
 		// $this->action_viewquery();
 	}
 
@@ -89,7 +89,7 @@ class AdminDebug extends AbstractController
 		$query_id = $this->_req->getQuery('qq', 'intval', 0);
 		--$query_id;
 
-		// Just to stay on the safe side, better remove any layer and add back only html
+		// Just to stay on the safe side, better remove any layer and add back only HTML
 		$layers = theme()->getLayers();
 		$layers->removeAll();
 		$layers->add('html');

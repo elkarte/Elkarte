@@ -56,7 +56,7 @@ class Admin extends AbstractController
 
 		Hooks::instance()->loadIntegrationsSettings();
 
-		// The Admin functions require Jquery UI ....
+		// The Admin functions require Jquery UI...
 		$modSettings['jquery_include_ui'] = true;
 
 		// No indexing evil stuff.
@@ -81,7 +81,7 @@ class Admin extends AbstractController
 		// Make sure the administrator has a valid session...
 		validateSession();
 
-		// Load the language and templates....
+		// Load the language and templates...
 		Txt::load('Admin+Help+ManageSettings');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');

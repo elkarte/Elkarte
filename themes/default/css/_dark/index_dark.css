@@ -658,8 +658,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #wrapper {
 	margin-top: 3.2rem;
 	border-color: var(--transparent);
-	border-top-color: var(--transparent);
-	border-bottom-color: var(--transparent);
 	background: var(--content_background);
 	box-shadow: 0 2px 4px var(--html_background);
 }

@@ -72,7 +72,7 @@ class AddonSettings extends AbstractController
 	}
 
 	/**
-	 * If you have a general mod setting to add stick it here.
+	 * If you have a general mod setting to add, stick it here.
 	 *
 	 * @event integrate_save_general_mod_settings allows for special processing needs during save operations
 	 * for addons added to Addon Settings area

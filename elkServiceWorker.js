@@ -342,7 +342,7 @@ async function processStaleWhileRevalidateRequest (event, cache_name)
 			if (networkResponse && networkResponse.ok)
 			{
 				const cache = await caches.open(cache_name);
-				cache.put(event.request, networkResponse.clone());
+				await cache.put(event.request, networkResponse.clone());
 			}
 			return networkResponse;
 		}
@@ -382,7 +382,7 @@ async function cacheAndReturnResponse (response, request, cache_name)
 	if (response && response.ok)
 	{
 		let cache = await caches.open(cache_name);
-		cache.put(request, response.clone());
+		await cache.put(request, response.clone());
 	}
 	return response;
 }

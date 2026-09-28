@@ -236,10 +236,8 @@ class ManageBans extends AbstractController
 								return sprintf('<span class="error">%1$s</span>', $txt['ban_expired']);
 							}
 							// Still need to wait a few days for this ban to expire.
-							else
-							{
-								return sprintf('%1$d&nbsp;%2$s', ceil(($rowData['expire_time'] - time()) / (60 * 60 * 24)), $txt['ban_days']);
-							}
+
+							return sprintf('%1$d&nbsp;%2$s', ceil(($rowData['expire_time'] - time()) / (60 * 60 * 24)), $txt['ban_days']);
 						},
 					],
 					'sort' => [
@@ -563,7 +561,7 @@ class ManageBans extends AbstractController
 				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, ['never', 'one_day', 'expired']) ? $this->_req->post->expiration : 'never',
 				'days' => $ban_info['expire_date'],
 			];
-			$ban_info['db_expiration'] = $ban_info['expiration']['status'] === 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
+			$ban_info['db_expiration'] = $ban_info['expiration']['status'] === 'never' ? 'NULL' : ($ban_info['expiration']['status'] === 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
 			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
 			$ban_info['reason'] = $this->_req->getPost('reason', 'Util::htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['name'] = $this->_req->getPost('ban_name', 'Util::htmlspecialchars[ENT_QUOTES]', '');

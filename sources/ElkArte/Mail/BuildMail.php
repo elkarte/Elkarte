@@ -258,10 +258,13 @@ class BuildMail extends BaseMail
 	}
 
 	/**
-	 * Replaces any valid &#123; entities with their UTF-8 chr() equivalent
+	 * Cleans a given string to ensure it contains only valid UTF-8 characters
+	 * by removing invalid control characters and optionally converting HTML entities
+	 * in the UTF-8 range into their corresponding characters.
 	 *
-	 * @param $string
-	 * @return string
+	 * @param string $string The input string to be validated and cleaned.
+	 * @param bool $convert Specifies whether to convert HTML entities to characters in the UTF-8 range. Default is true.
+	 * @return string A cleaned and valid UTF-8 compliant string.
 	 */
 	public function getValidUTF8String($string, $convert = true): string
 	{
@@ -478,7 +481,7 @@ class BuildMail extends BaseMail
 
 	/**
 	 * Quoted-Printable is an alternative encoding to Base64 which only encodes high-byte characters,
-	 * which can be detected by an equals sign followed by the hexadecimal representation of the
+	 * which can be detected by an equal sign followed by the hexadecimal representation of the
 	 * byte (e.g., “=D0”). This allows most of the text to remain human-readable, with clear
 	 * exceptions wherever equal signs are encountered.
 	 *

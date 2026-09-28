@@ -1552,17 +1552,24 @@ function elkCopyText (oCurElement, bActOnElement)
 		text = text.replace(/^\u00A0/gm, '\t');
 	}
 
-	navigator.clipboard.writeText(text);
+	navigator.clipboard.writeText(text)
+		.then(() => {
+			// Visual feedback, it shows the user that the command completed successfully
+			oCodeArea.classList.add('copied');
+			let sOriginalText = oCurElement.innerText;
+			oCurElement.innerText = oCurElement.getAttribute('data-copied');
 
-	// Visual feedback, it shows the user that the command completed successfully
-	oCodeArea.classList.add('copied');
-	let sOriginalText = oCurElement.innerText;
-	oCurElement.innerText = oCurElement.getAttribute('data-copied');
-
-	setTimeout(function() {
-		oCodeArea.classList.remove('copied');
-		oCurElement.innerText = sOriginalText;
-	}, 1500);
+			setTimeout(function() {
+				oCodeArea.classList.remove('copied');
+				oCurElement.innerText = sOriginalText;
+			}, 1500);
+		})
+		.catch(error => {
+			if ('console' in window && console.error)
+			{
+				console.error(error);
+			}
+		});
 
 	return false;
 }
