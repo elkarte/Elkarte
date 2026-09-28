@@ -33,6 +33,8 @@ function removeTopicsPermissions($topics)
 {
 	global $board;
 
+	$topics = (array) $topics;
+
 	// They can only delete their own topics. (we wouldn't be here if they couldn't do that.)
 	$possible_remove = topicAttribute($topics, ['id_topic', 'id_board', 'id_member_started']);
 
@@ -1164,9 +1166,9 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 		// Attempt to turn notifications on.
 		$db->insert('ignore',
 			'{db_prefix}log_notify',
-			['id_member' => 'int', 'id_topic' => 'int'],
-			[$id_member, $id_topic],
-			['id_member', 'id_topic']
+			['id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'],
+			[$id_member, $id_topic, 0],
+			['id_member', 'id_topic', 'id_board']
 		);
 	}
 	else

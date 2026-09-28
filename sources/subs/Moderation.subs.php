@@ -38,6 +38,8 @@ function recountOpenReports($flush = true, $count_pms = false)
 
 	$db = database();
 
+	$bq = !empty(User::$info->mod_cache['bq']) ? User::$info->mod_cache['bq'] : '1=1';
+
 	$open_reports = [
 		'msg' => 0,
 		'pm' => 0,
@@ -46,7 +48,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 		SELECT 
 			type, COUNT(*) as num_reports
 		FROM {db_prefix}log_reported
-		WHERE ' . User::$info->mod_cache['bq'] . '
+		WHERE ' . $bq . '
 			AND type IN ({array_string:rep_type})
 			AND closed = {int:not_closed}
 			AND ignore_all = {int:not_ignored}
@@ -231,12 +233,14 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 
 	$reports_id = is_array($reports_id) ? $reports_id : [$reports_id];
 
+	$bq = !empty(User::$info->mod_cache['bq']) ? User::$info->mod_cache['bq'] : '1=1';
+
 	$request = $db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET 
 			' . ($property == 'close' ? 'closed' : 'ignore_all') . '= {int:status}
 		WHERE id_report IN ({array_int:report_list})
-			AND ' . User::$info->mod_cache['bq'],
+			AND ' . $bq,
 		[
 			'report_list' => $reports_id,
 			'status' => $status,

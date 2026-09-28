@@ -566,16 +566,16 @@ function makeNotificationChanges($memID)
 		$notification_inserts = [];
 		foreach ($notification_wanted as $id)
 		{
-			$notification_inserts[] = [$memID, $id];
+			$notification_inserts[] = [$memID, 0, $id];
 		}
 
 		if (!empty($notification_inserts))
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_notify',
-				['id_member' => 'int', 'id_board' => 'int'],
+				['id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'],
 				$notification_inserts,
-				['id_member', 'id_board']
+				['id_member', 'id_topic', 'id_board']
 			);
 		}
 	}

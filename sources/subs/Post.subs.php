@@ -865,11 +865,11 @@ function approvePosts($msgs, $approve = true)
 			$msgInserts[] = [$msg];
 		}
 
-		$db->insert('ignore',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			['id_msg' => 'int'],
 			$msgInserts,
-			['id_msg']
+			[]
 		);
 	}
 
@@ -973,7 +973,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 			$lastModified[$id_board] = 0;
 		}
 
-		if (!empty($board) && $id_board == $board)
+		if (!empty($board) && $id_board == $board && isset($board_info['parent_boards']))
 		{
 			$parents = $board_info['parent_boards'];
 		}
