@@ -95,7 +95,16 @@ class UserSettingsLoader
 		if ($this->id !== 0)
 		{
 			$this->loadUserData($already_verified, $session_password);
-			$user_info = $this->initUser();
+
+			// Verification may invalidate the member id, so initialize as guest when that happens.
+			if ($this->id !== 0)
+			{
+				$user_info = $this->initUser();
+			}
+			else
+			{
+				$user_info = $this->initGuest();
+			}
 		}
 		else
 		{
