@@ -309,6 +309,9 @@ class Poll extends AbstractController
 		if (checkSession('post', '', false) !== '')
 		{
 			$poll_errors->addError('session_timeout');
+
+			$this->action_editpoll();
+			return;
 		}
 
 		// HACKERS (!!) can't edit :P.
@@ -325,6 +328,7 @@ class Poll extends AbstractController
 
 		// Get the starter and the poll's ID - if it's an edit.
 		$bcinfo = getPollStarter($topic);
+
 		// Check their adding/editing is valid.
 		if (!$isEdit && !empty($bcinfo['id_poll']))
 		{
@@ -378,7 +382,9 @@ class Poll extends AbstractController
 		// Got any errors to report?
 		if ($poll_errors->hasErrors())
 		{
+			// return guarantees that general validation errors also abort the write operation and return control to the form view as intended.
 			$this->action_editpoll();
+			return;
 		}
 
 		// Prevent double submission of this form.
