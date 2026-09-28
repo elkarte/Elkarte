@@ -11,6 +11,7 @@
  */
 
 use ElkArte\Languages\Loader;
+use ElkArte\User;
 use tests\ElkArteCommonSetupTest;
 
 /**
@@ -42,6 +43,20 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		parent::setUp();
 		parent::setSession();
 
+		global $board, $topic;
+		$board = 0;
+		$topic = 0;
+
+		User::$info->mod_cache = [
+			'bq' => '1=1',
+			'ap' => [0],
+			'gq' => '1=1',
+			'time' => time(),
+			'id' => 1,
+			'mb' => 1,
+			'mq' => 'b.id_board IN (1)',
+		];
+
 		global $txt;
 		$lang = new Loader('english', $txt, database());
 		$lang->load('Post');
@@ -54,6 +69,10 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	 */
 	protected function tearDown(): void
 	{
+		global $board, $topic;
+		$board = 0;
+		$topic = 0;
+
 		if (!empty($this->createdTopics))
 		{
 			removeTopics($this->createdTopics, false, true);

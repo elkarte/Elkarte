@@ -973,7 +973,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 			$lastModified[$id_board] = 0;
 		}
 
-		if (!empty($board) && $id_board == $board)
+		if (!empty($board) && $id_board == $board && isset($board_info['parent_boards']))
 		{
 			$parents = $board_info['parent_boards'];
 		}

@@ -33,6 +33,8 @@ function removeTopicsPermissions($topics)
 {
 	global $board;
 
+	$topics = (array) $topics;
+
 	// They can only delete their own topics. (we wouldn't be here if they couldn't do that.)
 	$possible_remove = topicAttribute($topics, ['id_topic', 'id_board', 'id_member_started']);
 
