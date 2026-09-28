@@ -207,10 +207,7 @@ class Search
 	{
 		// Unfortunately, searching for words like these is going to result in too many hits,
 		// so we're blocking them.
-		$blocklist_words = ['img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in'];
-		call_integration_hook('integrate_search_blocklist_words', [&$blocklist_words]);
-
-		$this->_blocklist_words = $blocklist_words;
+		$this->_blocklist_words = SearchHelpers::getDefaultBlocklistedWords();
 	}
 
 	/**
