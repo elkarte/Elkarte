@@ -923,9 +923,9 @@ function setBoardNotification($id_member, $id_board, $on = false)
 		// Turn notification on.  (note this just blows smoke if it's already on.)
 		$db->insert('ignore',
 			'{db_prefix}log_notify',
-			['id_member' => 'int', 'id_board' => 'int'],
-			[$id_member, $id_board],
-			['id_member', 'id_board']
+			['id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'],
+			[$id_member, 0, $id_board],
+			['id_member', 'id_topic', 'id_board']
 		);
 	}
 	else
