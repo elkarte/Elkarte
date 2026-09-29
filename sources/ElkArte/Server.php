@@ -59,8 +59,14 @@ class Server extends \ArrayObject
 	 */
 	public function setMemoryLimit($needed, $in_use = false): bool
 	{
+		$current_limit = ini_get('memory_limit');
+		if ((int) $current_limit === -1)
+		{
+			return true;
+		}
+
 		// Everything in bytes
-		$memory_current = memoryReturnBytes(ini_get('memory_limit'));
+		$memory_current = memoryReturnBytes($current_limit);
 		$memory_needed = memoryReturnBytes($needed);
 
 		// Should we account for how much is currently being used?
@@ -73,10 +79,14 @@ class Server extends \ArrayObject
 		if ($memory_current < $memory_needed)
 		{
 			@ini_set('memory_limit', ceil($memory_needed / 1048576) . 'M');
-			$memory_current = memoryReturnBytes(ini_get('memory_limit'));
-		}
+			$current_limit = ini_get('memory_limit');
+			if ((int) $current_limit === -1)
+			{
+				return true;
+			}
 
-		$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
+			$memory_current = memoryReturnBytes($current_limit);
+		}
 
 		// Return success or not
 		return $memory_current >= $memory_needed;

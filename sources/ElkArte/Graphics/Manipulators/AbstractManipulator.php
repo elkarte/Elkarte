@@ -171,7 +171,8 @@ abstract class AbstractManipulator
 	abstract public function getTransparency();
 
 	/**
-	 * See if we have enough memory to thumbnail an image
+	 * See if we have enough memory to thumbnail/process an image.  This is a bit of a guess,
+	 * but it should be close enough for most images and prevents decompression bombs.
 	 *
 	 * @param bool $fatal if to throw an exception on lack of memory
 	 *
@@ -180,8 +181,18 @@ abstract class AbstractManipulator
 	 */
 	public function memoryCheck($fatal = false): bool
 	{
-		// No Need
-		if (empty($this->_width) || empty($this->_height))
+		$width = !empty($this->_width) ? $this->_width : ($this->imageDimensions[0] ?? 0);
+		$height = !empty($this->_height) ? $this->_height : ($this->imageDimensions[1] ?? 0);
+
+		if (($width <= 0 || $height <= 0) && !empty($this->_fileName) && empty($this->imageDimensions))
+		{
+			$this->setImageDimensions();
+			$width = $this->imageDimensions[0] ?? 0;
+			$height = $this->imageDimensions[1] ?? 0;
+		}
+
+		// No dimensions available to check (e.g. non-image or text-generated canvas)
+		if ($width <= 0 || $height <= 0)
 		{
 			return true;
 		}
@@ -191,10 +202,11 @@ abstract class AbstractManipulator
 		// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
 		// overrun the calculated value.
 		// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
-		$needed_memory = $this->_width * $this->_height * 5;
+		$needed_memory = $width * $height * 5;
 
 		// If we need more, let's try to get it
-		$success = detectServer()->setMemoryLimit($needed_memory, true);
+		$server = function_exists('detectServer') ? \detectServer() : new \ElkArte\Server();
+		$success = $server->setMemoryLimit($needed_memory, true);
 
 		if ($fatal && !$success)
 		{

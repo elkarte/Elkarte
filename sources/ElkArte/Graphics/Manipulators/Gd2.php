@@ -77,6 +77,11 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
+		if (!$this->memoryCheck())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
@@ -91,6 +96,11 @@ class Gd2 extends AbstractManipulator
 			}
 		}
 		else
+		{
+			return false;
+		}
+
+		if (!($image instanceof \GdImage) && !is_resource($image))
 		{
 			return false;
 		}
@@ -129,11 +139,18 @@ class Gd2 extends AbstractManipulator
 		}
 
 		$this->setImageDimensions('string', $image_data);
+
+		if (!$this->memoryCheck())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
 			{
-				$image = imagecreatefromstring($image_data);
+				/** @var $image GdImage|false */
+				$image = @imagecreatefromstring($image_data);
 				unset($image_data);
 			}
 			catch (Exception)
@@ -142,6 +159,11 @@ class Gd2 extends AbstractManipulator
 			}
 		}
 		else
+		{
+			return false;
+		}
+
+		if (!($image instanceof \GdImage) && !is_resource($image))
 		{
 			return false;
 		}
