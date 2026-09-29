@@ -65,7 +65,7 @@ abstract class AbstractTable
 	 *  compatibilities across supported database systems.
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
-	 *  The columns array should have one sub-array for each column - these sub arrays contain:
+	 *  The column array should have one sub-array for each column - these sub arrays contain:
 	 *    'name' = Column name
 	 *    'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
 	 *    'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
@@ -82,6 +82,8 @@ abstract class AbstractTable
 	 *  - if_exists values:
 	 *    - 'ignore' will do nothing if the table exists. (And will return true)
 	 *    - 'overwrite' will drop any existing table of the same name.
+	 *    - 'update' will update an existing table without dropping data in columns that match the new table schema.
+	 *    - 'force_drop' will drop the table if it exists before creating it.
 	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
@@ -113,6 +115,8 @@ abstract class AbstractTable
 		// Log that we'll want to remove this during uninstallation.
 		$this->_package_log[] = ['remove_table', $table_name];
 
+		$old_table_exists = false;
+
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
 		if ($parameters['if_exists'] === 'force_drop')
 		{
@@ -124,6 +128,12 @@ abstract class AbstractTable
 			if ($parameters['if_exists'] === 'overwrite')
 			{
 				$this->drop_table($table_name);
+			}
+			elseif ($parameters['if_exists'] === 'update')
+			{
+				$this->drop_table($table_name . '_old', true);
+				$this->rename_table($table_name, $table_name . '_old');
+				$old_table_exists = true;
 			}
 			else
 			{
@@ -168,6 +178,35 @@ abstract class AbstractTable
 		// And the indexes... if any
 		$this->_build_indexes();
 
+		// If updating an existing table, copy over data for matching columns and drop the old table
+		if ($old_table_exists)
+		{
+			$old_columns = $this->list_columns($table_name . '_old');
+			$new_column_names = array_column($columns, 'name');
+			$common_columns = array_values(array_intersect($old_columns, $new_column_names));
+
+			if (!empty($common_columns))
+			{
+				$quoted_columns = array_map(function ($col) {
+					return $this->_quote_column_name($col);
+				}, $common_columns);
+
+				$columns_sql = implode(', ', $quoted_columns);
+
+				$this->_db->query('', '
+					INSERT INTO ' . $table_name . ' (' . $columns_sql . ')
+					SELECT ' . $columns_sql . '
+					FROM ' . $table_name . '_old',
+					[
+						'security_override' => true,
+					]
+				);
+			}
+
+			$this->_post_table_migration($table_name, $columns);
+			$this->drop_table($table_name . '_old', true);
+		}
+
 		// Go, go power rangers!
 		$this->_db->transaction('commit');
 
@@ -189,6 +228,15 @@ abstract class AbstractTable
 	abstract public function drop_table($table_name, $force = false);
 
 	/**
+	 * Renames an existing table.
+	 *
+	 * @param string $old_name Old table name (may contain {db_prefix})
+	 * @param string $new_name New table name (may contain {db_prefix})
+	 * @return bool
+	 */
+	abstract public function rename_table($old_name, $new_name);
+
+	/**
 	 * Checks if a table exists
 	 *
 	 * @param string $table_name
@@ -200,6 +248,15 @@ abstract class AbstractTable
 
 		return !empty($filter);
 	}
+
+	/**
+	 * Creates a query for a column
+	 *
+	 * @param array $column
+	 * @param string $table_name
+	 * @return string
+	 */
+	abstract protected function _db_create_query_column($column, $table_name): string;
 
 	/**
 	 * It is mean to parse the indexes array of a create_table function
@@ -382,6 +439,25 @@ abstract class AbstractTable
 	protected function _clean_indexes($columns)
 	{
 		return $columns;
+	}
+
+	/**
+	 * Quotes a column name for SQL queries according to DBMS rules.
+	 *
+	 * @param string $column
+	 * @return string
+	 */
+	abstract protected function _quote_column_name($column): string;
+
+	/**
+	 * Performs any driver-specific post-migration cleanup or adjustments.
+	 *
+	 * @param string $table_name
+	 * @param array $columns
+	 * @return void
+	 */
+	protected function _post_table_migration($table_name, $columns)
+	{
 	}
 
 	/**

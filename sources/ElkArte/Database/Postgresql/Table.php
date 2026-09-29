@@ -94,6 +94,30 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
+	public function rename_table($old_name, $new_name)
+	{
+		$old_name = str_replace('{db_prefix}', $this->_db_prefix, $old_name);
+		$new_name = str_replace('{db_prefix}', $this->_db_prefix, $new_name);
+
+		// First - no way do we touch our tables.
+		if (in_array(strtolower($old_name), $this->_reservedTables, true))
+		{
+			return false;
+		}
+
+		$this->_db->query('', '
+			ALTER TABLE "' . $old_name . '" RENAME TO "' . $new_name . '"',
+			[
+				'security_override' => true,
+			]
+		);
+
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	protected function _real_prefix()
 	{
 		return preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
@@ -697,7 +721,7 @@ class Table extends AbstractTable
 			$columns = implode(',', $index['columns']);
 
 			// Primary goes in the table...
-			if (isset($index['type']) && $index['type'] == 'primary')
+			if (isset($index['type']) && $index['type'] === 'primary')
 			{
 				$table_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
 			}
@@ -747,6 +771,12 @@ class Table extends AbstractTable
 		if (!empty($column['auto']))
 		{
 			$this->_db->query('', '
+				DROP SEQUENCE IF EXISTS ' . $table_name . '_seq',
+				[
+					'security_override' => true,
+				]
+			);
+			$this->_db->query('', '
 				CREATE SEQUENCE ' . $table_name . '_seq',
 				[
 					'security_override' => true,
@@ -773,5 +803,32 @@ class Table extends AbstractTable
 
 		// Now just put it together!
 		return '"' . $column['name'] . '" ' . $type . ' ' . (empty($column['null']) ? 'NOT NULL' : '') . ' ' . $default;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function _quote_column_name($column): string
+	{
+		return '"' . str_replace('"', '""', $column) . '"';
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function _post_table_migration($table_name, $columns)
+	{
+		foreach ($columns as $column)
+		{
+			if (!empty($column['auto']))
+			{
+				$this->_db->query('', '
+					SELECT setval(\'' . $table_name . '_seq\', COALESCE((SELECT MAX("' . $column['name'] . '") FROM ' . $table_name . '), 1), (SELECT MAX("' . $column['name'] . '") IS NOT NULL FROM ' . $table_name . '))',
+					[
+						'security_override' => true,
+					]
+				);
+			}
+		}
 	}
 }
