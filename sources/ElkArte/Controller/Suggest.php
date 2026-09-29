@@ -70,6 +70,7 @@ class Suggest extends AbstractController
 
 		// Good old session check
 		checkSession();
+		session_write_close();
 
 		// This requires the XML template
 		theme()->getTemplates()->load('Xml');

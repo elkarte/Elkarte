@@ -115,6 +115,7 @@ class Giphy extends AbstractController
 	public function action_getTrending(): bool
 	{
 		checkSession('get');
+		session_write_close();
 
 		is_not_guest();
 
@@ -144,6 +145,7 @@ class Giphy extends AbstractController
 	public function action_getSearchResults(): bool
 	{
 		checkSession('get');
+		session_write_close();
 
 		is_not_guest();
 

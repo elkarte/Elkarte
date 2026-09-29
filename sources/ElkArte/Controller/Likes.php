@@ -675,6 +675,7 @@ class Likes extends AbstractController
 		global $context;
 
 		checkSession('get');
+		session_write_close();
 
 		Txt::load('LikePosts');
 

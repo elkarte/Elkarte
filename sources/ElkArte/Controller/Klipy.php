@@ -113,6 +113,7 @@ class Klipy extends AbstractController
 	public function action_getFeatured(): bool
 	{
 		checkSession('get');
+		session_write_close();
 
 		is_not_guest();
 
@@ -140,6 +141,7 @@ class Klipy extends AbstractController
 	public function action_getSearchResults(): bool
 	{
 		checkSession('get');
+		session_write_close();
 
 		is_not_guest();
 

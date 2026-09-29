@@ -81,6 +81,8 @@ class Xml extends AbstractController
 	{
 		global $context;
 
+		session_write_close();
+
 		// Find the boards/categories they can see.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boardListOptions = [
@@ -108,6 +110,8 @@ class Xml extends AbstractController
 	{
 		global $context, $board;
 
+		session_write_close();
+
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		$context['icons'] = array_values(getMessageIcons($board));
@@ -115,11 +119,13 @@ class Xml extends AbstractController
 	}
 
 	/**
-	 * Get the member group icons
+	 * Get the member group icons for use in the admin area
 	 */
 	public function action_groupicons(): void
 	{
 		global $context, $settings;
+
+		session_write_close();
 
 		// Only load images
 		$allowedTypes = ['jpeg', 'jpg', 'gif', 'png', 'bmp'];
@@ -877,6 +883,10 @@ class Xml extends AbstractController
 		{
 			$context['json_data'] = json_encode(['session' => 'failed']);
 			$videoID = 0;
+		}
+		else
+		{
+			session_write_close();
 		}
 
 		// A fetch based on site

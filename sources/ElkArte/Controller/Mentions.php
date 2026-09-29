@@ -178,6 +178,7 @@ class Mentions extends AbstractController
 
 		$_SESSION['notifications_lastsentmention'] = $context['json_data']['lasttimemention'];
 		$_SESSION['notifications_lastsentpm'] = $context['json_data']['lasttimepm'];
+		session_write_close();
 	}
 
 	/**
