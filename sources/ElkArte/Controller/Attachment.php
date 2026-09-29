@@ -375,6 +375,9 @@ class Attachment extends AbstractController
 	{
 		global $modSettings, $context, $topic, $board, $settings;
 
+		// Release session lock early to prevent blocking concurrent asset/navigation requests
+		session_write_close();
+
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
 		$filename = null;
@@ -498,12 +501,6 @@ class Attachment extends AbstractController
 			isAllowedTo('approve_posts', $id_board ?? $board);
 		}
 
-		// Update the download counter (unless it's a thumbnail).
-		if (!empty($id_attach && $attachment_type != 3))
-		{
-			increaseDownloadCounter($id_attach);
-		}
-
 		if ($filename === null)
 		{
 			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
@@ -541,6 +538,13 @@ class Attachment extends AbstractController
 		// Show this content inline or download?
 		$disposition = (($reqQueryHasImage || $forceImage) || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
 		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
+
+		// Update the download counter (unless it's a thumbnail, and only after 304 validation passes).
+		if (!empty($id_attach) && (int) $attachment_type !== 3 && !$forceImage && $this->_req->getQuery('thumb') === null)
+		{
+			increaseDownloadCounter($id_attach);
+		}
+
 		$this->send_file($filename, $mime_type);
 
 		obExit(false);
@@ -760,6 +764,9 @@ class Attachment extends AbstractController
 	public function action_tmpattach(): void
 	{
 		global $modSettings, $topic;
+
+		// Release session lock early to prevent blocking concurrent asset/navigation requests
+		session_write_close();
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
