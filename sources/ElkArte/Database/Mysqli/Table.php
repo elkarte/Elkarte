@@ -74,6 +74,30 @@ class Table extends AbstractTable
 	/**
 	 * {@inheritDoc}
 	 */
+	public function rename_table($old_name, $new_name)
+	{
+		$old_name = str_replace('{db_prefix}', $this->_db_prefix, $old_name);
+		$new_name = str_replace('{db_prefix}', $this->_db_prefix, $new_name);
+
+		// First - no way do we touch our tables.
+		if (in_array(strtolower($old_name), $this->_reservedTables, true))
+		{
+			return false;
+		}
+
+		$this->_db->query('', '
+			RENAME TABLE `' . $old_name . '` TO `' . $new_name . '`',
+			[
+				'security_override' => true,
+			]
+		);
+
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	protected function _real_prefix()
 	{
 		return preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
@@ -572,7 +596,7 @@ class Table extends AbstractTable
 			$columns = implode(',', $index['columns']);
 
 			// Primary goes in the table...
-			if (isset($index['type']) && $index['type'] == 'primary')
+			if (isset($index['type']) && $index['type'] === 'primary')
 			{
 				$index_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
 			}
@@ -588,5 +612,13 @@ class Table extends AbstractTable
 		}
 
 		return $index_query;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function _quote_column_name($column): string
+	{
+		return '`' . str_replace('`', '``', $column) . '`';
 	}
 }
