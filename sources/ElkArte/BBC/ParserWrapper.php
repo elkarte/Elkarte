@@ -41,6 +41,9 @@ final class ParserWrapper
 	/** @var MarkdownParser */
 	protected $markdown_parser;
 
+	/** @var array Parsers grouped by area */
+	protected $parsers = [];
+
 	/** @var bool If smileys are enabled */
 	protected $smileys_enabled = true;
 
@@ -139,6 +142,11 @@ final class ParserWrapper
 	 */
 	protected function getParsersByArea($area): array
 	{
+		if (isset($this->parsers[$area]))
+		{
+			return $this->parsers[$area];
+		}
+
 		$parsers = [
 			'autolink' => false,
 			'html' => false,
@@ -153,10 +161,15 @@ final class ParserWrapper
 			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', [&$parser, $this]);
 
 			// If not, use the default one
-			$parser = $this->{'get' . ucfirst($parser_type) . 'Parser'}($area);
+			if (empty($parser))
+			{
+				$parser = $this->{'get' . ucfirst($parser_type) . 'Parser'}($area);
+			}
 		}
 
-		return $parsers;
+		$this->parsers[$area] = $parsers;
+
+		return $this->parsers[$area];
 	}
 
 	/**
