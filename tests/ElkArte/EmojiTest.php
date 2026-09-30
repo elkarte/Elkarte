@@ -152,4 +152,24 @@ class EmojiTest extends ElkArteCommonSetupTest
 		$this->assertStringContainsString('data-emoji-code="1f600"', $result);
 		$this->assertStringContainsString('src="http://127.0.0.1/smileys/tw-emoji/1f600.svg"', $result);
 	}
+
+	/**
+	 * Test getCodeByName mapping shortcodes to hex codes
+	 */
+	public function testGetCodeByName()
+	{
+		$emoji = Emoji::instance();
+
+		// Shortcode without colons
+		$this->assertEquals('1f600', $emoji->getCodeByName('grinning'));
+		$this->assertEquals('1f44d', $emoji->getCodeByName('thumbsup'));
+		$this->assertEquals('1f44d', $emoji->getCodeByName('+1'));
+
+		// Shortcode with colons
+		$this->assertEquals('1f600', $emoji->getCodeByName(':grinning:'));
+		$this->assertEquals('1f44d', $emoji->getCodeByName(':+1:'));
+
+		// Non-existent shortcode
+		$this->assertNull($emoji->getCodeByName('not_a_real_emoji_name'));
+	}
 }

@@ -401,7 +401,7 @@ var disableDrafts = false;
 				script.src = scriptUrl;
 				script.async = true;
 				script.onload = () => resolve(script);
-				script.onerror = () => reject(new Error(`Script load error for ${src}`));
+				script.onerror = () => reject(new Error(`Script load error for ${scriptUrl}`));
 
 				document.head.append(script);
 			});

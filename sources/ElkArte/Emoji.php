@@ -223,6 +223,21 @@ class Emoji extends AbstractModel
 	}
 
 	/**
+	 * Get the emoji hex code for a given shortcode name.
+	 *
+	 * @param string $name
+	 * @return string|null
+	 */
+	public function getCodeByName(string $name): ?string
+	{
+		$this->setSearchReplaceRegex();
+
+		$name = trim($name, ':');
+
+		return $this->shortcode_replace[$name] ?? null;
+	}
+
+	/**
 	 * Takes a shortcode array and, if available, converts it to an <img> emoji
 	 *
 	 * - Uses an input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
