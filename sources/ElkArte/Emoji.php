@@ -30,7 +30,7 @@ class Emoji extends AbstractModel
 	private const POSSIBLE_HTML_EMOJI = '~(&#x[a-fA-F\d]{5,6};|&#\d{5,6};)~';
 
 	/** @var string regex to check if any emoji characters appear in the string */
-	private const POSSIBLE_EMOJI = '~\p{Extended_Pictographic}|[\x{1F1E6}-\x{1F1FF}\x{20E3}]~u';
+	private const POSSIBLE_EMOJI = '~[\x{1F000}-\x{1FAFF}\x{2300}-\x{27BF}\x{2B00}-\x{2BFF}\x{203C}\x{2049}\x{2122}\x{2139}\x{2194}-\x{21AA}\x{24C2}\x{2934}-\x{2935}\x{3030}\x{303D}\x{3297}\x{3299}\x{00A9}\x{00AE}\x{20E3}]~u';
 
 	/** @var string used to find :emoji: style codes */
 	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~u';
@@ -47,8 +47,8 @@ class Emoji extends AbstractModel
 	/** @var string[] Array of hex codes to known emoji shortcode names */
 	public $code_to_shortcode = [];
 
-	/** @var string Supported emoji -> image regex 8.1+ only */
-	public $emoji_regex = '~\x{1F1E6}[\x{1F1E6}-\x{1F1FF}]|(?:\p{Extended_Pictographic}(?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?)(?:\x{200D}(?:\p{Extended_Pictographic}(?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?))*~u';
+	/** @var string Supported emoji -> image regex */
+	public $emoji_regex = '~\x{1F3F4}[\x{E0020}-\x{E007F}]+|[\x{1F1E6}-\x{1F1FF}]{2}|[#*0-9]\x{FE0F}?\x{20E3}|(?:[\x{1F000}-\x{1FAFF}\x{2300}-\x{27BF}\x{2B00}-\x{2BFF}\x{203C}\x{2049}\x{2122}\x{2139}\x{2194}-\x{21AA}\x{24C2}\x{2934}-\x{2935}\x{3030}\x{303D}\x{3297}\x{3299}\x{00A9}\x{00AE}](?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?)(?:\x{200D}(?:[\x{1F000}-\x{1FAFF}\x{2300}-\x{27BF}\x{2B00}-\x{2BFF}\x{203C}\x{2049}\x{2122}\x{2139}\x{2194}-\x{21AA}\x{24C2}\x{2934}-\x{2935}\x{3030}\x{303D}\x{3297}\x{3299}\x{00A9}\x{00AE}](?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?))*~u';
 
 	/**
 	 * Emoji constructor.
@@ -274,9 +274,9 @@ class Emoji extends AbstractModel
 	/**
 	 * Searches a string for Unicode points and replaces them with emoji <img> tags
 	 *
-	 * Uses \p{Extended_Pictographic}|[\x{1F1E6}-\x{1F1FF}\x{20E3}] as a fast pre-filter
-	 * to detect if emoji characters may be present. If this passes, then the
-	 * full emoji regex will be used to precisely find and replace supported codepoints.
+	 * Uses POSSIBLE_EMOJI as a fast pre-filter to detect if emoji characters
+	 * may be present. If this passes, then the full emoji regex will be used
+	 * to precisely find and replace supported codepoints.
 	 *
 	 * @param $string
 	 * @return string
