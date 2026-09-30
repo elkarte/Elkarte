@@ -53,6 +53,7 @@ class Jslocale extends AbstractController
 
 		// Get the sub action or set a default, call integrate_sa_avatar_settings
 		$subAction = $action->initialize($subActions);
+		session_write_close();
 		$action->dispatch($subAction);
 	}
 

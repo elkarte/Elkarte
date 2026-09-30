@@ -64,6 +64,9 @@ class XmlPreview extends AbstractController
 		// Set up the template and default sub-template.
 		$context['sub_template'] = 'generic_xml';
 
+		// Close the session to avoid blocking other requests while we do the preview
+		session_write_close();
+
 		// A preview it is then
 		$action->dispatch($subAction);
 	}

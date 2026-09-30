@@ -264,4 +264,31 @@ class ImageTest extends TestCase
 		$this->assertIsArray(getimagesizefromstring($jpeg));
 		$this->assertIsArray(getimagesizefromstring($gif));
 	}
+
+	public function testMemoryCheckNormalImage()
+	{
+		$png = $this->createPng(50, 50, false);
+		$img = new Image($png, true);
+
+		$this->assertTrue($img->isImageLoaded());
+		$this->assertTrue($img->memoryCheck());
+	}
+
+	public function testMemoryCheckOversizedImage()
+	{
+		// Create a mock JPEG with 50,000 x 50,000 dimensions in header
+		$rawJpeg = "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x01\x00`\x00`\x00\x00\xFF\xC0\x00\x11\x08\xC3\x50\xC3\x50\x03\x01\x22\x00\x02\x11\x01\x03\x11\x01\xFF\xD9";
+		$path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oversized_' . uniqid('', true) . '.jpg';
+		file_put_contents($path, $rawJpeg);
+		$this->tmp_files[] = $path;
+
+		$gd = new Gd2($path);
+		$dimensions = $gd->getImageDimensions();
+		$this->assertSame(50000, $dimensions[0]);
+		$this->assertSame(50000, $dimensions[1]);
+
+		// Creating an Image instance should not crash and should reject loading due to memory or invalid stream
+		$img = new Image($path, true);
+		$this->assertFalse($img->isImageLoaded());
+	}
 }

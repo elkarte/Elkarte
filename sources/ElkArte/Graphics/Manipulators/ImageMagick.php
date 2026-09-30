@@ -88,6 +88,11 @@ class ImageMagick extends AbstractManipulator
 			$heic = str_contains($mime, 'heic') || str_contains($mime, 'heif');
 		}
 
+		if (!$this->memoryCheck())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]) || $heic)
 		{
 			try
@@ -146,6 +151,12 @@ class ImageMagick extends AbstractManipulator
 		}
 
 		$this->setImageDimensions('string', $image_data);
+
+		if (!$this->memoryCheck())
+		{
+			return false;
+		}
+
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try

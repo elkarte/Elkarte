@@ -44,6 +44,9 @@ class Loader
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
 
+	/** @var bool[] Holds the name of the files already loaded from the database to query them only once */
+	protected $dbLoaded = [];
+
 	/**
 	 * The constructor
 	 *
@@ -56,7 +59,7 @@ class Loader
 	{
 		global $language;
 
-		$this->path = LANGUAGEDIR . '/';
+		$this->path = (defined('LANGUAGEDIR') ? LANGUAGEDIR : (defined('SOURCEDIR') ? SOURCEDIR . '/ElkArte/Languages' : __DIR__)) . '/';
 		$this->db = $db;
 		$this->variable = &$variable;
 		$this->variableName = $variable_name;
@@ -207,10 +210,29 @@ class Loader
 	/**
 	 * Load in a custom replacement string from the DB
 	 *
-	 * @param string[] $files
+	 * @param string[]|string $files
 	 */
 	protected function loadFromDb($files): void
 	{
+		$files = (array) $files;
+		$to_load = [];
+		foreach ($files as $file)
+		{
+			$file = trim((string) $file);
+			if ($file === '' || isset($this->dbLoaded[$file]))
+			{
+				continue;
+			}
+
+			$this->dbLoaded[$file] = true;
+			$to_load[] = $file;
+		}
+
+		if (empty($to_load))
+		{
+			return;
+		}
+
 		$result = $this->db->fetchQuery('
 			SELECT 
 				language_key, value
@@ -219,7 +241,7 @@ class Loader
 				AND file IN ({array_string:files})',
 			[
 				'language' => $this->language,
-				'files' => $files
+				'files' => $to_load
 			]
 		);
 		while ($row = $result->fetch_assoc())

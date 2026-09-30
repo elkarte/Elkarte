@@ -154,6 +154,11 @@ class Image
 			// Nothing to do
 		}
 
+		if ($this->_manipulator === null)
+		{
+			return;
+		}
+
 		if ($this->isWebAddress())
 		{
 			$success = $this->_manipulator->createImageFromWeb();
@@ -167,6 +172,19 @@ class Image
 		{
 			$this->_image_loaded = true;
 		}
+	}
+
+	/**
+	 * See if we have enough memory to thumbnail/process an image
+	 *
+	 * @param bool $fatal if to throw an exception on lack of memory
+	 *
+	 * @return bool Whether the memory is available.
+	 * @throws \Exception
+	 */
+	public function memoryCheck($fatal = false): bool
+	{
+		return $this->_manipulator !== null && $this->_manipulator->memoryCheck($fatal);
 	}
 
 	/**
