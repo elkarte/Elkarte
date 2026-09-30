@@ -43,11 +43,10 @@ class FileFunctions
 		foreach ($modes as $mode)
 		{
 			$this->elk_chmod($item, $mode);
+			clearstatcache(false, $item);
 
 			if ($this->isWritable($item))
 			{
-				clearstatcache(false, $item);
-
 				return true;
 			}
 		}
@@ -69,43 +68,48 @@ class FileFunctions
 	public function elk_chmod($item, $mode = ''): bool
 	{
 		$result = false;
-		$mode = trim($mode);
 
-		if (empty($mode) || !is_numeric($mode))
+		if (is_string($mode))
+		{
+			$mode = trim($mode);
+			if ($mode === '' || !is_numeric($mode))
+			{
+				$mode = $this->isDir($item) ? 0755 : 0644;
+			}
+			elseif (preg_match('/^0?[0-7]{3,4}$/', $mode))
+			{
+				$mode = (int) octdec($mode);
+			}
+			else
+			{
+				$mode = (int) $mode;
+			}
+		}
+		elseif (is_int($mode))
+		{
+			// If mode was passed as a decimal number representing octal digits (e.g. 755 or 644 instead of 0755 or 0644)
+			if ($mode >= 600 && $mode <= 777 && preg_match('/^[0-7]{3}$/', (string) $mode))
+			{
+				$mode = (int) octdec((string) $mode);
+			}
+		}
+		else
 		{
 			$mode = $this->isDir($item) ? 0755 : 0644;
 		}
 
-		// Make sure we have a form of 0777 or '777' or '0777' so it's safe for intval '8'
-		if (($mode % 10) >= 8)
+		// Ensure $mode is an integer within valid permission bit range
+		if (is_int($mode) && $mode >= 0 && $mode <= 07777)
 		{
-			$mode = decoct($mode);
-		}
-
-		// All numbers and outside the octal range, safely convert to octal
-		if (ctype_digit((string) $mode) && preg_match('~[8-9]~', $mode))
-		{
-			$mode = decoct($mode);
-		}
-
-		// Happens when passed the octal value 0777 (not string) which is 511 decimal, we work on the
-		// assumption no one is trying to do a chmod 511
-		if (in_array($mode, [511, 420, 436], true))
-		{
-			$mode = decoct($mode);
-		}
-
-		if ($mode == decoct(octdec($mode)))
-		{
-			return @chmod($item, intval($mode, 8));
+			$result = @chmod($item, $mode);
 		}
 
 		return $result;
 	}
 
 	/**
-	 * is_dir() helper using spl functions. is_dir can throw an exception if open_basedir
-	 * restrictions are in effect.
+	 * is_dir() helper using spl functions.
+	 * Returns true if the path is an existing directory or a link pointing to a directory.
 	 *
 	 * @param string $dir
 	 * @return bool
@@ -114,23 +118,17 @@ class FileFunctions
 	{
 		try
 		{
-			$splDir = new \SplFileInfo($dir);
-			if ($splDir->isDir() && $splDir->getType() === 'dir' && !$splDir->isLink())
-			{
-				return true;
-			}
+			return (new \SplFileInfo($dir))->isDir();
 		}
 		catch (\RuntimeException)
 		{
 			return false;
 		}
-
-		return false;
 	}
 
 	/**
-	 * file_exists() helper. file_exists can throw an E_WARNING on failure.
-	 * Returns true if the filename (not a directory or link) exists.
+	 * file_exists() helper.
+	 * Returns true if the filename (file or link) exists.
 	 *
 	 * @param string $item a file or directory location
 	 * @return bool
@@ -140,17 +138,12 @@ class FileFunctions
 		try
 		{
 			$fileInfo = new \SplFileInfo($item);
-			if ($fileInfo->isFile() && !$fileInfo->isLink())
-			{
-				return true;
-			}
+			return $fileInfo->isFile() || $fileInfo->isLink();
 		}
 		catch (\RuntimeException)
 		{
 			return false;
 		}
-
-		return false;
 	}
 
 	/**
@@ -178,7 +171,7 @@ class FileFunctions
 	}
 
 	/**
-	 * filesize() helper.  filesize can throw an E_WARNING on failure.
+	 * filesize() helper. filesize can throw an E_WARNING on failure.
 	 * Returns the filesize in bytes on success or false on failure.
 	 *
 	 * @param string $item a file location
@@ -200,7 +193,7 @@ class FileFunctions
 	}
 
 	/**
-	 * is_writable() helper.  is_writable can throw an E_WARNING on failure.
+	 * is_writable() helper. is_writable can throw an E_WARNING on failure.
 	 * Returns true if the filename/directory exists and is writable.
 	 *
 	 * @param string $item a file or directory location
@@ -225,10 +218,7 @@ class FileFunctions
 	}
 
 	/**
-	 * file_get_contents() helper using SPL to avoid PHP warnings.
-	 *
-	 * - Uses SplFileObject so failures throw RuntimeException which we catch.
-	 * - Consolidates error suppression for reading file contents.
+	 * file_get_contents() helper with error suppression.
 	 *
 	 * @param string $filename The file to read
 	 *
@@ -236,22 +226,12 @@ class FileFunctions
 	 */
 	public function fileGetContents($filename)
 	{
-		try
-		{
-			// Open using SPL so errors are exceptions we can catch
-			$file = new \SplFileObject($filename, 'rb');
-			$contents = '';
-			while (!$file->eof())
-			{
-				$contents .= $file->fread(1048576); // 1 MB chunks
-			}
-
-			return $contents;
-		}
-		catch (\RuntimeException)
+		if (!$this->fileExists($filename) && !is_file($filename))
 		{
 			return false;
 		}
+
+		return @file_get_contents($filename);
 	}
 
 	/**
@@ -270,10 +250,19 @@ class FileFunctions
 	 */
 	public function createDirectory($path, $makeSecure = true): bool
 	{
-		// Path already exists?
-		if (file_exists($path))
+		if (empty($path))
 		{
-			if ($this->isDir($path))
+			throw new Exception('attachments_no_create');
+		}
+
+		// Normalize windows and linux paths
+		$normalizedPath = str_replace('\\', '/', $path);
+		$normalizedPath = rtrim($normalizedPath, '/');
+
+		// Path already exists?
+		if (file_exists($normalizedPath))
+		{
+			if ($this->isDir($normalizedPath))
 			{
 				return true;
 			}
@@ -282,73 +271,114 @@ class FileFunctions
 			throw new Exception('attach_dir_duplicate_file');
 		}
 
-		// Normalize windows and linux path's
-		$path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
-		$path = rtrim($path, DIRECTORY_SEPARATOR);
+		// If relative path and does not exist, prefix with BOARDDIR if defined
+		$isAbsolute = str_starts_with($normalizedPath, '/')
+			|| (str_starts_with(PHP_OS_FAMILY, 'Win') && preg_match('/^[a-zA-Z]:\//', $normalizedPath))
+			|| str_starts_with($normalizedPath, '//');
 
-		$tree = explode(DIRECTORY_SEPARATOR, $path);
-		$count = empty($tree) ? 0 : count($tree);
-		$partialTree = '';
-
-		// Make sure we have a valid path format
-		$directory = empty($tree) ? false : $this->_initDir($tree, $count);
-		if ($directory === false)
+		if (!$isAbsolute && defined('BOARDDIR') && !file_exists($normalizedPath))
 		{
-			// Maybe it's just the folder name
-			$tree = explode(DIRECTORY_SEPARATOR, BOARDDIR . DIRECTORY_SEPARATOR . $path);
-			$count = empty($tree) ? 0 : count($tree);
-
-			$directory = empty($tree) ? false : $this->_initDir($tree, $count);
-			if ($directory === false)
-			{
-				throw new Exception('attachments_no_create');
-			}
+			$boardDirNormalized = rtrim(str_replace('\\', '/', BOARDDIR), '/');
+			$normalizedPath = $boardDirNormalized . '/' . $normalizedPath;
 		}
 
-		// Walk down the path until we find a part that exists
-		for ($i = $count - 1; $i >= 0; $i--)
+		// Split into path segments and root prefix
+		if (str_starts_with(PHP_OS_FAMILY, 'Win') && preg_match('/^([a-zA-Z]:)(\/.*)?$/', $normalizedPath, $matches))
 		{
-			$partialTree = $directory . DIRECTORY_SEPARATOR . implode('/', array_slice($tree, 0, $i + 1));
-			// If this exists, let's ensure it is a directory
-			if (file_exists($partialTree))
+			$prefix = $matches[1];
+			$rest = $matches[2] ?? '';
+			$segments = array_values(array_filter(explode('/', $rest), 'strlen'));
+		}
+		elseif (str_starts_with($normalizedPath, '//'))
+		{
+			$parts = array_values(array_filter(explode('/', $normalizedPath), 'strlen'));
+			if (count($parts) >= 2)
 			{
-				if (!is_dir($partialTree))
-				{
-					throw new Exception('attach_dir_duplicate_file');
-				}
-
-				break;
+				$prefix = '//' . $parts[0] . '/' . $parts[1];
+				$segments = array_slice($parts, 2);
+			}
+			else
+			{
+				$prefix = '//';
+				$segments = $parts;
 			}
 		}
+		elseif (str_starts_with($normalizedPath, '/'))
+		{
+			$prefix = '';
+			$segments = array_values(array_filter(explode('/', $normalizedPath), 'strlen'));
+		}
+		else
+		{
+			$prefix = '';
+			$segments = array_values(array_filter(explode('/', $normalizedPath), 'strlen'));
+		}
 
-		// Can't find this path anywhere
-		if ($i < 0)
+		if (empty($segments) && empty($prefix))
 		{
 			throw new Exception('attachments_no_create');
 		}
 
-		// Walk forward and create the missing parts
-		for ($i++; $i < $count; $i++)
+		// Walk down the path until we find a part that exists
+		$count = count($segments);
+		$existingIndex = -1;
+		$currentPath = '';
+
+		for ($i = $count - 1; $i >= 0; $i--)
 		{
-			$partialTree .= '/' . $tree[$i];
-			if (!mkdir($partialTree) && !$this->isDir($partialTree))
+			$testPath = $prefix . '/' . implode('/', array_slice($segments, 0, $i + 1));
+			if (file_exists($testPath))
 			{
-				return false;
+				if (!is_dir($testPath))
+				{
+					throw new Exception('attach_dir_duplicate_file');
+				}
+
+				$existingIndex = $i;
+				$currentPath = $testPath;
+				break;
+			}
+		}
+
+		if ($existingIndex === -1)
+		{
+			$basePrefix = $prefix === '' ? '/' : $prefix . '/';
+			if (!file_exists($basePrefix) || !is_dir($basePrefix))
+			{
+				throw new Exception('attachments_no_create');
+			}
+			$currentPath = rtrim($basePrefix, '/');
+		}
+
+		// Walk forward and create the missing parts
+		for ($i = $existingIndex + 1; $i < $count; $i++)
+		{
+			$currentPath .= '/' . $segments[$i];
+			if (!file_exists($currentPath))
+			{
+				if (!@mkdir($currentPath, 0755) && !$this->isDir($currentPath))
+				{
+					return false;
+				}
+			}
+			elseif (!is_dir($currentPath))
+			{
+				throw new Exception('attach_dir_duplicate_file');
 			}
 
 			// Make it writable
-			if (!$this->chmod($partialTree))
+			if (!$this->chmod($currentPath))
 			{
 				throw new Exception('attachments_no_write');
 			}
 
-			if ($makeSecure)
+			if ($makeSecure && function_exists('secureDirectory'))
 			{
-				secureDirectory($partialTree, true);
+				secureDirectory($currentPath, true);
 			}
 		}
 
-		clearstatcache(false, $partialTree);
+		clearstatcache(false, $currentPath);
 
 		return true;
 	}
@@ -356,18 +386,31 @@ class FileFunctions
 	/**
 	 * Deletes a file (not a directory) at a given location
 	 *
-	 * @param $path
+	 * @param string $path
 	 * @return bool
 	 */
 	public function delete($path): bool
 	{
-		if (!$this->fileExists($path) || !$this->isWritable($path))
+		if (!is_file($path) && !is_link($path) && !$this->fileExists($path))
 		{
 			return false;
 		}
 
 		error_clear_last();
-		return @unlink($path);
+		$result = @unlink($path);
+
+		if (!$result && ($this->fileExists($path) || is_file($path) || is_link($path)))
+		{
+			$this->chmod($path);
+			$result = @unlink($path);
+		}
+
+		if ($result)
+		{
+			clearstatcache(false, $path);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -390,64 +433,49 @@ class FileFunctions
 		$iterator = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
 		$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
 
-		/** @var \FilesystemIterator $file */
+		/** @var \SplFileInfo $file */
 		foreach ($files as $file)
 		{
-			// If its not writable try to make it so or removal will fail
-			if ($file->isWritable() || $this->chmod($file->getRealPath()))
+			$target = $file->getPathname();
+
+			// If it's a directory (and not a symlink to a directory)
+			if ($file->isDir() && !$file->isLink())
 			{
-				if ($delete_dir && $file->isDir())
+				if ($delete_dir)
 				{
-					$success = $success && rmdir($file->getRealPath());
-				}
-				else
-				{
-					$success = $success && @unlink($file->getRealPath());
+					if (!$file->isWritable())
+					{
+						$this->chmod($target);
+					}
+
+					$success = @rmdir($target) && $success;
 				}
 			}
 			else
 			{
-				$success = false;
+				// It's a file or symlink
+				if (!$file->isWritable() && !$file->isLink())
+				{
+					$this->chmod($target);
+				}
+
+				$success = @unlink($target) && $success;
 			}
 		}
 
-		return $success && rmdir($path);
-	}
-
-	/**
-	 * Helper function for createDirectory
-	 *
-	 * What it does:
-	 *
-	 * - Gets the directory w/o drive letter for windows
-	 *
-	 * @param string[] $tree
-	 * @param int $count
-	 * @return false|string|null
-	 */
-	private function _initDir(&$tree, &$count)
-	{
-		$directory = '';
-
-		// If on Windows servers, the first part of the path is the drive (e.g. "C:")
-		if (str_starts_with(PHP_OS_FAMILY, 'Win'))
+		if ($delete_dir)
 		{
-			// Better be sure that the first part of the path is actually a drive letter...
-			// ...even if I should check this in the admin page...isn't it?
-			// ...NHAAA Let's leave space for users' complains! :P
-			if (preg_match('/^[a-z]:$/i', $tree[0]))
+			if (!$this->isWritable($path))
 			{
-				$directory = array_shift($tree);
-			}
-			else
-			{
-				return false;
+				$this->chmod($path);
 			}
 
-			$count--;
+			$success = @rmdir($path) && $success;
 		}
 
-		return $directory;
+		clearstatcache(false, $path);
+
+		return $success;
 	}
 
 	/**
@@ -464,6 +492,9 @@ class FileFunctions
 			return $tree;
 		}
 
+		$normalizedBasePath = rtrim(str_replace('\\', '/', $path), '/');
+		$baseLength = strlen($normalizedBasePath);
+
 		$iterator = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
 		$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
 		/** @var \SplFileInfo $file */
@@ -474,7 +505,12 @@ class FileFunctions
 				continue;
 			}
 
-			$sub_path = str_replace($path, '', $file->getPath());
+			$filePath = str_replace('\\', '/', $file->getPath());
+			$sub_path = '';
+			if (str_starts_with($filePath, $normalizedBasePath))
+			{
+				$sub_path = ltrim(substr($filePath, $baseLength), '/');
+			}
 
 			$tree[] = [
 				'filename' => $sub_path === '' ? $file->getFilename() : $sub_path . '/' . $file->getFilename(),
@@ -499,5 +535,16 @@ class FileFunctions
 		}
 
 		return self::$_instance;
+	}
+
+	/**
+	 * Set or reset the singleton instance (useful for testing)
+	 *
+	 * @param FileFunctions|null $instance
+	 * @return void
+	 */
+	public static function setInstance(?FileFunctions $instance = null): void
+	{
+		self::$_instance = $instance;
 	}
 }
