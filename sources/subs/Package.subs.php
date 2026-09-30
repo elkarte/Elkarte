@@ -629,6 +629,12 @@ function deltree($dir, $delete_dir = true)
 		return;
 	}
 
+	if (!isset($package_ftp))
+	{
+		$fileFunc->rmDir($dir, $delete_dir);
+		return;
+	}
+
 	// Read all the files and directories in the parent directory
 	$iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
 	$entrynames = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD);
@@ -638,66 +644,35 @@ function deltree($dir, $delete_dir = true)
 	{
 		if ($entryname->isDir() && $delete_dir)
 		{
-			if (isset($package_ftp))
+			$ftp_file = setFtpName($entryname->getRealPath());
+
+			if (!$fileFunc->isWritable($ftp_file . '/'))
 			{
-				$ftp_file = setFtpName($entryname->getRealPath());
-
-				if (!$fileFunc->isWritable($ftp_file . '/'))
-				{
-					$package_ftp->chmod($ftp_file, 0777);
-				}
-
-				$package_ftp->unlink($ftp_file);
+				$package_ftp->chmod($ftp_file, 0777);
 			}
-			else
-			{
-				if (!$fileFunc->isWritable($entryname))
-				{
-					$fileFunc->chmod($entryname->getRealPath());
-				}
 
-				@rmdir($entryname->getRealPath());
-			}
+			$package_ftp->unlink($ftp_file);
 		}
 		// A file, delete it by any means necessary
 		else
 		{
-			if (isset($package_ftp))
+			// Here, 755 doesn't really matter since we're deleting it anyway.
+			$ftp_file = setFtpName($entryname->getPathname());
+
+			if (!$fileFunc->isWritable($ftp_file))
 			{
-				// Here, 755 doesn't really matter since we're deleting it anyway.
-				$ftp_file = setFtpName($entryname->getPathname());
-
-				if (!$fileFunc->isWritable($ftp_file))
-				{
-					$package_ftp->chmod($ftp_file, 0777);
-				}
-
-				$package_ftp->unlink($ftp_file);
+				$package_ftp->chmod($ftp_file, 0777);
 			}
-			else
-			{
-				if (!$entryname->isWritable())
-				{
-					$fileFunc->chmod($entryname->getRealPath());
-				}
 
-				$fileFunc->delete($entryname->getRealPath());
-			}
+			$package_ftp->unlink($ftp_file);
 		}
 	}
 
 	// Finish off with the directory itself
 	if ($delete_dir)
 	{
-		if (isset($package_ftp))
-		{
-			$ftp_file = setFtpName(realpath($dir));
-			$package_ftp->unlink($ftp_file);
-		}
-		else
-		{
-			@rmdir(realpath($dir));
-		}
+		$ftp_file = setFtpName(realpath($dir));
+		$package_ftp->unlink($ftp_file);
 	}
 }
 
