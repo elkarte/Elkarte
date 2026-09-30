@@ -13,7 +13,6 @@ namespace ElkArte;
 
 use BBC\PreparseCode;
 use ElkArte\Cache\Cache;
-use ElkArte\Helper\Util;
 
 /**
  * Class Emoji
@@ -30,8 +29,8 @@ class Emoji extends AbstractModel
 	 * This is how 4-byte characters are stored in the utf-8 db. */
 	private const POSSIBLE_HTML_EMOJI = '~(&#x[a-fA-F\d]{5,6};|&#\d{5,6};)~';
 
-	/** @var string regex to check if any none letter characters appear in the string */
-	private const POSSIBLE_EMOJI = '~([^\p{L}\x00-\x7F]+)~u';
+	/** @var string regex to check if any emoji characters appear in the string */
+	private const POSSIBLE_EMOJI = '~\p{Extended_Pictographic}|[\x{1F1E6}-\x{1F1FF}\x{20E3}]~u';
 
 	/** @var string used to find :emoji: style codes */
 	private const EMOJI_NAME = '~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~u';
@@ -44,6 +43,9 @@ class Emoji extends AbstractModel
 
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
+
+	/** @var string[] Array of hex codes to known emoji shortcode names */
+	public $code_to_shortcode = [];
 
 	/** @var string Supported emoji -> image regex 8.1+ only */
 	public $emoji_regex = '~\x{1F1E6}[\x{1F1E6}-\x{1F1FF}]|(?:\p{Extended_Pictographic}(?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?)(?:\x{200D}(?:\p{Extended_Pictographic}(?:\x{FE0F})?(?:[\x{1F3FB}-\x{1F3FF}])?))*~u';
@@ -194,29 +196,30 @@ class Emoji extends AbstractModel
 		$this->setSearchReplaceRegex();
 
 		// Is it one we have in our library?
-		if ($key = (array_search($hex, $this->shortcode_replace, true)))
+		if (isset($this->code_to_shortcode[$hex]))
 		{
-			return $key;
+			return $this->code_to_shortcode[$hex];
 		}
 
 		// If it does not end in -fe0f / Variation Selector-16, then give that a try.
 		if (!str_ends_with($hex, '-fe0f'))
 		{
-			if ($key = (array_search($hex . '-fe0f', $this->shortcode_replace, true)))
+			if (isset($this->code_to_shortcode[$hex . '-fe0f']))
 			{
-				return $key;
+				return $this->code_to_shortcode[$hex . '-fe0f'];
 			}
 
 			return false;
 		}
 
 		// Try it w/o any trailing -fe0f and see if we get a match
-		if (!($key = (array_search(substr($hex, 0, -5), $this->shortcode_replace, true))))
+		$trimmedHex = substr($hex, 0, -5);
+		if (isset($this->code_to_shortcode[$trimmedHex]))
 		{
-			return false;
+			return $this->code_to_shortcode[$trimmedHex];
 		}
 
-		return $key;
+		return false;
 	}
 
 	/**
@@ -256,10 +259,9 @@ class Emoji extends AbstractModel
 	/**
 	 * Searches a string for Unicode points and replaces them with emoji <img> tags
 	 *
-	 * We use [^\p{L}\x00-\x7F]+ which will match any non-letter character including
-	 * symbols, currency signs, dingbats, box-drawing characters, etc. This is an
-	 * easier regex but with more "false" hits for what we want.  If this passes, then the
-	 * full emoji regex will be used to precisely find supported codepoints
+	 * Uses \p{Extended_Pictographic}|[\x{1F1E6}-\x{1F1FF}\x{20E3}] as a fast pre-filter
+	 * to detect if emoji characters may be present. If this passes, then the
+	 * full emoji regex will be used to precisely find and replace supported codepoints.
 	 *
 	 * @param $string
 	 * @return string
@@ -337,14 +339,49 @@ class Emoji extends AbstractModel
 	 */
 	public function unicodeCharacterToNumber($code): string
 	{
-		$points = [];
-
 		// Strip skin tones as none of the libraries support them
-		$code = preg_replace('/[\x{1F3FB}\x{1F3FC}\x{1F3FD}\x{1F3FE}\x{1F3FF}]/u', '', $code);
+		$code = preg_replace('~[\x{1F3FB}-\x{1F3FF}]~u', '', $code);
 
-		for ($i = 0; $i < Util::strlen($code); $i++)
+		if (function_exists('mb_ord') && function_exists('mb_str_split'))
 		{
-			$points[] = str_pad(strtolower(dechex(Util::getUnicodeOrdinal(Util::substr($code, $i, 1)))), 4, '0', STR_PAD_LEFT);
+			$points = [];
+			foreach (mb_str_split($code) as $char)
+			{
+				$points[] = str_pad(dechex(mb_ord($char)), 4, '0', STR_PAD_LEFT);
+			}
+
+			return implode('-', $points);
+		}
+
+		$bytes = unpack('C*', $code);
+		if ($bytes === false || empty($bytes))
+		{
+			return '';
+		}
+
+		$points = [];
+		$len = count($bytes);
+		for ($i = 1; $i <= $len;)
+		{
+			$b1 = $bytes[$i++];
+			if ($b1 < 0x80)
+			{
+				$ord = $b1;
+			}
+			elseif ($b1 < 0xE0)
+			{
+				$ord = (($b1 & 0x1F) << 6) | ($bytes[$i++] & 0x3F);
+			}
+			elseif ($b1 < 0xF0)
+			{
+				$ord = (($b1 & 0x0F) << 12) | (($bytes[$i++] & 0x3F) << 6) | ($bytes[$i++] & 0x3F);
+			}
+			else
+			{
+				$ord = (($b1 & 0x07) << 18) | (($bytes[$i++] & 0x3F) << 12) | (($bytes[$i++] & 0x3F) << 6) | ($bytes[$i++] & 0x3F);
+			}
+
+			$points[] = str_pad(dechex($ord), 4, '0', STR_PAD_LEFT);
 		}
 
 		return implode('-', $points);
@@ -383,6 +420,18 @@ class Emoji extends AbstractModel
 
 			// Stash for two hours, not like this is going to change
 			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 7200);
+		}
+
+		// Build the reverse array for searching by Unicode code
+		if (empty($this->code_to_shortcode) && !empty($this->shortcode_replace))
+		{
+			foreach ($this->shortcode_replace as $name => $key)
+			{
+				if (!isset($this->code_to_shortcode[$key]))
+				{
+					$this->code_to_shortcode[$key] = $name;
+				}
+			}
 		}
 	}
 
