@@ -76,9 +76,7 @@ $loader->setPsr4('Addons\\', BOARDDIR . '/Addons');
 $loader->setPsr4('Wikimedia\\Minify\\', EXTDIR . '/Wikimedia/Minify');
 $loader->setPsr4('Michelf\\', EXTDIR . '/Michelf');
 // Need to find those tests
-$loader->setPsr4('tests\\', '/home/runner/work/Elkarte/Elkarte/elkarte/tests');
-// Might be useful on your local, just saying
-//$loader->setPsr4('tests\\', '/var/www/tests');
+$loader->setPsr4('tests\\', BOARDDIR . '/tests');
 $loader->register();
 
 // Used by the test, add others as needed or ...

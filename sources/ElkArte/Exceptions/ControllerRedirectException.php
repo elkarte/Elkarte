@@ -37,6 +37,26 @@ class ControllerRedirectException extends \Exception
 	}
 
 	/**
+	 * Returns the target controller name or class.
+	 *
+	 * @return string
+	 */
+	public function getController(): string
+	{
+		return $this->_controller;
+	}
+
+	/**
+	 * Returns the target method to call.
+	 *
+	 * @return string
+	 */
+	public function getMethod(): string
+	{
+		return $this->_method;
+	}
+
+	/**
 	 * Takes care of doing the redirect to the other controller.
 	 *
 	 * @param object $source The controller object that called the method
@@ -45,15 +65,57 @@ class ControllerRedirectException extends \Exception
 	 */
 	public function doRedirect($source)
 	{
-		if (ltrim($source::class, '\\') === ltrim($this->_controller, '\\'))
+		if (empty($this->_controller) && empty($this->_method))
 		{
-			return $source->{$this->_method}();
+			return null;
 		}
 
-		$controller = new $this->_controller(new EventManager());
+		$targetController = $this->_controller;
+		if (!empty($targetController) && !class_exists($targetController))
+		{
+			if (class_exists('\\ElkArte\\Controller\\' . ucfirst($targetController)))
+			{
+				$targetController = '\\ElkArte\\Controller\\' . ucfirst($targetController);
+			}
+			elseif (class_exists('\\ElkArte\\AdminController\\' . ucfirst($targetController)))
+			{
+				$targetController = '\\ElkArte\\AdminController\\' . ucfirst($targetController);
+			}
+		}
+
+		if (empty($targetController) || ltrim($source::class, '\\') === ltrim($targetController, '\\'))
+		{
+			return $this->_callControllerAction($source);
+		}
+
+		$controller = new $targetController(new EventManager(), User::$info);
 		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 
-		return $controller->{$this->_method}();
+		return $this->_callControllerAction($controller);
+	}
+
+	/**
+	 * Executes the target method on the controller instance, triggering lifecycle integration hooks.
+	 *
+	 * @param object $controller The controller instance to invoke
+	 * @return mixed
+	 */
+	protected function _callControllerAction($controller)
+	{
+		$hook = is_callable([$controller, 'getHook']) ? $controller->getHook() : '';
+		if (!empty($hook) && function_exists('call_integration_hook'))
+		{
+			call_integration_hook('integrate_action_' . $hook . '_before', [$this->_method]);
+		}
+
+		$result = $controller->{$this->_method}();
+
+		if (!empty($hook) && function_exists('call_integration_hook'))
+		{
+			call_integration_hook('integrate_action_' . $hook . '_after', [$this->_method]);
+		}
+
+		return $result;
 	}
 }

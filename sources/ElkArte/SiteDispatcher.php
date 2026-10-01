@@ -27,13 +27,15 @@ use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
 use ElkArte\Controller\ModerationCenter;
 use ElkArte\Controller\News;
-use ElkArte\PersonalMessage\PersonalMessage;
 use ElkArte\Controller\Post;
 use ElkArte\Controller\SplitTopics;
 use ElkArte\Controller\Unread;
 use ElkArte\Controller\Xml;
+use ElkArte\Exceptions\ControllerRedirectException;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\ValuesContainer;
+use ElkArte\PersonalMessage\PersonalMessage;
 use ElkArte\Profile\Profile;
 use ElkArte\Profile\ProfileHistory;
 use ElkArte\Profile\ProfileInfo;
@@ -403,27 +405,77 @@ class SiteDispatcher
 	 * - Calls generic post (_after) integration hook based on the controllers class name.
 	 *   - e.g., integrate_action_draft_after will be called after \ElkArte\Controller\Draft assuming it returns
 	 * normally from the controller (e.g., no fatal error, no redirect)
+	 * - Catches ControllerRedirectException to cleanly hand off execution to another controller or action
 	 *
 	 * @event integrate_action_xyz_before
 	 * @event integrate_action_xyz_after
 	 */
 	public function dispatch()
 	{
-		// Fetch controllers generic hook name from the action controller
-		$hook = $this->_controller->getHook();
+		$max_redirects = 5;
+		$redirect_count = 0;
 
-		// Call the controllers pre-dispatch method
-		$this->_controller->pre_dispatch();
+		while (true)
+		{
+			try
+			{
+				// Fetch controllers generic hook name from the action controller
+				$hook = $this->_controller->getHook();
 
-		// Call integrate_action_XYZ_before then XYZ_controller_>123 then integrate_action_XYZ_after
-		call_integration_hook('integrate_action_' . $hook . '_before', [$this->_function_name]);
+				// Call the controllers pre-dispatch method
+				$this->_controller->pre_dispatch();
 
-		$result = $this->_controller->{$this->_function_name}();
+				// Call integrate_action_XYZ_before then XYZ_controller_>123 then integrate_action_XYZ_after
+				call_integration_hook('integrate_action_' . $hook . '_before', [$this->_function_name]);
 
-		// Remember kids, if your controller bails, you will not get here
-		call_integration_hook('integrate_action_' . $hook . '_after', [$this->_function_name]);
+				$result = $this->_controller->{$this->_function_name}();
 
-		return $result;
+				// Remember kids, if your controller bails, you will not get here
+				call_integration_hook('integrate_action_' . $hook . '_after', [$this->_function_name]);
+
+				return $result;
+			}
+			catch (ControllerRedirectException $e)
+			{
+				$redirect_count++;
+				if ($redirect_count > $max_redirects)
+				{
+					throw new Exception('redirect_loop', false);
+				}
+
+				$targetController = $e->getController();
+				$targetMethod = $e->getMethod();
+
+				if (empty($targetController) && empty($targetMethod))
+				{
+					return null;
+				}
+
+				if (!empty($targetController) && !class_exists($targetController))
+				{
+					if (class_exists('\\ElkArte\\Controller\\' . ucfirst($targetController)))
+					{
+						$targetController = '\\ElkArte\\Controller\\' . ucfirst($targetController);
+					}
+					elseif (class_exists('\\ElkArte\\AdminController\\' . ucfirst($targetController)))
+					{
+						$targetController = '\\ElkArte\\AdminController\\' . ucfirst($targetController);
+					}
+				}
+
+				if (empty($targetController) || ltrim($this->_controller::class, '\\') === ltrim($targetController, '\\'))
+				{
+					$this->_function_name = $targetMethod ?: 'action_index';
+				}
+				else
+				{
+					$this->_controller_name = $targetController;
+					$this->_function_name = $targetMethod ?: 'action_index';
+					$this->_controller = new $this->_controller_name(new EventManager(), User::$info);
+					$this->_controller->setUser(User::$info);
+				}
+			}
+		}
 	}
 
 	/**

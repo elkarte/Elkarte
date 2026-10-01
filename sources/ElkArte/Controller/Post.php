@@ -23,7 +23,6 @@ use BBC\PreparseCode;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\ErrorContext;
-use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
 use ElkArte\Helper\Util;
@@ -117,14 +116,7 @@ class Post extends AbstractController
 		$this->_beforePrepareContext();
 
 		// Trigger the prepare_context event
-		try
-		{
-			$this->_events->trigger('prepare_context', ['id_member_poster' => (int) $this->_topic_attributes['id_member']]);
-		}
-		catch (ControllerRedirectException $controllerRedirectException)
-		{
-			return $controllerRedirectException->doRedirect($this);
-		}
+		$this->_events->trigger('prepare_context', ['id_member_poster' => (int) $this->_topic_attributes['id_member']]);
 
 		// Load up the message details if this is an existing msg
 		$this->_generatingMessage();
@@ -1188,14 +1180,7 @@ class Post extends AbstractController
 		}
 
 		// Trigger before_save_post event
-		try
-		{
-			$this->_events->trigger('before_save_post', ['post_errors' => $this->_post_errors, 'topic_info' => $topic_info]);
-		}
-		catch (ControllerRedirectException $controllerRedirectException)
-		{
-			return $controllerRedirectException->doRedirect($this);
-		}
+		$this->_events->trigger('before_save_post', ['post_errors' => $this->_post_errors, 'topic_info' => $topic_info]);
 
 		// Check the subject and message.
 		if (!isset($subject) || Util::htmltrim(Util::htmlspecialchars($subject)) === '')

@@ -9,9 +9,7 @@
 
 namespace ElkArte\Notifications;
 
-use ElkArte\Errors\ErrorContext;
 use ElkArte\Helper\DataValidator;
-use ElkArte\Helper\ValuesContainer;
 use ElkArte\Languages\Loader;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\User;

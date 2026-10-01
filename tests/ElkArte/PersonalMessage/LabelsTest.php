@@ -5,9 +5,9 @@ namespace ElkArte\PersonalMessage;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Languages\Loader;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use tests\ElkArteCommonSetupTest;
-use ElkArte\Themes\ThemeLoader;
 
 class LabelsTest extends ElkArteCommonSetupTest
 {

@@ -53,6 +53,9 @@ class EventManager
 	/** @var null|string[] List of classes declared, kept here just to avoid calling get_declared_classes at each trigger */
 	protected $_declared_classes;
 
+	/** @var array<string, int> Cache of method parameter counts. */
+	protected static $_param_cache = [];
+
 	/**
 	 * Just a dummy for the time being.
 	 */
@@ -293,20 +296,25 @@ class EventManager
 	 */
 	protected function _checkParameters($class_name, $method_name, &$dependencies): void
 	{
-		// Let's check on the actual methods parameters
-		try
+		$key = $class_name . '::' . $method_name;
+
+		if (!isset(self::$_param_cache[$key]))
 		{
-			$r = new \ReflectionMethod($class_name, $method_name);
-			$number_params = $r->getNumberOfParameters();
-			unset($r);
-		}
-		catch (\Exception)
-		{
-			$number_params = 0;
+			// Let's check on the actual methods parameters
+			try
+			{
+				$r = new \ReflectionMethod($class_name, $method_name);
+				self::$_param_cache[$key] = $r->getNumberOfParameters();
+				unset($r);
+			}
+			catch (\Exception)
+			{
+				self::$_param_cache[$key] = 0;
+			}
 		}
 
 		// Php8 will not like passing parameters to a method that takes none
-		if ($number_params === 0 && !empty($dependencies))
+		if (self::$_param_cache[$key] === 0 && !empty($dependencies))
 		{
 			$dependencies = [];
 		}

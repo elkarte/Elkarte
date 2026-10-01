@@ -102,12 +102,12 @@ class Action
 		$this->_subActions = array_filter(
 			$subActions,
 			static function ($subAction) {
-				if (isset($subAction['disabled']) && ($subAction['disabled'] === true || $subAction['disabled'] === 'true'))
+				if (is_array($subAction) && isset($subAction['disabled']) && ($subAction['disabled'] === true || $subAction['disabled'] === 'true'))
 				{
 					return false;
 				}
 
-				return !(isset($subAction['enabled']) && ($subAction['enabled'] === false || $subAction['enabled'] === 'false'));
+				return !(is_array($subAction) && isset($subAction['enabled']) && ($subAction['enabled'] === false || $subAction['enabled'] === 'false'));
 			}
 		);
 
@@ -129,14 +129,15 @@ class Action
 	 */
 	public function dispatch(string $sub_id): void
 	{
-		$subAction = $this->_subActions[$sub_id] ?? $this->_subActions[$this->_default];
+		$sub_id = isset($this->_subActions[$sub_id]) ? $sub_id : $this->_default;
+		$subAction = $this->_subActions[$sub_id] ?? [];
 		$this->isAllowedTo($sub_id);
 
 		// Start off by assuming that this is a callable of some kind.
-		$call = $subAction['function'] ?? $subAction;
+		$call = is_array($subAction) ? ($subAction['function'] ?? $subAction) : $subAction;
 
 		// Calling a method within a controller?
-		if (isset($subAction['controller'], $subAction['function']))
+		if (is_array($subAction) && isset($subAction['controller'], $subAction['function']))
 		{
 			// Instance of a class
 			if (is_object($subAction['controller']))
@@ -159,7 +160,7 @@ class Action
 			$call = [$controller, $subAction['function']];
 		}
 		// Callable directly within the array? Discard invalid entries.
-		elseif (isset($subAction[0], $subAction[1]))
+		elseif (is_array($subAction) && isset($subAction[0], $subAction[1]))
 		{
 			$call = [$subAction[0], $subAction[1]];
 		}
@@ -175,7 +176,7 @@ class Action
 	 */
 	protected function isAllowedTo(string $sub_id): bool
 	{
-		if (isset($this->_subActions[$sub_id]['permission']))
+		if (isset($this->_subActions[$sub_id]) && is_array($this->_subActions[$sub_id]) && isset($this->_subActions[$sub_id]['permission']))
 		{
 			isAllowedTo($this->_subActions[$sub_id]['permission']);
 		}

@@ -37,20 +37,22 @@ abstract class AbstractController
 	/** @var HttpReq Holds instance of \ElkArte\Helper\HttpReq object */
 	protected $_req;
 
-	/** @var ValuesContainer Holds instance of \ElkArte\User::$info object */
+	/** @var ValuesContainer|null Holds instance of \ElkArte\User::$info object */
 	protected $user;
 
 	/**
 	 * Constructor for the class.
 	 *
 	 * @param EventManager $eventManager The event manager object.
+	 * @param ValuesContainer|null $user The user object (optional, defaults to User::$info).
 	 */
-	public function __construct($eventManager)
+	public function __construct($eventManager, ?ValuesContainer $user = null)
 	{
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
 
 		$this->_events = $eventManager;
+		$this->user = $user ?? User::$info ?? null;
 	}
 
 	/**
@@ -195,8 +197,8 @@ abstract class AbstractController
 		return empty($this->_req->getRequest('api', 'trim', false));
 	}
 
-	/**-
-	 * Public function to return the controllers generic hook name
+	/**
+	 * Public function to return the controller generic hook name
 	 */
 	public function getHook(): string
 	{
@@ -213,7 +215,7 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Public function to return the modules hook class name
+	 * Public function to return the module hook class name
 	 */
 	public function getModuleClass(): string
 	{
@@ -245,7 +247,7 @@ abstract class AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Uses the controllers generic hook name to find modules
+	 * - Uses the controller generic hook name to find modules
 	 * - Searches for modules registered against the module name
 	 * - Example
 	 *   - \ElkArte\Controller\Display results in searching for modules registered against modules_display
@@ -312,9 +314,9 @@ abstract class AbstractController
 	/**
 	 * Returns the user object.
 	 *
-	 * @return ValuesContainer the user object.
+	 * @return ValuesContainer|null the user object.
 	 */
-	public function getUser(): ValuesContainer
+	public function getUser(): ?ValuesContainer
 	{
 		return $this->user;
 	}
@@ -322,7 +324,7 @@ abstract class AbstractController
 	/**
 	 * Sets the $this->user property to the current user
 	 *
-	 * @param ValuesContainer $user
+	 * @param ValuesContainer|null $user
 	 */
 	public function setUser($user): void
 	{

@@ -74,7 +74,7 @@ class Debug
 	}
 
 	/**
-	 * Adds a new cache hits
+	 * Adds new cache hits
 	 *
 	 * @param array $value contains the relevant cache info, in the form:
 	 *    d => method: put or get
