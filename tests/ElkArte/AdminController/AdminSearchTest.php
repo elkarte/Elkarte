@@ -10,22 +10,35 @@ use ElkArte\Helper\HttpReq;
 use ElkArte\Languages\Loader;
 use ElkArte\SiteDispatcher;
 use ElkArte\User;
-use PHPUnit\Framework\TestCase;
+use ElkArte\UserInfo;
+use tests\ElkArteCommonSetupTest;
 
-class AdminSearchTest extends TestCase
+class AdminSearchTest extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
+
+	/**
+	 * Initialize or add whatever necessary for these tests
+	 */
+	protected function setUp(): void
+	{
+		parent::setUp();
+		$this->setSession();
+	}
 
 	/**
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown(): void
 	{
-		User::$info->permissions = array();
-		global $context, $user_info;
+		if (User::$info !== null)
+		{
+			User::$info->permissions = [];
+		}
+		global $context;
 
-		User::$info->permissions = array();
 		unset($context['search_term'], $context['search_results']);
+		parent::tearDown();
 	}
 
 	/**
@@ -67,7 +80,21 @@ class AdminSearchTest extends TestCase
 		$req = HttpReq::instance();
 		$_GET['action'] = 'admin';
 		$req->query->action = 'admin';
-		User::$info->permissions = array_merge(User::$info->permissions, ['admin_forum']);
+		if (User::$info === null)
+		{
+			User::$info = new UserInfo([
+				'id' => 1,
+				'is_admin' => true,
+				'is_guest' => false,
+				'username' => 'testing',
+				'name' => 'itsme',
+				'permissions' => ['admin_forum'],
+			]);
+		}
+		else
+		{
+			User::$info->permissions = array_merge(User::$info->permissions ?? [], ['admin_forum']);
+		}
 		$dispatcher = new SiteDispatcher($req);
 
 		$controller = $dispatcher->getController();
