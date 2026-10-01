@@ -287,7 +287,7 @@ class ImageMagick extends AbstractManipulator
 		// Resize every frame individually
 		foreach ($this->_image as $frame)
 		{
-			$success .= $frame->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, .9891, true);
+			$success =  $success && $frame->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, .9891, true);
 		}
 
 		$this->_image = $this->_image->deconstructImages();
