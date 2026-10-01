@@ -18,7 +18,9 @@ use PHPUnit\Framework\TestCase;
 
 class ControllerRedirectExceptionTest extends TestCase
 {
-	protected $backupGlobalsExcludeList = ['user_info', 'modSettings', 'context'];
+	protected $backupGlobalsExcludeList = ['user_info'];
+	private static $previousHooksInstance = null;
+	private static $previousTxtLoader = null;
 
 	public static function setUpBeforeClass(): void
 	{
@@ -30,27 +32,42 @@ class ControllerRedirectExceptionTest extends TestCase
 		require_once(__DIR__ . '/../../../sources/Load.php');
 		require_once(__DIR__ . '/../../../sources/Subs.php');
 
-		$rc = new \ReflectionClass(Hooks::class);
-		$hooksInstance = $rc->newInstanceWithoutConstructor();
-
 		$ref = new \ReflectionProperty(Hooks::class, '_instance');
 		$ref->setAccessible(true);
-		$ref->setValue(null, $hooksInstance);
+		self::$previousHooksInstance = $ref->getValue();
+		if (self::$previousHooksInstance === null)
+		{
+			$rc = new \ReflectionClass(Hooks::class);
+			$hooksInstance = $rc->newInstanceWithoutConstructor();
+			$ref->setValue(null, $hooksInstance);
+		}
 
-		$mockLoader = new class {
-			public function load($file_name, $fatal = true, $fix_calendar_arrays = false): void {}
-			public function setFallback(bool $newStatus): void {}
-		};
 		$txtRef = new \ReflectionProperty(Txt::class, 'loader');
 		$txtRef->setAccessible(true);
-		$txtRef->setValue(null, $mockLoader);
+		self::$previousTxtLoader = $txtRef->getValue();
+		if (self::$previousTxtLoader === null)
+		{
+			$mockLoader = new class {
+				public function load($file_name, $fatal = true, $fix_calendar_arrays = false): void {}
+				public function setFallback(bool $newStatus): void {}
+			};
+			$txtRef->setValue(null, $mockLoader);
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		$ref = new \ReflectionProperty(Hooks::class, '_instance');
+		$ref->setAccessible(true);
+		$ref->setValue(null, self::$previousHooksInstance);
+
+		$txtRef = new \ReflectionProperty(Txt::class, 'loader');
+		$txtRef->setAccessible(true);
+		$txtRef->setValue(null, self::$previousTxtLoader);
 	}
 
 	protected function setUp(): void
 	{
-		global $modSettings;
-
-		$modSettings = [];
 		User::$info = new ValuesContainer([
 			'id' => 1,
 			'name' => 'Tester',
@@ -58,6 +75,11 @@ class ControllerRedirectExceptionTest extends TestCase
 			'is_guest' => false,
 			'permissions' => ['admin_forum'],
 		]);
+	}
+
+	protected function tearDown(): void
+	{
+		User::$info = null;
 	}
 
 	public function testGetters()
