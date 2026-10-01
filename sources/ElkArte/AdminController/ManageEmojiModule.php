@@ -62,15 +62,26 @@ abstract class ManageEmojiModule extends AbstractController
 	{
 		$req = HttpReq::instance();
 
-		if (empty($req->post->emoji_selection))
+		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, ['no-emoji', 'open-moji', 'tw-emoji', 'noto-emoji'], true))
 		{
 			$req->post->emoji_selection = 'no-emoji';
 			return;
 		}
 
+		if ($req->post->emoji_selection === 'no-emoji')
+		{
+			self::removeEmoji($req);
+			return;
+		}
+
 		// An emoji group was selected, unzip them if required
-		if (!FileFunctions::instance()->fileExists(BOARDDIR . '/smileys/' . $req->post->emoji_selection . '\1f44d.svg')
-			&& self::unZipEmoji($req))
+		$extracted = FileFunctions::instance()->fileExists(BOARDDIR . '/smileys/' . $req->post->emoji_selection . '/1f44d.svg');
+		if (!$extracted)
+		{
+			$extracted = self::unZipEmoji($req);
+		}
+
+		if ($extracted)
 		{
 			self::removeEmoji($req);
 			self::copyEmojiToSmiley($req);
@@ -85,6 +96,12 @@ abstract class ManageEmojiModule extends AbstractController
 	 */
 	private static function unZipEmoji(HttpReq $req): bool
 	{
+		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, ['open-moji', 'tw-emoji', 'noto-emoji'], true))
+		{
+			$req->post->emoji_selection = 'no-emoji';
+			return false;
+		}
+
 		$source = BOARDDIR . '/smileys/' . $req->post->emoji_selection . '/' . $req->post->emoji_selection . '.zip';
 		if (FileFunctions::instance()->fileExists($source))
 		{
@@ -111,6 +128,11 @@ abstract class ManageEmojiModule extends AbstractController
 
 		// Saved but did not change ...
 		if (empty($modSettings['emoji_selection']) || $modSettings['emoji_selection'] === $req->post->emoji_selection)
+		{
+			return true;
+		}
+
+		if (!in_array($modSettings['emoji_selection'], ['open-moji', 'tw-emoji', 'noto-emoji'], true))
 		{
 			return true;
 		}
@@ -148,6 +170,11 @@ abstract class ManageEmojiModule extends AbstractController
 
 		// Saved but did not change ...
 		if (!empty($modSettings['emoji_selection']) && $modSettings['emoji_selection'] === $req->post->emoji_selection)
+		{
+			return true;
+		}
+
+		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, ['open-moji', 'tw-emoji', 'noto-emoji'], true))
 		{
 			return true;
 		}

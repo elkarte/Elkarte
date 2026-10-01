@@ -794,11 +794,11 @@ function possibleSmileEmoji(&$row, $path = null, $ext = null)
 			$emoji = Emoji::instance();
 
 			// Check if we have an emoji image for this smiley code
-			$test = preg_replace_callback('~(:([-+\w]+):)~u', [$emoji, 'emojiToImage'], $row['code']);
-			if ($test !== $row['filename'] && preg_match('~data-emoji-code=["\'](.*?)["\']~', $test, $result))
+			$emojiCode = $emoji->getCodeByName($row['code']);
+			if (!empty($emojiCode))
 			{
 				// Valid emoji, set the filename to the proper emoji file and type
-				$row['emoji'] =  $result[1];
+				$row['emoji'] = $emojiCode;
 				return true;
 			}
 		}
