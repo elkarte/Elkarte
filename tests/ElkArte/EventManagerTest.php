@@ -2,7 +2,6 @@
 
 namespace ElkArte;
 
-use ElkArte\Helper\ValuesContainer;
 use PHPUnit\Framework\TestCase;
 
 /**
