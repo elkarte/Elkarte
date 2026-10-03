@@ -15,7 +15,7 @@ class chunkUpload
 	{
 		this.url = params.url;
 		this.form = params.form;
-		this.chunkSize = params.chunkSize || 250000;
+		this.chunkSize = params.chunkSize || 1000000; // 1MB default
 		this.maxChunks = params.maxChunks || 1000;
 		this.retries = params.retries || 4;
 		this.delayBeforeRetry = params.delayBeforeRetry || 5;

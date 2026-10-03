@@ -596,9 +596,9 @@ function template_add_new_attachments()
 		individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
 		numOfAttachmentAllowed: ' . (empty($modSettings['attachmentNumPerPostLimit']) ? 50 : $modSettings['attachmentNumPerPostLimit']) . ',
 		numAttachUploaded: ' . $context['attachments']['quantity'] . ',
-		chunkSize: ' . (empty($modSettings['attachmentChunkSize']) ? 250000 : $modSettings['attachmentChunkSize']) . ',
+		chunkSize: ' . (empty($modSettings['attachmentChunkSize']) ? 1000000 : $modSettings['attachmentChunkSize']) . ',
 		maxChunks: ' . (function () use ($modSettings) {
-			$chunkSize = empty($modSettings['attachmentChunkSize']) ? 250000 : (int) $modSettings['attachmentChunkSize'];
+			$chunkSize = empty($modSettings['attachmentChunkSize']) ? 1000000 : (int) $modSettings['attachmentChunkSize'];
 			if (!empty($modSettings['attachmentSizeLimit']))
 			{
 				$maxBytes = (int) $modSettings['attachmentSizeLimit'] * 1024;

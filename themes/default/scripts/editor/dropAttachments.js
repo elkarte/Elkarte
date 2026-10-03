@@ -7,7 +7,7 @@
  */
 
 /**
- * This file contains javascript associated with the drag drop of files functionality
+ * This file contains JavaScript associated with the drag drop of files functionality
  * while posting
  */
 
@@ -65,7 +65,7 @@
 				individualSizeAllowed = params.individualSizeAllowed || 0;
 				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
 				totalAttachSizeUploaded = params.totalAttachSizeUploaded || 0;
-				attachmentChunkSize = params.chunkSize || 250000;
+				attachmentChunkSize = params.chunkSize || 1000000; // 1MB default
 				attachmentMaxChunks = params.maxChunks || 1000;
 				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
