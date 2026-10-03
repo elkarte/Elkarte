@@ -53,7 +53,7 @@ trait ContextManagement
 
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
-		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions, true);
+		$context['robot_no_index'] = in_array(strtolower($context['current_action']), $this->no_index_actions, true);
 		$context['additional_dropdown_search'] = prepareSearchEngines();
 
 		$this->setupNewsLines();
@@ -81,7 +81,7 @@ trait ContextManagement
 
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
-		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions, true);
+		$context['robot_no_index'] = in_array(strtolower($context['current_action']), $this->no_index_actions, true);
 
 		if ($this->user->is_guest === false)
 		{

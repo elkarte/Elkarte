@@ -94,20 +94,25 @@ abstract class Theme
 		$this->layers = new TemplateLayers();
 		$this->templates = new Templates($dirs);
 		$this->no_index_actions = [
-			'profile',
-			'search',
-			'calendar',
-			'memberlist',
-			'help',
-			'who',
-			'stats',
-			'login',
-			'reminder',
-			'register',
-			'contact',
 			'admin',
+			'calendar',
+			'contact',
+			'draft',
+			'help',
+			'jsmodify',
+			'login',
+			'login2',
+			'memberlist',
+			'mentions',
 			'moderate',
-			'printpage'
+			'pm',
+			'printpage',
+			'profile',
+			'register',
+			'reminder',
+			'search',
+			'stats',
+			'who',
 		];
 		$this->_req = HttpReq::instance();
 

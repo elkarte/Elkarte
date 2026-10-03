@@ -15,8 +15,9 @@ class chunkUpload
 	{
 		this.url = params.url;
 		this.form = params.form;
-		this.chunkSize = params.chunkSize || 250000;
+		this.chunkSize = params.chunkSize || 1000000; // 1MB default
 		this.maxChunks = params.maxChunks || 1000;
+		this.concurrency = params.concurrency || 4; // 4 concurrent (chunks) default
 		this.retries = params.retries || 4;
 		this.delayBeforeRetry = params.delayBeforeRetry || 5;
 		this.signal = params.signal;
@@ -26,7 +27,6 @@ class chunkUpload
 
 		// Setup for this file
 		this._init();
-		this._reader = new FileReader();
 		this._eventEmitter = new ChunkEventEmitter();
 
 		// Guard: abort before sending anything if the file requires more chunks than the server allows
@@ -64,7 +64,7 @@ class chunkUpload
 		const combineChunkForm = new FormData();
 
 		combineChunkForm.append('elkuuid', String(this.uuid));
-		combineChunkForm.append('elkchunkindex', String(this.chunkCount));
+		combineChunkForm.append('elkchunkindex', String(this.totalChunks));
 		combineChunkForm.append('elktotalchunkcount', String(this.totalChunks));
 		combineChunkForm.append('filename', this.file.name);
 		combineChunkForm.append('filesize', this.file.size);
@@ -115,12 +115,15 @@ class chunkUpload
 	_init ()
 	{
 		this.file = this.form.get('attachment[]');
-		this.start = 0;
-		this.retriesCount = 0;
-		this.chunkData = null;
-		this.chunkCount = 0;
 		this.totalChunks = this._getTotalChunks();
 		this.uuid = this._getUniqueId();
+		this.concurrency = Math.min(this.concurrency, this.totalChunks);
+		this.chunkQueue = Array.from({length: this.totalChunks}, (_, i) => i);
+		this.activeWorkers = 0;
+		this.completedChunks = new Set();
+		this.retriesMap = new Map();
+		this.isAborted = false;
+		this.hasError = false;
 	}
 
 	/**
@@ -173,50 +176,47 @@ class chunkUpload
 	}
 
 	/**
-	 * Retrieves the next chunk of data from the file.
+	 * Retrieves the slice of data for a specific chunk index.
 	 *
-	 * @returns {Promise<unknown>} A promise that resolves when the chunk is retrieved.
+	 * @param {number} chunkIndex The index of the chunk to extract.
+	 * @returns {Blob} The sliced blob segment.
 	 * @private
 	 */
-	_getChunk ()
+	_getChunkBlob (chunkIndex)
 	{
-		return new Promise((resolve) => {
-			const length = this.totalChunks === 1 ? this.file.size : this.chunkSize;
-			const start = length * this.chunkCount;
+		const length = this.totalChunks === 1 ? this.file.size : this.chunkSize;
+		const start = length * chunkIndex;
 
-			this._reader.onload = () => {
-				this.chunkData = new Blob([this._reader.result], {type: 'application/octet-stream'});
-				resolve();
-			};
-
-			this._reader.readAsArrayBuffer(this.file.slice(start, start + length));
-		});
+		return this.file.slice(start, start + length);
 	}
 
 	/**
-	 * Sends a chunk of data to the server.
+	 * Sends a specific chunk of data to the server.
 	 *
+	 * @param {number} chunkIndex The index of the chunk being uploaded.
 	 * @private
-	 * @returns {Promise<Response>} - A Promise that resolves to a Response object.
+	 * @returns {void}
 	 */
-	_sendChunk ()
+	_uploadChunk (chunkIndex)
 	{
+		this.activeWorkers++;
+		const chunkBlob = this._getChunkBlob(chunkIndex);
 		const chunkForm = new FormData();
 
 		// Load the form with useful data
-		chunkForm.append('elkchunkindex', String(this.chunkCount));
+		chunkForm.append('elkchunkindex', String(chunkIndex));
 		chunkForm.append('elktotalchunkcount', String(this.totalChunks));
 		chunkForm.append('elkuuid', String(this.uuid));
 		chunkForm.append('filename', this.file.name);
-		chunkForm.append('filesize',  String(this.chunkData.size));
+		chunkForm.append('filesize', String(chunkBlob.size));
 		chunkForm.append('filetype', this.file.type);
-		chunkForm.append('attachment[]', this.chunkData);
+		chunkForm.append('attachment[]', chunkBlob);
 		chunkForm.append(elk_session_var, elk_session_id);
 
 		// Provide a way for the user to abort the upload
 		let signal = this.signal;
 
-		return fetch(this.url, {
+		fetch(this.url, {
 			signal,
 			method: 'POST',
 			headers: {
@@ -225,42 +225,7 @@ class chunkUpload
 			},
 			body: chunkForm,
 			cache: 'no-store'
-		});
-	}
-
-	/**
-	 * Manages retries for uploading a chunk of a file.
-	 *
-	 * @private
-	 */
-	_manageRetries ()
-	{
-		if (this.retriesCount++ < this.retries)
-		{
-			setTimeout(() => this._sendChunks(), this.delayBeforeRetry * 1000);
-
-			this._eventEmitter.emit('fileRetry', {
-				message: 'An error occurred uploading chunk ' + this.chunkCount + '. ' + (this.retries - this.retriesCount) + ' retries left',
-				chunk: this.chunkCount,
-				retriesLeft: this.retries - this.retriesCount
-			});
-
-			return;
-		}
-
-		this._eventEmitter.emit('error', 'An error occurred uploading part [' + this.chunkCount + ']');
-	}
-
-	/**
-	 * Handle the sending of all chunks of data.
-	 *
-	 * @private
-	 * @returns {void}
-	 */
-	_sendChunks ()
-	{
-		this._getChunk()
-			.then(() => this._sendChunk())
+		})
 			.then(response => {
 				if (!response.ok)
 				{
@@ -272,19 +237,28 @@ class chunkUpload
 				return response.json();
 			})
 			.then(response => {
+				this.activeWorkers--;
+
+				if (this.hasError || this.isAborted)
+				{
+					return;
+				}
+
 				if (response.result === true)
 				{
-					if (++this.chunkCount < this.totalChunks)
-					{
-						this._sendChunks();
-					}
-					else
+					this.completedChunks.add(chunkIndex);
+
+					const percentProgress = Math.round((100 / this.totalChunks) * this.completedChunks.size);
+					this._eventEmitter.emit('progress', percentProgress);
+
+					if (this.completedChunks.size === this.totalChunks)
 					{
 						this._eventEmitter.emit('complete', response);
 					}
-
-					const percentProgress = Math.round((100 / this.totalChunks) * this.chunkCount);
-					this._eventEmitter.emit('progress', percentProgress);
+					else
+					{
+						this._sendChunks();
+					}
 				}
 				else
 				{
@@ -294,19 +268,82 @@ class chunkUpload
 				}
 			})
 			.catch((response) => {
+				this.activeWorkers--;
+
+				if (this.hasError || this.isAborted)
+				{
+					return;
+				}
+
 				if (response.name === 'AbortError')
 				{
+					this.isAborted = true;
 					this._eventEmitter.emit('error', 'abort');
 				}
 				else if (response.cause && [408, 502, 503, 504].includes(response.cause.status))
 				{
-					this._manageRetries();
+					this._manageRetries(chunkIndex);
 				}
 				else
 				{
+					this.hasError = true;
 					this._eventEmitter.emit('error', response.message);
 				}
 			});
+	}
+
+	/**
+	 * Manages retries for uploading a specific chunk of a file.
+	 *
+	 * @param {number} chunkIndex The index of the failed chunk.
+	 * @private
+	 */
+	_manageRetries (chunkIndex)
+	{
+		const currentRetries = this.retriesMap.get(chunkIndex) || 0;
+		if (currentRetries < this.retries)
+		{
+			this.retriesMap.set(chunkIndex, currentRetries + 1);
+
+			setTimeout(() => {
+				if (!this.hasError && !this.isAborted)
+				{
+					this.chunkQueue.unshift(chunkIndex);
+					this._sendChunks();
+				}
+			}, this.delayBeforeRetry * 1000);
+
+			this._eventEmitter.emit('fileRetry', {
+				message: 'An error occurred uploading chunk ' + chunkIndex + '. ' + (this.retries - currentRetries - 1) + ' retries left',
+				chunk: chunkIndex,
+				retriesLeft: this.retries - currentRetries - 1
+			});
+
+			return;
+		}
+
+		this.hasError = true;
+		this._eventEmitter.emit('error', 'An error occurred uploading part [' + chunkIndex + ']');
+	}
+
+	/**
+	 * Handle the dispatching of concurrent chunk uploads.
+	 *
+	 * @private
+	 * @returns {void}
+	 */
+	_sendChunks ()
+	{
+		if (this.hasError || this.isAborted)
+		{
+			return;
+		}
+
+		while (this.activeWorkers < this.concurrency && this.chunkQueue.length > 0)
+		{
+			const chunkIndex = this.chunkQueue.shift();
+			this._uploadChunk(chunkIndex);
+		}
 	}
 }
 

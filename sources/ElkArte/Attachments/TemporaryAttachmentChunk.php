@@ -59,7 +59,7 @@ class TemporaryAttachmentChunk
 		$this->attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 		$this->attachmentDirectory->automanageCheckDirectory();
 		$this->attach_current_dir = $this->attachmentDirectory->getCurrent();
-		$this->chunkSize = empty($modSettings['attachmentChunkSize']) ? 250000 : $modSettings['attachmentChunkSize'];
+		$this->chunkSize = empty($modSettings['attachmentChunkSize']) ? 1000000 : $modSettings['attachmentChunkSize'];
 
 		// Derive the maximum allowable chunk count from the configured file-size limit.
 		// Uses attachmentSizeLimit (KB) when set, otherwise falls back to PHP's upload_max_filesize.
@@ -354,10 +354,9 @@ class TemporaryAttachmentChunk
 	 */
 	private function generateLocalFileName(string $uuid, int $chunkIndex): string
 	{
-		$salt = basename($_FILES['attachment']['tmp_name'][0]);
 		$user_ident = $this->getUserIdentifier();
 
-		return 'post_tmp_async_' . $user_ident . '_' . $uuid . '_part_' . $chunkIndex . '_' . $salt . '.dat';
+		return 'post_tmp_async_' . $user_ident . '_' . $uuid . '_part_' . $chunkIndex . '.dat';
 	}
 
 	/**
@@ -447,7 +446,7 @@ class TemporaryAttachmentChunk
 		}
 
 		// Combine the fragments in the correct order
-		$success = $this->combineFileFragments($user_ident, $uuid, $in);
+		$success = $this->combineFileFragments($user_ident, $uuid, $totalChunkCount);
 
 		if ($success)
 		{
@@ -535,36 +534,42 @@ class TemporaryAttachmentChunk
 	 *
 	 * @param string $user_ident The user identifier.
 	 * @param string $uuid The unique identifier.
-	 * @param string $in The input directory containing file fragments.
+	 * @param int $totalChunkCount The total count of chunks.
 	 *
 	 * @return bool Returns true if the file fragments were successfully combined into a single file, false otherwise.
 	 */
-	private function combineFileFragments(string $user_ident, string $uuid, string $in): bool
+	private function combineFileFragments(string $user_ident, string $uuid, int $totalChunkCount): bool
 	{
-		$files = iterator_to_array(new GlobIterator($in, FilesystemIterator::SKIP_DOTS | FilesystemIterator::KEY_AS_FILENAME));
-		natsort($files);
 		$this->combinedFilePath = $this->getCombinedFilePath($user_ident, $uuid);
 		$success = true;
 
-		foreach ($files as $file)
+		$outHandle = @fopen($this->combinedFilePath, 'wb');
+		if ($outHandle === false)
 		{
-			$fileInputPath = $this->attach_current_dir . '/' . $file->getFilename();
-			$data = @file_get_contents($fileInputPath);
-			if ($data === false)
+			return false;
+		}
+
+		for ($i = 0; $i < $totalChunkCount; $i++)
+		{
+			$fileInputPath = $this->attach_current_dir . '/post_tmp_async_' . $user_ident . '_' . $uuid . '_part_' . $i . '.dat';
+			$inHandle = @fopen($fileInputPath, 'rb');
+			if ($inHandle === false)
 			{
 				$success = false;
 			}
 			else
 			{
-				$writeResult = @file_put_contents($this->combinedFilePath, $data, LOCK_EX | FILE_APPEND);
-				if ($writeResult === false)
+				if (stream_copy_to_stream($inHandle, $outHandle) === false)
 				{
 					$success = false;
 				}
+				fclose($inHandle);
 			}
 
 			@unlink($fileInputPath);
 		}
+
+		fclose($outHandle);
 
 		return $success;
 	}
