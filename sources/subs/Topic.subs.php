@@ -2753,7 +2753,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	}
 
 	// Valid subject?
-	if ($new_subject != '')
+	if ($new_subject !== '')
 	{
 		$db->query('', '
 			UPDATE {db_prefix}messages
