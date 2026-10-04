@@ -54,6 +54,18 @@ function writeLog($force = false)
 		logSpider();
 	}
 
+	$cache = Cache::instance();
+
+	// Guests / spiders don't persist $_SESSION['log_time'], so try to use the cache.
+	if (User::$info->is_guest && empty($_SESSION['log_time']))
+	{
+		$guest_log_time = null;
+		if ($cache->getVar($guest_log_time, 'log_online-guest-' . md5(User::$info->ip), 8))
+		{
+			$_SESSION['log_time'] = (int) $guest_log_time;
+		}
+	}
+
 	// Don't mark them as online more than every so often.
 	if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= (time() - 8) && !$force)
 	{
@@ -80,8 +92,6 @@ function writeLog($force = false)
 
 	// Guests use 0, members use their session ID.
 	$session_id = User::$info->is_guest ? 'ip' . User::$info->ip : session_id();
-
-	$cache = Cache::instance();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = $cache->get('log_online-update', 30) < time() - 30;
@@ -114,6 +124,10 @@ function writeLog($force = false)
 
 	// Mark your session as being logged.
 	$_SESSION['log_time'] = time();
+	if (User::$info->is_guest)
+	{
+		$cache->put('log_online-guest-' . md5(User::$info->ip), $_SESSION['log_time'], 8);
+	}
 
 	// Well, they are online now.
 	if (empty($_SESSION['timeOnlineUpdated']))
@@ -121,8 +135,8 @@ function writeLog($force = false)
 		$_SESSION['timeOnlineUpdated'] = time();
 	}
 
-	// Set their login time, if not already done within the last minute.
-	if (ELK !== 'SSI' && !empty(User::$info->last_login) && User::$info->last_login < time() - 60)
+	// Set their login time, if not already done within the last two minutes.
+	if (ELK !== 'SSI' && !empty(User::$info->last_login) && User::$info->last_login < time() - 120)
 	{
 		// We log IPs the request came with, around here
 		$req = Request::instance();

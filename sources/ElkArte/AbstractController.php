@@ -194,7 +194,7 @@ abstract class AbstractController
 	 */
 	public function trackStats($action = '')
 	{
-		return empty($this->_req->getRequest('api', 'trim', false));
+		return !$this->getApi();
 	}
 
 	/**
