@@ -46,9 +46,30 @@ function spiderCheck()
 	unset($_SESSION['id_robot']);
 	$_SESSION['robot_check'] = time();
 
+	$req = Request::instance();
+	$cache = Cache::instance();
+	$spider_cache_key = 'spider_check-' . md5(($_SERVER['REMOTE_ADDR'] ?? '') . '-' . $req->user_agent());
+
+	// Check if this IP / user agent is cached (10 min)
+	$cached_spider = null;
+	if ($cache->getVar($cached_spider, $spider_cache_key, 600))
+	{
+		if (!empty($cached_spider))
+		{
+			$_SESSION['id_robot'] = (int) $cached_spider;
+		}
+
+		// If this is low tracking, then log the spider here as opposed to the main logging function.
+		if ((int) $modSettings['spider_mode'] === 1 && !empty($_SESSION['id_robot']))
+		{
+			logSpider();
+		}
+
+		return !empty($_SESSION['id_robot']);
+	}
+
 	// We cache the sorted spider data for five minutes.
 	$spider_data = [];
-	$cache = Cache::instance();
 	if (!$cache->getVar($spider_data, 'spider_search', 300))
 	{
 		$spider_data = $db->fetchQuery('
@@ -65,19 +86,18 @@ function spiderCheck()
 
 	if (empty($spider_data))
 	{
+		$cache->put($spider_cache_key, 0, 600);
+
 		return false;
 	}
 
-	// We need the user agent
-	$req = Request::instance();
-
 	// Always attempt IPv6 first.
-	if (str_contains($_SERVER['REMOTE_ADDR'], ':'))
+	if (!empty($_SERVER['REMOTE_ADDR']) && str_contains($_SERVER['REMOTE_ADDR'], ':'))
 	{
 		$ip_parts = convertIPv6toInts($_SERVER['REMOTE_ADDR']);
 	}
 	// Then xxx.xxx.xxx.xxx next
-	else
+	elseif (!empty($_SERVER['REMOTE_ADDR']))
 	{
 		preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/', $_SERVER['REMOTE_ADDR'], $ip_parts);
 	}
@@ -120,7 +140,10 @@ function spiderCheck()
 		}
 	}
 
-	// If this is low server tracking, then log the spider here as opposed to the main logging function.
+	// Cache the detection result for 10 minutes (600s)
+	$cache->put($spider_cache_key, !empty($_SESSION['id_robot']) ? (int) $_SESSION['id_robot'] : 0, 600);
+
+	// If this is low tracking, then log the spider here as opposed to the main logging function.
 	if ((int) $modSettings['spider_mode'] === 1 && !empty($_SESSION['id_robot']))
 	{
 		logSpider();

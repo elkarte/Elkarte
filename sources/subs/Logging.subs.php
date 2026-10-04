@@ -17,9 +17,9 @@
 use ElkArte\User;
 
 /**
- * @param string $session_id
- * @todo
+ * Delete expired/outdated session from log_online
  *
+ * @param string $session_id
  */
 function deleteLogOnlineInterval($session_id)
 {
