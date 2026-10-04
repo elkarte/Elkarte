@@ -648,6 +648,7 @@ class Maintenance extends AbstractController
 			{
 				recountApprovedMessages($this->start, $this->increment);
 				recountUnapprovedMessages($this->start, $this->increment);
+				recountTopicLikes($this->start, $this->increment);
 				$this->start += $this->increment;
 
 				if (microtime(true) - $time_start > 3)

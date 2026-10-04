@@ -1121,4 +1121,46 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function recalculate_topic_likes_title()
+	{
+		return 'Recalculating topic like totals...';
+	}
+
+	public function recalculate_topic_likes()
+	{
+		return array(
+			array(
+				'debug_title' => 'Updating topics.num_likes to reflect cumulative likes on all topic messages...',
+				'function' => function () {
+					// Reset all topic num_likes first
+					$this->db->query('', '
+						UPDATE {db_prefix}topics
+						SET num_likes = 0'
+					);
+
+					// Recalculate num_likes for all topics from message_likes
+					$this->db->fetchQuery('
+						SELECT m.id_topic, COUNT(ml.id_msg) AS total_likes
+						FROM {db_prefix}message_likes AS ml
+							INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
+						GROUP BY m.id_topic',
+						[]
+					)->fetch_callback(
+						function ($row) {
+							$this->db->query('', '
+								UPDATE {db_prefix}topics
+								SET num_likes = {int:total_likes}
+								WHERE id_topic = {int:id_topic}',
+								[
+									'total_likes' => (int) $row['total_likes'],
+									'id_topic' => (int) $row['id_topic'],
+								]
+							);
+						}
+					);
+				}
+			)
+		);
+	}
 }

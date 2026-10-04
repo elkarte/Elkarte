@@ -363,15 +363,29 @@ class ManageAttachments extends AbstractController
 			updateSettings(['attachment_heic_enable' => 0]);
 		}
 
-		// Check if the server settings support these upload size values
+		// Check if the server settings support chunked uploads
 		$post_max_size = ini_get('post_max_size');
 		$upload_max_filesize = ini_get('upload_max_filesize');
-		$testPM = empty($post_max_size) || memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0);
-		$testUM = empty($upload_max_filesize) || memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0);
+		$chunkSize = empty($modSettings['attachmentChunkSize']) ? 1000000 : (int) $modSettings['attachmentChunkSize'];
 
-		// Set some helpful information for the UI
-		$post_max_size_text = sprintf($txt['zero_for_system_limit'], $post_max_size === '' || $post_max_size === '0' || $post_max_size === false ? $txt['none'] : $post_max_size, 'post_max_size');
-		$upload_max_filesize_text = sprintf($txt['zero_for_system_limit'], $upload_max_filesize === '' || $upload_max_filesize === '0' || $upload_max_filesize === false ? $txt['none'] : $upload_max_filesize, 'upload_max_filesize');
+		$pm_bytes = empty($post_max_size) || $post_max_size === '-1' || $post_max_size === '0' ? 0 : memoryReturnBytes($post_max_size);
+		$um_bytes = empty($upload_max_filesize) || $upload_max_filesize === '-1' || $upload_max_filesize === '0' ? 0 : memoryReturnBytes($upload_max_filesize);
+
+		// With chunked uploads, each chunk is uploaded independently (bounded by chunkSize).
+		// upload_max_filesize must be >= chunkSize, and post_max_size must be >= chunkSize.
+		$testUM = $um_bytes === 0 || $um_bytes >= $chunkSize;
+		$testPM = $pm_bytes === 0 || $pm_bytes >= $chunkSize;
+		$testOrder = $pm_bytes === 0 || $um_bytes === 0 || $pm_bytes >= $um_bytes;
+
+		$php_upload_warning = '';
+		if ($testUM === false || $testPM === false)
+		{
+			$php_upload_warning = sprintf($txt['attachment_php_ini_warning'], byte_format($chunkSize));
+		}
+		elseif ($testOrder === false)
+		{
+			$php_upload_warning = $txt['attachment_php_post_max_warning'];
+		}
 
 		$config_vars = [
 			['title', 'attachment_manager_settings'],
@@ -397,8 +411,9 @@ class ManageAttachments extends AbstractController
 			['int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']],
 			'',
 			// Posting limits
-			['int', 'attachmentPostLimit', 'subtext' => $post_max_size_text, 6, 'postinput' => $testPM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testPM === false],
-			['int', 'attachmentSizeLimit', 'subtext' => $upload_max_filesize_text, 6, 'postinput' => $testUM === false ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => $testUM === false],
+			['warning', !empty($php_upload_warning) ? 'attachment_php_ini_warning' : '', 'text_label' => $php_upload_warning],
+			['int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']],
+			['int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']],
 			['int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6],
 			// Resize limits
 			['title', 'attachment_image_resize'],

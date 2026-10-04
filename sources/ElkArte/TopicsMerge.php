@@ -442,6 +442,23 @@ class TopicsMerge
 		$notifications = is_array($details['notifications']) ? array_intersect($this->_topics, $details['notifications']) : [];
 		fixMergedTopics($first_msg, $this->_topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
 
+		$num_likes = 0;
+		if (!empty($affected_msgs))
+		{
+			$this->_db->fetchQuery('
+				SELECT COUNT(*) AS total_likes
+				FROM {db_prefix}message_likes
+				WHERE id_msg IN ({array_int:messages})',
+				[
+					'messages' => $affected_msgs,
+				]
+			)->fetch_callback(
+				function ($row) use (&$num_likes) {
+					$num_likes = (int) $row['total_likes'];
+				}
+			);
+		}
+
 		// Assign the properties of the newly merged topic.
 		setTopicAttribute($id_topic, [
 			'id_board' => $target_board,
@@ -455,6 +472,7 @@ class TopicsMerge
 			'num_replies' => $num_replies,
 			'unapproved_posts' => $num_unapproved,
 			'num_views' => $this->_num_views,
+			'num_likes' => $num_likes,
 		]);
 
 		// Get rid of the redundant polls.

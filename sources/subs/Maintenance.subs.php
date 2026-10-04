@@ -298,6 +298,40 @@ function recountUnapprovedMessages($start, $increment)
 }
 
 /**
+ * Recounts topic like counts
+ *
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $increment
+ * @package Maintenance
+ */
+function recountTopicLikes($start, $increment)
+{
+	$db = database();
+
+	// Recount topic likes
+	$db->fetchQuery('
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_likes) AS num_likes,
+			COUNT(ml.id_msg) AS real_num_likes
+		FROM {db_prefix}topics AS t
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
+			LEFT JOIN {db_prefix}message_likes AS ml ON (ml.id_msg = m.id_msg)
+		WHERE t.id_topic > {int:start}
+			AND t.id_topic <= {int:max_id}
+		GROUP BY t.id_topic
+		HAVING COUNT(ml.id_msg) != MAX(t.num_likes)',
+		[
+			'start' => $start,
+			'max_id' => $start + $increment,
+		]
+	)->fetch_callback(
+		function ($row) {
+			setTopicAttribute($row['id_topic'], ['num_likes' => $row['real_num_likes']]);
+		}
+	);
+}
+
+/**
  * Reset the boards table's counter for posts, topics, unapproved posts, and
  * unapproved topics
  *
