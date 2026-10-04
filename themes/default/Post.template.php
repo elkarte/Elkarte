@@ -602,12 +602,10 @@ function template_add_new_attachments()
 			if (!empty($modSettings['attachmentSizeLimit']))
 			{
 				$maxBytes = (int) $modSettings['attachmentSizeLimit'] * 1024;
+				return min((int) ceil($maxBytes / $chunkSize), 1000);
 			}
-			else
-			{
-				$maxBytes = (int) memoryReturnBytes(ini_get('upload_max_filesize'));
-			}
-			return $maxBytes > 0 ? min((int) ceil($maxBytes / $chunkSize), 1000) : 1000;
+
+			return 1000;
 		})() . ',
 		resizeImageEnabled: ' . (empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
 		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
