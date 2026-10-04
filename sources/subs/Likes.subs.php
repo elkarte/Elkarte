@@ -261,11 +261,8 @@ function updateLike($id_liker, $liked_message, $direction)
 			['id_msg', 'id_member', 'id_poster']
 		);
 
-		// If we like the first message in a topic, we de facto like the topic
-		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
-		{
-			increaseTopicLikes($liked_message['id_topic'], $direction);
-		}
+		// Liking any message in a topic increases the topic's like count
+		increaseTopicLikes($liked_message['id_topic'], $direction);
 
 		// And update the stats
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -285,11 +282,8 @@ function updateLike($id_liker, $liked_message, $direction)
 			]
 		);
 
-		// If we are unliking the first message in a topic, we are de facto unliking the topic
-		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
-		{
-			increaseTopicLikes($liked_message['id_topic'], $direction);
-		}
+		// Unliking any message in a topic decreases the topic's like count
+		increaseTopicLikes($liked_message['id_topic'], $direction);
 
 		// And update the stats
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -320,7 +314,7 @@ function increaseTopicLikes($id_topic, $direction)
 	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET 
-			num_likes = num_likes ' . ($direction === '+' ? '+ 1' : '- 1') . '
+			num_likes = ' . ($direction === '+' ? 'num_likes + 1' : 'CASE WHEN num_likes > 0 THEN num_likes - 1 ELSE 0 END') . '
 		WHERE id_topic = {int:current_topic}',
 		[
 			'current_topic' => $id_topic,
@@ -661,15 +655,15 @@ function dbMostLikedMessage($limit = 10)
 }
 
 /**
- * Function to get most liked messages in a topic
+ * Function to get most liked messages in a topic (or multiple topics)
  *
  * What it does:
  *
- * - For a supplied topic gets the default 5 posts that have been liked
+ * - For supplied topic(s) gets the default 5 posts that have been liked
  * - Returns the messages in descending order of likes
  *
- * @param int $topic the topic_id we are going to look for liked posts within
- * @param int $limit the maximum number of liked posts to return
+ * @param int|int[] $topic the topic_id or array of topic_ids we are going to look for liked posts within
+ * @param int $limit the maximum number of liked posts to return per topic
  *
  * @return array
  * @package Likes
@@ -680,9 +674,17 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 
 	$db = database();
 	$bbc_parser = ParserWrapper::instance();
+	$is_array = is_array($topic);
+	$topics = (array) $topic;
 
-	// Most liked messages in a given topic
-	return $db->fetchQuery('
+	if (empty($topics))
+	{
+		return [];
+	}
+
+	// Most liked messages in given topic(s)
+	$messagesByTopic = [];
+	$db->fetchQuery('
 		SELECT
 			COALESCE(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
 			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
@@ -700,16 +702,19 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = {int:type_avatar})
-		WHERE t.id_topic = {int:id_topic}
-		ORDER BY lp.like_count DESC
-		LIMIT {int:limit}',
+		WHERE t.id_topic IN ({array_int:id_topic})
+		ORDER BY lp.like_count DESC',
 		[
-			'id_topic' => $topic,
-			'limit' => $limit,
+			'id_topic' => $topics,
 			'type_avatar' => 1,
 		]
 	)->fetch_callback(
-		function ($row) use ($scripturl, $bbc_parser) {
+		function ($row) use ($scripturl, $bbc_parser, &$messagesByTopic, $limit) {
+			if (isset($messagesByTopic[$row['id_topic']]) && count($messagesByTopic[$row['id_topic']]) >= $limit)
+			{
+				return;
+			}
+
 			// Censor those naughty words
 			$row['body'] = censor($row['body']);
 			$row['subject'] = censor($row['subject']);
@@ -722,7 +727,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 
 			$avatar = determineAvatar($row);
 
-			return [
+			$messagesByTopic[$row['id_topic']][] = [
 				'id_msg' => $row['id_msg'],
 				'id_topic' => $row['id_topic'],
 				'id_board' => $row['id_board'],
@@ -743,6 +748,14 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			];
 		}
 	);
+
+	if (!$is_array)
+	{
+		$singleTopic = reset($topics);
+		return $messagesByTopic[$singleTopic] ?? [];
+	}
+
+	return $messagesByTopic;
 }
 
 /**
@@ -819,10 +832,16 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	uasort($mostLikedTopics, 'sort_by_relevance');
 	$mostLikedTopics = array_slice($mostLikedTopics, 0, $limit);
 
-	// Fetch some sample posts for each of the top X topics
-	foreach ($mostLikedTopics as $key => $topic)
+	// Fetch some sample posts for each of the top X topics in a single query
+	if (!empty($mostLikedTopics))
 	{
-		$mostLikedTopics[$key]['msg_data'] = dbMostLikedMessagesByTopic($topic['id_topic']);
+		$topic_ids = array_column($mostLikedTopics, 'id_topic');
+		$batchMessages = dbMostLikedMessagesByTopic($topic_ids, 5);
+
+		foreach ($mostLikedTopics as $key => $topic)
+		{
+			$mostLikedTopics[$key]['msg_data'] = $batchMessages[$topic['id_topic']] ?? [];
+		}
 	}
 
 	// Looks like there is nothing liked
@@ -1158,13 +1177,14 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 }
 
 /**
- * Utility function to decrease member like counts when a message is removed
+ * Utility function to decrease member and topic like counts when a message is removed
  *
  * When a message is removed, we need to update the like counts for those who liked the message
- * as well as those who posted the message.
+ * as well as those who posted the message and the topic containing the message.
  *  - Members who liked the message have likes given decreased.
  *  - The member who posted has the likes received decreased by the number of likers
  * for that message.
+ *  - The topic containing the message has its num_likes decreased.
  *
  * @param int[]|int $messages
  */
@@ -1196,8 +1216,8 @@ function decreaseLikeCounts($messages)
 	)->fetch_callback(
 		function ($row) use (&$posters, &$likers) {
 			// Track how many likes each member gave and how many were received
-			$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? $posters[$row['id_poster']]++ : 1;
-			$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? $likers[$row['id_member']]++ : 1;
+			$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? ++$posters[$row['id_poster']] : 1;
+			$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? ++$likers[$row['id_member']] : 1;
 		}
 	);
 
@@ -1205,6 +1225,37 @@ function decreaseLikeCounts($messages)
 	if (empty($posters) && empty($likers))
 	{
 		return;
+	}
+
+	// Update topic num_likes for the topics containing these messages
+	$topic_likes = [];
+	$db->fetchQuery('
+		SELECT
+			m.id_topic, COUNT(ml.id_msg) AS num_likes
+		FROM {db_prefix}message_likes AS ml
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
+		WHERE ml.id_msg IN ({array_int:messages})
+		GROUP BY m.id_topic',
+		[
+			'messages' => $messages,
+		]
+	)->fetch_callback(
+		function ($row) use (&$topic_likes) {
+			$topic_likes[$row['id_topic']] = (int) $row['num_likes'];
+		}
+	);
+
+	foreach ($topic_likes as $id_topic => $count)
+	{
+		$db->query('', '
+			UPDATE {db_prefix}topics
+			SET num_likes = CASE WHEN num_likes >= {int:count} THEN num_likes - {int:count} ELSE 0 END
+			WHERE id_topic = {int:id_topic}',
+			[
+				'count' => $count,
+				'id_topic' => $id_topic,
+			]
+		);
 	}
 
 	// Re-count the "likes given" totals for the likers

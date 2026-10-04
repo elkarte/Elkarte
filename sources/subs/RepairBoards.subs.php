@@ -470,6 +470,34 @@ function loadForumTests()
 			},
 			'messages' => ['repair_stats_topics_4', 'id_topic', 'unapproved_posts'],
 		],
+		// Find topics with incorrect num_likes.
+		'stats_topics4' => [
+			'substeps' => [
+				'step_size' => 2000,
+				'step_max' => '
+					SELECT MAX(id_topic)
+					FROM {db_prefix}topics'
+			],
+			'check_query' => '
+				SELECT
+					t.id_topic, t.num_likes, COUNT(ml.id_msg) AS my_num_likes
+				FROM {db_prefix}topics AS t
+					LEFT JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
+					LEFT JOIN {db_prefix}message_likes AS ml ON (ml.id_msg = m.id_msg)
+				WHERE t.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
+				GROUP BY t.id_topic, t.num_likes
+				HAVING num_likes != COUNT(ml.id_msg)
+				ORDER BY t.id_topic',
+			'fix_processing' => function ($row) {
+				$row['my_num_likes'] = (int) $row['my_num_likes'];
+
+				require_once(SUBSDIR . '/Topic.subs.php');
+				setTopicAttribute($row['id_topic'], [
+					'num_likes' => $row['my_num_likes'],
+				]);
+			},
+			'messages' => ['repair_stats_topics_likes', 'id_topic', 'num_likes'],
+		],
 		// Find topics with nonexistent boards.
 		'missing_boards' => [
 			'substeps' => [
