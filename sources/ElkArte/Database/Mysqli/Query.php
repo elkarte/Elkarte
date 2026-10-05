@@ -130,7 +130,40 @@ class Query extends AbstractQuery
 	 */
 	public function replace($table, $columns, $data, $keys, $disable_trans = false)
 	{
-		return $this->insert('replace', $table, $columns, $data, $keys, $disable_trans);
+		[$table, $indexed_columns, $insertRows] = $this->prepareInsert($table, $columns, $data);
+
+		$updateColumns = array_diff($indexed_columns, $keys);
+
+		// If all columns are part of the unique key, fall back to IGNORE behavior
+		if (empty($updateColumns))
+		{
+			return $this->insert('ignore', $table, $columns, $data, $keys, $disable_trans);
+		}
+
+		$updates = [];
+		foreach ($updateColumns as $column)
+		{
+			$updates[] = '`' . $column . '` = VALUES(`' . $column . '`)';
+		}
+
+		$this->result = $this->query('', '
+			INSERT INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
+			VALUES
+				' . implode(',
+				', $insertRows) . '
+			ON DUPLICATE KEY UPDATE
+				' . implode(',
+				', $updates),
+				[
+					'security_override' => true,
+				]
+		);
+
+		$this->result->updateDetails([
+			'connection' => $this->connection,
+		]);
+
+		return $this->result;
 	}
 
 	/**
