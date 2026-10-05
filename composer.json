@@ -34,7 +34,7 @@
 	    "ext-exif": "*",
 	    "michelf/php-markdown": "2.*",
         "ext-libxml": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
     },
     "soft-require": {
     	"ext-intl": "*",
@@ -44,8 +44,8 @@
 	"suggest": {
 		"ext-memcache": "*",
 		"ext-memcached": "*",
-		"predis/predis": "*",
 		"ext-apcu": "*",
+		"ext-redis": "*",
 		"ext-zlib": "*",
 		"ext-pgsql": "*",
 		"ext-imap": "*",

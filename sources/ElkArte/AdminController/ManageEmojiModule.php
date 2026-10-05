@@ -29,6 +29,9 @@ use RecursiveIteratorIterator;
  */
 abstract class ManageEmojiModule extends AbstractController
 {
+	/** @var array Known emoji sets */
+	private static array $knowSets =  ['no-emoji', 'open-moji', 'tw-emoji', 'noto-emoji'];
+
 	/**
 	 * Adds the necessary settings to the smiley area of the ACP
 	 *
@@ -62,7 +65,7 @@ abstract class ManageEmojiModule extends AbstractController
 	{
 		$req = HttpReq::instance();
 
-		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, ['no-emoji', 'open-moji', 'tw-emoji', 'noto-emoji'], true))
+		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, self::$knowSets, true))
 		{
 			$req->post->emoji_selection = 'no-emoji';
 			return;
@@ -96,7 +99,7 @@ abstract class ManageEmojiModule extends AbstractController
 	 */
 	private static function unZipEmoji(HttpReq $req): bool
 	{
-		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, ['open-moji', 'tw-emoji', 'noto-emoji'], true))
+		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, self::$knowSets, true))
 		{
 			$req->post->emoji_selection = 'no-emoji';
 			return false;
@@ -132,7 +135,7 @@ abstract class ManageEmojiModule extends AbstractController
 			return true;
 		}
 
-		if (!in_array($modSettings['emoji_selection'], ['open-moji', 'tw-emoji', 'noto-emoji'], true))
+		if (!in_array($modSettings['emoji_selection'], self::$knowSets, true))
 		{
 			return true;
 		}
@@ -174,7 +177,7 @@ abstract class ManageEmojiModule extends AbstractController
 			return true;
 		}
 
-		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, ['open-moji', 'tw-emoji', 'noto-emoji'], true))
+		if (empty($req->post->emoji_selection) || !in_array($req->post->emoji_selection, self::$knowSets, true))
 		{
 			return true;
 		}
