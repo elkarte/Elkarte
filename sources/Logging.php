@@ -72,29 +72,27 @@ function writeLog($force = false)
 		return;
 	}
 
+	// If who is online is enabled, serialize the URL so we can see what they are (kind of) doing.
+	$serialized = '';
 	if (!empty($modSettings['who_enabled']))
 	{
 		$serialized = $_GET;
 
 		// In the case of a dlattach action, session_var may not be set.
-		if (!isset($context['session_var']))
+		$session_var = $context['session_var'] ?? ($_SESSION['session_var'] ?? '');
+		if (!empty($session_var))
 		{
-			$context['session_var'] = $_SESSION['session_var'];
+			unset($serialized[$session_var]);
 		}
 
-		unset($serialized['sesc'], $serialized[$context['session_var']]);
 		$serialized = serialize($serialized);
-	}
-	else
-	{
-		$serialized = '';
 	}
 
 	// Guests use 0, members use their session ID.
 	$session_id = User::$info->is_guest ? 'ip' . User::$info->ip : session_id();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
-	$do_delete = $cache->get('log_online-update', 30) < time() - 30;
+	$do_delete = $cache->get('log_online-update', 60) < time() - 60;
 
 	require_once(SUBSDIR . '/Logging.subs.php');
 
@@ -106,7 +104,7 @@ function writeLog($force = false)
 			deleteLogOnlineInterval($session_id);
 
 			// Cache when we did it last.
-			$cache->put('log_online-update', time(), 30);
+			$cache->put('log_online-update', time(), 60);
 		}
 
 		updateLogOnline($session_id, $serialized);
@@ -142,7 +140,7 @@ function writeLog($force = false)
 		$req = Request::instance();
 
 		// Don't count longer than 15 minutes.
-		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)
+		if (time() - $_SESSION['timeOnlineUpdated'] > $modSettings['lastActive'] * 60)
 		{
 			$_SESSION['timeOnlineUpdated'] = time();
 		}
