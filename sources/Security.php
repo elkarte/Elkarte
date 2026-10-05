@@ -767,19 +767,19 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// We'll work out user agent checks
 	$req = Request::instance();
 
-	// Is it in as $_POST['sc']?
+	// Is it in as $_POST?
 	if ($type === 'post')
 	{
-		$check = $_POST[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null);
+		$check = $_POST[$_SESSION['session_var']] ?? null;
 		if ($check !== $_SESSION['session_value'])
 		{
 			$error = 'session_timeout';
 		}
 	}
-	// How about $_GET['sesc']?
+	// How about $_GET?
 	elseif ($type === 'get')
 	{
-		$check = $_GET[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : null);
+		$check = $_GET[$_SESSION['session_var']] ?? null;
 		if ($check !== $_SESSION['session_value'])
 		{
 			$error = 'session_verify_fail';
@@ -788,23 +788,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Or can it be in either?
 	elseif ($type === 'request')
 	{
-		$check = null;
-		if (isset($_GET[$_SESSION['session_var']]))
-		{
-			$check = $_GET[$_SESSION['session_var']];
-		}
-		elseif (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']))
-		{
-			$check = $_GET['sesc'];
-		}
-		elseif (isset($_POST[$_SESSION['session_var']]))
-		{
-			$check = $_POST[$_SESSION['session_var']];
-		}
-		elseif (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']))
-		{
-			$check = $_POST['sc'];
-		}
+		$check = $_GET[$_SESSION['session_var']] ?? ($_POST[$_SESSION['session_var']] ?? null);
 
 		if ($check !== $_SESSION['session_value'])
 		{

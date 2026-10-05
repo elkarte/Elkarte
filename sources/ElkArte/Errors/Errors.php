@@ -210,7 +210,18 @@ class Errors extends AbstractModel
 		}
 
 		// Don't log the session hash in the url twice, it's a waste.
-		$query_string = htmlspecialchars((ELK === 'SSI' ? '' : '?') . preg_replace(['~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'], [';sesc', ''], $query_string), ENT_COMPAT, 'UTF-8');
+		$session_var = $_SESSION['session_var'] ?? ($GLOBALS['context']['session_var'] ?? '');
+		$patterns = ['~' . session_name() . '=' . session_id() . '[&;]~'];
+		$replacements = [''];
+		if (!empty($session_var))
+		{
+			$patterns[] = '~;' . preg_quote($session_var, '~') . '=[^&;]+~';
+			$replacements[] = ';' . $session_var;
+			$patterns[] = '~[?&]' . preg_quote($session_var, '~') . '=[^&;]+~';
+			$replacements[] = '';
+		}
+
+		$query_string = htmlspecialchars((ELK === 'SSI' ? '' : '?') . preg_replace($patterns, $replacements, $query_string), ENT_COMPAT, 'UTF-8');
 
 		// Just so we know what board error messages are from.
 		if (isset($_POST['board']) && !isset($_GET['board']))

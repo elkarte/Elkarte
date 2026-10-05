@@ -220,13 +220,10 @@ function logSpider()
 		if ($modSettings['spider_mode'] > 2)
 		{
 			$url = $_GET;
-			if (isset($context['session_var']))
+			$session_var = $context['session_var'] ?? ($_SESSION['session_var'] ?? '');
+			if (!empty($session_var))
 			{
-				unset($url['sesc'], $url[$context['session_var']]);
-			}
-			else
-			{
-				unset($url['sesc']);
+				unset($url[$session_var]);
 			}
 
 			$url = serialize($url);
