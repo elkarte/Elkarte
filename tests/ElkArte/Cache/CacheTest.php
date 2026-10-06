@@ -8,7 +8,6 @@ use ElkArte\Cache\CacheMethod\Apc;
 use ElkArte\Cache\CacheMethod\Filebased;
 use ElkArte\Cache\CacheMethod\Memcached;
 use ElkArte\Cache\CacheMethod\Redis;
-use ElkArte\Hooks;
 use PHPUnit\Framework\TestCase;
 
 class MockMemcached extends Memcached
@@ -98,46 +97,6 @@ class CacheTest extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		if (!defined('BOARDDIR'))
-		{
-			define('BOARDDIR', dirname(__DIR__, 2));
-		}
-
-		if (!defined('SOURCEDIR'))
-		{
-			define('SOURCEDIR', BOARDDIR . '/sources');
-		}
-
-		if (!defined('EXTDIR'))
-		{
-			define('EXTDIR', SOURCEDIR . '/ext');
-		}
-
-		if (!defined('LANGUAGEDIR'))
-		{
-			define('LANGUAGEDIR', SOURCEDIR . '/ElkArte/Languages');
-		}
-
-		if (!defined('ADMINDIR'))
-		{
-			define('ADMINDIR', SOURCEDIR . '/ElkArte/AdminController');
-		}
-
-		if (!defined('CONTROLLERDIR'))
-		{
-			define('CONTROLLERDIR', SOURCEDIR . '/ElkArte/Controller');
-		}
-
-		if (!defined('SUBSDIR'))
-		{
-			define('SUBSDIR', SOURCEDIR . '/subs');
-		}
-
-		if (!defined('ADDONSDIR'))
-		{
-			define('ADDONSDIR', BOARDDIR . '/Addons');
-		}
-
 		if (!defined('CACHEDIR'))
 		{
 			$cacheDir = sys_get_temp_dir() . '/elkarte_cache';
@@ -147,10 +106,6 @@ class CacheTest extends TestCase
 			}
 			define('CACHEDIR', $cacheDir);
 		}
-
-		$mockDb = $this->createMock(\ElkArte\Database\QueryInterface::class);
-		$mockDebug = $this->createMock(\ElkArte\Debug::class);
-		Hooks::init($mockDb, $mockDebug, []);
 	}
 
 	/**

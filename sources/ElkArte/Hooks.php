@@ -45,14 +45,14 @@ final class Hooks
 	private function __construct(protected $_db, protected $_debug, $paths = null)
 	{
 		$this->_path_replacements = [
-			'BOARDDIR' => BOARDDIR,
-			'SOURCEDIR' => SOURCEDIR,
-			'EXTDIR' => EXTDIR,
-			'LANGUAGEDIR' => LANGUAGEDIR,
-			'ADMINDIR' => ADMINDIR,
-			'CONTROLLERDIR' => CONTROLLERDIR,
-			'SUBSDIR' => SUBSDIR,
-			'ADDONSDIR' => ADDONSDIR,
+			'BOARDDIR' => defined('BOARDDIR') ? BOARDDIR : '',
+			'SOURCEDIR' => defined('SOURCEDIR') ? SOURCEDIR : '',
+			'EXTDIR' => defined('EXTDIR') ? EXTDIR : '',
+			'LANGUAGEDIR' => defined('LANGUAGEDIR') ? LANGUAGEDIR : '',
+			'ADMINDIR' => defined('ADMINDIR') ? ADMINDIR : '',
+			'CONTROLLERDIR' => defined('CONTROLLERDIR') ? CONTROLLERDIR : '',
+			'SUBSDIR' => defined('SUBSDIR') ? SUBSDIR : '',
+			'ADDONSDIR' => defined('ADDONSDIR') ? ADDONSDIR : '',
 		];
 		$this->fileFunc = FileFunctions::instance();
 
@@ -562,12 +562,12 @@ final class Hooks
 	 */
 	public static function init($db = null, $debug = null, $paths = null): void
 	{
-		if ($db === null)
+		if ($db === null && function_exists('database'))
 		{
 			$db = database();
 		}
 
-		if ($debug === null)
+		if ($debug === null && class_exists('ElkArte\\Debug'))
 		{
 			$debug = Debug::instance();
 		}
