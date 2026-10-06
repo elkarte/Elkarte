@@ -44,8 +44,8 @@
 	"suggest": {
 		"ext-memcache": "*",
 		"ext-memcached": "*",
-		"predis/predis": "*",
 		"ext-apcu": "*",
+		"ext-redis": "*",
 		"ext-zlib": "*",
 		"ext-pgsql": "*",
 		"ext-imap": "*",

@@ -71,7 +71,7 @@ function updateLogOnline($session_id, $serialized)
 }
 
 /**
- * Update a users entry in the online log
+ * Insert or update a user's entry in the online log.
  *
  * @param string $session_id
  * @param string $serialized
@@ -79,33 +79,34 @@ function updateLogOnline($session_id, $serialized)
  */
 function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 {
-	global $modSettings;
-
 	$db = database();
 
-	if ($do_delete || !empty(User::$info->id))
+	// If a global interval cleanup is requested, run it via the dedicated function
+	if ($do_delete)
+	{
+		deleteLogOnlineInterval($session_id);
+	}
+
+	// If this is a logged-in member, clear any older/other sessions they may have had
+	if (!empty(User::$info->id))
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_online
-			WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty(User::$info->id) ? ' OR ' : '') . (empty(User::$info->id) ? '' : 'id_member = {int:current_member}'),
+			WHERE id_member = {int:current_member}
+				AND session != {string:session}',
 			[
 				'current_member' => User::$info->id,
-				'log_time' => time() - $modSettings['lastActive'] * 60,
+				'session' => $session_id,
 			]
 		);
 	}
 
-	$db->insert($do_delete ? 'ignore' : 'replace',
+	// Replace the row with fresh data or insert a new one if it doesn't exist
+	$db->replace(
 		'{db_prefix}log_online',
-		[
-			'session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'
-		],
-		[
-			$session_id, User::$info->id, empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), User::$info->ip, $serialized
-		],
-		[
-			'session'
-		]
+		['session' => 'string',	'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'],
+		[$session_id, User::$info->id, empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), User::$info->ip, $serialized],
+		['session']
 	);
 }
 

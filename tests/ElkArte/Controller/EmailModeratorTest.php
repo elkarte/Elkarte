@@ -58,9 +58,9 @@ class EmailModeratorTest extends ElkArteCommonSetupTest
 
 		$req = HttpReq::instance();
 		$req->query->msg = 1;
-		$req->post->msg = 1;
-		$req->post->comment = 'some needless complaint';
-		$req->post->email = 'complainer@nowhere.tld';
+
+		// Unset post data so initial call only renders the form
+		unset($req->post->{$context['session_var']}, $req->post->save);
 
 		// Get the controller
 		$controller = new Emailmoderator(new EventManager());
@@ -71,8 +71,12 @@ class EmailModeratorTest extends ElkArteCommonSetupTest
 		// We are ready to show the report forum
 		$this->assertEquals('report', $context['sub_template']);
 
-		// Send the form, you will see a sendmail error in the CI log, ignore it.
+		// Send the form, you may see a sendmail error in the CI log, ignore it.
+		$req->post->{$context['session_var']} = $context['session_value'];
 		$req->post->save = 1;
+		$req->post->msg = 1;
+		$req->post->comment = 'some needless complaint';
+		$req->post->email = 'complainer@nowhere.tld';
 		$controller->pre_dispatch();
 		$controller->action_reporttm();
 
