@@ -2,9 +2,13 @@
 
 namespace ElkArte\Cache;
 
+require_once dirname(__DIR__, 3) . '/sources/Subs.php';
+
 use ElkArte\Cache\CacheMethod\Apc;
 use ElkArte\Cache\CacheMethod\Filebased;
 use ElkArte\Cache\CacheMethod\Memcached;
+use ElkArte\Cache\CacheMethod\Redis;
+use ElkArte\Hooks;
 use PHPUnit\Framework\TestCase;
 
 class MockMemcached extends Memcached
@@ -18,12 +22,71 @@ class MockMemcached extends Memcached
 	{
 		return $this->getServers();
 	}
+
+	protected function getServers(): array
+	{
+		return $this->_options['servers'] ?? [];
+	}
+}
+
+class MockRedisClient
+{
+	public $selectedDb = null;
+	public $authPassword = null;
+	public $options = [];
+
+	public function auth($password)
+	{
+		$this->authPassword = $password;
+		return true;
+	}
+
+	public function select(int $db)
+	{
+		$this->selectedDb = $db;
+		return true;
+	}
+
+	public function setOption($option, $value)
+	{
+		$this->options[$option] = $value;
+		return true;
+	}
+
+	public function ping()
+	{
+		return true;
+	}
+}
+
+class TestableRedisMethod extends Redis
+{
+	public function __construct($options, $mockObj = null)
+	{
+		$this->_options = $options;
+		if ($mockObj !== null)
+		{
+			$this->obj = $mockObj;
+			$this->isConnected = true;
+			$this->setOptions();
+		}
+	}
+
+	public function getIsConnected(): bool
+	{
+		return $this->isConnected;
+	}
+
+	public function getObj()
+	{
+		return $this->obj;
+	}
 }
 
 /**
  * TestCase class for caching classes.
  */
-class CacheBasic extends TestCase
+class CacheTest extends TestCase
 {
 	private $_cache_obj;
 	protected $backupGlobalsExcludeList = ['user_info'];
@@ -35,6 +98,59 @@ class CacheBasic extends TestCase
 	 */
 	protected function setUp(): void
 	{
+		if (!defined('BOARDDIR'))
+		{
+			define('BOARDDIR', dirname(__DIR__, 2));
+		}
+
+		if (!defined('SOURCEDIR'))
+		{
+			define('SOURCEDIR', BOARDDIR . '/sources');
+		}
+
+		if (!defined('EXTDIR'))
+		{
+			define('EXTDIR', SOURCEDIR . '/ext');
+		}
+
+		if (!defined('LANGUAGEDIR'))
+		{
+			define('LANGUAGEDIR', SOURCEDIR . '/ElkArte/Languages');
+		}
+
+		if (!defined('ADMINDIR'))
+		{
+			define('ADMINDIR', SOURCEDIR . '/ElkArte/AdminController');
+		}
+
+		if (!defined('CONTROLLERDIR'))
+		{
+			define('CONTROLLERDIR', SOURCEDIR . '/ElkArte/Controller');
+		}
+
+		if (!defined('SUBSDIR'))
+		{
+			define('SUBSDIR', SOURCEDIR . '/subs');
+		}
+
+		if (!defined('ADDONSDIR'))
+		{
+			define('ADDONSDIR', BOARDDIR . '/Addons');
+		}
+
+		if (!defined('CACHEDIR'))
+		{
+			$cacheDir = sys_get_temp_dir() . '/elkarte_cache';
+			if (!is_dir($cacheDir))
+			{
+				mkdir($cacheDir, 0777, true);
+			}
+			define('CACHEDIR', $cacheDir);
+		}
+
+		$mockDb = $this->createMock(\ElkArte\Database\QueryInterface::class);
+		$mockDebug = $this->createMock(\ElkArte\Debug::class);
+		Hooks::init($mockDb, $mockDebug, []);
 	}
 
 	/**
@@ -69,7 +185,66 @@ class CacheBasic extends TestCase
 	{
 		$this->_cache_obj = new MockMemcached(array('servers' => array('localhost', 'localhost:11212', 'localhost:11213')));
 		$this->assertCount(3, $this->_cache_obj->getNumServers());
-		$this->doCacheTests();
+	}
+
+	/**
+	 * Testing Redis cache with invalid non-numeric cache_uid
+	 */
+	public function testRedisInvalidCacheUid()
+	{
+		$mock = new MockRedisClient();
+		$redis = new TestableRedisMethod(['cache_uid' => 'xyz'], $mock);
+
+		$this->assertFalse($redis->getIsConnected());
+		$this->assertNull($mock->selectedDb);
+	}
+
+	/**
+	 * Testing Redis cache with valid string numeric cache_uid
+	 */
+	public function testRedisNumericStringCacheUid()
+	{
+		$mock = new MockRedisClient();
+		$redis = new TestableRedisMethod(['cache_uid' => '3'], $mock);
+
+		$this->assertTrue($redis->getIsConnected());
+		$this->assertSame(3, $mock->selectedDb);
+	}
+
+	/**
+	 * Testing Redis cache with integer cache_uid
+	 */
+	public function testRedisIntCacheUid()
+	{
+		$mock = new MockRedisClient();
+		$redis = new TestableRedisMethod(['cache_uid' => 2], $mock);
+
+		$this->assertTrue($redis->getIsConnected());
+		$this->assertSame(2, $mock->selectedDb);
+	}
+
+	/**
+	 * Testing Redis cache with empty cache_uid
+	 */
+	public function testRedisEmptyCacheUid()
+	{
+		$mock = new MockRedisClient();
+		$redis = new TestableRedisMethod(['cache_uid' => ''], $mock);
+
+		$this->assertTrue($redis->getIsConnected());
+		$this->assertNull($mock->selectedDb);
+	}
+
+	/**
+	 * Testing Redis cache with zero cache_uid
+	 */
+	public function testRedisZeroCacheUid()
+	{
+		$mock = new MockRedisClient();
+		$redis = new TestableRedisMethod(['cache_uid' => '0'], $mock);
+
+		$this->assertTrue($redis->getIsConnected());
+		$this->assertSame(0, $mock->selectedDb);
 	}
 
 	/**

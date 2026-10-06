@@ -14,6 +14,7 @@
 namespace ElkArte\Cache\CacheMethod;
 
 use ElkArte\Helper\HttpReq;
+use Throwable;
 
 /**
  * Redis
@@ -39,10 +40,13 @@ class Redis extends AbstractCacheMethod
 		if ($this->isAvailable())
 		{
 			$this->obj = new \Redis();
-			$this->addServers();
-			$this->setOptions();
-			$this->setSerializerValue();
-			$this->isConnected();
+			$this->isConnected = $this->addServers();
+			if ($this->isConnected)
+			{
+				$this->setOptions();
+				$this->setSerializerValue();
+				$this->isConnected();
+			}
 		}
 	}
 
@@ -61,11 +65,16 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function isConnected(): bool
 	{
+		if (!$this->isConnected)
+		{
+			return false;
+		}
+
 		try
 		{
 			$this->isConnected = $this->obj->ping();
 		}
-		catch (\RedisException $e)
+		catch (Throwable $e)
 		{
 			$this->isConnected = false;
 		}
@@ -97,12 +106,19 @@ class Redis extends AbstractCacheMethod
 				$this->obj->auth($this->_options['cache_password']);
 			}
 
-			if (!empty($this->_options['cache_uid']))
+			if (isset($this->_options['cache_uid']) && $this->_options['cache_uid'] !== '')
 			{
-				$this->obj->select($this->_options['cache_uid']);
+				if (is_numeric($this->_options['cache_uid']))
+				{
+					$this->obj->select((int) $this->_options['cache_uid']);
+				}
+				else
+				{
+					$this->isConnected = false;
+				}
 			}
 		}
-		catch (\RedisException $e)
+		catch (Throwable $e)
 		{
 			$this->isConnected = false;
 		}
@@ -113,6 +129,11 @@ class Redis extends AbstractCacheMethod
 	 */
 	private function setSerializerValue(): void
 	{
+		if (!$this->isConnected)
+		{
+			return;
+		}
+
 		$serializer = $this->obj::SERIALIZER_PHP;
 		if (defined('Redis::SERIALIZER_IGBINARY') && extension_loaded('igbinary'))
 		{
@@ -123,7 +144,7 @@ class Redis extends AbstractCacheMethod
 		{
 			$this->obj->setOption($this->obj::OPT_SERIALIZER, $serializer);
 		}
-		catch (\RedisException $e)
+		catch (Throwable $e)
 		{
 			$this->isConnected = false;
 		}
@@ -157,7 +178,7 @@ class Redis extends AbstractCacheMethod
 					$retVal = $this->obj->connect($host, $port, 0.0);
 				}
 			}
-			catch (\RedisException $e)
+			catch (Throwable $e)
 			{
 				$retVal = false;
 			}
@@ -206,11 +227,16 @@ class Redis extends AbstractCacheMethod
 	{
 		$results = [];
 
+		if (!$this->isConnected)
+		{
+			return $results;
+		}
+
 		try
 		{
 			$cache = $this->obj->info();
 		}
-		catch (\RedisException $e)
+		catch (Throwable $e)
 		{
 			$cache = false;
 		}
@@ -239,7 +265,19 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function exists($key)
 	{
-		return $this->obj->exists($key);
+		if (!$this->isConnected)
+		{
+			return false;
+		}
+
+		try
+		{
+			return (bool) $this->obj->exists($key);
+		}
+		catch (Throwable $e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -256,7 +294,7 @@ class Redis extends AbstractCacheMethod
 		{
 			$result = $this->obj->get($key);
 		}
-		catch (\RedisException $e)
+		catch (Throwable $e)
 		{
 			$result = null;
 		}
@@ -290,7 +328,7 @@ class Redis extends AbstractCacheMethod
 
 			return $this->obj->set($key, $value);
 		}
-		catch (\RedisException $e)
+		catch (Throwable $e)
 		{
 			return false;
 		}
@@ -301,8 +339,19 @@ class Redis extends AbstractCacheMethod
 	 */
 	public function clean($type = '')
 	{
-		// Clear it out
-		$this->obj->flushDB();
+		if (!$this->isConnected)
+		{
+			return;
+		}
+
+		try
+		{
+			// Clear it out
+			$this->obj->flushDB();
+		}
+		catch (Throwable $e)
+		{
+		}
 	}
 
 	/**
