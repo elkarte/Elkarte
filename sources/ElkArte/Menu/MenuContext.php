@@ -52,7 +52,7 @@ class MenuContext
 	}
 
 	/**
-	 * Sets up all the top menu buttons
+	 * Sets up the top menu buttons
 	 *
 	 * What it does:
 	 *
@@ -151,8 +151,7 @@ class MenuContext
 			// Allow editing menu buttons easily.
 			call_integration_hook('integrate_menu_buttons', [&$buttons, &$menu_count]);
 
-			// Now we put the buttons in the context so the theme can use them.
-			$menu_buttons = $this->initializeButtonProperties($buttons, $menu_count);
+			$menu_buttons = $this->initializeButtonProperties($buttons);
 
 			if ($this->cache->levelHigherThan(1))
 			{
@@ -160,30 +159,28 @@ class MenuContext
 			}
 		}
 
-		if (!empty($menu_buttons['profile']['sub_buttons']['logout']))
-		{
-			$menu_buttons['profile']['sub_buttons']['logout']['href'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
-		}
+		// Now we apply the unique counters to the cached buttons.
+		$menu_buttons = $this->applyDynamicButtonProperties($menu_buttons, $menu_count);
 
+		// Now we put the buttons in the context so the theme can use them.
 		$context['menu_buttons'] = $menu_buttons;
 	}
 
 	/**
-	 * Initializes the properties of the buttons.
+	 * Initializes the static properties and structure of the buttons for caching.
 	 *
 	 * @param array $buttons The array of buttons.
-	 * @param array $menu_count The count of menus.
 	 *
 	 * @return array The array of buttons with initialized properties.
 	 */
-	private function initializeButtonProperties($buttons, $menu_count)
+	private function initializeButtonProperties($buttons)
 	{
 		$menu_buttons = [];
 		foreach ($buttons as $act => $button)
 		{
 			if (!empty($button['show']))
 			{
-				$button = $this->setButtonProperties($button, $menu_count);
+				$button = $this->setButtonProperties($button);
 				$menu_buttons[$act] = $button;
 			}
 		}
@@ -192,20 +189,122 @@ class MenuContext
 	}
 
 	/**
-	 * Set the properties of a button based on the menu count and other criteria.
+	 * Set the static properties of a button and clean inactive sub-buttons.
 	 *
 	 * @param array $button The button that needs to be updated.
-	 * @param array $menu_count The menu count data.
 	 * @return array The updated button.
 	 */
-	private function setButtonProperties($button, $menu_count)
+	private function setButtonProperties($button)
 	{
 		$button['active_button'] = false;
 
 		$button = $this->setButtonActionHook($button);
-		$button = $this->setButtonCounter($button, $menu_count);
 
-		return $this->setSubButtonCounter($button, $menu_count);
+		return $this->cleanSubButtons($button);
+	}
+
+	/**
+	 * Cleans inactive sub buttons from a given button structure.
+	 *
+	 * @param array $button The button containing sub buttons.
+	 * @return array The cleaned button.
+	 */
+	private function cleanSubButtons($button)
+	{
+		if (isset($button['sub_buttons']))
+		{
+			foreach ($button['sub_buttons'] as $key => $subButton)
+			{
+				if (empty($subButton['show']))
+				{
+					unset($button['sub_buttons'][$key]);
+					continue;
+				}
+
+				if (!empty($subButton['sub_buttons']))
+				{
+					foreach ($subButton['sub_buttons'] as $key2 => $subButton2)
+					{
+						if (empty($subButton2['show']))
+						{
+							unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
+						}
+					}
+				}
+			}
+		}
+
+		return $button;
+	}
+
+	/**
+	 * Applies dynamic properties (per-user counters, badges, links, and tokens) to the buttons.
+	 *
+	 * @param array $menu_buttons The cached or initialized menu buttons.
+	 * @param array $menu_count The menu count data.
+	 * @return array The updated menu buttons.
+	 */
+	private function applyDynamicButtonProperties($menu_buttons, $menu_count)
+	{
+		global $context, $modSettings;
+
+		foreach ($menu_buttons as &$button)
+		{
+			$this->setButtonCounter($button, $menu_count);
+
+			if (!empty($button['sub_buttons']))
+			{
+				$this->setSubButtonCounter($button['sub_buttons'], $menu_count);
+			}
+		}
+		unset($button);
+
+		if (isset($menu_buttons['pm']))
+		{
+			$menu_buttons['pm']['data-icon'] = !empty($menu_count['unread_messages']) ? 'i-menu-pm-on' : 'i-menu-pm-off';
+		}
+
+		if (isset($menu_buttons['mentions']))
+		{
+			$menu_buttons['mentions']['data-icon'] = !empty($menu_count['mentions']) ? 'i-menu-mentions-on' : 'i-menu-mentions-off';
+		}
+
+		if (!empty($menu_buttons['profile']))
+		{
+			if (!empty($modSettings['displayMemberNames']))
+			{
+				$menu_buttons['profile']['title'] = $this->user->name;
+			}
+
+			// Set the profile button's links to the user's profile
+			$menu_buttons['profile']['href'] = getUrl('profile', ['action' => 'profile', 'u' => $this->user->id, 'name' => $this->user->name]);
+			if (!empty($menu_buttons['profile']['sub_buttons']['account']))
+			{
+				$menu_buttons['profile']['sub_buttons']['account']['href'] = getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => $this->user->id, 'name' => $this->user->name]);
+			}
+
+			if (!empty($menu_buttons['profile']['sub_buttons']['drafts']))
+			{
+				$menu_buttons['profile']['sub_buttons']['drafts']['href'] = getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $this->user->id, 'name' => $this->user->name]);
+			}
+
+			if (!empty($menu_buttons['profile']['sub_buttons']['forumprofile']))
+			{
+				$menu_buttons['profile']['sub_buttons']['forumprofile']['href'] = getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $this->user->id, 'name' => $this->user->name]);
+			}
+
+			if (!empty($menu_buttons['profile']['sub_buttons']['theme']))
+			{
+				$menu_buttons['profile']['sub_buttons']['theme']['href'] = getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => $this->user->id, 'name' => $this->user->name]);
+			}
+
+			if (!empty($menu_buttons['profile']['sub_buttons']['logout']))
+			{
+				$menu_buttons['profile']['sub_buttons']['logout']['href'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
+			}
+		}
+
+		return $menu_buttons;
 	}
 
 	/**
@@ -229,9 +328,9 @@ class MenuContext
 	 *
 	 * @param array $button The button that needs to be updated.
 	 * @param array $menu_count The menu count data.
-	 * @return array The updated button.
+	 * @return void
 	 */
-	private function setButtonCounter($button, $menu_count)
+	private function setButtonCounter(&$button, $menu_count)
 	{
 		if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
 		{
@@ -245,78 +344,32 @@ class MenuContext
 			// If the counter is set but is zero, add a hidden indicator to simplify ajax update the counter
 			$this->addCountsToTitle($button['title'], $menu_count[$button['counter']], -1);
 		}
-
-		return $button;
 	}
 
 	/**
-	 * Sets the counter for sub buttons of a given button
+	 * Sets the counter for sub buttons of a given button structure.
 	 *
-	 * @param array $button The button containing sub buttons
-	 * @param array $menu_count The count of items for each sub button
-	 *
-	 * @return array The modified button with updated counters for sub buttons
+	 * @param array $sub_buttons Array of sub buttons.
+	 * @param array $menu_count The count of items for each sub button.
+	 * @param int $level Nesting level for formatting.
+	 * @return void
 	 */
-	private function setSubButtonCounter($button, $menu_count)
+	private function setSubButtonCounter(&$sub_buttons, $menu_count, $level = 1)
 	{
-		if (isset($button['sub_buttons']))
+		foreach ($sub_buttons as &$subButton)
 		{
-			foreach ($button['sub_buttons'] as $key => $subButton)
+			if (isset($subButton['counter']) && !empty($menu_count[$subButton['counter']]))
 			{
-				if (empty($subButton['show']))
-				{
-					unset($button['sub_buttons'][$key]);
-					continue;
-				}
+				$subButton['alttitle'] = $subButton['title'] . ' [' . $menu_count[$subButton['counter']] . ']';
+				$this->addCountsToTitle($subButton['title'], $menu_count[$subButton['counter']], min($level, 2));
+			}
 
-				if (isset($subButton['counter']) && !empty($menu_count[$subButton['counter']]))
-				{
-					$button['sub_buttons'][$key]['alttitle'] = $subButton['title'] . ' [' . $menu_count[$subButton['counter']] . ']';
-					$this->addCountsToTitle($button['sub_buttons'][$key]['title'], $menu_count[$subButton['counter']], 1);
-
-					// And any counter on its submenu
-					$button = $this->setSubButtonCounts($button, $key, $subButton, $menu_count);
-				}
+			if (!empty($subButton['sub_buttons']))
+			{
+				$this->setSubButtonCounter($subButton['sub_buttons'], $menu_count, $level + 1);
 			}
 		}
-
-		return $button;
-	}
-
-	/**
-	 * Sets the sub button counts for a given button.
-	 *
-	 * @param array $button The original button array.
-	 * @param int $key The key of the sub button.
-	 * @param array $subButton The sub button array.
-	 * @param array $menu_count The count of menus.
-	 *
-	 * @return array The updated button array with sub button counts set.
-	 */
-	private function setSubButtonCounts($button, $key, $subButton, $menu_count)
-	{
-		if (empty($subButton['sub_buttons']))
-		{
-			return $button;
-		}
-
-		foreach ($subButton['sub_buttons'] as $key2 => $subButton2)
-		{
-			$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subButton2;
-
-			if (empty($subButton2['show']))
-			{
-				unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
-			}
-			elseif (isset($subButton2['counter']) && !empty($menu_count[$subButton2['counter']]))
-			{
-				$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $subButton2['title'] . ' [' . $menu_count[$subButton2['counter']] . ']';
-				$this->addCountsToTitle($button['sub_buttons'][$key]['sub_buttons'][$key2]['title'], $menu_count[$subButton2['counter']], 1);
-				unset($menu_count[$subButton2['counter']]);
-			}
-		}
-
-		return $button;
+		unset($subButton);
 	}
 
 	/**
