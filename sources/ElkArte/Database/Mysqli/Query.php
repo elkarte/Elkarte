@@ -292,7 +292,7 @@ class Query extends AbstractQuery
 	{
 		global $modSettings;
 
-		if (function_exists('\\ElkArte\\Cache\\Cache::instance()->get')
+		if (class_exists('\\ElkArte\\Cache\\Cache')
 			&& (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] === '1'))
 		{
 			$db_last_error = db_last_error();
