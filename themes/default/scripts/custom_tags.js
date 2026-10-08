@@ -9,6 +9,7 @@
  
  let custom = [
  	{name: 'angry', key: 'angry', type: 'svg'},
+	{name: 'banghead', key: 'banghead', type: 'gif'},
 	{name: 'cheesy', key: 'cheesy', type: 'svg'},
 	{name: 'clown', key: 'clown', type: 'svg'},
 	{name: 'cool', key: 'cool', type: 'svg'},
@@ -16,7 +17,9 @@
 	{name: 'elk', key: 'elk', type: 'svg'},
 	{name: 'embarrassed', key: 'embarrassed', type: 'svg'},
 	{name: 'evil', key: 'evil', type: 'svg'},
+	{name: 'facepalm', key: 'facepalm2', type: 'gif'},
 	{name: 'face_vomiting', key: 'vomit', type: 'svg'},
+	{name: 'giggle', key: 'giggle', type: 'gif'},
 	{name: 'grimacing', key: 'grimacing', type: 'svg'},
 	{name: 'grin', key: 'grin', type: 'svg'},
 	{name: 'head_bandage', key: 'clumsy', type: 'svg'},
