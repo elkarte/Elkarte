@@ -146,4 +146,43 @@ class UtilTest extends TestCase
 	{
 		$this->assertEquals(45, Util::strlen($this->string));
 	}
+
+	/**
+	 * test is_serialized with various valid and invalid data
+	 */
+	public function test_is_serialized()
+	{
+		$this->assertFalse(Util::is_serialized(''));
+		$this->assertFalse(Util::is_serialized(null));
+		$this->assertFalse(Util::is_serialized(123));
+		$this->assertFalse(Util::is_serialized('just a plain string'));
+		$this->assertFalse(Util::is_serialized('a:2:{invalid_serialized_data'));
+
+		$this->assertTrue(Util::is_serialized(serialize(['key' => 'value'])));
+		$this->assertTrue(Util::is_serialized(serialize('test string')));
+		$this->assertTrue(Util::is_serialized(serialize(12345)));
+		$this->assertTrue(Util::is_serialized(serialize(true)));
+		$this->assertTrue(Util::is_serialized(serialize(false)));
+		$this->assertTrue(Util::is_serialized(serialize(null)));
+	}
+
+	/**
+	 * test unserialize with various inputs
+	 */
+	public function test_unserialize()
+	{
+		$this->assertSame('', Util::unserialize(''));
+		$this->assertSame('', Util::unserialize(null));
+		$this->assertSame('', Util::unserialize('not a serialized string'));
+		$this->assertSame('', Util::unserialize('a:3:{broken:serialization'));
+
+		$array = ['foo' => 'bar', 'nested' => [1, 2, 3]];
+		$this->assertSame($array, Util::unserialize(serialize($array)));
+
+		$this->assertSame('hello world', Util::unserialize(serialize('hello world')));
+		$this->assertSame(42, Util::unserialize(serialize(42)));
+		$this->assertSame(true, Util::unserialize(serialize(true)));
+		$this->assertSame(false, Util::unserialize(serialize(false)));
+		$this->assertNull(Util::unserialize(serialize(null)));
+	}
 }

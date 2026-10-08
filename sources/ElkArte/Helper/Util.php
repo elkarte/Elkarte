@@ -576,10 +576,28 @@ class Util
 	 */
 	public static function unserialize($string, $options = [])
 	{
-		$options['allowed_classes'] = false;
-		if (self::is_serialized($string))
+		if (!is_string($string) || $string === '')
 		{
-			return unserialize($string, $options);
+			return '';
+		}
+
+		if ($string === 'b:0;')
+		{
+			return false;
+		}
+
+		try
+		{
+			$options['allowed_classes'] = false;
+			$result = @unserialize($string, $options);
+			if ($result !== false)
+			{
+				return $result;
+			}
+		}
+		catch (\Throwable)
+		{
+			return '';
 		}
 
 		return '';
@@ -595,33 +613,25 @@ class Util
 	 */
 	public static function is_serialized($string): bool
 	{
-		$check = false;
-
 		// Easy cases
 		if (!is_string($string) || $string === '')
 		{
 			return false;
 		}
 
-		// Attempt to unserialize, mask errors
-		set_error_handler(static function () { /* ignore errors */ });
+		if ($string === 'b:0;')
+		{
+			return true;
+		}
+
 		try
 		{
-			if (unserialize($string, ['allowed_classes' => false]) !== false)
-			{
-				$check = true;
-			}
+			return @unserialize($string, ['allowed_classes' => false]) !== false;
 		}
 		catch (\Throwable)
 		{
-			/* do nothing */
+			return false;
 		}
-		finally
-		{
-			restore_error_handler();
-		}
-
-		return $check;
 	}
 
 	/**
