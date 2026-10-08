@@ -287,20 +287,20 @@ class Cache
 			return;
 		}
 
+		$this->_cached_keys[] = $key;
+		$key = $this->_key($key);
+		$value = $value === null ? null : serialize($value);
+
 		// If we are showing debug information, we have some data to collect
 		if ($db_show_debug === true)
 		{
 			$cache_hit = [
 				'k' => $key,
 				'd' => 'put',
-				's' => $value === null ? 0 : strlen(serialize($value))
+				's' => $value === null ? 0 : strlen($value)
 			];
 			$st = microtime(true);
 		}
-
-		$this->_cached_keys[] = $key;
-		$key = $this->_key($key);
-		$value = $value === null ? null : serialize($value);
 
 		$this->_cache_obj->put($key, $value, $ttl);
 
