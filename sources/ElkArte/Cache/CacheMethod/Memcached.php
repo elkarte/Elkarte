@@ -2,6 +2,7 @@
 
 /**
  * This file contains functions that deal with getting and setting memcacheD cache values.
+ * Memcached.php interfaces with PHP's newer memcached PECL extension and instantiates \Memcached.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

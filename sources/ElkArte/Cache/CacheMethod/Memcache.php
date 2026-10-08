@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file contains functions that deal with getting and setting cache values.
+ * This file contains functions that deal with getting and setting cache values
+ * using the memcache PECL extension. This is the older memcache extension, not memcached.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
