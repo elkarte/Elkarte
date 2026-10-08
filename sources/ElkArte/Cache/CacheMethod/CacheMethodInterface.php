@@ -58,6 +58,25 @@ interface CacheMethodInterface
 	public function get($key, $ttl = 120);
 
 	/**
+	 * Gets multiple values from the cache specified by an array of keys,
+	 * so long as they are not older than ttl seconds.
+	 *
+	 * @param array $keys
+	 * @param int $ttl = 120
+	 * @return array
+	 */
+	public function getMulti(array $keys, $ttl = 120);
+
+	/**
+	 * Puts multiple values in the cache under their respective keys for ttl seconds.
+	 *
+	 * @param array $items [key => value]
+	 * @param int $ttl = 120
+	 * @return void
+	 */
+	public function putMulti(array $items, $ttl = 120);
+
+	/**
 	 * Empty out the cache in use as best it can.
 	 *
 	 * It may only remove the files of a certain type (if the $type parameter is given)

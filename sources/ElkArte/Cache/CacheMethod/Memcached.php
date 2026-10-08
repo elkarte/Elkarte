@@ -2,6 +2,7 @@
 
 /**
  * This file contains functions that deal with getting and setting memcacheD cache values.
+ * Memcached.php interfaces with PHP's newer memcached PECL extension and instantiates \Memcached.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -210,6 +211,21 @@ class Memcached extends AbstractCacheMethod
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		if (empty($keys))
+		{
+			return [];
+		}
+
+		$results = $this->obj->getMulti($keys);
+
+		return is_array($results) ? $results : [];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		if ($value === null)
@@ -218,6 +234,19 @@ class Memcached extends AbstractCacheMethod
 		}
 
 		$this->obj->set($key, $value, $ttl);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		if (empty($items))
+		{
+			return;
+		}
+
+		$this->obj->setMulti($items, $ttl);
 	}
 
 	/**

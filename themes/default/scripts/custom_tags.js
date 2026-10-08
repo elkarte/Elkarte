@@ -1,14 +1,14 @@
 /*!
  * Auto-generated file, DO NOT manually edit
- *		
+ *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  */
- 
- let custom = [
- 	{name: 'angry', key: 'angry', type: 'svg'},
+
+let custom = [
+	{name: 'angry', key: 'angry', type: 'svg'},
 	{name: 'cheesy', key: 'cheesy', type: 'svg'},
 	{name: 'clown', key: 'clown', type: 'svg'},
 	{name: 'cool', key: 'cool', type: 'svg'},

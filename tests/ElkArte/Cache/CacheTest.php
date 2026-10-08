@@ -28,11 +28,58 @@ class MockMemcached extends Memcached
 	}
 }
 
+class MockRedisPipeline
+{
+	private $client;
+	private $operations = [];
+
+	public function __construct($client)
+	{
+		$this->client = $client;
+	}
+
+	public function setex($key, $ttl, $value)
+	{
+		$this->operations[] = ['setex', $key, $ttl, $value];
+		return $this;
+	}
+
+	public function set($key, $value)
+	{
+		$this->operations[] = ['set', $key, $value];
+		return $this;
+	}
+
+	public function del($key)
+	{
+		$this->operations[] = ['del', $key];
+		return $this;
+	}
+
+	public function exec()
+	{
+		foreach ($this->operations as $op)
+		{
+			if ($op[0] === 'setex' || $op[0] === 'set')
+			{
+				$this->client->data[$op[1]] = $op[3] ?? $op[2];
+			}
+			elseif ($op[0] === 'del')
+			{
+				unset($this->client->data[$op[1]]);
+			}
+		}
+		$this->operations = [];
+		return true;
+	}
+}
+
 class MockRedisClient
 {
 	public $selectedDb = null;
 	public $authPassword = null;
 	public $options = [];
+	public $data = [];
 
 	public function auth($password)
 	{
@@ -55,6 +102,26 @@ class MockRedisClient
 	public function ping()
 	{
 		return true;
+	}
+
+	public function get($key)
+	{
+		return $this->data[$key] ?? false;
+	}
+
+	public function mget(array $keys)
+	{
+		$results = [];
+		foreach ($keys as $k)
+		{
+			$results[] = $this->data[$k] ?? false;
+		}
+		return $results;
+	}
+
+	public function pipeline()
+	{
+		return new MockRedisPipeline($this);
 	}
 }
 
@@ -281,8 +348,89 @@ class CacheTest extends TestCase
 		$this->assertTrue($this->_cache_obj->exists('test'));
 		$this->_cache_obj->put('test2', $test_array);
 		$this->assertTrue($this->_cache_obj->exists('test2'));
+
+		// Test getMulti and putMulti
+		$multiItems = [
+			'multi_a' => serialize('val_a'),
+			'multi_b' => serialize('val_b'),
+		];
+		$this->_cache_obj->putMulti($multiItems, 120);
+		$multiResults = $this->_cache_obj->getMulti(['multi_a', 'multi_b', 'multi_c'], 120);
+		$this->assertCount(2, $multiResults);
+		$this->assertSame(serialize('val_a'), $multiResults['multi_a']);
+		$this->assertSame(serialize('val_b'), $multiResults['multi_b']);
+
 		$this->_cache_obj->clean();
 		$this->assertFalse($this->_cache_obj->exists('test'));
 		$this->assertFalse($this->_cache_obj->exists('test2'));
+		$this->assertFalse($this->_cache_obj->exists('multi_a'));
+		$this->assertFalse($this->_cache_obj->exists('multi_b'));
+	}
+
+	/**
+	 * Testing multi-key get and put on Cache class
+	 */
+	public function testCacheClassMulti()
+	{
+		global $cache_accelerator, $cache_enable;
+
+		$cache_accelerator = '';
+		$cache_enable = 1;
+
+		$cache = Cache::instance();
+		$file_cache = new Filebased([]);
+		$object = new \ReflectionClass($cache);
+		$property = $object->getProperty('_cache_obj');
+		$property->setAccessible(true);
+		$property->setValue($cache, $file_cache);
+
+		$cache->setLevel(1);
+		$cache->enable(true);
+
+		$items = [
+			'multi_key_1' => ['id' => 1, 'name' => 'Alice'],
+			'multi_key_2' => ['id' => 2, 'name' => 'Bob'],
+			'multi_key_3' => ['id' => 3, 'name' => 'Charlie'],
+		];
+
+		$cache->putMulti($items, 240);
+
+		$results = $cache->getMulti(['multi_key_1', 'multi_key_2', 'multi_key_3', 'multi_key_missing'], 240);
+
+		$this->assertCount(3, $results);
+		$this->assertSame(['id' => 1, 'name' => 'Alice'], $results['multi_key_1']);
+		$this->assertSame(['id' => 2, 'name' => 'Bob'], $results['multi_key_2']);
+		$this->assertSame(['id' => 3, 'name' => 'Charlie'], $results['multi_key_3']);
+		$this->assertArrayNotHasKey('multi_key_missing', $results);
+
+		// Clean up
+		$cache->put('multi_key_1', null);
+		$cache->put('multi_key_2', null);
+		$cache->put('multi_key_3', null);
+	}
+
+	/**
+	 * Testing Redis getMulti and putMulti
+	 */
+	public function testRedisMultiOperations()
+	{
+		$mock = new MockRedisClient();
+		$redis = new TestableRedisMethod(['cache_uid' => '1'], $mock);
+
+		$items = [
+			'k1' => serialize('v1'),
+			'k2' => serialize('v2'),
+			'k3' => serialize('v3'),
+		];
+
+		$redis->putMulti($items, 120);
+
+		$results = $redis->getMulti(['k1', 'k2', 'k3', 'k4'], 120);
+
+		$this->assertCount(3, $results);
+		$this->assertSame(serialize('v1'), $results['k1']);
+		$this->assertSame(serialize('v2'), $results['k2']);
+		$this->assertSame(serialize('v3'), $results['k3']);
+		$this->assertArrayNotHasKey('k4', $results);
 	}
 }

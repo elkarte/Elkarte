@@ -73,6 +73,35 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		$results = [];
+		foreach ($keys as $key)
+		{
+			$val = $this->get($key, $ttl);
+			if (!$this->isMiss())
+			{
+				$results[$key] = $val;
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		foreach ($items as $key => $value)
+		{
+			$this->put($key, $value, $ttl);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function isMiss(): bool
 	{
 		return $this->is_miss;

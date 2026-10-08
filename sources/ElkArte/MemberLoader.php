@@ -109,7 +109,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data from a member id
+	 * Loads users' data from a member id
 	 *
 	 * @param int|int[] $users Single id or list of ids to load
 	 * @param string $set The data to load (see the constants SET_*)
@@ -148,37 +148,47 @@ class MemberLoader
 	{
 		if (!$this->useCache)
 		{
-			$to_load = $users;
+			return (array) $users;
 		}
-		else
-		{
-			$to_load = [];
-			foreach ($users as $user)
-			{
-				$data = $this->cache->get('member_data-' . $this->set . '-' . $user, 240);
-				if ($this->cache->isMiss())
-				{
-					$to_load[] = $user;
-					continue;
-				}
 
-				$member = new Member($data['data'], $data['set'], $this->bbc_parser);
+		$keys = [];
+		foreach ($users as $user)
+		{
+			$keys[] = 'member_data-' . $this->set . '-' . $user;
+		}
+
+		$cachedData = $this->cache->getMulti($keys, 240);
+		$to_load = [];
+
+		foreach ($users as $user)
+		{
+			$cacheKey = 'member_data-' . $this->set . '-' . $user;
+			if (!isset($cachedData[$cacheKey]) || !is_array($cachedData[$cacheKey]) || empty($cachedData[$cacheKey]['data']))
+			{
+				$to_load[] = $user;
+				continue;
+			}
+
+			$data = $cachedData[$cacheKey];
+			$member = new Member($data['data'], $data['set'], $this->bbc_parser);
+			if (!empty($data['additional_data']) && is_array($data['additional_data']))
+			{
 				foreach ($data['additional_data'] as $key => $values)
 				{
 					$member->append($key, $values, $this->options['display_fields']);
 				}
-
-				$this->users_list::add($member, $data['data']['id_member']);
-				$this->loaded_ids[] = $data['data']['id_member'];
-				$this->loaded_members[$data['data']['id_member']] = $member;
 			}
+
+			$this->users_list::add($member, $data['data']['id_member']);
+			$this->loaded_ids[] = $data['data']['id_member'];
+			$this->loaded_members[$data['data']['id_member']] = $member;
 		}
 
 		return $to_load;
 	}
 
 	/**
-	 * Loads users data provided a where clause and an array of ids
+	 * Loads users' data provided a where clause and an array of ids
 	 *
 	 * @param string $where_clause The WHERE clause of the query to run
 	 * @param int[] $to_load Array of ids to load
@@ -303,17 +313,27 @@ class MemberLoader
 	 */
 	protected function storeInCache($new_loaded_ids): void
 	{
-		if ($this->useCache)
+		if ($this->useCache && !empty($new_loaded_ids))
 		{
+			$items = [];
 			foreach ($new_loaded_ids as $id)
 			{
-				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getById($id)->toArray(), 240);
+				$member = $this->users_list->getById($id);
+				if ($member !== null)
+				{
+					$items['member_data-' . $this->set . '-' . $id] = $member->toArray();
+				}
+			}
+
+			if (!empty($items))
+			{
+				$this->cache->putMulti($items, 240);
 			}
 		}
 	}
 
 	/**
-	 * Loads moderators data into the \ElkArte\Member objects
+	 * Loads moderator data into the \ElkArte\Member objects
 	 */
 	protected function loadModerators(): void
 	{
@@ -359,7 +379,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data from a member name
+	 * Loads users' data from a member name
 	 *
 	 * @param string|string[] $name Single name or list of names to load
 	 * @param string $set The data to load (see the constants SET_*)

@@ -251,6 +251,73 @@ class Cache
 	}
 
 	/**
+	 * Gets multiple values from the cache specified by an array of keys,
+	 * so long as they are not older than ttl seconds.
+	 *
+	 * @param array $keys Array of cache keys to retrieve
+	 * @param int $ttl = 120
+	 *
+	 * @return array Associative array of [key => unserialized_value] for cache hits
+	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		global $db_show_debug;
+
+		if (!$this->isEnabled() || empty($keys))
+		{
+			return [];
+		}
+
+		$keyMap = [];
+		$engineKeys = [];
+		foreach ($keys as $key)
+		{
+			$engineKey = $this->_key($key);
+			$engineKeys[] = $engineKey;
+			$keyMap[$engineKey] = $key;
+		}
+
+		if ($db_show_debug === true)
+		{
+			$cache_hit = [
+				'k' => implode(', ', $keys),
+				'd' => 'getMulti'
+			];
+			$st = microtime(true);
+		}
+
+		$rawResults = $this->_cache_obj->getMulti($engineKeys, $ttl);
+
+		if ($db_show_debug === true)
+		{
+			$cache_hit['t'] = microtime(true) - $st;
+			$cache_hit['s'] = is_array($rawResults) ? array_sum(array_map('strlen', $rawResults)) : 0;
+			Debug::instance()->cache($cache_hit);
+		}
+
+		call_integration_hook('cache_get_multi_data', [$engineKeys, $ttl, $rawResults]);
+
+		$results = [];
+		if (is_array($rawResults))
+		{
+			foreach ($rawResults as $engineKey => $value)
+			{
+				if ($value !== null && $value !== '')
+				{
+					$cacheHit = Util::unserialize($value);
+					if ($cacheHit !== '' || $value === serialize(''))
+					{
+						$origKey = $keyMap[$engineKey] ?? $engineKey;
+						$results[$origKey] = $cacheHit;
+					}
+				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Get the key for the cache.
 	 *
 	 * @param string $key
@@ -287,26 +354,76 @@ class Cache
 			return;
 		}
 
+		$this->_cached_keys[] = $key;
+		$key = $this->_key($key);
+		$value = $value === null ? null : serialize($value);
+
 		// If we are showing debug information, we have some data to collect
 		if ($db_show_debug === true)
 		{
 			$cache_hit = [
 				'k' => $key,
 				'd' => 'put',
-				's' => $value === null ? 0 : strlen(serialize($value))
+				's' => $value === null ? 0 : strlen($value)
 			];
 			$st = microtime(true);
 		}
-
-		$this->_cached_keys[] = $key;
-		$key = $this->_key($key);
-		$value = $value === null ? null : serialize($value);
 
 		$this->_cache_obj->put($key, $value, $ttl);
 
 		call_integration_hook('cache_put_data', [$key, $value, $ttl]);
 
 		// Show the debug cache hit information
+		if ($db_show_debug === true)
+		{
+			$cache_hit['t'] = microtime(true) - $st;
+			Debug::instance()->cache($cache_hit);
+		}
+	}
+
+	/**
+	 * Puts multiple values in the cache under their respective keys for ttl seconds.
+	 *
+	 * @param array $items Array of [key => value] to store
+	 * @param int $ttl = 120
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		global $db_show_debug;
+
+		if (!$this->isEnabled() || empty($items))
+		{
+			return;
+		}
+
+		$engineItems = [];
+		$totalSize = 0;
+		foreach ($items as $key => $value)
+		{
+			$this->_cached_keys[] = $key;
+			$engineKey = $this->_key($key);
+			$serialized = $value === null ? null : serialize($value);
+			$engineItems[$engineKey] = $serialized;
+			if ($db_show_debug === true && $serialized !== null)
+			{
+				$totalSize += strlen($serialized);
+			}
+		}
+
+		if ($db_show_debug === true)
+		{
+			$cache_hit = [
+				'k' => implode(', ', array_keys($items)),
+				'd' => 'putMulti',
+				's' => $totalSize
+			];
+			$st = microtime(true);
+		}
+
+		$this->_cache_obj->putMulti($engineItems, $ttl);
+
+		call_integration_hook('cache_put_multi_data', [$engineItems, $ttl]);
+
 		if ($db_show_debug === true)
 		{
 			$cache_hit['t'] = microtime(true) - $st;

@@ -43,6 +43,21 @@ class MembersList
 	}
 
 	/**
+	 * Returns the singleton instance of MembersList
+	 *
+	 * @return MembersList
+	 */
+	public static function instance(): MembersList
+	{
+		if (self::$instance === null)
+		{
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * Initialize the loader and the instance of this class
 	 *
 	 * @param QueryInterface $db The object to query the database
@@ -53,12 +68,7 @@ class MembersList
 	{
 		global $modSettings, $board_info;
 
-		if (self::$instance === null)
-		{
-			self::$instance = new MembersList();
-		}
-
-		self::$loader = new MemberLoader($db, $cache, $bbc_parser, self::$instance, [
+		self::$loader = new MemberLoader($db, $cache, $bbc_parser, self::instance(), [
 			'titlesEnable' => !empty($modSettings['titlesEnable']),
 			'custom_fields' => featureEnabled('cp'),
 			'load_moderators' => !empty($board_info['moderators']),
@@ -141,7 +151,7 @@ class MembersList
 	}
 
 	/**
-	 * Unloads a \ElkArte\Member object from the list to allow freeing some memory.
+	 * Unloads an \ElkArte\Member object from the list to allow freeing some memory.
 	 *
 	 * @param int $id id of the member
 	 */
