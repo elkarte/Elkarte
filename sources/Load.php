@@ -367,34 +367,8 @@ function loadBoard()
 				}
 			} while (($row = $request->fetch_assoc()));
 
-			// If the board only contains unapproved posts and the user can't approve, then they can't see any topics.
-			// If that is the case, do an additional check to see if they have any topics waiting to be approved.
-			if ($board_info['num_topics'] === 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
-			{
-				// Free the previous result
-				$request->free_result();
-
-				// @todo why is this using id_topic?
-				// @todo Can this get cached?
-				$request = $db->query('', '
-					SELECT COUNT(id_topic)
-					FROM {db_prefix}topics
-					WHERE id_member_started={int:id_member}
-						AND approved = {int:unapproved}
-						AND id_board = {int:board}',
-					[
-						'id_member' => User::$info->id,
-						'unapproved' => 0,
-						'board' => $board,
-					]
-				);
-
-				[$board_info['unapproved_user_topics']] = $request->fetch_row();
-			}
-
 			if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
 			{
-				// @todo SLOW?
 				if (!empty($topic))
 				{
 					$cache->put('topic_board-' . $topic, $board_info);
@@ -435,6 +409,31 @@ function loadBoard()
 		if (!empty($modSettings['deny_boards_access']) &&  User::$info->is_admin === false && count(array_intersect(User::$info->groups, $board_info['deny_groups'])) !== 0)
 		{
 			$board_info['error'] = 'access';
+		}
+
+		// If the board only contains unapproved posts and the user can't approve, then they can't see any topics.
+		// If that is the case, do an additional check to see if they have any topics waiting to be approved.
+		if (empty($board_info['error'])
+			&& $board_info['num_topics'] === 0
+			&& !empty($modSettings['postmod_active'])
+			&& !allowedTo('approve_posts'))
+		{
+			$request = $db->query('', '
+				SELECT COUNT(id_topic)
+				FROM {db_prefix}topics
+				WHERE id_member_started = {int:id_member}
+					AND approved = {int:unapproved}
+					AND id_board = {int:board}',
+				[
+					'id_member' => User::$info->id,
+					'unapproved' => 0,
+					'board' => $board,
+				]
+			);
+
+			[$board_info['unapproved_user_topics']] = $request->fetch_row();
+			$board_info['unapproved_user_topics'] = (int) $board_info['unapproved_user_topics'];
+			$request->free_result();
 		}
 
 		// Build up the breadcrumbs.
