@@ -135,7 +135,7 @@ class LoadBoardCacheTest extends TestCase
 
 	protected function setUp(): void
 	{
-		global $context, $modSettings, $scripturl, $boardurl, $txt, $mock_db;
+		global $context, $modSettings, $scripturl, $boardurl, $txt, $mock_db, $db_instance;
 
 		$boardurl = 'http://example.com';
 		$scripturl = 'http://example.com/index.php';
@@ -148,6 +148,7 @@ class LoadBoardCacheTest extends TestCase
 		$txt['forum_name_html_safe'] = 'Test Forum';
 
 		$mock_db = new MockDatabase();
+		$db_instance = $mock_db;
 		$mock_db->boardData[2] = [
 			[
 				'id_cat' => 1,
@@ -192,6 +193,15 @@ class LoadBoardCacheTest extends TestCase
 		]);
 
 		$context['breadcrumbs'] = [];
+	}
+
+	protected function tearDown(): void
+	{
+		global $db_instance;
+
+		$db_instance = null;
+		Cache::instance()->remove('board-2');
+		Cache::instance()->remove('topic_board-0');
 	}
 
 	public function testBoardCacheCleanFromUserState()

@@ -50,7 +50,13 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  */
 function database($fatal = true, $force = false)
 {
+	global $db_instance;
 	static $db = null;
+
+	if ($db_instance !== null)
+	{
+		return $db_instance;
+	}
 
 	if ($db === null || $force === true)
 	{
