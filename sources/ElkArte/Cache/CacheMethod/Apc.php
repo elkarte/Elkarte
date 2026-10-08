@@ -101,6 +101,43 @@ class Apc extends AbstractCacheMethod
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		if (empty($keys))
+		{
+			return [];
+		}
+
+		$prefixedKeys = [];
+		$keyMap = [];
+		foreach ($keys as $key)
+		{
+			$pKey = $this->getprefixedKey($key);
+			$prefixedKeys[] = $pKey;
+			$keyMap[$pKey] = $key;
+		}
+
+		$success = false;
+		$fetched = apcu_fetch($prefixedKeys, $success);
+
+		$results = [];
+		if ($success && is_array($fetched))
+		{
+			foreach ($fetched as $pKey => $val)
+			{
+				if (isset($keyMap[$pKey]))
+				{
+					$results[$keyMap[$pKey]] = $val;
+				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		$prefixedKey = $this->getprefixedKey($key);
@@ -113,6 +150,25 @@ class Apc extends AbstractCacheMethod
 		{
 			apcu_store($prefixedKey, $value, $ttl);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		if (empty($items))
+		{
+			return;
+		}
+
+		$prefixedItems = [];
+		foreach ($items as $key => $value)
+		{
+			$prefixedItems[$this->getprefixedKey($key)] = $value;
+		}
+
+		apcu_store($prefixedItems, null, $ttl);
 	}
 
 	/**

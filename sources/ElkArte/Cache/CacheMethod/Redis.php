@@ -307,6 +307,44 @@ class Redis extends AbstractCacheMethod
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		if (!$this->isConnected || empty($keys))
+		{
+			return [];
+		}
+
+		try
+		{
+			$values = $this->obj->mget($keys);
+		}
+		catch (Throwable $e)
+		{
+			$values = false;
+		}
+
+		if (!is_array($values))
+		{
+			return [];
+		}
+
+		$results = [];
+		$i = 0;
+		foreach ($keys as $key)
+		{
+			$val = $values[$i++];
+			if ($val !== false && $val !== null)
+			{
+				$results[$key] = $val;
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		if (!$this->isConnected)
@@ -331,6 +369,41 @@ class Redis extends AbstractCacheMethod
 		catch (Throwable $e)
 		{
 			return false;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		if (!$this->isConnected || empty($items))
+		{
+			return;
+		}
+
+		try
+		{
+			$pipe = $this->obj->pipeline();
+			foreach ($items as $key => $value)
+			{
+				if ($value === null)
+				{
+					$pipe->del($key);
+				}
+				elseif ($ttl > 0)
+				{
+					$pipe->setex($key, $ttl, $value);
+				}
+				else
+				{
+					$pipe->set($key, $value);
+				}
+			}
+			$pipe->exec();
+		}
+		catch (Throwable $e)
+		{
 		}
 	}
 

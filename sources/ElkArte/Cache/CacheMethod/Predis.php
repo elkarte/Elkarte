@@ -166,6 +166,44 @@ class Predis extends AbstractCacheMethod
 	/**
 	 * {@inheritdoc}
 	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		if (!is_object($this->obj) || empty($keys))
+		{
+			return [];
+		}
+
+		try
+		{
+			$values = $this->obj->mget($keys);
+		}
+		catch (\Throwable $e)
+		{
+			$values = null;
+		}
+
+		if (!is_array($values))
+		{
+			return [];
+		}
+
+		$results = [];
+		$i = 0;
+		foreach ($keys as $key)
+		{
+			$val = $values[$i++];
+			if ($val !== false && $val !== null)
+			{
+				$results[$key] = $val;
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		if (!is_object($this->obj))
@@ -179,6 +217,37 @@ class Predis extends AbstractCacheMethod
 		}
 
 		$this->obj->set($key, $value);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		if (!is_object($this->obj) || empty($items))
+		{
+			return;
+		}
+
+		try
+		{
+			$pipe = $this->obj->pipeline();
+			foreach ($items as $key => $value)
+			{
+				if ($value === null)
+				{
+					$pipe->del($key);
+				}
+				else
+				{
+					$pipe->set($key, $value);
+				}
+			}
+			$pipe->execute();
+		}
+		catch (\Throwable $e)
+		{
+		}
 	}
 
 	/**

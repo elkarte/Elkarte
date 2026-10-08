@@ -189,6 +189,21 @@ class Memcache extends AbstractCacheMethod
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getMulti(array $keys, $ttl = 120): array
+	{
+		if (!$this->_is_running || empty($keys))
+		{
+			return [];
+		}
+
+		$results = $this->obj->get($keys);
+
+		return is_array($results) ? $results : [];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		if (!$this->_is_running)
@@ -204,6 +219,22 @@ class Memcache extends AbstractCacheMethod
 		$this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
 
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function putMulti(array $items, $ttl = 120): void
+	{
+		if (!$this->_is_running || empty($items))
+		{
+			return;
+		}
+
+		foreach ($items as $key => $value)
+		{
+			$this->put($key, $value, $ttl);
+		}
 	}
 
 	/**
