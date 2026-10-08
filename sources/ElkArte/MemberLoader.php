@@ -109,7 +109,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data from a member id
+	 * Loads users' data from a member id
 	 *
 	 * @param int|int[] $users Single id or list of ids to load
 	 * @param string $set The data to load (see the constants SET_*)
@@ -188,7 +188,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data provided a where clause and an array of ids
+	 * Loads users' data provided a where clause and an array of ids
 	 *
 	 * @param string $where_clause The WHERE clause of the query to run
 	 * @param int[] $to_load Array of ids to load
@@ -333,7 +333,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads moderators data into the \ElkArte\Member objects
+	 * Loads moderator data into the \ElkArte\Member objects
 	 */
 	protected function loadModerators(): void
 	{
@@ -379,7 +379,7 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data from a member name
+	 * Loads users' data from a member name
 	 *
 	 * @param string|string[] $name Single name or list of names to load
 	 * @param string $set The data to load (see the constants SET_*)

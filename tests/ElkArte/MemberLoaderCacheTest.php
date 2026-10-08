@@ -67,10 +67,25 @@ class MemberLoaderCacheTest extends TestCase
 			define('SUBSDIR', SOURCEDIR . '/subs');
 			define('CACHEDIR', BOARDDIR . '/cache');
 			define('LANGUAGEDIR', SOURCEDIR . '/ElkArte/Languages');
+			define('EXTDIR', SOURCEDIR . '/ext');
+		}
+
+		if (!defined('CACHE_STALE'))
+		{
+			define('CACHE_STALE', '?123');
 		}
 
 		require_once(SOURCEDIR . '/QueryString.php');
 		require_once(SOURCEDIR . '/Subs.php');
+
+		if (!class_exists('ElkArte\ext\Composer\Autoload\ClassLoader', false) && file_exists(EXTDIR . '/ClassLoader.php'))
+		{
+			require_once(EXTDIR . '/ClassLoader.php');
+			$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+			$loader->register();
+		}
 	}
 
 	protected function setUp(): void
@@ -81,6 +96,17 @@ class MemberLoaderCacheTest extends TestCase
 		$modSettings['lastActive'] = 15;
 		$modSettings['titlesEnable'] = 0;
 		$txt['guest_title'] = 'Guest';
+	}
+
+	protected function tearDown(): void
+	{
+		$cache = Cache::instance();
+		$cache->put('member_data-normal-101', null);
+		$cache->put('member_data-normal-102', null);
+
+		MembersList::unset(101);
+		MembersList::unset(102);
+		MembersList::unset(103);
 	}
 
 	public function testBatchLoadFromCacheAndDb()
@@ -179,8 +205,8 @@ class MemberLoaderCacheTest extends TestCase
 			'pm_ignore_list' => '',
 		];
 
-		$parser = new ParserWrapper();
-		$usersList = new MembersList();
+		$parser = ParserWrapper::instance();
+		$usersList = MembersList::instance();
 
 		// Clear any existing cache for these users
 		$cache->put('member_data-normal-101', null);
