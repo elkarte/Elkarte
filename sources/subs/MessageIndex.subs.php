@@ -152,6 +152,28 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 }
 
 /**
+ * Defines the default sort direction for each message index sort method.
+ *
+ * Numeric count columns should default to descending (most to least), while
+ * text/date columns default to ascending so the ordering feels natural.
+ *
+ * @return array Keyed by sort method name, true = ascending
+ */
+function messageIndexSortDirections()
+{
+	return [
+		'subject' => true,
+		'starter' => true,
+		'last_poster' => true,
+		'replies' => false,
+		'views' => false,
+		'likes' => false,
+		'first_post' => true,
+		'last_post' => false,
+	];
+}
+
+/**
  * This function returns the sort methods for message index in an array.
  */
 function messageIndexSort()

@@ -465,6 +465,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// Known sort methods.
 		$this->sort_methods = messageIndexSort();
 		$default_sort_method = 'last_post';
+		$default_sort_directions = messageIndexSortDirections();
 
 		// Requested a sorting method?
 		$chosen_sort = $this->_req->getQuery('sort', 'trim', $default_sort_method);
@@ -477,12 +478,12 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		$sort_string = ';sort=' . $chosen_sort . ($this->_req->isSet('desc') ? ';desc' : '');
 		$this->sort_by = $chosen_sort;
-		$this->ascending = $this->_req->isSet('asc');
+		$this->ascending = $this->_req->isSet('asc') ? true : ($this->_req->isSet('desc') ? false : ($default_sort_directions[$chosen_sort] ?? true));
 		$this->sort_column = $this->sort_methods[$this->sort_by];
 
 		$context['sort_by'] = $this->sort_by;
 		$context['sort_direction'] = $this->ascending ? 'up' : 'down';
-		$context['sort_title'] = $this->ascending ? $txt['sort_desc'] : $txt['sort_asc'];
+		$context['sort_title'] = $this->ascending ? $txt['sort_asc'] : $txt['sort_desc'];
 
 		return $sort_string;
 	}
@@ -603,6 +604,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		// Trick
 		$txt['starter'] = $txt['started_by'];
+		$default_sort_directions = messageIndexSortDirections();
 
 		// todo: Need to move this to theme.
 		foreach ($this->sort_methods as $key => $val)
@@ -613,8 +615,12 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				default => 'numeric',
 			};
 
+			$sort_direction = $this->sort_by === $key
+				? ($this->ascending ? 'desc' : 'asc')
+				: (($default_sort_directions[$key] ?? true) ? 'asc' : 'desc');
+
 			$context['topics_headers'][$key] = [
-				'url' => getUrl('board', ['board' => $board, 'start' => $this->sort_start, 'sort' => $key, 'name' => $board_info['name'], $this->sort_by === $key && $this->ascending ? 'desc' : 'asc']),
+				'url' => getUrl('board', ['board' => $board, 'start' => $this->sort_start, 'sort' => $key, 'name' => $board_info['name'], $sort_direction]),
 				'sort_dir_img' => $this->sort_by === $key ? '<i class="icon icon-small i-sort-' . $sortIcon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"><s>' . $context['sort_title'] . '</s></i>' : '',
 			];
 		}
