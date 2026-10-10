@@ -15,26 +15,33 @@
 use ElkArte\Database\AbstractDump;
 use ElkArte\Database\AbstractSearch;
 use ElkArte\Database\AbstractTable;
-use ElkArte\Database\Mysqli\Connection;
+use ElkArte\Database\DatabaseConnectionFactory;
 use ElkArte\Database\QueryInterface;
-use ElkArte\Errors\Errors;
 
 /**
  * Initialize database classes and connection.
+ * Deprecated: Use DatabaseConfig instead.
  *
- * @param string $db_server server name
- * @param string $db_name database name like forum
- * @param string $db_user userid to attempt db connection
- * @param string $db_passwd password of user to attempt db connection
- * @param string $db_prefix prefix of the database, like elkarte_
- * @param array $db_options
- * @param string $db_type
+ * @param array $dbOptions
+ * @param string $dbType
  *
  * @return QueryInterface
  */
-function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
+function elk_db_initiate(array $dbOptions, string $dbType = 'mysqli'): QueryInterface
 {
-	return database(false);
+	return (new DatabaseConnectionFactory($dbOptions, $dbType))->getDatabase();
+}
+
+/**
+ * Resolve the database type to the appropriate class name.
+ *
+ * @param string $type
+ *
+ * @return string
+ */
+function resolveType(string $type): string
+{
+	return DatabaseConnectionFactory::resolveType($type);
 }
 
 /**
@@ -42,11 +49,9 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *
  * @param bool $fatal - Stop the execution or throw an \Exception
  * @param bool $force - Force the re-creation of the database instance.
- *                      If set to true, from that moment onwards the old
- *                      instance will be lost and only the new one returned
  *
  * @return QueryInterface
- * @throws \Exception if fatal is false
+ * @throws Exception if fatal is false
  */
 function database($fatal = true, $force = false)
 {
@@ -63,32 +68,22 @@ function database($fatal = true, $force = false)
 		global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 		global $db_type, $db_name, $db_prefix, $mysql_set_mode;
 
+		// Create the database connection options array using standard variable names.
 		$db_options = [
 			'persist' => $db_persist,
 			'select_db' => true,
-			'port' => $db_port,
-			'mysql_set_mode' => (bool) ($mysql_set_mode ?? false)
+			'port' => (int) $db_port,
+			'mysql_set_mode' => (bool) ($mysql_set_mode ?? false),
+			'server' => $db_server,
+			'name' => $db_name,
+			'user' => $db_user,
+			'password' => $db_passwd,
+			'passwd' => $db_passwd,
+			'prefix' => $db_prefix,
 		];
-		$type = strtolower($db_type);
-		$type = $type === 'mysql' ? 'mysqli' : $type;
 
-		/** @var Connection $class */
-		$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
-		try
-		{
-			$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
-		}
-		catch (\Exception $e)
-		{
-			if ($fatal === true)
-			{
-				Errors::instance()->display_db_error($e->getMessage());
-			}
-			else
-			{
-				throw $e;
-			}
-		}
+		$factory = new DatabaseConnectionFactory($db_options, $db_type ?? 'mysqli');
+		$db = $factory->getDatabase($fatal);
 	}
 
 	return $db;
@@ -103,7 +98,7 @@ function database($fatal = true, $force = false)
  *
  * @return AbstractTable
  */
-function db_table($db = null, $fatal = false)
+function db_table($db = null, $fatal = false): AbstractTable
 {
 	global $db_prefix, $db_type;
 	static $db_table = null;
@@ -114,24 +109,9 @@ function db_table($db = null, $fatal = false)
 		{
 			$db = database();
 		}
-		$db_type = strtolower($db_type);
-		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
-		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Table';
-		try
-		{
-			$db_table = new $class($db, $db_prefix);
-		}
-		catch (\Exception $e)
-		{
-			if ($fatal === true)
-			{
-				Errors::instance()->display_db_error($e->getMessage());
-			}
-			else
-			{
-				throw $e;
-			}
-		}
+
+		$factory = new DatabaseConnectionFactory(['prefix' => $db_prefix], $db_type ?? 'mysqli');
+		$db_table = $factory->getTable($db, $db_prefix, $fatal);
 	}
 
 	return $db_table;
@@ -143,7 +123,7 @@ function db_table($db = null, $fatal = false)
  *
  * @return AbstractSearch
  */
-function db_search()
+function db_search(): AbstractSearch
 {
 	global $db_type;
 	static $db_search = null;
@@ -151,17 +131,8 @@ function db_search()
 	if ($db_search === null)
 	{
 		$db = database();
-		$db_type = strtolower($db_type);
-		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
-		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Search';
-		try
-		{
-			$db_search = new $class($db);
-		}
-		catch (\Exception $e)
-		{
-			Errors::instance()->display_db_error($e->getMessage());
-		}
+		$factory = new DatabaseConnectionFactory([], $db_type ?? 'mysqli');
+		$db_search = $factory->getSearch($db);
 	}
 
 	return $db_search;
@@ -173,7 +144,7 @@ function db_search()
  *
  * @return AbstractDump
  */
-function db_dump()
+function db_dump(): AbstractDump
 {
 	global $db_type;
 	static $db_dump = null;
@@ -182,17 +153,8 @@ function db_dump()
 	{
 		$db = database();
 		$db_table = db_table($db);
-		$db_type = strtolower($db_type);
-		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
-		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Dump';
-		try
-		{
-			$db_dump = new $class($db, $db_table);
-		}
-		catch (\Exception $e)
-		{
-			Errors::instance()->display_db_error($e->getMessage());
-		}
+		$factory = new DatabaseConnectionFactory([], $db_type ?? 'mysqli');
+		$db_dump = $factory->getDump($db, $db_table);
 	}
 
 	return $db_dump;
