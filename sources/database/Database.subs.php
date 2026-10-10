@@ -53,7 +53,7 @@ function resolveType(string $type): string
  * @return QueryInterface
  * @throws Exception if fatal is false
  */
-function database($fatal = true, $force = false): QueryInterface
+function database($fatal = true, $force = false)
 {
 	global $db_instance;
 	static $db = null;
@@ -68,6 +68,7 @@ function database($fatal = true, $force = false): QueryInterface
 		global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 		global $db_type, $db_name, $db_prefix, $mysql_set_mode;
 
+		// Create the database connection options array using standard variable names.
 		$db_options = [
 			'persist' => $db_persist,
 			'select_db' => true,

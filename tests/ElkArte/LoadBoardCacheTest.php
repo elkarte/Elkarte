@@ -1,17 +1,6 @@
 <?php
 
-namespace {
-	if (!function_exists('database'))
-	{
-		function database($fatal = true, $force = false)
-		{
-			global $mock_db;
-			return $mock_db ?? null;
-		}
-	}
-}
-
-namespace ElkArte {
+namespace ElkArte;
 
 use ElkArte\Cache\Cache;
 use ElkArte\Helper\ValuesContainer;
@@ -129,6 +118,7 @@ class LoadBoardCacheTest extends TestCase
 
 		require_once(SOURCEDIR . '/QueryString.php');
 		require_once(SOURCEDIR . '/Subs.php');
+		require_once(SOURCEDIR . '/database/Database.subs.php');
 		require_once(SOURCEDIR . '/Load.php');
 		require_once(SOURCEDIR . '/Security.php');
 	}
@@ -262,5 +252,4 @@ class LoadBoardCacheTest extends TestCase
 		// Clean up cache
 		$cache->remove('board-2');
 	}
-}
 }
