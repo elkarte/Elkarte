@@ -26,7 +26,10 @@ sudo apt-get install -y libu2f-udev
 
 # 2. Download Chrome 123
 CHROME_VERSION='123.0.6312.58-1'
-wget https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
+#
+# https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_
+# https://mirror.vitalinux.educa.aragon.es/google/pool/main/g/google-chrome-stable/google-chrome-stable_
+wget https://mirror.vitalinux.educa.aragon.es/google/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb -q
 
 # 3. Install with ALLOW DOWNGRADES
 sudo apt-get install -y ./google-chrome-stable_${CHROME_VERSION}_amd64.deb --allow-downgrades
