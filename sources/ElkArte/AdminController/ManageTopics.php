@@ -125,7 +125,6 @@ class ManageTopics extends AbstractController
 			// Some simple big bools...
 			['check', 'enableParticipation'],
 			['check', 'enableFollowup'],
-			['check', 'enable_unwatch'],
 			['check', 'pollMode'],
 			'',
 			// Pagination etc...

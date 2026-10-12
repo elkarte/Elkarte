@@ -685,7 +685,6 @@ $txt['nofollow_allowlist_desc'] = 'The domains listed here (one per line) will a
 
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
-$txt['enable_unwatch'] = 'Enable unwatching of topics';
 $txt['oldTopicDays'] = 'Time before topic is warned as old on reply';
 $txt['oldTopicDays_zero'] = '0 to disable';
 $txt['defaultMaxTopics'] = 'Number of topics per page in the message index';

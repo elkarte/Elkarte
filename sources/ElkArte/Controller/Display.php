@@ -915,7 +915,7 @@ class Display extends AbstractController
 		$context['can_reply'] = $context['can_reply'] || $context['can_reply_unapproved'];
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']), true));
 		$context['can_mark_unread'] = $this->user->is_guest === false && $settings['show_mark_read'];
-		$context['can_unwatch'] = $this->user->is_guest === false && $modSettings['enable_unwatch'];
+		$context['can_unwatch'] = $this->user->is_guest === false;
 		$context['can_print'] = empty($modSettings['disable_print_topic']);
 
 		// Start this off for quick moderation - it will be or'd for each post.

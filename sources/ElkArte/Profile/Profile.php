@@ -246,7 +246,7 @@ class Profile extends AbstractController
 						'subsections' => [
 							'messages' => [$txt['showMessages'], ['profile_view_own', 'profile_view_any']],
 							'topics' => [$txt['showTopics'], ['profile_view_own', 'profile_view_any']],
-							'unwatchedtopics' => [$txt['showUnwatched'], ['profile_view_own', 'profile_view_any'], 'enabled' => $modSettings['enable_unwatch'] && $context['user']['is_owner']],
+							'unwatchedtopics' => [$txt['showUnwatched'], ['profile_view_own', 'profile_view_any'], 'enabled' => $context['user']['is_owner']],
 							'attach' => [$txt['showAttachments'], ['profile_view_own', 'profile_view_any']],
 						],
 						'permission' => [

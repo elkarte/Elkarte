@@ -233,6 +233,12 @@ class PostNotifications extends AbstractModel
 					continue;
 				}
 
+				// Don't if they have unwatched this topic
+				if ($this->_isTopicUnwatched($notifyDatum['id_member'], $id_topic))
+				{
+					continue;
+				}
+
 				// Don't if they don't have notification or board permissions
 				$email_perm = true;
 				if (!validateNotificationAccess($notifyDatum, true, $email_perm))
@@ -700,6 +706,13 @@ class PostNotifications extends AbstractModel
 					continue;
 				}
 
+				// Don't notify if the member unwatched this topic
+				$id_topic = $topicData[$key]['topic'] ?? $topicData[$key]['id_topic'] ?? 0;
+				if (!empty($id_topic) && $this->_isTopicUnwatched($notifyDatum['id_member'], $id_topic))
+				{
+					continue;
+				}
+
 				$status = 'new';
 				$notifier->add(new NotificationsTask(
 					'watchedboard',
@@ -754,6 +767,13 @@ class PostNotifications extends AbstractModel
 				// Don't notify the guy who started the topic!
 				// @todo In this case actually send them a "it's approved hooray" email :P
 				if ($topicData[$key]['poster'] === $notifyDatum['id_member'])
+				{
+					continue;
+				}
+
+				// Don't notify if the member unwatched this topic
+				$id_topic = $topicData[$key]['topic'] ?? $topicData[$key]['id_topic'] ?? 0;
+				if (!empty($id_topic) && $this->_isTopicUnwatched($notifyDatum['id_member'], $id_topic))
 				{
 					continue;
 				}
@@ -920,5 +940,45 @@ class PostNotifications extends AbstractModel
 		{
 			updateLogNotify(User::$info->id, $topics);
 		}
+	}
+
+	/**
+	 * Check if a member has unwatched a specific topic.
+	 *
+	 * @param int $id_member
+	 * @param int $id_topic
+	 * @return bool
+	 */
+	protected function _isTopicUnwatched($id_member, $id_topic): bool
+	{
+		static $unwatched_cache = [];
+
+		if (!isset($unwatched_cache[$id_member][$id_topic]))
+		{
+			$db = database();
+			$request = $db->fetchQuery('
+				SELECT unwatched
+				FROM {db_prefix}log_topics
+				WHERE id_member = {int:id_member}
+					AND id_topic = {int:id_topic}
+				LIMIT 1',
+				[
+					'id_member' => (int) $id_member,
+					'id_topic' => (int) $id_topic,
+				]
+			);
+
+			$unwatched = false;
+			if ($request->hasResults())
+			{
+				$row = $request->fetch_assoc();
+				$unwatched = (int) $row['unwatched'] === 1;
+			}
+			$request->free_result();
+
+			$unwatched_cache[$id_member][$id_topic] = $unwatched;
+		}
+
+		return $unwatched_cache[$id_member][$id_topic];
 	}
 }

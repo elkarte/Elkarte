@@ -1170,6 +1170,19 @@ function setTopicNotification($id_member, $id_topic, $on = false)
 			[$id_member, $id_topic, 0],
 			['id_member', 'id_topic', 'id_board']
 		);
+
+		// Subscribing clears unwatched status for this topic and member.
+		$db->query('', '
+			UPDATE {db_prefix}log_topics
+			SET unwatched = {int:not_unwatched}
+			WHERE id_member = {int:current_member}
+				AND id_topic = {int:current_topic}',
+			[
+				'not_unwatched' => 0,
+				'current_member' => $id_member,
+				'current_topic' => $id_topic,
+			]
+		);
 	}
 	else
 	{
@@ -1309,9 +1322,24 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 function setTopicWatch($id_member, $topic, $on = false)
 {
 	$db = database();
+	$id_member = !empty($id_member) ? (int) $id_member : (int) User::$info->id;
 
-	// find the current entry if it exists that is
-	$was_set = getLoggedTopics(User::$info->id, [$topic]);
+	// When unwatching (muting) a topic, remove any topic notification subscription.
+	if ($on)
+	{
+		$db->query('', '
+			DELETE FROM {db_prefix}log_notify
+			WHERE id_member = {int:current_member}
+				AND id_topic = {int:current_topic}',
+			[
+				'current_member' => $id_member,
+				'current_topic' => $topic,
+			]
+		);
+	}
+
+	// Find the current entry if it exists for this member
+	$was_set = getLoggedTopics($id_member, [$topic]);
 
 	// Set a topic unwatched on/off for this topic.
 	$db->insert(empty($was_set[$topic]) ? 'ignore' : 'replace',

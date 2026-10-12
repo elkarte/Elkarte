@@ -451,8 +451,8 @@ class ProfileInfo extends AbstractController
 			return;
 		}
 
-		// Instead, if we're dealing with unwatched topics (and the feature is enabled), use that other function.
-		if ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
+		// Instead, if we're dealing with unwatched topics, use that other function.
+		if ($action === 'unwatchedtopics')
 		{
 			$this->action_showUnwatched();
 			return;
@@ -842,8 +842,8 @@ class ProfileInfo extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		// Only the owner can see the list (if the function is enabled, of course)
-		if ($this->user->id != $this->_memID || !$modSettings['enable_unwatch'])
+		// Only the owner can see the list
+		if ($this->user->id != $this->_memID)
 		{
 			return;
 		}

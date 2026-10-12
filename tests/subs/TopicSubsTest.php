@@ -669,6 +669,52 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	}
 
 	/**
+	 * Test that unwatching a topic removes topic notification subscriptions and vice versa.
+	 */
+	public function testSetTopicWatchMutualExclusivityWithNotification(): void
+	{
+		$fixture = $this->createTestTopic('Mutual Exclusivity Watch Test');
+
+		// Enable topic notification
+		setTopicNotification(1, $fixture['topic_id'], true);
+		$this->assertTrue(hasTopicNotification(1, $fixture['topic_id']));
+
+		// Unwatch (mute) topic -> should delete topic notification
+		setTopicWatch(1, $fixture['topic_id'], true);
+		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
+		$this->assertEquals(1, (int) $logged[$fixture['topic_id']]['unwatched']);
+		$this->assertFalse(hasTopicNotification(1, $fixture['topic_id']));
+
+		// Subscribing again should clear unwatched status in log_topics
+		setTopicNotification(1, $fixture['topic_id'], true);
+		$this->assertTrue(hasTopicNotification(1, $fixture['topic_id']));
+		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
+		$this->assertEquals(0, (int) $logged[$fixture['topic_id']]['unwatched']);
+
+		setTopicNotification(1, $fixture['topic_id'], false);
+	}
+
+	/**
+	 * Test setTopicWatch correctly sets unwatched for specified member rather than just current session.
+	 */
+	public function testSetTopicWatchCrossMemberConsistency(): void
+	{
+		$fixture = $this->createTestTopic('Cross Member Watch Test');
+
+		// Set watch on for member 2 explicitly
+		setTopicWatch(2, $fixture['topic_id'], true);
+		$logged2 = getLoggedTopics(2, [$fixture['topic_id']]);
+		$this->assertArrayHasKey($fixture['topic_id'], $logged2);
+		$this->assertEquals(1, (int) $logged2[$fixture['topic_id']]['unwatched']);
+
+		// Member 1 should remain unaffected
+		$logged1 = getLoggedTopics(1, [$fixture['topic_id']]);
+		$this->assertEmpty($logged1);
+
+		setTopicWatch(2, $fixture['topic_id'], false);
+	}
+
+	/**
 	 * Test topicNotificationManagement() correctly manages topic notifications for a given member.
 	 */
 	public function testTopicNotificationManagement(): void

@@ -247,6 +247,57 @@ class DailyDigest implements ScheduledTaskInterface
 			return true;
 		}
 
+		// Exclude unwatched topics for members
+		$all_topic_ids = [];
+		foreach ($types as $type_data)
+		{
+			foreach ($type_data as $board_data)
+			{
+				$all_topic_ids = array_merge($all_topic_ids, array_keys($board_data['lines']));
+			}
+		}
+		$all_topic_ids = array_unique(array_filter($all_topic_ids));
+
+		if (!empty($all_topic_ids))
+		{
+			$unwatched_by_topic = [];
+			$db->fetchQuery('
+				SELECT id_topic, id_member
+				FROM {db_prefix}log_topics
+				WHERE id_topic IN ({array_int:topics})
+					AND unwatched = {int:is_unwatched}',
+				[
+					'topics' => $all_topic_ids,
+					'is_unwatched' => 1,
+				]
+			)->fetch_callback(
+				static function ($row) use (&$unwatched_by_topic) {
+					$unwatched_by_topic[$row['id_topic']][$row['id_member']] = true;
+				}
+			);
+
+			if (!empty($unwatched_by_topic))
+			{
+				foreach ($types as $note_type => &$type_boards)
+				{
+					foreach ($type_boards as $b_id => &$b_data)
+					{
+						foreach ($b_data['lines'] as $t_id => &$line_data)
+						{
+							if (!empty($unwatched_by_topic[$t_id]))
+							{
+								$line_data['members'] = array_values(array_filter(
+									$line_data['members'],
+									static fn($m_id) => empty($unwatched_by_topic[$t_id][$m_id])
+								));
+							}
+						}
+					}
+				}
+				unset($type_boards, $b_data, $line_data);
+			}
+		}
+
 		// Fix the last reply message so it's suitable for previewing
 		if ($maillist && !empty($types['reply']))
 		{

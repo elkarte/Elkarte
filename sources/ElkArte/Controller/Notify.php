@@ -368,23 +368,19 @@ class Notify extends AbstractController
 	 */
 	public function action_unwatchtopic(): void
 	{
-		global $topic, $modSettings;
+		global $topic;
 
 		is_not_guest();
 
-		// Let's do something only if the function is enabled
-		if ($this->user->is_guest === false && !empty($modSettings['enable_unwatch']))
+		if ($this->getApi() === 'xml')
 		{
-			checkSession('get');
-
-			if ($this->getApi() === 'xml')
-			{
-				$this->action_unwatchtopic_api();
-				return;
-			}
-
-			$this->_toggle_topic_watch();
+			$this->action_unwatchtopic_api();
+			return;
 		}
+
+		checkSession('get');
+
+		$this->_toggle_topic_watch();
 
 		// Back to the topic.
 		$start = $this->_req->getQuery('start', 'intval', 0);
@@ -409,7 +405,7 @@ class Notify extends AbstractController
 	 */
 	public function action_unwatchtopic_api(): void
 	{
-		global $topic, $modSettings, $txt, $context;
+		global $topic, $txt, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -423,18 +419,6 @@ class Notify extends AbstractController
 			$context['xml_data'] = [
 				'error' => 1,
 				'text' => $txt['not_guests']
-			];
-
-			return;
-		}
-
-		// Let's do something only if the function is enabled
-		if (empty($modSettings['enable_unwatch']))
-		{
-			Txt::load('Errors');
-			$context['xml_data'] = [
-				'error' => 1,
-				'text' => $txt['feature_disabled'],
 			];
 
 			return;
@@ -462,8 +446,6 @@ class Notify extends AbstractController
 			'text' => $toggle === 'on' ? $txt['watch'] : $txt['unwatch'],
 			'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => ($toggle === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 		];
-
-		setTopicWatch($this->user->id, $topic, $toggle === 'on');
 	}
 
 	/**
