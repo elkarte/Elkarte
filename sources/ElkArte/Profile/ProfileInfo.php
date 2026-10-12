@@ -423,7 +423,7 @@ class ProfileInfo extends AbstractController
 
 		// What are we viewing?
 		$action = $this->_req->getQuery('sa', 'trim', '');
-		$action_title = ['messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched'];
+		$action_title = ['messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics'];
 		$action_title = $action_title[$action] ?? 'Posts';
 
 		theme()->getTemplates()->load('ProfileInfo');
@@ -448,13 +448,6 @@ class ProfileInfo extends AbstractController
 		if ($action === 'attach')
 		{
 			$this->action_showAttachments();
-			return;
-		}
-
-		// Instead, if we're dealing with unwatched topics, use that other function.
-		if ($action === 'unwatchedtopics')
-		{
-			$this->action_showUnwatched();
 			return;
 		}
 
@@ -845,8 +838,26 @@ class ProfileInfo extends AbstractController
 		// Only the owner can see the list
 		if ($this->user->id != $this->_memID)
 		{
-			return;
+			throw new Exception('no_access', false);
 		}
+
+		$base_href = getUrl('action', ['action' => 'profile', 'area' => 'notification', 'sa' => 'unwatchedtopics', 'u' => $this->_memID]);
+		$id_topic = $this->_req->getQuery('watch', 'intval', 0);
+		if ($id_topic > 0)
+		{
+			isAllowedTo(['profile_extra_own', 'profile_extra_any']);
+			checkSession('get');
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$logged = getLoggedTopics($this->_memID, [$id_topic]);
+			if (!empty($logged[$id_topic]['unwatched']))
+			{
+				setTopicWatch($this->_memID, $id_topic, false);
+			}
+
+			redirectexit($base_href);
+		}
+
+		$context['page_title'] = $txt['showUnwatched'];
 
 		// And here they are: the topics you don't like
 		$listOptions = [
@@ -854,7 +865,7 @@ class ProfileInfo extends AbstractController
 			'title' => $txt['showUnwatched'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['unwatched_topics_none'],
-			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'unwatchedtopics', 'u' => $this->_memID]),
+			'base_href' => $base_href,
 			'default_sort_col' => 'started_on',
 			'get_items' => [
 				'function' => fn($start, $items_per_page, $sort) => $this->list_getUnwatched($start, $items_per_page, $sort),
@@ -867,7 +878,7 @@ class ProfileInfo extends AbstractController
 					'header' => [
 						'value' => $txt['subject'],
 						'class' => 'lefttext',
-						'style' => 'width: 30%;',
+						'style' => 'width: 25%;',
 					],
 					'data' => [
 						'sprintf' => [
@@ -900,11 +911,11 @@ class ProfileInfo extends AbstractController
 					'header' => [
 						'value' => $txt['on'],
 						'class' => 'lefttext',
-						'style' => 'width: 20%;',
+						'style' => 'width: 10%;',
 					],
 					'data' => [
 						'db' => 'started_on',
-						'timeformat' => true,
+						'timeformat' => 'html_time',
 					],
 					'sort' => [
 						'default' => 'm.poster_time',
@@ -928,16 +939,35 @@ class ProfileInfo extends AbstractController
 					'header' => [
 						'value' => $txt['on'],
 						'class' => 'lefttext',
-						'style' => 'width: 20%;',
+						'style' => 'width: 10%;',
 					],
 					'data' => [
 						'db' => 'last_post_on',
-						'timeformat' => true,
+						'timeformat' => 'html_time',
 					],
 					'sort' => [
 						'default' => 'm.poster_time',
 						'reverse' => 'm.poster_time DESC',
 					],
+				],
+				'watch' => [
+					'header' => [
+						'value' => $txt['unwatched_topics_watch'],
+						'class' => 'centertext',
+					],
+					'data' => [
+						'function' => static function ($topic) use ($base_href, $context, $txt) {
+							return '<a href="' . $base_href . ';watch=' . (int) $topic['id_topic'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['unwatched_topics_watch'] . '</a>';
+						},
+						'class' => 'centertext',
+					],
+				],
+			],
+			'additional_rows' => [
+				[
+					'position' => 'top_of_list',
+					'value' => $txt['unwatched_topics_info'],
+					'class' => 'description',
 				],
 			],
 		];

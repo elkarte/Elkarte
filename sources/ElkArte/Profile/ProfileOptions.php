@@ -652,7 +652,8 @@ class ProfileOptions extends AbstractController
 		$subActions = [
 			'settings' => [$this, 'action_editNotificationSettings'],
 			'boards' => [$this, 'action_editNotificationBoards'],
-			'topics' => [$this, 'action_editNotificationTopics']
+			'topics' => [$this, 'action_editNotificationTopics'],
+			'unwatchedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showUnwatched'],
 		];
 
 		// Set a subaction
