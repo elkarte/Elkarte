@@ -160,7 +160,7 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 			$controller->pre_dispatch();
 			$controller->action_notification();
 
-			$this->assertEquals('list', $context['sub_template']);
+			$this->assertEquals('show_list', $context['sub_template']);
 			$this->assertEquals('unwatched_topics', $context['default_list']);
 			$this->assertEquals($txt['showUnwatched'], $context['page_title']);
 			$list = $context['unwatched_topics'];
