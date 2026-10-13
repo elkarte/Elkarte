@@ -847,14 +847,21 @@ class Attachment extends AbstractController
 		// do not resize for ;image
 		if ($resize && !isset($this->_req->query->ila, $this->_req->query->image))
 		{
-			// Create a thumbnail image
-			$image = new Image($filename);
+			$thumb_filename = $filename . '_thumb';
 
-			$filename .= '_thumb';
-			$max_width = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 300;
-			$max_height = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 300;
+			// Check if the thumbnail needs to be created or updated
+			if (!is_file($thumb_filename) || (filemtime($thumb_filename) < filemtime($filename)))
+			{
+				// Create a thumbnail image
+				$image = new Image($filename);
 
-			$image->createThumbnail($max_width, $max_height, $filename, null, false);
+				$max_width = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbWidth']) ? $modSettings['attachmentThumbWidth'] : 300;
+				$max_height = $this->_req->isSet('thumb') && !empty($modSettings['attachmentThumbHeight']) ? $modSettings['attachmentThumbHeight'] : 300;
+
+				$image->createThumbnail($max_width, $max_height, $thumb_filename, null, false);
+			}
+
+			$filename = $thumb_filename;
 		}
 
 		// With the headers complete, send the file data
