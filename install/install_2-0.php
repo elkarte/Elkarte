@@ -2601,7 +2601,6 @@ class InstallInstructions_install_2_0
 				array('enable_buddylist', '1'),
 				array('avatar_reencode', '1'),
 				array('avatar_paranoid', '0'),
-				array('enable_unwatch', '0'),
 				array('mentions_enabled', '1'),
 				array('mentions_buddy', '0'),
 				array('mentions_dont_notify_rlike', '0'),

@@ -221,7 +221,6 @@ $helptxt['trackStats'] = 'Stats:<br />
 This will allow users to see the latest posts and the most popular topics on your forum. It will also show several statistics like the most members online, new members and new topics.<hr />
 	Page views:<br />
 Adds another column to the stats page with the number of page views on your forum.';
-$helptxt['enable_unwatch'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
 $helptxt['titlesEnable'] = 'Switching Custom Titles on will allow members with the relevant permission to create a special title for themselves. This will be shown underneath the name.<br />
 <em>Example:</em><br />
 Jeff<br />
@@ -247,9 +246,13 @@ $helptxt['pollMode'] = 'This selects whether polls are enabled or not. If polls 
 <br />
 To choose who can post polls, view polls, and similar, you can allow and disallow those permissions. Remember this if polls don\'t seem to be working.';
 $helptxt['enableCompressedOutput'] = 'This option will compress output to lower bandwidth consumption, but it requires zlib to be installed.';
-$helptxt['databaseSession_enable'] = 'This option makes use of the database for session storage - it is best for load balanced servers, but helps with all timeout issues and can make the forum faster.';
-$helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth your forum uses, since clicking the browser\'s back button will not reload the page. The downside is that things like &quot;new&quot; icons won\'t update unless you navigate to that page directly rather than going back to it.';
-$helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed.  If a session is not accessed for too long, it is said to have &quot;timed out&quot;.  Anything higher than 2400 is recommended.';
+$helptxt['databaseSession_enable'] = 'Stores active PHP user sessions directly in the forum database rather than server filesystem files:
+	<ul class="normallist">
+		<li><strong>Multi-server / Load Balancing:</strong> Essential for multi-server clusters so that requests hitting different backend nodes share the same session data.</li>
+		<li><strong>Reliability &amp; Concurrency:</strong> Avoids filesystem lock contention and permission issues commonly encountered with default PHP session file storage.</li>
+	</ul>';
+$helptxt['databaseSession_loose'] = 'Loosens HTTP <code>Cache-Control</code> headers for cached pages (sending <code>private</code> instead of strict no-cache headers). This reduces server bandwidth and speeds up page navigation by enabling browser back-button caching without forcing a full page reload, though dynamic notification badges may not refresh until the page is explicitly reloaded.';
+$helptxt['databaseSession_lifetime'] = 'The number of seconds of inactivity before an inactive user session is considered expired and cleaned up by PHP garbage collection. A value of at least <code>2400</code> seconds (40 minutes) is recommended to prevent unexpected logouts while reading or composing posts.';
 $helptxt['cache_enable'] = 'ElkArte performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
 $helptxt['cache_memcached'] = 'If you are using memcached you need to provide the server details. This should be entered as a comma separated list as shown in this example:<br />
 <br/>
@@ -344,11 +347,7 @@ $helptxt['avatar_reencode'] = 'Selecting this option will enable the re-encode o
 $helptxt['karmaMode'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated. You can change the number of posts needed to have a &quot;karma&quot;, the time between smites or applauds, and if administrators have to wait this time as well.<br />
 <br />
 Whether groups of members can smite others is controlled by a permission. If you have trouble getting this feature to work for everyone, double check your permissions.';
-$helptxt['localCookies'] = 'Controls how authentication cookies are scoped in the user\'s browser:
-	<ul class="normallist">
-		<li><strong>Enabled (Local):</strong> Scopes cookies strictly to the forum sub-directory (e.g. <code>example.com/forum/</code>). Use this if you host multiple independent applications under the same domain.</li>
-		<li><strong>Disabled (Global / Recommended):</strong> Scopes cookies to the entire domain (e.g. <code>example.com</code>). Required if you integrate forum logins with site-wide pages or SSI.php.</li>
-	</ul>';
+
 $helptxt['enableBBC'] = 'Selecting this option will allow your members to use Bulletin Board Code (BBC) throughout the forum, allowing users to format their posts with images, type formatting and more.';
 $helptxt['time_offset'] = 'Not all forum administrators want their forum to use the same time zone as the server upon which it is hosted. Use this option to specify a time difference (in hours) from which the forum should operate from the server time. Negative and decimal values are permitted.';
 $helptxt['default_timezone'] = 'The server timezone tells PHP where your server is located. You should ensure this is set correctly, preferably to the country/city in which the server is located. You can find out more information on the <a href="https://www.php.net/manual/en/timezones.php" target="_blank">PHP Site</a>.';
@@ -391,15 +390,32 @@ Remember this: Deleting a theme does not remove it from the server, it only remo
 
 $helptxt['enableVideoEmbeding'] = 'This allows automatic conversion of standard URLs into an embedded video when the post is viewed. Currently supports YouTube, Vimeo, TikTok, Twitter, Facebook, Instagram and Dailymotion links.';
 $helptxt['enableCodePrettify'] = 'This will load the Prettify script which will color highlight code used in code tags.  It adds styles to code snippets so that tokens stand out and your users can more easily read the code.';
-// @todo Add more information about how to use them here.
 $helptxt['xmlnews_enable'] = 'Allows people to link to <a href="%1$s?action=.xml;sa=news" target="_blank" class="new_win">Recent news</a> and similar data. It is also recommended that you limit the number of recent posts/news because, when RSS data is displayed in some clients, like feed readers and aggregators, it is expected to be truncated.';
-$helptxt['hotTopicPosts'] = 'Change the number of posts needed for a topic to reach the state of a &quot;hot&quot; or &quot;very hot&quot; topic. Select the likes option to base this state on the number of likes instead of the number of posts.';
-$helptxt['globalCookies'] = 'Allows login cookies to be shared across multiple subdomains (e.g., sharing session authentication between <code>forum.example.com</code> and <code>www.example.com</code>).<br />
-<br />
-	<strong>Security Note:</strong> Do not enable this if other subdomains on your domain are operated by untrusted parties.';
-$helptxt['globalCookiesDomain'] = 'Define the main domain to be used when login cookies are available across subdomains.';
-$helptxt['httponlyCookies'] = 'With this setting on, cookies will not be accessible by scripting languages, such as JavaScript. This setting can help to reduce identity theft through XSS attacks. This may cause issues with some third party scripts but is recommended to be on when possible.';
-$helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
+$helptxt['hotTopicPosts'] = 'Change the number of posts needed for a topic to reach the state of a &quot;hot&quot; or &quot;very hot&quot; topic.  This is used to show the topic with a different icon.';
+
+$helptxt['localCookies'] = 'Controls whether authentication cookies are restricted to the forum\'s specific directory path:
+	<ul class="normallist">
+		<li><strong>Enabled (Local Path):</strong> Scopes cookies strictly to the forum sub-directory (e.g. <code>example.com/forum/</code>). Use this if you host multiple independent applications or forums under different folders on the same domain name.</li>
+		<li><strong>Disabled (Site-wide / Recommended):</strong> Scopes cookies to the root path (<code>/</code>). This allows login sessions to be shared with site-wide pages, portals, or <code>SSI</code> integrations located outside the forum directory.</li>
+	</ul>
+	<br />
+	<em>Note: Local cookies cannot be used simultaneously with subdomain-independent cookies.</em>';
+$helptxt['globalCookies'] = 'Allows login authentication and PHP sessions to be shared across all subdomains on your domain (e.g., between <code>forum.example.com</code>, <code>www.example.com</code>, and <code>blog.example.com</code>):
+	<ul class="normallist">
+		<li><strong>Enabled:</strong> Sets both the ElkArte login cookie and the PHP session cookie (<code>PHPSESSID</code>) domain to the apex domain (e.g. <code>.example.com</code>). This is required if you use ElkArte portal bridges or <code>SSI</code> across multiple subdomains.</li>
+		<li><strong>Disabled (Recommended for standalone forums):</strong> Keeps cookies and PHP sessions host-locked strictly to the forum\'s exact Fully Qualified Domain Name (FQDN, e.g. <code>forum.example.com</code>).</li>
+	</ul>
+	<strong>Security Note:</strong> Only enable this if all subdomains on your domain are owned and operated by trusted parties, as any subdomain will be able to read shared cookies.';
+$helptxt['globalCookiesDomain'] = 'Specifies the parent domain to use when subdomain-independent cookies are enabled:
+	<ul class="normallist">
+		<li><strong>Automatic Detection (Default):</strong> Leaving this blank allows ElkArte to automatically determine the base domain from your forum URL (e.g. converting <code>forum.example.com</code> to <code>.example.com</code>).</li>
+		<li><strong>Manual Override:</strong> Enter your base domain without protocol or slashes (e.g. <code>example.com</code> or <code>example.co.uk</code>). This is necessary if your domain uses a multi-part country code top-level domain (ccTLD) where automatic detection may not isolate the root domain correctly.</li>
+	</ul>';
+$helptxt['cookiename'] = 'The name assigned to the ElkArte authentication cookie. If you host multiple ElkArte forums on the same domain or server, each forum must have a unique cookie name to avoid login collisions and session overwrites.';
+$helptxt['cookieTime'] = 'Sets the default expiration time for the login cookie when members select &quot;Stay logged in&quot; during sign-in.';
+$helptxt['httponlyCookies'] = 'Instructs the browser that cookies should not be accessible through client-side scripts such as JavaScript (via the <code>HttpOnly</code> flag). This significantly mitigates session hijacking and credential theft through Cross-Site Scripting (XSS) attacks. Recommended to keep enabled.';
+$helptxt['secureCookies'] = 'Forces all authentication and session cookies to be transmitted exclusively over encrypted HTTPS connections (via the <code>Secure</code> flag). This prevents cookie eavesdropping over unencrypted networks. Only enable this if your forum is served entirely over HTTPS; enabling it on HTTP will cause login failures!';
+
 $helptxt['admin_session_lifetime'] = 'This controls the length of time an admin session can remain active. Once this timer expires the session will end, requiring you to enter your admin credentials to continue accessing the admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (equals a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
 $helptxt['auto_admin_session'] = 'This controls whether an administrative session is activated during logon or not.';
 $helptxt['securityDisable'] = 'This <em>disables</em> the additional password check for the administration section. This is not recommended!';

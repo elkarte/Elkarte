@@ -82,7 +82,7 @@ class Unread extends AbstractController
 		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);
 
 		// Initialize the Unread class
-		$this->_grabber = new \ElkArte\Unread($this->user->id, $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
+		$this->_grabber = new \ElkArte\Unread($this->user->id, $modSettings['postmod_active'], true, $context['showing_all_topics']);
 
 		// Make sure we can continue
 		$this->_checkServerLoad();

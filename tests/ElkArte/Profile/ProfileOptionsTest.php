@@ -8,6 +8,8 @@ namespace ElkArte\Profile;
 
 use ElkArte;
 use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\HttpReq;
 use ElkArte\Languages\Loader;
 use ElkArte\MembersList;
 use ElkArte\Menu\Menu;
@@ -137,5 +139,63 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 		// Lets see some items loaded into $context['profile_fields']
 		$this->assertArrayHasKey('mentionmem', $context['mention_types'], 'Missing mention type');
 		$this->assertEquals('0', $context['member']['notify_announcements']);
+	}
+
+	public function testNotificationUnwatchedTopics(): void
+	{
+		global $context, $txt;
+
+		$req = HttpReq::instance();
+		$previous_sa = $req->query->sa;
+		$req->query->sa = 'unwatchedtopics';
+		$context['menu_item_selected'] = 'notification';
+		$context['profile_menu_name'] = 'menu_data_1';
+		$context['menu_data_1']['object'] = new Menu();
+		parent::setSession();
+
+		try
+		{
+			$controller = new ProfileOptions(new EventManager());
+			$controller->setUser(User::$info);
+			$controller->pre_dispatch();
+			$controller->action_notification();
+
+			$this->assertEquals('show_list', $context['sub_template']);
+			$this->assertEquals('unwatched_topics', $context['default_list']);
+			$this->assertEquals($txt['showUnwatched'], $context['page_title']);
+			$list = $context['unwatched_topics'];
+			$headers = array_column($list['headers'], null, 'id');
+			$this->assertEquals($txt['unwatched_topics_watch'], $headers['watch']['label']);
+			foreach (['subject', 'started_on', 'last_post_on'] as $column)
+			{
+				$this->assertStringContainsString('area=notification', $headers[$column]['href']);
+				$this->assertStringContainsString('sa=unwatchedtopics', $headers[$column]['href']);
+				$this->assertStringNotContainsString('area=showposts', $headers[$column]['href']);
+			}
+		}
+		finally
+		{
+			$req->query->sa = $previous_sa;
+		}
+	}
+
+	public function testUnwatchedTopicsCannotBeViewedByAnotherMember(): void
+	{
+		$controller = new ProfileInfo(new EventManager());
+		$controller->setUser(User::$info);
+		$controller->pre_dispatch();
+		$id = User::$info->id;
+		User::$info->id = $id + 1;
+
+		try
+		{
+			$this->expectException(Exception::class);
+			$this->expectExceptionMessage((new Exception('no_access', false))->getMessage());
+			$controller->action_showUnwatched();
+		}
+		finally
+		{
+			User::$info->id = $id;
+		}
 	}
 }

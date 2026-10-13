@@ -95,6 +95,16 @@ class Mentioning extends AbstractModel
 			return [];
 		}
 
+		// Filter out members who have unwatched the topic containing this message
+		if (!empty($this->_validator->msg))
+		{
+			$id_targets = $this->_filterUnwatchedTargets($id_targets, (int) $this->_validator->msg);
+			if (empty($id_targets))
+			{
+				return [];
+			}
+		}
+
 		$actually_mentioned = $mention_obj->insert($this->_data['id_member_from'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count
@@ -316,5 +326,40 @@ class Mentioning extends AbstractModel
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Removes members from the target list who have unwatched the topic containing this message.
+	 *
+	 * @param int[] $id_targets
+	 * @param int $id_msg
+	 * @return int[]
+	 */
+	protected function _filterUnwatchedTargets(array $id_targets, int $id_msg): array
+	{
+		$unwatched_targets = [];
+		$this->_db->fetchQuery('
+			SELECT lt.id_member
+			FROM {db_prefix}messages AS m
+				INNER JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = m.id_topic AND lt.id_member IN ({array_int:targets}))
+			WHERE m.id_msg = {int:id_msg}
+				AND lt.unwatched = {int:is_unwatched}',
+			[
+				'targets' => $id_targets,
+				'id_msg' => $id_msg,
+				'is_unwatched' => 1,
+			]
+		)->fetch_callback(
+			static function ($row) use (&$unwatched_targets) {
+				$unwatched_targets[] = (int) $row['id_member'];
+			}
+		);
+
+		if (!empty($unwatched_targets))
+		{
+			$id_targets = array_values(array_diff($id_targets, $unwatched_targets));
+		}
+
+		return $id_targets;
 	}
 }
