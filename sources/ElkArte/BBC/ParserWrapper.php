@@ -389,6 +389,8 @@ final class ParserWrapper
 	/**
 	 * Parse the BBC and smileys in board descriptions
 	 *
+	 * Uncached, use BoardDescriptionParser to get cached output
+	 *
 	 * @param string $board
 	 *
 	 * @return string

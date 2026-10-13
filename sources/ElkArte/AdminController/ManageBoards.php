@@ -16,7 +16,7 @@
 
 namespace ElkArte\AdminController;
 
-use BBC\ParserWrapper;
+use BBC\BoardDescriptionParser;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\BoardsTree;
@@ -150,7 +150,7 @@ class ManageBoards extends AbstractController
 		$move_board = $this->_req->getQuery('move', 'intval', 0);
 		$context['move_board'] = isset($boards[$move_board]) ? $move_board : 0;
 
-		$bbc_parser = ParserWrapper::instance();
+		$bbc_parser = BoardDescriptionParser::instance();
 		$cat_tree = $boardTree->getCategories();
 
 		$context['categories'] = [];
@@ -164,7 +164,7 @@ class ManageBoards extends AbstractController
 			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] === $catid;
 			foreach ($boardList[$catid] as $boardid)
 			{
-				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
+				$boards[$boardid]['description'] = $bbc_parser->parse($boards[$boardid]['description']);
 				$context['categories'][$catid]['boards'][$boardid] = [
 					'id' => $boards[$boardid]['id'],
 					'name' => $boards[$boardid]['name'],
