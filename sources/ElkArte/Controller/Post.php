@@ -29,6 +29,7 @@ use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
+use ElkArte\Notifications\PostNotificationQueue;
 use ElkArte\Themes\TemplateLayers;
 use ElkArte\User;
 
@@ -154,6 +155,51 @@ class Post extends AbstractController
 
 		$this->_finalizePage();
 		return null;
+	}
+
+	/**
+	 * Tells the members watching the topic or board about a new post
+	 *
+	 * What it does:
+	 * - With the deferred_post_notifications setting on, only a small job is saved here and the
+	 *   post_notifications scheduled task finds and mails the subscribers outside of this request.
+	 * - With it off, the subscribers are handled right now, as it was done in ElkArte 1.0-1.1.
+	 *
+	 * @param string $type One of the PostNotificationQueue TYPE constants
+	 * @param int $topic
+	 * @param int $msg The new message
+	 * @param array $payload Extra details for the job, 'topic_data' for a new topic or 'members_only' for a reply
+	 */
+	private function _notifySubscribers($type, $topic, $msg, $payload = []): void
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['deferred_post_notifications']))
+		{
+			// The runner has no poster, so what it needs to know about them is saved with the job
+			$payload['name'] = $this->user->name;
+			$payload['language'] = $this->user->language;
+
+			// Hold the job back for a short grace period, the text is read when the job runs so quick edits are included
+			$delay = (int) ($modSettings['deferred_post_notifications_delay'] ?? PostNotificationQueue::GRACE_SECONDS);
+
+			if ((new PostNotificationQueue())->enqueue($type, $topic, $msg, $this->user->id, $payload, max(0, $delay)) > 0)
+			{
+				scheduleTaskImmediate('post_notifications');
+
+				return;
+			}
+		}
+
+		if ($type === PostNotificationQueue::TYPE_TOPIC)
+		{
+			$topicData = $payload['topic_data'];
+			sendBoardNotifications($topicData);
+		}
+		else
+		{
+			sendNotifications($topic, 'reply', [], $payload['members_only'] ?? []);
+		}
 	}
 
 	/**
@@ -468,8 +514,8 @@ class Post extends AbstractController
 
 		// Trigger the prepare_modifying event
 		$this->_events->trigger('prepare_modifying', [
-			'post_errors' => $this->_post_errors,
-			'really_previewing' => &$really_previewing]
+				'post_errors' => $this->_post_errors,
+				'really_previewing' => &$really_previewing]
 		);
 
 		// To keep the approval status flowing through, we have to pass it through the form...
@@ -1420,18 +1466,18 @@ class Post extends AbstractController
 					'topic' => $topic,
 					'signature' => User::$settings->signature(''),
 				];
-				sendBoardNotifications($notifyData);
+				$this->_notifySubscribers(PostNotificationQueue::TYPE_TOPIC, (int) $topic, (int) $msgOptions['id'], ['topic_data' => $notifyData]);
 			}
 			elseif (empty($_REQUEST['msg']))
 			{
 				// Only send it to everyone if the topic is approved, otherwise just to the topic starter if they want it.
 				if ($topic_info['approved'])
 				{
-					sendNotifications($topic, 'reply');
+					$this->_notifySubscribers(PostNotificationQueue::TYPE_REPLY, (int) $topic, (int) $msgOptions['id']);
 				}
 				else
 				{
-					sendNotifications($topic, 'reply', [], $topic_info['id_member_started']);
+					$this->_notifySubscribers(PostNotificationQueue::TYPE_REPLY, (int) $topic, (int) $msgOptions['id'], ['members_only' => [(int) $topic_info['id_member_started']]]);
 				}
 			}
 		}

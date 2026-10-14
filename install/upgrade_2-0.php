@@ -1163,4 +1163,56 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function post_notification_queue_title()
+	{
+		return 'Deferred post notifications...';
+	}
+
+	public function post_notification_queue()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding post notification queue table...',
+				'function' => function () {
+					$this->table->create_table('{db_prefix}post_notification_queue',
+						array(
+							array('name' => 'id_job', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+							array('name' => 'task_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+							array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+							array('name' => 'id_msg', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+							array('name' => 'payload', 'type' => 'text'),
+							array('name' => 'attempts', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+							array('name' => 'created', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'locked_until', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+						),
+						array(
+							array('name' => 'id_job', 'columns' => array('id_job'), 'type' => 'primary'),
+							array('name' => 'locked_until', 'columns' => array('locked_until'), 'type' => 'key'),
+						),
+						array(),
+						'ignore'
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Registering the post notifications task...',
+				'function' => function () {
+					$this->db->insert('ignore',
+						'{db_prefix}scheduled_tasks',
+						array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
+						array(
+							array(0, 0, 5, 'm', 0, 'post_notifications'),
+						),
+						array('id_task')
+					);
+
+					updateSettings(array(
+						'deferred_post_notifications' => '1',
+					));
+				}
+			)
+		);
+	}
 }
