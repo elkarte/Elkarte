@@ -107,6 +107,20 @@ $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	<br />
 	<em>* Does not work on Windows-based servers.</em></span>';
 
+$helptxt['deferred_post_notifications'] = '<strong>Send post notifications in the background</strong><br />
+	Normally, when a member posts a new topic or reply, the forum emails everyone watching that topic or board before the poster is taken to their post. On forums with many watchers, this can make posting noticeably slow.<br />
+	<br />
+	When this option is enabled, the post is saved immediately and the emails are sent shortly afterward by the &quot;Post notifications&quot; scheduled task. Watchers receive the same emails as before, with the same content and permission checks.<br />
+	<br />
+	<strong>What to expect:</strong>
+	<ul class="normallist">
+		<li>Notifications are held for about two minutes after posting. If the poster edits the post during that time, the emailed text will be the edited version.</li>
+		<li>Because the scheduled task runs every few minutes, emails may arrive several minutes after the post is made.</li>
+		<li>If sending fails, it is retried a few times. If it still fails, the notification is dropped and an entry is added to the error log.</li>
+	</ul>
+	<br />
+	Disable this option to send notifications <em>immediately</em> when the original post is being saved.';
+
 $helptxt['deleteAccount_posts'] = '
 	<ul class="normallist">
 		<li><strong>Replies Only:</strong> This will remove just the posts this member made in reply to other posts.</li>
