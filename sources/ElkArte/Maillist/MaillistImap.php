@@ -45,11 +45,14 @@ class MaillistImap extends AbstractModel
 	/** @var bool Are we going to delete the emails once read? */
 	protected $_delete = false;
 
-	/** @var null The inbox object */
+	/** @var \IMAP\Connection The inbox object */
 	protected $_inbox;
 
 	/** @var string imap_open $mailbox string */
 	protected $_imap_server = '';
+
+	/** @var bool Skip TLS/SSL certificate validation (insecure, off by default) */
+	protected $_novalidate_cert = false;
 
 	/**
 	 * The constructor prepares few variables.
@@ -61,6 +64,7 @@ class MaillistImap extends AbstractModel
 	 *    - maillist_imap_mailbox
 	 *    - maillist_imap_connection
 	 *    - maillist_imap_delete
+	 *    - maillist_imap_novalidate_cert
 	 */
 	public function __construct()
 	{
@@ -75,6 +79,7 @@ class MaillistImap extends AbstractModel
 
 		// Values used for options
 		$this->_delete = (bool) $this->_modSettings->maillist_imap_delete;
+		$this->_novalidate_cert = (bool) $this->_modSettings->maillist_imap_novalidate_cert;
 		$this->_is_gmail = str_contains($this->_hostname, '.gmail.');
 	}
 
@@ -174,49 +179,51 @@ class MaillistImap extends AbstractModel
 	 */
 	protected function _port_type(): array
 	{
+		$novalidate = $this->_novalidate_cert ? '/novalidate-cert' : '';
+
 		switch ($this->_type)
 		{
 			case 'pop3':
 				// Standard POP3 mailbox.
 				$protocol = 'POP3';
 				$port = 110;
-				$flags = '/novalidate-cert';
+				$flags = $novalidate;
 				break;
 			case 'pop3tls':
 				// POP3, TLS mode.
 				$protocol = 'POP3';
 				$port = 110;
-				$flags = '/tls/novalidate-cert';
+				$flags = '/tls' . $novalidate;
 				break;
 			case 'pop3ssl':
 				// POP3, SSL mode.
 				$protocol = 'POP3SSL';
 				$port = 995;
-				$flags = '/ssl/novalidate-cert';
+				$flags = '/ssl' . $novalidate;
 				break;
 			case 'imap':
 				// Standard IMAP mailbox.
 				$protocol = 'IMAP';
 				$port = 143;
-				$flags = '/novalidate-cert';
+				$flags = $novalidate;
 				break;
 			case 'imaptls':
 				// IMAP in TLS mode.
 				$protocol = 'IMAPTLS';
 				$port = 143;
-				$flags = '/tls/novalidate-cert';
+				$flags = '/tls' . $novalidate;
 				break;
 			case 'imapssl':
 				// IMAP in SSL mode.
 				$protocol = 'IMAP';
 				$port = 993;
-				$flags = '/ssl/novalidate-cert';
+				$flags = '/ssl' . $novalidate;
 				break;
 			default:
 				// Something's wrong, so use a standard POP3 mailbox.
 				$protocol = 'POP3';
 				$port = 110;
-				$flags = '/novalidate-cert';
+				$flags = $novalidate;
 				break;
 		}
 
