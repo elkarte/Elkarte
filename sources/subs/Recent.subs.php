@@ -118,16 +118,25 @@ function cache_getLastPosts($latestPostOptions)
 	return [
 		'data' => getLastPosts($latestPostOptions),
 		'expires' => time() + 60,
-		'post_retri_eval' => '
-			foreach ($cache_block[\'data\'] as $k => $post)
-			{
-				$cache_block[\'data\'][$k] += array(
-					\'time\' => standardTime($post[\'raw_timestamp\']),
-					\'html_time\' => htmlTime($post[\'raw_timestamp\']),
-					\'timestamp\' => $post[\'raw_timestamp\'],
-				);
-			}',
+		'post_retri_callback' => 'cache_getLastPosts_post_retri',
 	];
+}
+
+/**
+ * Refines the last posts retrieved from cache with user-specific time formatting.
+ *
+ * @param array $cache_block
+ */
+function cache_getLastPosts_post_retri(&$cache_block)
+{
+	foreach ($cache_block['data'] as $k => $post)
+	{
+		$cache_block['data'][$k] += [
+			'time' => standardTime($post['raw_timestamp']),
+			'html_time' => htmlTime($post['raw_timestamp']),
+			'timestamp' => $post['raw_timestamp'],
+		];
+	}
 }
 
 /**
@@ -309,16 +318,25 @@ function cache_getLastTopics($latestTopicOptions)
 	return [
 		'data' => getLastTopics($latestTopicOptions),
 		'expires' => time() + 60,
-		'post_retri_eval' => '
-			foreach ($cache_block[\'data\'] as $k => $post)
-			{
-				$cache_block[\'data\'][$k] += array(
-					\'time\' => standardTime($post[\'raw_timestamp\']),
-					\'html_time\' => htmlTime($post[\'raw_timestamp\']),
-					\'timestamp\' => $post[\'raw_timestamp\'],
-				);
-			}',
+		'post_retri_callback' => 'cache_getLastTopics_post_retri',
 	];
+}
+
+/**
+ * Refines the last topics retrieved from cache with user-specific time formatting.
+ *
+ * @param array $cache_block
+ */
+function cache_getLastTopics_post_retri(&$cache_block)
+{
+	foreach ($cache_block['data'] as $k => $post)
+	{
+		$cache_block['data'][$k] += [
+			'time' => standardTime($post['raw_timestamp']),
+			'html_time' => htmlTime($post['raw_timestamp']),
+			'timestamp' => $post['raw_timestamp'],
+		];
+	}
 }
 
 /**

@@ -683,8 +683,23 @@ function cache_getMembergroupList()
 	return [
 		'data' => $groupCache,
 		'expires' => time() + 3600,
-		'refresh_eval' => 'return $GLOBALS[\'modSettings\'][\'settings_updated\'] > ' . time() . ';',
+		'cached_time' => time(),
+		'refresh_callback' => 'cache_getMembergroupList_refresh',
 	];
+}
+
+/**
+ * Check if the membergroup list cache needs to be refreshed.
+ *
+ * @param array $cache_block
+ * @return bool
+ * @package Membergroups
+ */
+function cache_getMembergroupList_refresh($cache_block): bool
+{
+	global $modSettings;
+
+	return !empty($modSettings['settings_updated']) && !empty($cache_block['cached_time']) && $modSettings['settings_updated'] > $cache_block['cached_time'];
 }
 
 /**
