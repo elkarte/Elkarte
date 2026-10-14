@@ -1075,7 +1075,8 @@ function groupsAllowedTo($permission, $board_id = null)
 		elseif ($board_id !== 0)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$board_data = fetchBoardsInfo(['boards' => $board_id], ['selects' => 'permissions']);
+			// Looking up the permission profile of a board must not depend on who is asking (e.g. a scheduled task)
+			$board_data = fetchBoardsInfo(['boards' => $board_id], ['selects' => 'permissions', 'override_permissions' => true]);
 
 			if (empty($board_data))
 			{
