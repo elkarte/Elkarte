@@ -68,7 +68,6 @@ class MaillistPostSubsTest extends ElkArteCommonSetupTest
 
 		// Seed some parser/filter rows for tests that depend on DB-driven filters
 		$db = database();
-		pbe_load_filters('filter', true);
 
 		// Parser: simple string marker
 		$db->insert('insert', '{db_prefix}postby_emails_filters',
@@ -178,6 +177,10 @@ class MaillistPostSubsTest extends ElkArteCommonSetupTest
 			$this->created_filter_ids[] = (int) $row['id_filter'];
 		}
 		$request->free_result();
+
+		// Reset only now: pbe_load_filters() reloads after a reset, so resetting before the inserts cached empty results
+		pbe_load_filters('filter', true);
+		pbe_load_filters('parser', true);
 	}
 
 	protected function tearDown(): void
