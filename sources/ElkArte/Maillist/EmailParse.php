@@ -107,12 +107,10 @@ class EmailParse
 	/** @var bool If the file was converted to utf8 */
 	public $_converted_utf8 = false;
 
-	/** @var bool Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
-	 * indicating failed delivery */
+	/** @var bool Whether the message is a DSN (Delivery Status Notification - aka "bounce"), indicating failed delivery */
 	public $_is_dsn = false;
 
-	/** @var array Holds the field/value/type report codes from DSN messages
-	    Accessible as [$field]['type'] and [$field]['value'] */
+	/** @var array Holds the field/value/type report codes from DSN messages Accessible as [$field]['type'] and [$field]['value'] */
 	public $_dsn;
 
 	/** @var array Wrapped multipart/mixed sections */

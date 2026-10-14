@@ -177,10 +177,16 @@ class MaillistPostSubsTest extends ElkArteCommonSetupTest
 			$this->created_filter_ids[] = (int) $row['id_filter'];
 		}
 		$request->free_result();
+
+		// Reset only now: pbe_load_filters() reloads after a reset, so resetting before the inserts cached empty results
+		pbe_load_filters('filter', true);
+		pbe_load_filters('parser', true);
 	}
 
 	protected function tearDown(): void
 	{
+		// The filters are cached per request, drop them so the next test sees its own rows
+		pbe_load_filters('filter', true);
 		// Cleanup created filters
 		if (!empty($this->created_filter_ids))
 		{
@@ -289,6 +295,112 @@ class MaillistPostSubsTest extends ElkArteCommonSetupTest
 		$hay = 'xx foo yy foo';
 		$res = pbe_str_replace_once('foo', 'bar', $hay);
 		$this->assertSame('xx bar yy foo', $res);
+	}
+
+	public function testFiltersAreCachedPerRequest()
+	{
+		$first = pbe_load_filters('filter');
+		$this->assertNotEmpty($first);
+
+		// Rows added after the first load are not seen until the cache is reset
+		$db = database();
+		$db->insert('insert', '{db_prefix}postby_emails_filters',
+			['filter_style' => 'string', 'filter_from' => 'string', 'filter_to' => 'string', 'filter_type' => 'string', 'filter_order' => 'int', 'filter_name' => 'string'],
+			['filter', 'zzz', 'yyy', 'string', 99, 'cache_probe'],
+			['id_filter']
+		);
+		$request = $db->query('', 'SELECT id_filter FROM {db_prefix}postby_emails_filters WHERE filter_name = {string:n}', ['n' => 'cache_probe']);
+		while ($row = $request->fetch_assoc())
+		{
+			$this->created_filter_ids[] = (int) $row['id_filter'];
+		}
+		$request->free_result();
+
+		$this->assertSame($first, pbe_load_filters('filter'));
+		$this->assertCount(count($first) + 1, pbe_load_filters('filter', true));
+	}
+
+	public function testReplyPermissionMatrix()
+	{
+		$pbe = static fn(array $perms, int $id = 5, bool $admin = false) => [
+			'profile' => ['id_member' => $id],
+			'user_info' => ['is_admin' => $admin, 'permissions' => $perms],
+		];
+
+		// Admin always allowed
+		$this->assertSame(['allowed' => true, 'approved' => true], pbe_reply_permission($pbe([], 5, true), ['id_member_started' => 9], true));
+
+		// Other people's topic needs post_reply_any
+		$this->assertTrue(pbe_reply_permission($pbe(['post_reply_any']), ['id_member_started' => 9], false)['allowed']);
+		$this->assertFalse(pbe_reply_permission($pbe(['post_reply_own']), ['id_member_started' => 9], false)['allowed']);
+
+		// Own topic needs post_reply_own, even when ids differ in type (string from the db vs int)
+		$this->assertTrue(pbe_reply_permission($pbe(['post_reply_own']), ['id_member_started' => '5'], false)['allowed']);
+		$this->assertFalse(pbe_reply_permission($pbe(['post_reply_any']), ['id_member_started' => '5'], false)['allowed']);
+
+		// Post moderation, unapproved replies only
+		$result = pbe_reply_permission($pbe(['post_unapproved_replies_any']), ['id_member_started' => 9], true);
+		$this->assertSame(['allowed' => true, 'approved' => false], $result);
+
+		// Post moderation off, the unapproved permission alone is not enough
+		$this->assertFalse(pbe_reply_permission($pbe(['post_unapproved_replies_any']), ['id_member_started' => 9], false)['allowed']);
+
+		// Having post_reply_any wins over the unapproved permission
+		$result = pbe_reply_permission($pbe(['post_reply_any', 'post_unapproved_replies_any']), ['id_member_started' => 9], true);
+		$this->assertSame(['allowed' => true, 'approved' => true], $result);
+	}
+
+	public function testBanCheck()
+	{
+		$db = database();
+		$pbe = ['profile' => ['id_member' => 987654, 'email_address' => 'banned.user@example.invalid'], 'user_info' => ['is_admin' => false, 'permissions' => []]];
+		$this->assertFalse(pbe_is_banned($pbe));
+
+		$db->insert('insert', '{db_prefix}ban_groups',
+			['name' => 'string', 'ban_time' => 'int', 'expire_time' => 'raw', 'cannot_access' => 'int', 'cannot_register' => 'int', 'cannot_post' => 'int', 'cannot_login' => 'int', 'reason' => 'string', 'notes' => 'string'],
+			['pbe_test_ban', time(), 'NULL', 0, 0, 1, 0, '', ''],
+			['id_ban_group']
+		);
+		$request = $db->query('', 'SELECT id_ban_group FROM {db_prefix}ban_groups WHERE name = {string:n}', ['n' => 'pbe_test_ban']);
+		[$group] = $request->fetch_row();
+		$request->free_result();
+
+		try
+		{
+			$db->insert('insert', '{db_prefix}ban_items',
+				['id_ban_group' => 'int', 'email_address' => 'string'],
+				[(int) $group, '%@example.invalid'],
+				['id_ban']
+			);
+
+			$this->assertTrue(pbe_is_banned($pbe));
+
+			// Admins are never banned
+			$pbe['user_info']['is_admin'] = true;
+			$this->assertFalse(pbe_is_banned($pbe));
+		}
+		finally
+		{
+			$db->query('', 'DELETE FROM {db_prefix}ban_items WHERE id_ban_group = {int:g}', ['g' => (int) $group]);
+			$db->query('', 'DELETE FROM {db_prefix}ban_groups WHERE id_ban_group = {int:g}', ['g' => (int) $group]);
+		}
+	}
+
+	public function testFloodCheckSkippedWhenDisabledOrExempt()
+	{
+		global $modSettings;
+
+		$old = $modSettings['spamWaitTime'] ?? null;
+		$pbe = ['profile' => ['id_member' => 987654], 'user_info' => ['is_admin' => false, 'permissions' => []]];
+
+		$modSettings['spamWaitTime'] = 0;
+		$this->assertFalse(pbe_is_flooding($pbe));
+
+		// No posts at all for this member, so never flooding
+		$modSettings['spamWaitTime'] = 5;
+		$this->assertFalse(pbe_is_flooding($pbe));
+
+		$modSettings['spamWaitTime'] = $old;
 	}
 
 	public function testPrepareTextConvertsToMarkdown()

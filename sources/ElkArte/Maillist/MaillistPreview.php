@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Used to preview a failed email from the ACP so it can be actioned.  Does not expose any PM's
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,8 +24,7 @@ use ElkArte\Languages\Txt;
 class MaillistPreview extends AbstractController
 {
 	/**
-	 * The action_index method is responsible for executing the functionality for the "index" action.
-	 * It calls the action_pbe_preview method, should it ever get here.
+	 * Calls the action_pbe_preview method, should it ever get here.
 	 *
 	 * @return void
 	 */
@@ -38,7 +38,7 @@ class MaillistPreview extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
+	 * - Called from ManageMaillist, which checks topic/message permission for viewing
 	 * - Calls pbe_load_text to prepare text for the preview
 	 * - Returns an array of values for use in the template
 	 *

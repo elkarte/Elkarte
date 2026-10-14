@@ -1,7 +1,7 @@
 <?php
 
 /**
- * All the helper functions for use by the maillist controller
+ * All the helper functions for use by the manage maillist controller
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

@@ -14,7 +14,6 @@ namespace ElkArte\Maillist;
 
 use ElkArte\AbstractController;
 use ElkArte\Languages\Loader;
-use ElkArte\Languages\Txt;
 
 /**
  * Handles items pertaining to posting or PM an item that was received by email
@@ -23,8 +22,7 @@ use ElkArte\Languages\Txt;
  */
 class MaillistPost extends AbstractController
 {
-	/** @var array holds user information based on found email address */
-	public $pbeUser;
+	use MaillistEmailTrait;
 
 	/** @var array holds information on the topic being replyed to */
 	public $topicInfo = [];
@@ -68,8 +66,6 @@ class MaillistPost extends AbstractController
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
-		global $maintenance;
-
 		// The function is not even on ...
 		if (!$this->isMailListEnabled())
 		{
@@ -77,11 +73,10 @@ class MaillistPost extends AbstractController
 		}
 
 		// Prepare
-		require_once(SUBSDIR . '/MaillistPost.subs.php');
-		Txt::load('Maillist');
-		detectServer()->setMemoryLimit('128M');
+		$this->initPbe();
 
-		$email_message = $this->loadEmailMessage($data, $key);
+		$email_message = $this->loadEmailMessage($data);
+		$email_message->load_key($key);
 
 		// Is the email valid, not spam, not a bounced message
 		if ($this->isValidEmail($email_message, $force) !== true)
@@ -96,11 +91,17 @@ class MaillistPost extends AbstractController
 		}
 
 		// In maintenance mode, just log it for now
-		if (!empty($maintenance) && $maintenance !== 2
-			&& !$this->pbeUser['user_info']['is_admin'] && $this->getUser()->is_admin === false)
+		if ($this->isBlockedByMaintenance())
 		{
 			pbe_emailError('error_in_maintenance_mode', $email_message);
 			return 'error_in_maintenance_mode';
+		}
+
+		// Enforce the separate post / pm switches for the type of message this is
+		if (!$force && $this->isTypeDisabled($email_message))
+		{
+			pbe_emailError('error_email_notenabled', $email_message);
+			return 'error_email_notenabled';
 		}
 
 		// The email looks valid, now on to check the actual user trying to make the post/pm
@@ -117,10 +118,24 @@ class MaillistPost extends AbstractController
 		}
 
 		// Account for moderation actions
-		pbe_check_moderation($this->pbeUser);
+		$this->applyModerationLimits();
 
 		// Maybe an addon wants to do additional spam / security checking
-		call_integration_hook('integrate_mailist_checks_before', [$email_message, $this->pbeUser]);
+		$this->runPreChecksHook($email_message);
+
+		// Claim the one-time key so a duplicate delivery cannot post twice
+		$claimed = true;
+		if (!$force)
+		{
+			$claimed = query_key_claim($email_message);
+			if ($claimed === false)
+			{
+				pbe_emailError('error_' . ($email_message->message_type === self::PM_REPLY ? 'pm_' : '') . 'not_find_entry', $email_message);
+				return 'error_not_find_entry';
+			}
+		}
+
+		$result = false;
 
 		// Load in the correct Re: for the language
 		$this->adjustForUserLanguage();
@@ -154,42 +169,29 @@ class MaillistPost extends AbstractController
 			return true;
 		}
 
+		// Nothing was posted, so give the key back for a retry
+		query_key_restore($claimed);
+
 		return false;
 	}
 
 	/**
-	 * Checks if the mail list is enabled.
+	 * Is the post or pm function that this message needs switched off
 	 *
-	 * @return bool Returns true if the mail list is enabled, false otherwise.
-	 * @global array $modSettings The settings array.
+	 * @param EmailParse $email_message
+	 *
+	 * @return bool
 	 */
-	private function isMailListEnabled(): bool
+	private function isTypeDisabled($email_message): bool
 	{
 		global $modSettings;
 
-		return !empty($modSettings['maillist_enabled']);
-	}
+		if ($email_message->message_type === self::PM_REPLY)
+		{
+			return empty($modSettings['pbe_pm_enabled']);
+		}
 
-	/**
-	 * The loadEmailMessage method is responsible for loading and parsing an email message.
-	 *
-	 * @param mixed $data The data to be passed to the EmailParse class for reading.
-	 * @param string $key The key to be passed to the EmailParse class for loading data.
-	 *
-	 * @return EmailParse The parsed email message.
-	 */
-	private function loadEmailMessage($data, $key): EmailParse
-	{
-		// Load the email parser and set some data to work with
-		$email_message = new EmailParse();
-		$email_message->read_data($data, BOARDDIR);
-
-		// Ask for an HTML version (if available) and some necessary details
-		$email_message->read_email(true, $email_message->raw_message);
-		$email_message->load_address();
-		$email_message->load_key($key);
-
-		return $email_message;
+		return empty($modSettings['pbe_post_enabled']);
 	}
 
 	/**
@@ -205,26 +207,9 @@ class MaillistPost extends AbstractController
 		global $modSettings;
 
 		// Check if it's a DSN and handle it
-		if ($email_message->_is_dsn)
+		if (($result = $this->checkDsn($email_message)) !== true)
 		{
-			if (!empty($modSettings['pbe_bounce_detect']))
-			{
-				pbe_disable_user_notify($email_message);
-
-				if (!empty($modSettings['pbe_bounce_record']))
-				{
-					// They can record the message anyway if they so wish
-					pbe_emailError('error_bounced', $email_message);
-					return 'error_bounced';
-				}
-
-				return 'error_bounced';
-			}
-
-			// When the auto-disable function is not turned on, record the DSN
-			// In the failed email table for the admins to handle, however
-			pbe_emailError('error_bounced', $email_message);
-			return 'error_bounced';
+			return $result;
 		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
@@ -242,14 +227,9 @@ class MaillistPost extends AbstractController
 		}
 
 		// Load the user from the database based on the sending email address
-		$email_message->email['from'] = empty($email_message->email['from']) ? '' : strtolower($email_message->email['from']);
-		$this->pbeUser = query_load_user_info($email_message->email['from']);
-
-		// Can't find this email in our database, a non-user, a spammer, a looser, a poser or even worse?
-		if (empty($this->pbeUser))
+		if (($result = $this->loadSender($email_message)) !== true)
 		{
-			pbe_emailError('error_not_find_member', $email_message);
-			return 'error_not_find_member';
+			return $result;
 		}
 
 		// Find the message security key; without it, we are not going anywhere ever
@@ -265,7 +245,7 @@ class MaillistPost extends AbstractController
 	/**
 	 * Checks if the given message key is valid.
 	 *
-	 * @param object $email_message The email message object.
+	 * @param EmailParse $email_message The email message object.
 	 * @param bool $force Flag indicating whether to force the message validation.
 	 *
 	 * @return bool|string Returns true if the message key is valid, or an error code if the key is invalid and $force is false.
@@ -296,7 +276,7 @@ class MaillistPost extends AbstractController
 	/**
 	 * Load the topic permissions and message details.
 	 *
-	 * @param object $email_message The email message object.
+	 * @param EmailParse $email_message The email message object.
 	 * @return array|bool The topic info or false if topic is not found.
 	 */
 	private function loadTopicPermissions($email_message)
@@ -319,7 +299,7 @@ class MaillistPost extends AbstractController
 	/**
 	 * Load the private message permissions and details.
 	 *
-	 * @param object $email_message The email message object.
+	 * @param EmailParse $email_message The email message object.
 	 * @return array|bool The private message info or false if the message is not found.
 	 */
 	private function loadPmPermissions($email_message)
@@ -345,18 +325,25 @@ class MaillistPost extends AbstractController
 	private function adjustForUserLanguage(): void
 	{
 		global $txt, $language;
+		static $prefixCache = [];
 
-		if ($language === $this->pbeUser['user_info']['language'])
+		$userLanguage = $this->pbeUser['user_info']['language'];
+		if ($language === $userLanguage)
 		{
 			$this->pbeUser['response_prefix'] = $txt['response_prefix'];
 		}
 		else
 		{
-			$mtxt = [];
-			$lang = new Loader($language, $mtxt, database());
-			$lang->load('index', false, true);
-			$this->pbeUser['response_prefix'] = $mtxt['response_prefix'];
-			unset($mtxt);
+			if (!isset($prefixCache[$language]))
+			{
+				$mtxt = [];
+				$lang = new Loader($language, $mtxt, database());
+				$lang->load('index', false, true);
+				$prefixCache[$language] = $mtxt['response_prefix'];
+				unset($mtxt);
+			}
+
+			$this->pbeUser['response_prefix'] = $prefixCache[$language];
 		}
 	}
 

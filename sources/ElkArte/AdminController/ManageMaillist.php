@@ -1736,6 +1736,7 @@ class ManageMaillist extends AbstractController
 					], 'postinput' => $txt['maillist_imap_connection_desc'], 'disabled' => !function_exists('imap_open'),
 				],
 				['check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')],
+				['check', 'maillist_imap_novalidate_cert', 20, 'subtext' => $txt['maillist_imap_novalidate_cert_desc'], 'disabled' => !function_exists('imap_open')],
 				['check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')],
 			]);
 		}
