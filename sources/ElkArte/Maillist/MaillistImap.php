@@ -54,6 +54,9 @@ class MaillistImap extends AbstractModel
 	/** @var bool Skip TLS/SSL certificate validation (insecure, off by default) */
 	protected $_novalidate_cert = false;
 
+	/** @var int Maximum number of messages to process per run */
+	protected $_max_per_run = 50;
+
 	/**
 	 * The constructor prepares few variables.
 	 *
@@ -65,6 +68,7 @@ class MaillistImap extends AbstractModel
 	 *    - maillist_imap_connection
 	 *    - maillist_imap_delete
 	 *    - maillist_imap_novalidate_cert
+	 *    - maillist_imap_max
 	 */
 	public function __construct()
 	{
@@ -80,7 +84,23 @@ class MaillistImap extends AbstractModel
 		// Values used for options
 		$this->_delete = (bool) $this->_modSettings->maillist_imap_delete;
 		$this->_novalidate_cert = (bool) $this->_modSettings->maillist_imap_novalidate_cert;
+		$this->_max_per_run = (int) $this->_modSettings->maillist_imap_max(50);
 		$this->_is_gmail = str_contains($this->_hostname, '.gmail.');
+	}
+
+	/**
+	 * Takes a list of email UIDs, sorts them from oldest to newest, and caps
+	 * the result to max per run (at least 1).
+	 *
+	 * @param array $emails
+	 * @return array
+	 */
+	protected function _select_batch(array $emails): array
+	{
+		sort($emails, SORT_NUMERIC);
+		$max = max(1, (int) $this->_max_per_run);
+
+		return array_slice($emails, 0, $max);
 	}
 
 	/**
@@ -105,8 +125,8 @@ class MaillistImap extends AbstractModel
 			$controller = new MaillistPost(new EventManager());
 			$controller->setUser($this->user);
 
-			// Make sure we work from the oldest to the newest message
-			sort($emails);
+			// Make sure we work from the oldest to the newest message, capped by batch size
+			$emails = $this->_select_batch($emails);
 
 			// For every email...
 			foreach ($emails as $email_uid)

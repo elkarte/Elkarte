@@ -86,7 +86,13 @@ class BoardsSubsTest extends ElkArteCommonSetupTest
 		global $modSettings;
 
 		// Set a max that is greater than what we have done in the tests
-		$modSettings['maxMsgID'] = 10;
+		$db = database();
+		$maxMsg = 0;
+		$db->fetchQuery('SELECT MAX(id_msg) AS max_id FROM {db_prefix}messages', [])
+			->fetch_callback(function ($row) use (&$maxMsg) {
+				$maxMsg = (int) $row['max_id'];
+			});
+		$modSettings['maxMsgID'] = max(10, $maxMsg);
 
 		// Mark them as read
 		markBoardsRead(1, false, true);
