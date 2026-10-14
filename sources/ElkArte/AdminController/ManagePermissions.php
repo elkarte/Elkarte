@@ -17,7 +17,7 @@
 
 namespace ElkArte\AdminController;
 
-use BBC\ParserWrapper;
+use BBC\BoardDescriptionParser;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\BoardsTree;
@@ -510,7 +510,7 @@ class ManagePermissions extends AbstractController
 
 		// Build the list of the boards.
 		$context['categories'] = [];
-		$bbc_parser = ParserWrapper::instance();
+		$bbc_parser = BoardDescriptionParser::instance();
 		foreach ($cat_tree as $catid => $tree)
 		{
 			$context['categories'][$catid] = [
@@ -520,7 +520,7 @@ class ManagePermissions extends AbstractController
 			];
 			foreach ($boardList[$catid] as $boardid)
 			{
-				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
+				$boards[$boardid]['description'] = $bbc_parser->parse($boards[$boardid]['description']);
 
 				if (!isset($context['profiles'][$boards[$boardid]['profile']]))
 				{

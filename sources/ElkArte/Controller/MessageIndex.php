@@ -17,7 +17,7 @@
 
 namespace ElkArte\Controller;
 
-use BBC\ParserWrapper;
+use BBC\BoardDescriptionParser;
 use ElkArte\AbstractController;
 use ElkArte\BoardsList;
 use ElkArte\EventManager;
@@ -238,7 +238,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	{
 		global $txt, $context, $board_info, $modSettings;
 
-		$description = ParserWrapper::instance()->parseBoard($board_info['description']);
+		$description = BoardDescriptionParser::instance()->parse($board_info['description']);
 
 		$context += [
 			'name' => $board_info['name'],

@@ -185,21 +185,6 @@ class Cache
 	}
 
 	/**
-	 * Just before forgetting about the cache, let's save the existing keys.
-	 */
-	public function __destruct()
-	{
-		$cached = $this->get('_cached_keys');
-		if (!is_array($cached))
-		{
-			$cached = [];
-		}
-
-		$_cached_keys = array_unique(array_merge($this->_cached_keys, $cached));
-		$this->put('_cached_keys', $_cached_keys);
-	}
-
-	/**
 	 * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
 	 *
 	 * - It may often "miss", so shouldn't be depended on.

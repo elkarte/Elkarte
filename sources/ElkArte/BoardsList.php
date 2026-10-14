@@ -17,7 +17,7 @@
 
 namespace ElkArte;
 
-use BBC\ParserWrapper;
+use BBC\BoardDescriptionParser;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\Util;
@@ -129,7 +129,7 @@ class BoardsList
 	{
 		// Fetch and sort the boards' data.
 		$result_boards = $this->_fetchBoardsData();
-		$bbc_parser = ParserWrapper::instance();
+		$bbc_parser = BoardDescriptionParser::instance();
 
 		// Parent map used when accumulating grandchild post/topic counts
 		$parent_map = [];
@@ -301,7 +301,7 @@ class BoardsList
 	/**
 	 * Ensure the parent board entry exists and record for moderators mapping
 	 */
-	private function _ensureParentBoardEntry(array $row_board, ParserWrapper $bbc_parser): void
+	private function _ensureParentBoardEntry(array $row_board, BoardDescriptionParser $bbc_parser): void
 	{
 		if (!isset($this->_current_boards[$row_board['id_board']]))
 		{
@@ -310,7 +310,7 @@ class BoardsList
 				'new' => empty($row_board['is_read']),
 				'id' => (int) $row_board['id_board'],
 				'name' => $row_board['board_name'],
-				'description' => $bbc_parser->parseBoard($row_board['description']),
+				'description' => $bbc_parser->parse($row_board['description']),
 				'raw_description' => $row_board['description'],
 				'moderators' => [],
 				'link_moderators' => [],
@@ -334,13 +334,13 @@ class BoardsList
 	/**
 	 * Add a child board to its parent and update counters and links
 	 */
-	private function _addChildBoard(array $row_board, ParserWrapper $bbc_parser): void
+	private function _addChildBoard(array $row_board, BoardDescriptionParser $bbc_parser): void
 	{
 		$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['board_name']]);
 		$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = [
 			'id' => (int) $row_board['id_board'],
 			'name' => $row_board['board_name'],
-			'description' => $bbc_parser->parseBoard($row_board['description']),
+			'description' => $bbc_parser->parse($row_board['description']),
 			'raw_description' => $row_board['description'],
 			'new' => empty($row_board['is_read']) && $row_board['poster_name'] !== '',
 			'topics' => (int) $row_board['num_topics'],
