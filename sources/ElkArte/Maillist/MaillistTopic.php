@@ -13,7 +13,7 @@
 namespace ElkArte\Maillist;
 
 use ElkArte\AbstractController;
-use ElkArte\Languages\Txt;
+use ElkArte\Helper\Util;
 
 /**
  * Handles items pertaining to posting or PM an item that was received by email
@@ -22,8 +22,7 @@ use ElkArte\Languages\Txt;
  */
 class MaillistTopic extends AbstractController
 {
-	/** @var array holds user information based on found email address */
-	public $pbeUser;
+	use MaillistEmailTrait;
 
 	/** @var array holds information on the PM being replied to */
 	public $boardInfo = [];
@@ -59,8 +58,6 @@ class MaillistTopic extends AbstractController
 	 */
 	public function action_pbe_topic($data = null): bool
 	{
-		global $maintenance;
-
 		// The function is not even on ...
 		if (!$this->isMailListEnabled())
 		{
@@ -68,9 +65,7 @@ class MaillistTopic extends AbstractController
 		}
 
 		// Init
-		require_once(SUBSDIR . '/MaillistPost.subs.php');
-		Txt::load('Maillist');
-		detectServer()->setMemoryLimit('128M');
+		$this->initPbe();
 
 		// Get the data from one of our email data
 		$email_message = $this->loadEmailMessage($data);
@@ -88,13 +83,13 @@ class MaillistTopic extends AbstractController
 		}
 
 		// In maintenance mode so just save it for the moderators to deal with
-		if (!empty($maintenance) && $maintenance !== 2 && !$this->pbeUser['user_info']['is_admin'] && $this->emailpost->getUser()->is_admin === false)
+		if ($this->isBlockedByMaintenance())
 		{
 			return pbe_emailError('error_in_maintenance_mode', $email_message);
 		}
 
 		// Any additional spam / security checking that an addon may want
-		call_integration_hook('integrate_mailist_checks_before', [$email_message, $this->pbeUser]);
+		$this->runPreChecksHook($email_message);
 
 		// To post a NEW topic, we need some board details for where it goes
 		$this->boardInfo = query_load_board_details($this->boardNumber, $this->pbeUser);
@@ -108,43 +103,10 @@ class MaillistTopic extends AbstractController
 		query_load_permissions('board', $this->pbeUser, $this->boardInfo);
 
 		// Account for any moderation they may be under
-		pbe_check_moderation($this->pbeUser);
+		$this->applyModerationLimits();
 
 		// Create the topic, send notifications
 		return pbe_create_topic($this->pbeUser, $email_message, $this->boardInfo);
-	}
-
-	/**
-	 * Checks if the mail list is enabled.
-	 *
-	 * @return bool Returns true if the mail list is enabled, false otherwise.
-	 * @global array $modSettings The settings array.
-	 */
-	private function isMailListEnabled(): bool
-	{
-		global $modSettings;
-
-		return !empty($modSettings['maillist_enabled']);
-	}
-
-	/**
-	 * The loadEmailMessage method is responsible for loading and parsing an email message.
-	 *
-	 * @param mixed $data The data to be passed to the EmailParse class for reading.
-	 *
-	 * @return EmailParse The parsed email message.
-	 */
-	private function loadEmailMessage($data): EmailParse
-	{
-		// Load the email parser and set some data to work with
-		$email_message = new EmailParse();
-		$email_message->read_data($data, BOARDDIR);
-
-		// Ask for an HTML version (if available) and some needed details
-		$email_message->read_email(true, $email_message->raw_message);
-		$email_message->load_address();
-
-		return $email_message;
 	}
 
 	/**
@@ -159,28 +121,9 @@ class MaillistTopic extends AbstractController
 		global $modSettings;
 
 		// Check if it's a DSN
-		if ($email_message->_is_dsn)
+		if (($result = $this->checkDsn($email_message)) !== true)
 		{
-			if (!empty($modSettings['pbe_bounce_detect']))
-			{
-				pbe_disable_user_notify($email_message);
-
-				// @todo Notify the user
-				if (!empty($modSettings['pbe_bounce_record']))
-				{
-					// They can record the message anyway, if they so wish
-					pbe_emailError('error_bounced', $email_message);
-					return 'error_bounced';
-				}
-
-				// If they don't wish, then return false like recording the failure
-				return 'error_bounced';
-			}
-
-			// When the auto-disable function is not turned on, record the DSN
-			// In the failed email table for the admins to handle however
-			pbe_emailError('error_bounced', $email_message);
-			return 'error_bounced';
+			return $result;
 		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
@@ -191,14 +134,9 @@ class MaillistTopic extends AbstractController
 		}
 
 		// Load the user from the database based on the sending email address
-		$email_message->email['from'] = empty($email_message->email['from']) ? '' : strtolower($email_message->email['from']);
-		$this->pbeUser = query_load_user_info($email_message->email['from']);
-
-		// Can't find this email as one of our users?
-		if (empty($this->pbeUser))
+		if (($result = $this->loadSender($email_message)) !== true)
 		{
-			pbe_emailError('error_not_find_member', $email_message);
-			return 'error_not_find_member';
+			return $result;
 		}
 
 		// Getting hammy with it?
@@ -209,7 +147,7 @@ class MaillistTopic extends AbstractController
 		}
 
 		// The board that this email address corresponds to
-		$this->boardNumber = pbe_find_board_number($email_message);
+		$this->boardNumber = $this->findBoardNumber($email_message);
 		if (empty($this->boardNumber))
 		{
 			pbe_emailError('error_not_find_board', $email_message);
@@ -217,5 +155,35 @@ class MaillistTopic extends AbstractController
 		}
 
 		return true;
+	}
+
+	/**
+	 * Finds the board id that the address(es) an email was sent to is assigned to in the ACP
+	 *
+	 * @param EmailParse $email_message
+	 *
+	 * @return int the board number in which the new topic must go, 0 if none
+	 */
+	private function findBoardNumber($email_message): int
+	{
+		global $modSettings;
+
+		$valid_address = [];
+		$data = empty($modSettings['maillist_receiving_address']) ? [] : Util::unserialize($modSettings['maillist_receiving_address']);
+		foreach ($data as $addr)
+		{
+			$valid_address[$addr[0]] = $addr[1];
+		}
+
+		// May have been sent to multiple addresses, so check each one
+		foreach ($email_message->email['to'] as $to_email)
+		{
+			if (isset($valid_address[$to_email]))
+			{
+				return (int) $valid_address[$to_email];
+			}
+		}
+
+		return 0;
 	}
 }
