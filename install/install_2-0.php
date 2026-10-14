@@ -2033,6 +2033,29 @@ class InstallInstructions_install_2_0
 		);
 	}
 
+	public function table_post_notification_queue()
+	{
+		return $this->table->create_table('{db_prefix}post_notification_queue',
+			array(
+				array('name' => 'id_job', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
+				array('name' => 'task_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+				array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+				array('name' => 'id_msg', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+				array('name' => 'payload', 'type' => 'text'),
+				array('name' => 'attempts', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
+				array('name' => 'created', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'locked_until', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+			),
+			array(
+				array('name' => 'id_job', 'columns' => array('id_job'), 'type' => 'primary'),
+				array('name' => 'locked_until', 'columns' => array('locked_until'), 'type' => 'key'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
 	public function table_pending_notifications()
 	{
 		return $this->table->create_table('{db_prefix}pending_notifications',
@@ -2385,6 +2408,7 @@ class InstallInstructions_install_2_0
 				array(0, 0, 6, 'h', 0, 'remove_old_followups'),
 				array(0, 360, 10, 'm', 1, 'maillist_fetch_IMAP'),
 				array(0, 30, 1, 'h', 0, 'user_access_mentions'),
+				array(0, 0, 5, 'm', 0, 'post_notifications'),
 			),
 			array('id_task')
 		);
@@ -2587,6 +2611,7 @@ class InstallInstructions_install_2_0
 				array('permission_enable_deny', '0'),
 				array('permission_enable_postgroups', '0'),
 				array('mail_next_send', '0'),
+				array('deferred_post_notifications', '1'),
 				array('mail_recent', '0000000000|0'),
 				array('settings_updated', '0'),
 				array('next_task_time', '1'),

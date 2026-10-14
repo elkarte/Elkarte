@@ -221,6 +221,7 @@ class ManageMail extends AbstractController
 		$config_vars = [
 			// Mail queue stuff, this rocks ;)
 			['check', 'mail_queue'],
+			['check', 'deferred_post_notifications'],
 			['int', 'mail_period_limit'],
 			['int', 'mail_batch_size'],
 			'',

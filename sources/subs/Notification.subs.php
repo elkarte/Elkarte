@@ -543,10 +543,12 @@ function validateNotifierToken($memEmail, $memSalt, $area, $hash)
  *
  * @param int[] $topics
  * @param string $type
+ * @param int $id_msg Use this message of the topic instead of the last one, for notices that
+ * are sent after other posts may have been added to the topic.
  * @return array[] A board array and the topic info array.  Board array used to search
  * for board subscriptions.
  */
-function getTopicInfos($topics, $type)
+function getTopicInfos($topics, $type, $id_msg = 0)
 {
 	$db = database();
 
@@ -561,19 +563,20 @@ function getTopicInfos($topics, $type)
 
 	$db->fetchQuery('
 		SELECT 
-			mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, t.id_member_started,
+			mf.subject, ml.body, ml.id_member, ml.id_msg AS id_last_msg, t.id_topic, t.id_board, t.id_member_started,
 			mem.signature, COALESCE(mem.real_name, ml.poster_name) AS poster_name,
 			COUNT(a.id_attach) as num_attach,
 			' . $aggregateThumbs . ' AS thumb_ids
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			INNER JOIN {db_prefix}messages AS ml ON (' . (empty($id_msg) ? 'ml.id_msg = t.id_last_msg' : 'ml.id_msg = {int:id_msg} AND ml.id_topic = t.id_topic') . ')
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = t.id_last_msg AND a.approved = {int:approved})
+			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = ml.id_msg AND a.approved = {int:approved})
 		WHERE t.id_topic IN ({array_int:topic_list})
 		GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9',
 		[
 			'topic_list' => $topics,
+			'id_msg' => (int) $id_msg,
 			'attachment_type' => 0,
 			'approved' => 1,
 			'delim' => ',',

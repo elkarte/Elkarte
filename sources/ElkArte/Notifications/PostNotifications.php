@@ -80,8 +80,10 @@ class PostNotifications extends AbstractModel
 	 *                       move, merge, and split.  An appropriate message will be sent for each.
 	 * @param int[]|int $members_only = array() - restrict to only send the notification to this list, otherwise all
 	 * @param array $pbe = array() - PBE user_info if this is being run as a result of an email posting
+	 * @param int $id_msg = 0 - notify about this message of the topic instead of the latest one, used when
+	 * the notifications are sent after the post was made and other posts may have followed it
 	 */
-	public function sendNotifications($topics, $type, $members_only = [], $pbe = []): void
+	public function sendNotifications($topics, $type, $members_only = [], $pbe = [], $id_msg = 0): void
 	{
 		global $txt;
 
@@ -108,7 +110,7 @@ class PostNotifications extends AbstractModel
 		$user_language = $this->_getUserLanguage($pbe);
 
 		// Get the subject, body and basic poster details, number of attachments if any
-		[$boards_index, $topicData] = getTopicInfos($topics, $type);
+		[$boards_index, $topicData] = getTopicInfos($topics, $type, $id_msg);
 
 		// Nada?
 		if (empty($topicData))
