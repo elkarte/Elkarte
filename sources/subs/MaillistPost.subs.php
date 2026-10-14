@@ -358,6 +358,58 @@ function pbe_email_quote_depth(&$string, $update = true)
 }
 
 /**
+ * Loads the ACP email filters / parsers, cached for the duration of the request
+ *
+ * @param string $style 'filter' or 'parser'
+ * @param bool $reset if true, drops the cached rows (call after the filters are edited)
+ *
+ * @return array
+ * @package Maillist
+ */
+function pbe_load_filters($style, $reset = false)
+{
+	static $cache = [];
+
+	if ($reset)
+	{
+		$cache = [];
+	}
+
+	if (isset($cache[$style]))
+	{
+		return $cache[$style];
+	}
+
+	$rows = [];
+	database()->fetchQuery('
+		SELECT
+			filter_from, filter_to, filter_type
+		FROM {db_prefix}postby_emails_filters
+		WHERE filter_style = {string:filter_style}
+		ORDER BY ' . ($style === 'parser' ? '' : 'filter_type ASC, ') . 'filter_order ASC',
+		[
+			'filter_style' => $style
+		]
+	)->fetch_callback(
+		static function ($row) use (&$rows, $style) {
+			if ($style === 'parser')
+			{
+				$rows[] = [
+					'type' => $row['filter_type'] === 'regex' ? 'regex' : 'string',
+					'parser' => $row['filter_from']
+				];
+			}
+			else
+			{
+				$rows[] = $row;
+			}
+		}
+	);
+
+	return $cache[$style] = $rows;
+}
+
+/**
  * Splits a message at a given string, returning only the upper portion
  *
  * - Intended to split off the 'replied to' portion that often follows the reply
@@ -371,27 +423,7 @@ function pbe_email_quote_depth(&$string, $update = true)
  */
 function pbe_parse_email_message(&$body)
 {
-	$db = database();
-
-	// Load up the parsers from the database
-	$expressions = [];
-	$db->fetchQuery('
-		SELECT
-			filter_from, filter_type
-		FROM {db_prefix}postby_emails_filters
-		WHERE filter_style = {string:filter_style}
-		ORDER BY filter_order ASC',
-		[
-			'filter_style' => 'parser'
-		]
-	)->fetch_callback(
-		static function ($row) use (&$expressions) {
-			// Build an array of valid expressions
-			$expressions[] = [
-				'type' => $row['filter_type'] === 'regex' ? 'regex' : 'string',
-				'parser' => $row['filter_from']];
-		}
-	);
+	$expressions = pbe_load_filters('parser');
 
 	// Look for the markers, **stop** after the first successful one, good hunting!
 	foreach ($expressions as $expression)
@@ -432,41 +464,29 @@ function pbe_filter_email_message($text)
 		return '';
 	}
 
-	$db = database();
-
-	// load up the text filters from the database, regex first and ordered by the filter order ...
-	$db->fetchQuery('
-		SELECT
-			filter_from, filter_to, filter_type
-		FROM {db_prefix}postby_emails_filters
-		WHERE filter_style = {string:filter_style}
-		ORDER BY filter_type ASC, filter_order ASC',
-		[
-			'filter_style' => 'filter'
-		]
-	)->fetch_callback(
-		static function ($row) use (&$text) {
-			if ($row['filter_type'] === 'regex')
+	// The text filters (cached per request), regex first and ordered by the filter order ...
+	foreach (pbe_load_filters('filter') as $row)
+	{
+		if ($row['filter_type'] === 'regex')
+		{
+			// Newline madness
+			if (!empty($row['filter_to']))
 			{
-				// Newline madness
-				if (!empty($row['filter_to']))
-				{
-					$row['filter_to'] = str_replace('\n', "\n", $row['filter_to']);
-				}
-
-				// Test the regex and if good use, else skip, don't want a bad regex to empty the message!
-				$temp = preg_replace($row['filter_from'], $row['filter_to'], $text);
-				if ($temp !== null)
-				{
-					$text = $temp;
-				}
+				$row['filter_to'] = str_replace('\n', "\n", $row['filter_to']);
 			}
-			else
+
+			// Test the regex and if good use, else skip, don't want a bad regex to empty the message!
+			$temp = preg_replace($row['filter_from'], $row['filter_to'], $text);
+			if ($temp !== null)
 			{
-				$text = str_replace($row['filter_from'], $row['filter_to'], $text);
+				$text = $temp;
 			}
 		}
-	);
+		else
+		{
+			$text = str_replace($row['filter_from'], $row['filter_to'], $text);
+		}
+	}
 
 	return $text;
 }
@@ -619,62 +639,6 @@ function pbe_str_replace_once($needle, $replace, $haystack)
 	}
 
 	return substr_replace($haystack, $replace, $pos, strlen($needle));
-}
-
-/**
- * Does moderation check on a given user (global)
- *
- * - Removes permissions of PBE concern that a given moderated level denies
- *
- * @param array $pbe array of user values
- * @package Maillist
- */
-function pbe_check_moderation(&$pbe)
-{
-	global $modSettings;
-
-	if (empty($modSettings['postmod_active']))
-	{
-		return;
-	}
-
-	// Have they been muted for being naughty?
-	if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $pbe['user_info']['warning'])
-	{
-		// Remove anything that would allow them to do anything via PBE
-		$denied_permissions = [
-			'pm_send', 'postby_email',
-			'admin_forum', 'moderate_forum',
-			'post_new', 'post_reply_own', 'post_reply_any',
-			'post_attachment', 'post_unapproved_attachments',
-			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
-		];
-		$pbe['user_info']['permissions'] = array_diff($pbe['user_info']['permissions'], $denied_permissions);
-	}
-	elseif (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $pbe['user_info']['warning'])
-	{
-		// Work out what permissions should change if they are just being moderated
-		$permission_change = [
-			'post_new' => 'post_unapproved_topics',
-			'post_reply_own' => 'post_unapproved_replies_own',
-			'post_reply_any' => 'post_unapproved_replies_any',
-			'post_attachment' => 'post_unapproved_attachments',
-		];
-
-		foreach ($permission_change as $old => $new)
-		{
-			if (!in_array($old, $pbe['user_info']['permissions']))
-			{
-				unset($permission_change[$old]);
-			}
-			else
-			{
-				$pbe['user_info']['permissions'][] = $new;
-			}
-		}
-
-		$pbe['user_info']['permissions'] = array_diff($pbe['user_info']['permissions'], array_keys($permission_change));
-	}
 }
 
 /**
@@ -941,46 +905,6 @@ function pbe_email_attachments($pbe, $email_message)
 	$tmp_attachments->unset();
 
 	return $attachIDs;
-}
-
-/**
- * Used when an email attempts to start a new topic
- *
- * - Load the board id that a given email address is assigned to in the ACP
- * - Returns the board number in which the new topic must go
- *
- * @param EmailParse $email_address
- *
- * @return int
- * @package Maillist
- *
- */
-function pbe_find_board_number($email_address)
-{
-	global $modSettings;
-
-	$valid_address = [];
-	$board_number = 0;
-
-	// Load our valid email ids and the corresponding board ids
-	$data = (empty($modSettings['maillist_receiving_address'])) ? [] : Util::unserialize($modSettings['maillist_receiving_address']);
-	foreach ($data as $addr)
-	{
-		$valid_address[$addr[0]] = $addr[1];
-	}
-
-	// Who was this message sent to, may have been sent to multiple addresses,
-	// so we must check each one to see if we have a valid entry
-	foreach ($email_address->email['to'] as $to_email)
-	{
-		if (isset($valid_address[$to_email]))
-		{
-			$board_number = (int) $valid_address[$to_email];
-			break;
-		}
-	}
-
-	return $board_number;
 }
 
 /**
@@ -1770,6 +1694,92 @@ function query_mark_pms($email_message, $pbe)
 }
 
 /**
+ * Claims (consumes) the key of an email before it is posted, so a duplicate delivery
+ * of the same email cannot create a second post
+ *
+ * - PM keys are reusable, so nothing is claimed for them
+ * - The loser of a race gets false, the winner gets the removed row so it can be restored on failure
+ *
+ * @param EmailParse $email_message
+ *
+ * @return bool|array true if nothing needs claiming, the claimed row, or false if already claimed
+ * @package Maillist
+ */
+function query_key_claim($email_message)
+{
+	if ($email_message->message_type === 'p')
+	{
+		return true;
+	}
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			time_sent, email_to
+		FROM {db_prefix}postby_emails
+		WHERE message_key = {string:key}
+			AND message_type = {string:type}
+			AND message_id = {string:message_id}
+		LIMIT 1',
+		[
+			'key' => $email_message->message_key,
+			'type' => $email_message->message_type,
+			'message_id' => $email_message->message_id,
+		]
+	);
+	$row = $request->fetch_assoc();
+	$request->free_result();
+
+	if (empty($row))
+	{
+		return false;
+	}
+
+	// Only one process can delete the row
+	$result = $db->query('', '
+		DELETE FROM {db_prefix}postby_emails
+		WHERE message_key = {string:key}
+			AND message_type = {string:type}
+			AND message_id = {string:message_id}',
+		[
+			'key' => $email_message->message_key,
+			'type' => $email_message->message_type,
+			'message_id' => $email_message->message_id,
+		]
+	);
+	if ($result->affected_rows() < 1)
+	{
+		return false;
+	}
+
+	return [
+		'message_key' => $email_message->message_key,
+		'message_type' => $email_message->message_type,
+		'message_id' => $email_message->message_id,
+		'time_sent' => (int) $row['time_sent'],
+		'email_to' => $row['email_to'],
+	];
+}
+
+/**
+ * Puts back a key claimed by query_key_claim when the post did not happen
+ *
+ * @param array $claimed the row returned by query_key_claim
+ * @package Maillist
+ */
+function query_key_restore($claimed)
+{
+	if (!is_array($claimed))
+	{
+		return;
+	}
+
+	require_once(SUBSDIR . '/Maillist.subs.php');
+	log_email([$claimed['message_key'], $claimed['message_type'], $claimed['message_id'], $claimed['time_sent'], $claimed['email_to']]);
+}
+
+/**
  * Once a key has been used, it is removed and cannot be used again
  *
  * - Also removes any old keys to minimize security issues
@@ -1971,6 +1981,122 @@ function pbe_load_html($email_message, &$html)
 }
 
 /**
+ * Determines if a member may reply to a topic, and if the reply needs approval
+ *
+ * - The single place for the reply permission matrix (mirrors the Post controller)
+ * - Own topic uses post_reply_own, any other topic uses post_reply_any
+ * - With post moderation active, post_unapproved_replies_any (without post_reply_any)
+ * allows the reply but it will need approval
+ *
+ * @param array $pbe array of all pbe user_info values
+ * @param array $topic_info needs id_member_started
+ * @param bool $postmod_active
+ *
+ * @return array ['allowed' => bool, 'approved' => bool]
+ * @package Maillist
+ */
+function pbe_reply_permission($pbe, $topic_info, $postmod_active)
+{
+	if (!empty($pbe['user_info']['is_admin']))
+	{
+		return ['allowed' => true, 'approved' => true];
+	}
+
+	$permissions = $pbe['user_info']['permissions'] ?? [];
+	$is_own = (int) ($topic_info['id_member_started'] ?? 0) === (int) $pbe['profile']['id_member'];
+
+	// Replies that will need approval, only when allowed by post moderation and not otherwise entitled
+	if ($postmod_active
+		&& in_array('post_unapproved_replies_any', $permissions, true)
+		&& !in_array('post_reply_any', $permissions, true))
+	{
+		return ['allowed' => true, 'approved' => false];
+	}
+
+	$needed = $is_own ? 'post_reply_own' : 'post_reply_any';
+
+	return ['allowed' => in_array($needed, $permissions, true), 'approved' => true];
+}
+
+/**
+ * Is this member banned from posting (or accessing) the forum
+ *
+ * - Checks active bans by member id and by email address (wildcards allowed)
+ * - Admins are never considered banned
+ *
+ * @param array $pbe array of all pbe user_info values
+ *
+ * @return bool
+ * @package Maillist
+ */
+function pbe_is_banned($pbe)
+{
+	if (!empty($pbe['user_info']['is_admin']))
+	{
+		return false;
+	}
+
+	$request = database()->query('', '
+		SELECT
+			bi.id_ban
+		FROM {db_prefix}ban_items AS bi
+			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
+		WHERE (bg.cannot_post = {int:one} OR bg.cannot_access = {int:one})
+			AND (bg.expire_time IS NULL OR bg.expire_time > {int:now})
+			AND (bi.id_member = {int:id_member} OR (bi.email_address != {string:blank} AND {string:email} LIKE bi.email_address))
+		LIMIT 1',
+		[
+			'one' => 1,
+			'now' => time(),
+			'blank' => '',
+			'id_member' => (int) $pbe['profile']['id_member'],
+			'email' => $pbe['profile']['email_address'] ?? '',
+		]
+	);
+	$banned = $request->num_rows() > 0;
+	$request->free_result();
+
+	return $banned;
+}
+
+/**
+ * Is this member posting faster than the forum's spamWaitTime allows
+ *
+ * - Admins and moderators are exempt, as they are with the regular posting flood control
+ *
+ * @param array $pbe array of all pbe user_info values
+ *
+ * @return bool
+ * @package Maillist
+ */
+function pbe_is_flooding($pbe)
+{
+	global $modSettings;
+
+	$wait = (int) ($modSettings['spamWaitTime'] ?? 0);
+	if ($wait <= 0
+		|| !empty($pbe['user_info']['is_admin'])
+		|| in_array('moderate_board', $pbe['user_info']['permissions'] ?? [], true))
+	{
+		return false;
+	}
+
+	$request = database()->query('', '
+		SELECT
+			MAX(poster_time)
+		FROM {db_prefix}messages
+		WHERE id_member = {int:id_member}',
+		[
+			'id_member' => (int) $pbe['profile']['id_member'],
+		]
+	);
+	[$last_post] = $request->fetch_row();
+	$request->free_result();
+
+	return !empty($last_post) && (time() - (int) $last_post) < $wait;
+}
+
+/**
  * Attempts to create a reply post on the forum
  *
  * What it does:
@@ -1991,8 +2117,18 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 {
 	global $modSettings, $txt;
 
+	// Banned members, or members posting too quickly, are not welcome here either
+	if (pbe_is_banned($pbe))
+	{
+		return pbe_emailError('error_banned', $email_message);
+	}
+
+	if (pbe_is_flooding($pbe))
+	{
+		return pbe_emailError('error_flood', $email_message);
+	}
+
 	// Validate they have permission to reply
-	$becomesApproved = true;
 	if (!$pbe['user_info']['is_admin'] && !in_array('postby_email', $pbe['user_info']['permissions'], true))
 	{
 		return pbe_emailError('error_permission', $email_message);
@@ -2003,28 +2139,13 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 		return pbe_emailError('error_locked', $email_message);
 	}
 
-	if ($topic_info['id_member_started'] === $pbe['profile']['id_member'] && !$pbe['user_info']['is_admin'])
+	$reply = pbe_reply_permission($pbe, $topic_info, !empty($modSettings['postmod_active']));
+	if (!$reply['allowed'])
 	{
-		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions'], true) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
-		{
-			$becomesApproved = false;
-		}
-		elseif (!in_array('post_reply_own', $pbe['user_info']['permissions'], true))
-		{
-			return pbe_emailError('error_cant_reply', $email_message);
-		}
+		return pbe_emailError('error_cant_reply', $email_message);
 	}
-	elseif (!$pbe['user_info']['is_admin'])
-	{
-		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions'], true) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
-		{
-			$becomesApproved = false;
-		}
-		elseif (!in_array('post_reply_any', $pbe['user_info']['permissions'], true))
-		{
-			return pbe_emailError('error_cant_reply', $email_message);
-		}
-	}
+
+	$becomesApproved = $reply['approved'];
 
 	// Convert to BBC and Format the message
 	$text = pbe_load_text($email_message, $pbe);
@@ -2120,10 +2241,22 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
 {
 	global $modSettings, $txt;
 
+	// Banned members are not welcome here either
+	if (pbe_is_banned($pbe))
+	{
+		return pbe_emailError('error_banned', $email_message);
+	}
+
 	// Can they send?
 	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions'], true))
 	{
 		return pbe_emailError('error_pm_not_allowed', $email_message);
+	}
+
+	// And are they allowed to use post by email at all
+	if (!$pbe['user_info']['is_admin'] && !in_array('postby_email', $pbe['user_info']['permissions'], true))
+	{
+		return pbe_emailError('error_permission', $email_message);
 	}
 
 	// Convert the PM to BBC and Format the message
@@ -2190,6 +2323,17 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	if (empty($pbe) || empty($email_message))
 	{
 		return false;
+	}
+
+	// Banned members, or members posting too quickly, are not welcome here either
+	if (pbe_is_banned($pbe))
+	{
+		return pbe_emailError('error_banned', $email_message);
+	}
+
+	if (pbe_is_flooding($pbe))
+	{
+		return pbe_emailError('error_flood', $email_message);
 	}
 
 	// We have the board info and their permissions - do they have a right to start a new topic?
