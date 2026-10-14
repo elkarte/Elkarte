@@ -1121,7 +1121,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 	list ($unread) = $request->fetch_row();
 	$request->free_result();
 
-	return $unread;
+	return (int) $unread;
 }
 
 /**

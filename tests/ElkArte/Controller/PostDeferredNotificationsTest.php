@@ -30,7 +30,11 @@ class PostDeferredNotificationsTest extends ElkArteCommonSetupTest
 
 	protected function setUp(): void
 	{
+		global $modSettings;
+
 		parent::setUp();
+
+		$modSettings['deferred_post_notifications_delay'] = 0;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Notification.subs.php');
@@ -59,28 +63,12 @@ class PostDeferredNotificationsTest extends ElkArteCommonSetupTest
 		$method->invoke($controller, $type, $topic, $msg, $payload);
 	}
 
-	protected function makeTopic(): array
-	{
-		$topicOptions = ['id' => 0, 'board' => 1, 'mark_as_read' => false];
-		$posterOptions = [
-			'id' => 1,
-			'name' => 'test-user',
-			'email' => 'noemail@test.tes',
-			'update_post_count' => false,
-			'ip' => '127.0.0.1',
-		];
-		$msgOptions = ['id' => 0, 'subject' => 'Deferred topic', 'smileys_enabled' => true, 'body' => 'Deferred body', 'attachments' => [], 'approved' => 1];
-		createPost($msgOptions, $topicOptions, $posterOptions);
-
-		return [(int) $topicOptions['id'], (int) $msgOptions['id']];
-	}
-
 	public function testReplyIsQueuedWhenSettingIsOn()
 	{
 		global $modSettings;
 
 		$modSettings['deferred_post_notifications'] = 1;
-		[$topic, $msg] = $this->makeTopic();
+		[$topic, $msg] = [1, 1];
 
 		$this->notify(PostNotificationQueue::TYPE_REPLY, $topic, $msg);
 
@@ -99,7 +87,7 @@ class PostDeferredNotificationsTest extends ElkArteCommonSetupTest
 		global $modSettings;
 
 		$modSettings['deferred_post_notifications'] = 1;
-		[$topic, $msg] = $this->makeTopic();
+		[$topic, $msg] = [1, 1];
 		$topicData = ['body' => 'Deferred body', 'subject' => 'Deferred topic', 'name' => 'itsme', 'poster' => 1, 'msg' => $msg, 'board' => 1, 'topic' => $topic, 'signature' => ''];
 
 		$this->notify(PostNotificationQueue::TYPE_TOPIC, $topic, $msg, ['topic_data' => $topicData]);
@@ -115,7 +103,7 @@ class PostDeferredNotificationsTest extends ElkArteCommonSetupTest
 		global $modSettings;
 
 		$modSettings['deferred_post_notifications'] = 0;
-		[$topic, $msg] = $this->makeTopic();
+		[$topic, $msg] = [1, 1];
 
 		// The member does not exist, so the inline send has nobody to mail
 		$this->notify(PostNotificationQueue::TYPE_REPLY, $topic, $msg, ['members_only' => [999999]]);
