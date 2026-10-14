@@ -265,7 +265,7 @@ $txt['maintain_fail'] = 'The maintenance task \'%1$s\' failed.';
 $txt['maintain_no_errors'] = 'Congratulations, no errors were found.  Thanks for checking.';
 
 $txt['maintain_tasks'] = 'Scheduled Tasks';
-$txt['maintain_tasks_desc'] = 'Manage all the scheduled tasks.';
+$txt['maintain_tasks_desc'] = 'Manage all scheduled tasks.<br />By default, tasks are triggered by normal web traffic (human visitors or bots). For consistent timing add a server cron job, for example: <code>*/5 * * * * /usr/bin/curl -fsS --max-time 25 "https://your-forum.example.com/index.php?scheduled=1" > /dev/null</code>.';
 
 $txt['scheduled_log'] = 'Task Log';
 $txt['scheduled_log_desc'] = 'Lists logs of the tasks that were run.';
