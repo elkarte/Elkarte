@@ -174,9 +174,10 @@ class Post extends AbstractController
 	{
 		global $modSettings;
 
+		// If the setting is on, queue a job for the scheduled task to handle later
 		if (!empty($modSettings['deferred_post_notifications']))
 		{
-			// The runner has no poster, so what it needs to know about them is saved with the job
+			// The scheduled runner has no poster, so what it needs to know about them is saved with the job
 			$payload['name'] = $this->user->name;
 			$payload['language'] = $this->user->language;
 
@@ -191,6 +192,7 @@ class Post extends AbstractController
 			}
 		}
 
+		// Otherwise, do it right now
 		if ($type === PostNotificationQueue::TYPE_TOPIC)
 		{
 			$topicData = $payload['topic_data'];
