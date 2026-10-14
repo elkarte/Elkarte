@@ -433,4 +433,117 @@ class CacheTest extends TestCase
 		$this->assertSame(serialize('v3'), $results['k3']);
 		$this->assertArrayNotHasKey('k4', $results);
 	}
+
+	/**
+	 * Testing quick_get cache retrieval, miss, hit, and expiration
+	 */
+	public function testQuickGetBasic()
+	{
+		global $cache_accelerator, $cache_enable;
+
+		$cache_accelerator = '';
+		$cache_enable = 1;
+
+		$cache = Cache::instance();
+		$file_cache = new Filebased([]);
+		$object = new \ReflectionClass($cache);
+		$property = $object->getProperty('_cache_obj');
+		$property->setAccessible(true);
+		$property->setValue($cache, $file_cache);
+
+		$cache->setLevel(1);
+		$cache->enable(true);
+
+		$callCount = 0;
+		$fetchCallback = function () use (&$callCount) {
+			$callCount++;
+			return [
+				'data' => ['hello' => 'world', 'count' => $callCount],
+				'expires' => time() + 300,
+			];
+		};
+
+		// 1. Initial call: Cache miss -> calls fetch callback and caches result
+		$result1 = $cache->quick_get('quick_test_key', '', $fetchCallback, []);
+		$this->assertSame(1, $callCount);
+		$this->assertSame(['hello' => 'world', 'count' => 1], $result1);
+
+		// 2. Second call: Cache hit -> returns cached data without calling fetch callback
+		$result2 = $cache->quick_get('quick_test_key', '', $fetchCallback, []);
+		$this->assertSame(1, $callCount);
+		$this->assertSame(['hello' => 'world', 'count' => 1], $result2);
+
+		// Clean up
+		$cache->put('quick_test_key', null);
+	}
+
+	/**
+	 * Testing quick_get refresh_callback and post_retri_callback
+	 */
+	public function testQuickGetCallbacks()
+	{
+		global $cache_accelerator, $cache_enable;
+
+		$cache_accelerator = '';
+		$cache_enable = 1;
+
+		$cache = Cache::instance();
+		$file_cache = new Filebased([]);
+		$object = new \ReflectionClass($cache);
+		$property = $object->getProperty('_cache_obj');
+		$property->setAccessible(true);
+		$property->setValue($cache, $file_cache);
+
+		$cache->setLevel(1);
+		$cache->enable(true);
+
+		$shouldRefresh = false;
+		$fetchCount = 0;
+
+		$fetchCallback = function () use (&$fetchCount) {
+			$fetchCount++;
+			return [
+				'data' => ['computed' => 10 * $fetchCount],
+				'expires' => time() + 3600,
+				'refresh_callback' => '\\ElkArte\\Cache\\testQuickGetRefreshHelper',
+				'post_retri_callback' => '\\ElkArte\\Cache\\testQuickGetPostRetriHelper',
+			];
+		};
+
+		$GLOBALS['test_quick_get_should_refresh'] = false;
+		$GLOBALS['test_quick_get_post_retri_added'] = '_modified';
+
+		// Initial fetch
+		$result = $cache->quick_get('callback_test_key', '', $fetchCallback, []);
+		$this->assertSame(1, $fetchCount);
+		$this->assertSame(10, $result['computed']);
+		$this->assertSame('_modified', $result['added']);
+
+		// Cache hit without refresh
+		$result2 = $cache->quick_get('callback_test_key', '', $fetchCallback, []);
+		$this->assertSame(1, $fetchCount);
+		$this->assertSame(10, $result2['computed']);
+		$this->assertSame('_modified', $result2['added']);
+
+		// Trigger refresh condition
+		$GLOBALS['test_quick_get_should_refresh'] = true;
+		$result3 = $cache->quick_get('callback_test_key', '', $fetchCallback, []);
+		$this->assertSame(2, $fetchCount);
+		$this->assertSame(20, $result3['computed']);
+		$this->assertSame('_modified', $result3['added']);
+
+		// Clean up
+		unset($GLOBALS['test_quick_get_should_refresh'], $GLOBALS['test_quick_get_post_retri_added']);
+		$cache->put('callback_test_key', null);
+	}
+}
+
+function testQuickGetRefreshHelper($cache_block)
+{
+	return !empty($GLOBALS['test_quick_get_should_refresh']);
+}
+
+function testQuickGetPostRetriHelper(&$cache_block)
+{
+	$cache_block['data']['added'] = $GLOBALS['test_quick_get_post_retri_added'] ?? '';
 }

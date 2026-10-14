@@ -707,9 +707,26 @@ function cache_getOffsetIndependentEvents($days_to_index)
 			'birthdays' => getBirthdayRange($low_date, $high_date),
 			'events' => getEventRange($low_date, $high_date, false),
 		],
-		'refresh_eval' => 'return \'' . Util::strftime('%Y%m%d', forum_time(false)) . '\' != \\ElkArte\\Helper\\Util::strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
+		'cached_date' => Util::strftime('%Y%m%d', forum_time(false)),
+		'cached_time' => time(),
+		'refresh_callback' => 'cache_getOffsetIndependentEvents_refresh',
 		'expires' => time() + 3600,
 	];
+}
+
+/**
+ * Check if the offset-independent events cache needs to be refreshed.
+ *
+ * @param array $cache_block
+ * @return bool
+ * @package Calendar
+ */
+function cache_getOffsetIndependentEvents_refresh($cache_block): bool
+{
+	global $modSettings;
+
+	return (isset($cache_block['cached_date']) && $cache_block['cached_date'] !== Util::strftime('%Y%m%d', forum_time(false)))
+		|| (!empty($modSettings['calendar_updated']) && !empty($cache_block['cached_time']) && $cache_block['cached_time'] < $modSettings['calendar_updated']);
 }
 
 /**
@@ -818,11 +835,26 @@ function cache_getRecentEvents($eventOptions)
 	return [
 		'data' => $return_data,
 		'expires' => time() + 3600,
-		'refresh_eval' => 'return \'' . Util::strftime('%Y%m%d', forum_time(false)) . '\' != \\ElkArte\\Helper\\Util::strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
-		'post_retri_eval' => '
-			require_once(SUBSDIR . \'/Calendar.subs.php\');
-			return cache_getRecentEvents_post_retri_eval($cache_block, $params);',
+		'cached_date' => Util::strftime('%Y%m%d', forum_time(false)),
+		'cached_time' => time(),
+		'refresh_callback' => 'cache_getRecentEvents_refresh',
+		'post_retri_callback' => 'cache_getRecentEvents_post_retri',
 	];
+}
+
+/**
+ * Check if the recent events cache needs to be refreshed.
+ *
+ * @param array $cache_block
+ * @return bool
+ * @package Calendar
+ */
+function cache_getRecentEvents_refresh($cache_block): bool
+{
+	global $modSettings;
+
+	return (isset($cache_block['cached_date']) && $cache_block['cached_date'] !== Util::strftime('%Y%m%d', forum_time(false)))
+		|| (!empty($modSettings['calendar_updated']) && !empty($cache_block['cached_time']) && $cache_block['cached_time'] < $modSettings['calendar_updated']);
 }
 
 /**
@@ -832,7 +864,7 @@ function cache_getRecentEvents($eventOptions)
  * @param array $params
  * @package Calendar
  */
-function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
+function cache_getRecentEvents_post_retri(&$cache_block, $params)
 {
 	foreach ($cache_block['data']['calendar_events'] as $k => $event)
 	{
@@ -882,6 +914,18 @@ function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
 	}
 
 	$cache_block['data']['show_calendar'] = !empty($cache_block['data']['calendar_holidays']) || !empty($cache_block['data']['calendar_birthdays']) || !empty($cache_block['data']['calendar_events']);
+}
+
+/**
+ * Backwards compatibility wrapper for cache_getRecentEvents_post_retri.
+ *
+ * @param array $cache_block
+ * @param array $params
+ * @package Calendar
+ */
+function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
+{
+	cache_getRecentEvents_post_retri($cache_block, $params);
 }
 
 /**

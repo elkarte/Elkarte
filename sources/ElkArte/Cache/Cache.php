@@ -44,9 +44,6 @@ class Cache
 	/** @var string The accelerator in use */
 	protected $_accelerator;
 
-	/** @var string[] Cached keys */
-	protected $_cached_keys = [];
-
 	/** @var AbstractCacheMethod|null The caching engine object */
 	protected $_cache_obj;
 
@@ -339,7 +336,6 @@ class Cache
 			return;
 		}
 
-		$this->_cached_keys[] = $key;
 		$key = $this->_key($key);
 		$value = $value === null ? null : serialize($value);
 
@@ -385,7 +381,6 @@ class Cache
 		$totalSize = 0;
 		foreach ($items as $key => $value)
 		{
-			$this->_cached_keys[] = $key;
 			$engineKey = $this->_key($key);
 			$serialized = $value === null ? null : serialize($value);
 			$engineItems[$engineKey] = $serialized;
@@ -417,17 +412,15 @@ class Cache
 	}
 
 	/**
-	 * Try to retrieve a cache entry. On failure, call the appropriate function.
-	 * This callback is sent as $file to include, and $function to call, with
-	 * $params parameters.
+	 * Retrieves cached data or regenerates it if necessary.
 	 *
-	 * @param string $key cache entry key
-	 * @param string $file file to include
-	 * @param string $function function to call
-	 * @param array $params parameters sent to the function
-	 * @param int $level = 1
+	 * @param string $key The cache key
+	 * @param string $file The file containing the function to call if the cache is missing or expired
+	 * @param callable $function The function to call if the cache is missing or expired
+	 * @param array $params The parameters to pass to the function
+	 * @param int $level The cache level required for the data
 	 *
-	 * @return array
+	 * @return array The cached data
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1): array
 	{
@@ -441,30 +434,57 @@ class Cache
 			5. The expiry time set in the cache item has passed (needed for Zend).
 		*/
 		$cache_block = $this->get($key, 3600);
+
+		$refresh = false;
+		if (is_array($cache_block) && !empty($cache_block['refresh_callback']))
+		{
+			if (!is_callable($cache_block['refresh_callback']) && !empty($file))
+			{
+				require_once(SOURCEDIR . '/' . $file);
+			}
+
+			if (is_callable($cache_block['refresh_callback']))
+			{
+				$refresh = (bool) call_user_func_array($cache_block['refresh_callback'], [&$cache_block, $params]);
+			}
+		}
+
 		if ($this->level < $level
 			|| !is_array($cache_block)
 			|| !$this->isEnabled()
-			|| (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval']))
+			|| $refresh
 			|| (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 		{
-			require_once(SOURCEDIR . '/' . $file);
+			if (!empty($file))
+			{
+				require_once(SOURCEDIR . '/' . $file);
+			}
 			$cache_block = call_user_func_array($function, $params);
 
-			if ($this->level >= $level)
+			if ($this->level >= $level && is_array($cache_block))
 			{
-				$this->put($key, $cache_block, $cache_block['expires'] - time());
+				$ttl = !empty($cache_block['expires']) ? (int) ($cache_block['expires'] - time()) : 120;
+				$this->put($key, $cache_block, max(0, $ttl));
 			}
 		}
 
 		// Some cached data may need a freshening up after retrieval.
-		if (!empty($cache_block['post_retri_eval']))
+		if (is_array($cache_block) && !empty($cache_block['post_retri_callback']))
 		{
-			eval($cache_block['post_retri_eval']);
+			if (!is_callable($cache_block['post_retri_callback']) && !empty($file))
+			{
+				require_once(SOURCEDIR . '/' . $file);
+			}
+
+			if (is_callable($cache_block['post_retri_callback']))
+			{
+				call_user_func_array($cache_block['post_retri_callback'], [&$cache_block, $params]);
+			}
 		}
 
 		call_integration_hook('post_cache_quick_get', [$cache_block]);
 
-		return $cache_block['data'];
+		return is_array($cache_block) && isset($cache_block['data']) ? $cache_block['data'] : [];
 	}
 
 	/**
@@ -595,34 +615,5 @@ class Cache
 
 		$key = $this->_key($key);
 		$this->_cache_obj->remove($key);
-	}
-
-	/**
-	 * Removes one or multiple keys from the cache.
-	 *
-	 * Supports the preg_match syntax.
-	 *
-	 * @param string|string[] $keys_match The regular expression/s to match
-	 *                        the key to remove from the cache.
-	 * @param string $delimiter The delimiter used by preg_match.
-	 * @param string $modifiers Any modifier required by the regexp.
-	 */
-	public function removeKeys($keys_match, $delimiter = '~', $modifiers = ''): void
-	{
-		if (!$this->isEnabled())
-		{
-			return;
-		}
-
-		$to_remove = (array) $keys_match;
-		$pattern = $delimiter . implode('|', $to_remove) . $delimiter . $modifiers;
-
-		foreach ($this->_cached_keys as $cached_key)
-		{
-			if (preg_match($pattern, $cached_key) === 1)
-			{
-				$this->_cache_obj->remove($cached_key);
-			}
-		}
 	}
 }
