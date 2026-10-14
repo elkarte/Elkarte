@@ -76,8 +76,8 @@ class PostNotifications extends AbstractModel
 	 * subscribed boards and/or subscribed (watched) topics.
 	 *
 	 * @param int[]|int $topics - represents the topics the action is happening to.
-	 * @param string $type - can be any of reply, sticky, lock, unlock, remove,
-	 *                       move, merge, and split.  An appropriate message will be sent for each.
+	 * @param string $type - can be any of reply, sticky, lock, unlock, remove, move, merge, and split.
+	 * An appropriate message will be sent for each.
 	 * @param int[]|int $members_only = array() - restrict to only send the notification to this list, otherwise all
 	 * @param array $pbe = array() - PBE user_info if this is being run as a result of an email posting
 	 * @param int $id_msg = 0 - notify about this message of the topic instead of the latest one, used when

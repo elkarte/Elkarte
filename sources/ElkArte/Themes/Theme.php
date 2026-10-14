@@ -159,11 +159,11 @@ abstract class Theme
 		// Relative times for posts?
 		$this->relativeTimes();
 
-		// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
+		// If we think we have mail to send or its task time, trigger a scheduled background run.
 		if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ||
 			(!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])))
 		{
-			$this->doScheduledSendMail();
+			$this->triggerScheduledBackgroundRun();
 		}
 	}
 

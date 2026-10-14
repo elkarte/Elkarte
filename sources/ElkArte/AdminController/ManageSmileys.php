@@ -237,7 +237,7 @@ class ManageSmileys extends AbstractController
 		// Whatever we have, save it
 		$header = '/*!
  * Auto-generated file, DO NOT manually edit
- *		
+ *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)

@@ -67,16 +67,16 @@ class ManageScheduledTasks extends AbstractController
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['object']->prepareTabData([
-				'title' => 'scheduled_tasks_title',
-				'description' => 'maintain_info',
-				'tabs' => [
-					'tasks' => [
-						'description' => $txt['maintain_tasks_desc'],
-					],
-					'tasklog' => [
-						'description' => $txt['scheduled_log_desc'],
-					],
-				]]
+			'title' => 'scheduled_tasks_title',
+			'description' => 'maintain_info',
+			'tabs' => [
+				'tasks' => [
+					'description' => $txt['maintain_tasks_desc'],
+				],
+				'tasklog' => [
+					'description' => $txt['scheduled_log_desc'],
+				],
+			]]
 		);
 
 		// Call the right function for this sub-action.

@@ -121,16 +121,20 @@ trait FeatureIntegration
 	}
 
 	/**
-	 * Ensures we kick the mail queue from time to time so that it gets
-	 * checked as often as possible.
+	 * Triggers a scheduled background run based on the current settings and user status.
+	 *
+	 * This method checks if the current user is possibly a robot. If so, it uses a controller to handle scheduled tasks.
+	 * If not a robot, it sets up a JavaScript timeout to trigger a background task or mail queue reduction.
+	 *
+	 * @return void
 	 */
-	public function doScheduledSendMail(): void
+	public function triggerScheduledBackgroundRun(): void
 	{
 		global $modSettings;
 
+		// robots get some slowdown pain
 		if (!empty(User::$info->possibly_robot))
 		{
-			// @todo Maybe move this somewhere better?!
 			$controller = new ScheduledTasks(new EventManager());
 
 			// What to do, what to do?!
