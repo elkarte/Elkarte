@@ -16,6 +16,8 @@ class UtilTest extends TestCase
 	 */
 	protected function setUp(): void
 	{
+		require_once(__DIR__ . '/../../../sources/Load.php');
+
 		// Create a utf-8 string with 4 byte characters
 		$this->string = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779; for elkarte testing', ENT_COMPAT, 'UTF-8');
 	}
@@ -184,5 +186,80 @@ class UtilTest extends TestCase
 		$this->assertSame(true, Util::unserialize(serialize(true)));
 		$this->assertSame(false, Util::unserialize(serialize(false)));
 		$this->assertNull(Util::unserialize(serialize(null)));
+	}
+
+	/**
+	 * test serializeToJson with valid JSON, legacy serialized strings, empty strings, and malformed inputs
+	 */
+	public function test_serializeToJson()
+	{
+		// 1. Valid JSON array - should decode without calling save callback
+		$validJsonArray = json_encode([123, 'hash123', 12345678, 1]);
+		$callbackCalled = false;
+		$result = serializeToJson($validJsonArray, static function ($data) use (&$callbackCalled) {
+			$callbackCalled = true;
+		});
+		$this->assertFalse($callbackCalled);
+		$this->assertSame([123, 'hash123', 12345678, 1], $result);
+
+		// 2. Legacy serialized PHP array - should unserialize and invoke callback
+		$legacyArray = [123, 'hash123', 12345678, 1];
+		$legacySerialized = serialize($legacyArray);
+		$callbackData = null;
+		$result = serializeToJson($legacySerialized, static function ($data) use (&$callbackData) {
+			$callbackData = $data;
+		});
+		$this->assertSame($legacyArray, $callbackData);
+		$this->assertSame($legacyArray, $result);
+
+		// 3. Empty string - should fallback to default array and pass array to callback
+		$callbackData = null;
+		$result = serializeToJson('', static function ($data) use (&$callbackData) {
+			$callbackData = $data;
+		});
+		$this->assertSame([0, '', 0], $callbackData);
+		$this->assertSame([0, '', 0], $result);
+
+		// 4. Whitespace string
+		$result = serializeToJson('   ');
+		$this->assertSame([0, '', 0], $result);
+
+		// 5. Malformed string / corrupted cookie data
+		$callbackData = null;
+		$result = serializeToJson('invalid_cookie_data_!@#', static function ($data) use (&$callbackData) {
+			$callbackData = $data;
+		});
+		$this->assertSame([0, '', 0], $callbackData);
+		$this->assertSame([0, '', 0], $result);
+
+		// 6. Serialized scalar string
+		$callbackData = null;
+		$result = serializeToJson(serialize('scalar string'), static function ($data) use (&$callbackData) {
+			$callbackData = $data;
+		});
+		$this->assertSame([0, '', 0], $callbackData);
+		$this->assertSame([0, '', 0], $result);
+
+		// 7. Serialized scalar integer
+		$result = serializeToJson(serialize(42));
+		$this->assertSame([0, '', 0], $result);
+
+		// 8. JSON scalar values
+		$callbackData = null;
+		$result = serializeToJson('12345', static function ($data) use (&$callbackData) {
+			$callbackData = $data;
+		});
+		$this->assertSame([0, '', 0], $callbackData);
+		$this->assertSame([0, '', 0], $result);
+
+		// 9. Null and boolean inputs
+		$this->assertSame([0, '', 0], serializeToJson(null));
+		$this->assertSame([0, '', 0], serializeToJson(false));
+
+		// 10. Destructuring safely without notices or warnings
+		[$id, $password, $span] = serializeToJson('');
+		$this->assertSame(0, $id);
+		$this->assertSame('', $password);
+		$this->assertSame(0, $span);
 	}
 }

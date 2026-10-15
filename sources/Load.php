@@ -1642,7 +1642,7 @@ function loadBBCParsers()
  */
 function serializeToJson($variable, $save_callback = null)
 {
-	$array_form = json_decode($variable, true);
+	$array_form = is_string($variable) ? json_decode($variable, true) : null;
 
 	// decoding failed, let's try with unserialize
 	if (!is_array($array_form))
@@ -1651,13 +1651,13 @@ function serializeToJson($variable, $save_callback = null)
 		{
 			$array_form = Util::unserialize($variable);
 		}
-		catch (Exception)
+		catch (\Throwable)
 		{
 			$array_form = false;
 		}
 
-		// If unserialize fails as well, let's just store an empty array
-		if ($array_form === false)
+		// If unserialize fails as well or did not return an array, use a default array
+		if (!is_array($array_form))
 		{
 			$array_form = [0, '', 0];
 		}

@@ -56,7 +56,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 
 			require_once(SUBSDIR . '/Auth.subs.php');
 			$_COOKIE[$cookiename] = json_encode($array_from);
-			setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0], $array_from[1]);
+			setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0] ?? 0, $array_from[1] ?? '');
 		});
 
 		// Out with the old, in with the new!
