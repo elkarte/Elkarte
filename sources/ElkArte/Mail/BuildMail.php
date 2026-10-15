@@ -86,7 +86,7 @@ class BuildMail extends BaseMail
 			$this->headers[] = 'Return-Path: <' . $this->returnPath . '>';
 		}
 
-		$this->headers[] = 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000';
+		$this->headers[] = 'Date: ' . gmdate('D, d M Y H:i:s') . ' +0000';
 		$this->headers[] = 'X-Mailer: ELK';
 
 		// For maillist, digests or newsletters we include a few more headers for compliance
@@ -335,13 +335,28 @@ class BuildMail extends BaseMail
 		{
 			// Try to avoid auto replies
 			$this->headers[] = 'X-Auto-Response-Suppress: All';
-			$this->headers[] = 'Auto-Submitted: auto-replied';
+			$this->headers[] = 'Auto-Submitted: auto-generated';
 
 			// Indicate it is a list server to avoid spam tagging and to help client filters
-			// http://www.ietf.org/rfc/rfc2369.txt
-			// List-Id: Notifications <listname.forumsite.tld>
-			$listId = self::getReplyToAddress();
-			$listId = str_replace('@', '.', $listId);
+			// http://www.ietf.org/rfc/rfc2369.txt and RFC 2919 List-Id namespace requirements
+			// List-Id: Notifications <listprefix.forumhost>
+			// Ensure List-Id aligns with the host domain, maximizing deliverability
+			$boardHost = !empty($boardurl) ? parse_url($boardurl, PHP_URL_HOST) : '';
+			if (empty($boardHost))
+			{
+				$boardHost = ltrim(strstr(self::getFromAddress(), '@'), '@');
+			}
+
+			$listPrefix = !empty($modSettings['maillist_sitename'])
+				? preg_replace('/[^a-zA-Z0-9_-]/', '', strtolower($modSettings['maillist_sitename']))
+				: 'notifications';
+
+			if (empty($listPrefix))
+			{
+				$listPrefix = 'notifications';
+			}
+
+			$listId = $listPrefix . '.' . $boardHost;
 			$this->headers[] = 'List-Id: Notifications <' . $listId . '>';
 
 			// RFC 2369 List-Unsubscribe header pointing to notification preferences
