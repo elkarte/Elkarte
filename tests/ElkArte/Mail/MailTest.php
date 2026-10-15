@@ -318,11 +318,10 @@ class MailTest extends ElkArteCommonSetupTest
 		unset($modSettings['maillist_mail_from'], $modSettings['maillist_sitename_address'], $modSettings['maillist_sitename_help'], $modSettings['maillist_sitename']);
 
 		$sendMail = new BuildMail();
-		$sendMail->setMailList(true);
 
 		// Fallback scenario
 		$sendMail->headers = [];
-		$sendMail->setDigestHeaders(1);
+		$sendMail->setDigestHeaders(4);
 		$this->assertContains('List-Id: Notifications <webmaster.example.com>', $sendMail->headers);
 		$this->assertContains('List-Unsubscribe: <https://forum.example.com/index.php?action=profile;area=notification>, <mailto:webmaster@example.com?subject=unsubscribe>', $sendMail->headers);
 		$this->assertContains('List-Owner: <mailto:webmaster@example.com> (Example Community)', $sendMail->headers);
@@ -334,7 +333,7 @@ class MailTest extends ElkArteCommonSetupTest
 		$modSettings['maillist_sitename'] = 'Custom List Name';
 
 		$sendMail->headers = [];
-		$sendMail->setDigestHeaders(1);
+		$sendMail->setDigestHeaders(4);
 		$this->assertContains('List-Id: Notifications <list.example.com>', $sendMail->headers);
 		$this->assertContains('List-Unsubscribe: <https://forum.example.com/index.php?action=profile;area=notification>, <mailto:support@example.com?subject=unsubscribe>', $sendMail->headers);
 		$this->assertContains('List-Owner: <mailto:support@example.com> (Custom List Name)', $sendMail->headers);
