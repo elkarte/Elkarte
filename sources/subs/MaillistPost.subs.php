@@ -1148,7 +1148,7 @@ function query_load_user_info($email)
 }
 
 /**
- * Load the users permissions either general or board-specific
+ * Load the user's permissions either general or board-specific
  *
  * - Similar to the functions in loadPermissions()
  *

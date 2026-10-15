@@ -61,7 +61,7 @@ $txt['maillist_enabled'] = 'Enable Maillist Functions (master on/off setting)';
 $txt['pbe_post_enabled'] = 'Allow posting to the forum by Email';
 $txt['pbe_pm_enabled'] = 'Allow replying to PMs by Email';
 $txt['pbe_no_mod_notices'] = 'Turn off moderation notices';
-$txt['pbe_no_mod_notices_desc'] = 'Do not send notifications of moved, locked, deleted, merged, etc.  These consume your email quota with no real purpose';
+$txt['pbe_no_mod_notices_desc'] = 'Do not send notifications of moved, locked, deleted, merged, etc.';
 $txt['pbe_bounce_detect'] = 'Turn on automatic bounce detection';
 $txt['pbe_bounce_detect_desc'] = 'Attempt to identify mail bounces and disable further notifications';
 $txt['pbe_bounce_record'] = 'Record bounce messages in failed mail after auto processing';
@@ -71,22 +71,22 @@ $txt['saved'] = 'Information Saved';
 
 // General Sending Settings
 $txt['maillist_outbound'] = 'General Sending Settings';
-$txt['maillist_outbound_desc'] = 'Use these settings to modify how outbound emails appear to the user and where a reply will be sent to.  ';
+$txt['maillist_outbound_desc'] = 'Use these settings to modify how outbound emails appear to recipients, define Reply-To destinations, and customize list server headers.';
 $txt['maillist_group_mode'] = 'Enable group maillist mode';
 $txt['maillist_digest_enabled'] = 'Enable enhanced daily digest (provides topic snips in the digest)';
 $txt['maillist_sitename'] = 'Site Name to use for the email (not the email address)';
-$txt['maillist_sitename_desc'] = 'This is the name for the email address, something familiar to the users as this will appear in several areas of the outbound email, including the subject line - [Site Name] subject';
+$txt['maillist_sitename_desc'] = 'This is the friendly name for outbound emails, appearing in From/Reply-To sender headers and list metadata.';
 $txt['maillist_sitename_post'] = 'e.g. &lt;<strong>Site Name</strong>&gt;emailpost@yourdomain.com';
-$txt['maillist_sitename_address'] = 'Reply-To and From email address';
-$txt['maillist_sitename_address_desc'] = 'The email address that replied to messages will be sent. If empty the notification (if set) or webmaster one will be used.';
+$txt['maillist_sitename_address'] = 'Reply-To email address';
+$txt['maillist_sitename_address_desc'] = 'The email address where user replies to notifications will be sent (sets Reply-To: and List-Id: headers). If empty, the Notifications email address (or Webmaster email) will be used.';
 $txt['maillist_sitename_regards'] = 'Email "signature"';
 $txt['maillist_sitename_regards_desc'] = 'What to put at the end of outbound emails, something like "Regards, the Site Name Team"';
 $txt['maillist_sitename_address_post'] = 'e.g. emailpost@yourdomain.com';
-$txt['maillist_sitename_help'] = 'Help email address';
-$txt['maillist_sitename_help_desc'] = 'Used for the "List Owner" header to help prevent outbound email from being flagged as spam.';
+$txt['maillist_sitename_help'] = 'Help / List Owner email address';
+$txt['maillist_sitename_help_desc'] = 'Populates RFC 2369 List-Owner: and List-Unsubscribe: headers. If empty, falls back to the Notifications email address (or Webmaster email).';
 $txt['maillist_sitename_help_post'] = 'e.g. help@yourdomain.com';
-$txt['maillist_mail_from'] = 'Notifications email address';
-$txt['maillist_mail_from_desc'] = 'The email address used for password reminders, notifications, etc.  If left empty the webmaster address will be used (this is the default)';
+$txt['maillist_mail_from'] = 'Notifications email address (From / Envelope Sender)';
+$txt['maillist_mail_from_desc'] = 'Global outbound sender and envelope Return-Path address for notifications, password reminders, digests, and system emails. Overrides the Server Settings Webmaster email when set.';
 $txt['maillist_mail_from_post'] = 'e.g. noreply@yourdomain.com';
 
 // Imap settings

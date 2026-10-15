@@ -292,27 +292,25 @@ class BuildMail extends BaseMail
 	 */
 	public function setFromHeaders($from, $from_name, $from_wrapper = null, $reference = null): void
 	{
-		global $webmaster_email, $context, $modSettings;
+		global $context, $modSettings;
 
 		if ($from_wrapper !== null)
 		{
 			$this->headers[] = 'From: ' . $from_name . ' <' . $from_wrapper . '>';
 
 			// If they reply, where is it going to be sent?
-			$this->headers[] = 'Reply-To: "' . (empty($modSettings['maillist_sitename']) ? $context['forum_name'] : $modSettings['maillist_sitename']) . '" <' . (empty($modSettings['maillist_sitename_address']) ? (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) : ($modSettings['maillist_sitename_address'])) . '>';
+			$this->headers[] = 'Reply-To: "' . (empty($modSettings['maillist_sitename']) ? $context['forum_name'] : $modSettings['maillist_sitename']) . '" <' . self::getReplyToAddress() . '>';
 			if ($reference !== null)
 			{
 				$this->headers[] = 'References: <' . $reference .
-					strstr(empty($modSettings['maillist_mail_from'])
-						? $webmaster_email
-						: $modSettings['maillist_mail_from'], '@')
+					strstr(self::getFromAddress(), '@')
 					. '>';
 			}
 		}
 		else
 		{
 			// Standard ElkArte headers
-			$this->headers[] = 'From: ' . $from_name . ' <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>';
+			$this->headers[] = 'From: ' . $from_name . ' <' . self::getFromAddress() . '>';
 			if ($from !== null && str_contains($from, '@'))
 			{
 				$this->headers[] = 'Reply-To: <' . $from . '>';
@@ -330,7 +328,7 @@ class BuildMail extends BaseMail
 	 */
 	public function setDigestHeaders($priority): void
 	{
-		global $modSettings, $boardurl, $webmaster_email, $mbname;
+		global $modSettings, $boardurl, $mbname;
 
 		// For maillist, digests or newsletters we include a few more headers for compliance
 		if ($this->mailList || $priority > 3)
@@ -342,22 +340,14 @@ class BuildMail extends BaseMail
 			// Indicate it is a list server to avoid spam tagging and to help client filters
 			// http://www.ietf.org/rfc/rfc2369.txt
 			// List-Id: Notifications <listname.forumsite.tld>
-			$listId = (!empty($modSettings['maillist_sitename_address'])
-				? $modSettings['maillist_sitename_address']
-				: (empty($modSettings['maillist_mail_from'])
-					? $webmaster_email
-					: $modSettings['maillist_mail_from']));
+			$listId = self::getReplyToAddress();
 			$listId = str_replace('@', '.', $listId);
 			$this->headers[] = 'List-Id: Notifications <' . $listId . '>';
 
 			// RFC 2369 List-Unsubscribe header pointing to notification preferences
 			// List-Unsubscribe: <https://www.forumsite.tld/index.php?action=profile;area=notification>, <mailto:...>
 			$unsubscribe_url = $boardurl . '/index.php?action=profile;area=notification';
-			$unsubscribe_email = (!empty($modSettings['maillist_sitename_help'])
-				? $modSettings['maillist_sitename_help']
-				: (empty($modSettings['maillist_mail_from'])
-					? $webmaster_email
-					: $modSettings['maillist_mail_from']));
+			$unsubscribe_email = self::getListHelpAddress();
 
 			$unsubscribe_header = '<' . $unsubscribe_url . '>';
 			if (!empty($unsubscribe_email))

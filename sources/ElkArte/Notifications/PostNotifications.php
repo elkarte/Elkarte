@@ -16,6 +16,7 @@ namespace ElkArte\Notifications;
 
 use ElkArte\AbstractModel;
 use ElkArte\Languages\Loader;
+use ElkArte\Mail\BaseMail;
 use ElkArte\Mail\BuildMail;
 use ElkArte\Mail\PreparseMail;
 use ElkArte\User;
@@ -476,20 +477,7 @@ class PostNotifications extends AbstractModel
 	 */
 	private function _getFromWrapper(): string
 	{
-		global $webmaster_email;
-
-		// The email address of the sender, irrespective of the envelope name above
-		if (!empty($this->_modSettings['maillist_mail_from']))
-		{
-			return $this->_modSettings['maillist_mail_from'];
-		}
-
-		if (!empty($this->_modSettings['maillist_sitename_address']))
-		{
-			return $this->_modSettings['maillist_sitename_address'];
-		}
-
-		return $webmaster_email;
+		return BaseMail::getFromAddress();
 	}
 
 	/**
@@ -959,7 +947,8 @@ class PostNotifications extends AbstractModel
 		{
 			$db = database();
 			$request = $db->fetchQuery('
-				SELECT unwatched
+				SELECT
+					unwatched
 				FROM {db_prefix}log_topics
 				WHERE id_member = {int:id_member}
 					AND id_topic = {int:id_topic}
@@ -974,7 +963,10 @@ class PostNotifications extends AbstractModel
 			if ($request->hasResults())
 			{
 				$row = $request->fetch_assoc();
-				$unwatched = (int) $row['unwatched'] === 1;
+				if (is_array($row) && isset($row['unwatched']))
+				{
+					$unwatched = (int) $row['unwatched'] === 1;
+				}
 			}
 			$request->free_result();
 

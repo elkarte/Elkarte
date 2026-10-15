@@ -31,6 +31,7 @@ $txt['admin_title'] = 'Forum Title';
 $txt['admin_url'] = 'Forum URL';
 $txt['cookie_name'] = 'Cookie name';
 $txt['admin_webmaster_email'] = 'Webmaster email address';
+$txt['admin_webmaster_email_desc'] = 'Universal baseline email address for system errors and administrative notices. Used as the default sender unless a specialized notifications email is defined in Maillist Settings.';
 $txt['url_format'] = 'URLs Style';
 $txt['url_format_standard'] = 'Standard (index.php?action=something;area=param)';
 $txt['url_format_semantic'] = 'Semantic (index.php?/action/something/area/param)';
