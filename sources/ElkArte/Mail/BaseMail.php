@@ -163,23 +163,64 @@ abstract class BaseMail
 	}
 
 	/**
+	 * Returns the configured default sender email address (From / Return-Path fallback).
+	 *
+	 * Falls back to $webmaster_email if maillist_mail_from is not set.
+	 *
+	 * @return string
+	 */
+	public static function getFromAddress(): string
+	{
+		global $modSettings, $webmaster_email;
+
+		return !empty($modSettings['maillist_mail_from']) ? $modSettings['maillist_mail_from'] : ($webmaster_email ?? '');
+	}
+
+	/**
+	 * Returns the configured Reply-To email address for maillist / list communications.
+	 *
+	 * Falls back to getFromAddress() if maillist_sitename_address is not set.
+	 *
+	 * @return string
+	 */
+	public static function getReplyToAddress(): string
+	{
+		global $modSettings;
+
+		return !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : self::getFromAddress();
+	}
+
+	/**
+	 * Returns the configured help / owner / list-unsubscribe email address.
+	 *
+	 * Falls back to getFromAddress() if maillist_sitename_help is not set.
+	 *
+	 * @return string
+	 */
+	public static function getListHelpAddress(): string
+	{
+		global $modSettings;
+
+		return !empty($modSettings['maillist_sitename_help']) ? $modSettings['maillist_sitename_help'] : self::getFromAddress();
+	}
+
+	/**
+	 * Returns the envelope return path email address.
+	 *
+	 * @return string
+	 */
+	public static function getReturnPath(): string
+	{
+		return self::getFromAddress();
+	}
+
+	/**
 	 * Sets a return path, mainly used in PHP mail() function to help in bounce detection
 	 *
 	 * @return void
 	 */
 	public function setReturnPath(): void
 	{
-		global $modSettings, $webmaster_email;
-
-		$this->returnPath = '';
-		if ($this->mailList === true)
-		{
-			$this->returnPath = empty($modSettings['maillist_sitename_address']) ? '' : $modSettings['maillist_sitename_address'];
-		}
-
-		if ($this->returnPath === '')
-		{
-			$this->returnPath = empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'];
-		}
+		$this->returnPath = self::getReturnPath();
 	}
 }

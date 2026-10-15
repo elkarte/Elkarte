@@ -176,7 +176,7 @@ class ManageServer extends AbstractController
 			['mtitle', $txt['maintenance_subject'], 'file', 'text', 36],
 			['mmessage', $txt['maintenance_message'], 'file', 'large_text', 6],
 			'',
-			['webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30],
+			['webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30, 'subtext' => $txt['admin_webmaster_email_desc']],
 			'',
 			['enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'],
 			['disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'],

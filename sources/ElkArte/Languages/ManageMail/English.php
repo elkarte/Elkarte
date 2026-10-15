@@ -1,7 +1,7 @@
 <?php
 // Version: 2.0; ManageMail
 
-$txt['mailqueue_desc'] = 'From this page you can configure your mail settings, as well as viewing and administrating the current mail queue if it is enabled.';
+$txt['mailqueue_desc'] = 'From this page you can configure your mail transport and delivery settings, as well as viewing and administrating the current mail queue. Outbound sender and Reply-To addresses are configured under <a href="?action=admin;area=maillist;sa=emailsettings">Maillist Settings</a> (with fallback to the Server Settings <a href="?action=admin;area=serversettings;sa=general">Webmaster email</a>).';
 $txt['mail_settings'] = 'Mail Settings';
 
 $txt['mail_type'] = 'Mail type';

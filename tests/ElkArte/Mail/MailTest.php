@@ -119,6 +119,7 @@ class MailTest extends ElkArteCommonSetupTest
 		$this->assertStringContainsString('X-Mailer: ELK', $email['headers']);
 		$this->assertStringContainsString('Mime-Version: 1.0', $email['headers']);
 		$this->assertStringContainsString('Content-Type: multipart/alternative;', $email['headers']);
+		$this->assertMatchesRegularExpression('~Date: [A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} \+0000~', $email['headers']);
 
 		// Sniff for Plain section (quoted printable UTF-8)
 		$this->assertStringContainsString('Content-Type: text/plain; charset=UTF-8', $email['body']);
@@ -221,7 +222,10 @@ class MailTest extends ElkArteCommonSetupTest
 	 */
 	public function testSetFromHeaders()
 	{
-		global $webmaster_email;
+		global $webmaster_email, $modSettings;
+
+		$webmaster_email = 'webmaster@example.com';
+		unset($modSettings['maillist_mail_from']);
 
 		$sendMail = new BuildMail();
 		$sendMail->headers = [];
@@ -229,6 +233,132 @@ class MailTest extends ElkArteCommonSetupTest
 
 		$this->assertContains('From: Test User <' . $webmaster_email . '>', $sendMail->headers);
 		$this->assertContains('Reply-To: <user@example.com>', $sendMail->headers);
+	}
+
+	/**
+	 * Test email address resolution hierarchy across setting permutations
+	 */
+	public function testEmailAddressResolutionHierarchy()
+	{
+		global $webmaster_email, $modSettings;
+
+		// Scenario 1: Only webmaster_email configured
+		$webmaster_email = 'webmaster@testforum.com';
+		unset($modSettings['maillist_mail_from'], $modSettings['maillist_sitename_address'], $modSettings['maillist_sitename_help']);
+
+		$this->assertSame('webmaster@testforum.com', BaseMail::getFromAddress());
+		$this->assertSame('webmaster@testforum.com', BaseMail::getReplyToAddress());
+		$this->assertSame('webmaster@testforum.com', BaseMail::getListHelpAddress());
+		$this->assertSame('webmaster@testforum.com', BaseMail::getReturnPath());
+
+		// Scenario 2: maillist_mail_from configured (overrides webmaster_email)
+		$modSettings['maillist_mail_from'] = 'noreply@testforum.com';
+
+		$this->assertSame('noreply@testforum.com', BaseMail::getFromAddress());
+		$this->assertSame('noreply@testforum.com', BaseMail::getReplyToAddress());
+		$this->assertSame('noreply@testforum.com', BaseMail::getListHelpAddress());
+		$this->assertSame('noreply@testforum.com', BaseMail::getReturnPath());
+
+		// Scenario 3: maillist_sitename_address configured
+		$modSettings['maillist_sitename_address'] = 'reply@testforum.com';
+
+		$this->assertSame('noreply@testforum.com', BaseMail::getFromAddress());
+		$this->assertSame('reply@testforum.com', BaseMail::getReplyToAddress());
+		$this->assertSame('noreply@testforum.com', BaseMail::getListHelpAddress());
+		$this->assertSame('noreply@testforum.com', BaseMail::getReturnPath());
+
+		// Scenario 4: All settings populated
+		$modSettings['maillist_sitename_help'] = 'help@testforum.com';
+
+		$this->assertSame('noreply@testforum.com', BaseMail::getFromAddress());
+		$this->assertSame('reply@testforum.com', BaseMail::getReplyToAddress());
+		$this->assertSame('help@testforum.com', BaseMail::getListHelpAddress());
+		$this->assertSame('noreply@testforum.com', BaseMail::getReturnPath());
+	}
+
+	/**
+	 * Test header generation for both standard and maillist post notifications
+	 */
+	public function testFromAndReplyToHeadersPermutations()
+	{
+		global $webmaster_email, $modSettings, $context;
+
+		$webmaster_email = 'webmaster@testforum.com';
+		$modSettings['maillist_mail_from'] = 'noreply@testforum.com';
+		$modSettings['maillist_sitename_address'] = 'postreply@testforum.com';
+		$modSettings['maillist_sitename'] = 'Test Community';
+		$context['forum_name'] = 'Fallback Forum';
+
+		$sendMail = new BuildMail();
+
+		// Standard email with user reply
+		$sendMail->headers = [];
+		$sendMail->setFromHeaders('author@userdomain.com', 'Author Name');
+		$this->assertContains('From: Author Name <noreply@testforum.com>', $sendMail->headers);
+		$this->assertContains('Reply-To: <author@userdomain.com>', $sendMail->headers);
+
+		// Maillist post notification with wrapper and reference
+		$sendMail->headers = [];
+		$from_wrapper = BaseMail::getFromAddress();
+		$sendMail->setFromHeaders('author@userdomain.com', 'Author Name', $from_wrapper, 'msg1234');
+		$this->assertContains('From: Author Name <noreply@testforum.com>', $sendMail->headers);
+		$this->assertContains('Reply-To: "Test Community" <postreply@testforum.com>', $sendMail->headers);
+		$this->assertContains('References: <msg1234@testforum.com>', $sendMail->headers);
+	}
+
+	/**
+	 * Test RFC 2369 digest headers generation under configured and fallback settings
+	 */
+	public function testDigestHeadersResolution()
+	{
+		global $webmaster_email, $modSettings, $boardurl, $mbname;
+
+		$boardurl = 'https://forum.example.com';
+		$mbname = 'Example Community';
+		$webmaster_email = 'webmaster@example.com';
+		unset($modSettings['maillist_mail_from'], $modSettings['maillist_sitename_address'], $modSettings['maillist_sitename_help'], $modSettings['maillist_sitename']);
+
+		$sendMail = new BuildMail();
+
+		// Fallback scenario
+		$sendMail->headers = [];
+		$sendMail->setDigestHeaders(4);
+		$this->assertContains('List-Id: Notifications <notifications.forum.example.com>', $sendMail->headers);
+		$this->assertContains('List-Unsubscribe: <https://forum.example.com/index.php?action=profile;area=notification>, <mailto:webmaster@example.com?subject=unsubscribe>', $sendMail->headers);
+		$this->assertContains('List-Owner: <mailto:webmaster@example.com> (Example Community)', $sendMail->headers);
+
+		// Configured scenario
+		$modSettings['maillist_mail_from'] = 'noreply@example.com';
+		$modSettings['maillist_sitename_address'] = 'list@example.com';
+		$modSettings['maillist_sitename_help'] = 'support@example.com';
+		$modSettings['maillist_sitename'] = 'Custom List Name';
+
+		$sendMail->headers = [];
+		$sendMail->setDigestHeaders(4);
+		$this->assertContains('List-Id: Notifications <customlistname.forum.example.com>', $sendMail->headers);
+		$this->assertContains('List-Unsubscribe: <https://forum.example.com/index.php?action=profile;area=notification>, <mailto:support@example.com?subject=unsubscribe>', $sendMail->headers);
+		$this->assertContains('List-Owner: <mailto:support@example.com> (Custom List Name)', $sendMail->headers);
+
+		// Third-party reply-to address scenario (e.g. Gmail for post-by-email)
+		$boardurl = 'https://www.elkarte.net';
+		$modSettings['maillist_mail_from'] = 'noreply@elkarte.net';
+		$modSettings['maillist_sitename_address'] = 'elkarte@gmail.com';
+		$modSettings['maillist_sitename_help'] = 'help@elkarte.net';
+		$modSettings['maillist_sitename'] = 'ElkArte Forum';
+
+		$sendMail->headers = [];
+		$sendMail->setDigestHeaders(4);
+		// List-Id MUST use the forum domain namespace (RFC 2919), not third-party gmail.com
+		$this->assertContains('List-Id: Notifications <elkarteforum.www.elkarte.net>', $sendMail->headers);
+		$this->assertContains('List-Unsubscribe: <https://www.elkarte.net/index.php?action=profile;area=notification>, <mailto:help@elkarte.net?subject=unsubscribe>', $sendMail->headers);
+		$this->assertContains('List-Owner: <mailto:help@elkarte.net> (ElkArte Forum)', $sendMail->headers);
+
+		// Fallback when boardurl is empty
+		$boardurl = '';
+		$modSettings['maillist_sitename'] = '';
+		$sendMail->headers = [];
+		$sendMail->setDigestHeaders(4);
+		$this->assertContains('List-Id: Notifications <notifications.elkarte.net>', $sendMail->headers);
 	}
 
 	/**

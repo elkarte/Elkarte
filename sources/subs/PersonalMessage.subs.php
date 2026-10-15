@@ -22,6 +22,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractResult;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\BaseMail;
 use ElkArte\Mail\BuildMail;
 use ElkArte\Mail\PreparseMail;
 use ElkArte\User;
@@ -1051,8 +1052,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			{
 				continue;
 			}
-
-			$from_wrapper = !empty($modSettings['maillist_mail_from']) ? $modSettings['maillist_mail_from'] : (empty($modSettings['maillist_sitename_address']) ? $webmaster_email : $modSettings['maillist_sitename_address']);
+			$from_wrapper = BaseMail::getFromAddress();
 
 			// Add in the signature
 			$replacements['SIGNATURE'] = $mailPreparse->preparseSignature($sender_details['signature']);

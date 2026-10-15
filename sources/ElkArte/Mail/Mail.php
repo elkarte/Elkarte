@@ -149,7 +149,7 @@ class Mail extends BaseMail
 			$headers = strtr($headers, ["\r" => '']);
 		}
 
-		$mid = strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@');
+		$mid = strstr(self::getFromAddress(), '@');
 		$this->setReturnPath();
 
 		// This is frequently not set, or not set according to the needs of PBE and bounce detection
@@ -274,7 +274,7 @@ class Mail extends BaseMail
 		// Fix the message for any lines beginning with a period! (the first is ignored, you see.)
 		$message = preg_replace('/^\./m', '..', $message);
 
-		$mid = strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@');
+		$mid = strstr(self::getFromAddress(), '@');
 		$this->setReturnPath();
 		$mail_to_array = array_values($mail_to_array);
 		$sent = [];

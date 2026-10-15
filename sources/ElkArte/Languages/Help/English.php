@@ -720,9 +720,9 @@ $helptxt['pbe_post_enabled'] = 'Enable this to allow users to respond to email n
 $helptxt['pbe_pm_enabled'] = 'Enable this to allow users to reply by email to PM notifications. They are still required to have PM permissions; this setting only allows them to receive and reply to notifications.';
 $helptxt['maillist_group_mode'] = 'If enabled outbound post/topic emails will come from the poster\'s display name, otherwise it will come from the site name.  This is simply an envelope, affecting only how the "From name" appears in the receiving mailbox, the actual from email address is unchanged.';
 $helptxt['maillist_newtopic_change'] = 'This will allow a user to change the subject of an email notification and have it post as a new topic. The new topic will be started on the same board the reply was going to.';
-$helptxt['maillist_sitename_address'] = 'This must be the address that is piped to the emailpost.php file or the address of the IMAP mailbox.';
+$helptxt['maillist_sitename_address'] = 'This must be the address that is used to process replies. Either the email piped to the <code>emailpost.php</code> file or the address of the IMAP mailbox.';
 $helptxt['maillist_help_short'] = 'This feature allows users of your forum to reply to the site\'s email notifications and have those replies post on the forum. Please visit the Wiki for full instructions.';
-
+$helptxt['pbe_bounce_detect'] = 'Enable this to detect bounced emails and automatically disable email notifications for members with invalid email addresses, helping protect your email sender reputation.';
 $helptxt['frame_security'] = 'Configures the <code>X-Frame-Options</code> HTTP response header to protect your site against clickjacking attacks:
 	<ul class="normallist">
 		<li><strong>SAMEORIGIN (Recommended):</strong> Allows page embedding only within frames on your own domain.</li>
