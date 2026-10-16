@@ -133,9 +133,9 @@ class TokenTest extends TestCase
 	public function testCleanTokensPrefixMatch()
 	{
 		$_SESSION['token'] = [
-			'post-admin-ssc' => ['var1', 'hash1', time(), 'token1'],
-			'get-admin-test' => ['var2', 'hash2', time(), 'token2'],
-			'post-other' => ['var3', 'hash3', time(), 'token3'],
+			'post-admin-ssc' => [['var1', 'hash1', time(), 'token1']],
+			'get-admin-test' => [['var2', 'hash2', time(), 'token2']],
+			'post-other' => [['var3', 'hash3', time(), 'token3']],
 		];
 
 		// cleanTokens with suffix matching 'post' at index 0 should clean 'post-admin-ssc' and 'post-other'
@@ -378,5 +378,95 @@ class TokenTest extends TestCase
 		// validateToken('admin-mpq', 'post') should validate the token successfully
 		$valid = validateToken('admin-mpq', 'post', false, false);
 		$this->assertTrue($valid);
+	}
+
+	/**
+	 * Test multi-tab concurrency where multiple tokens are generated for the same action
+	 * and both earlier and later tabs can be submitted successfully without token errors.
+	 */
+	public function testMultiTokenConcurrentTabs()
+	{
+		global $context;
+
+		// Tab 1 loads mailqueue settings form
+		createToken('admin-ssc-mailqueue');
+		$tab1Var = $context['admin-ssc-mailqueue_token_var'];
+		$tab1Val = $context['admin-ssc-mailqueue_token'];
+
+		// Tab 2 loads mailqueue settings form
+		createToken('admin-ssc-mailqueue');
+		$tab2Var = $context['admin-ssc-mailqueue_token_var'];
+		$tab2Val = $context['admin-ssc-mailqueue_token'];
+
+		$this->assertNotSame($tab1Var, $tab2Var);
+		$this->assertCount(2, $_SESSION['token']['post-admin-ssc-mailqueue']);
+
+		// Tab 1 submits first
+		$_POST = [$tab1Var => $tab1Val];
+		$validTab1 = validateToken('admin-ssc-mailqueue', 'post', false, false);
+		$this->assertTrue($validTab1, 'Tab 1 form submission must validate successfully');
+
+		// Tab 2 submits second
+		$_POST = [$tab2Var => $tab2Val];
+		$validTab2 = validateToken('admin-ssc-mailqueue', 'post', false, false);
+		$this->assertTrue($validTab2, 'Tab 2 form submission must validate successfully');
+	}
+
+	/**
+	 * Test that mobile/IPv6 IP roaming does not fail token validation.
+	 */
+	public function testRoamingIpAddressValidation()
+	{
+		global $context;
+
+		// Token generated on initial IP
+		createToken('admin-login');
+		$tokenVar = $context['admin-login_token_var'];
+		$tokenVal = $context['admin-login_token'];
+
+		// Client switches IP on mobile/roaming network
+		$_SERVER['REMOTE_ADDR'] = '198.51.100.42';
+		$rc = new \ReflectionClass(\ElkArte\Request::class);
+		$prop = $rc->getProperty('_instance');
+		$prop->setAccessible(true);
+		$prop->setValue(null, null);
+
+		$_POST = ['admin_pass' => 'secret', $tokenVar => $tokenVal];
+		$valid = validateToken('admin-login', 'post', false, false);
+		$this->assertTrue($valid, 'Token validation should succeed even when client IP changes');
+	}
+
+	/**
+	 * Test token ring buffer capacity limit and cleanup of pooled tokens.
+	 */
+	public function testTokenPoolCapacityAndExpiry()
+	{
+		global $context;
+
+		$tokenVars = [];
+		$tokenVals = [];
+
+		// Generate 12 tokens for the same action
+		for ($i = 0; $i < 12; $i++)
+		{
+			createToken('admin-pool-test');
+			$tokenVars[] = $context['admin-pool-test_token_var'];
+			$tokenVals[] = $context['admin-pool-test_token'];
+		}
+
+		// Pool size is capped at 10 active tokens
+		$this->assertCount(10, $_SESSION['token']['post-admin-pool-test']);
+
+		// The first 2 generated tokens were shifted out of the pool
+		$_POST = [$tokenVars[0] => $tokenVals[0]];
+		$this->assertFalse(validateToken('admin-pool-test', 'post', false, false));
+
+		// The 12th token (most recent) is valid
+		$_POST = [$tokenVars[11] => $tokenVals[11]];
+		$this->assertTrue(validateToken('admin-pool-test', 'post', false, false));
+
+		// Clean tokens with suffix
+		cleanTokens(true, 'admin-pool-test');
+		$this->assertArrayNotHasKey('post-admin-pool-test', $_SESSION['token']);
 	}
 }
