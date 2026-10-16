@@ -1915,8 +1915,8 @@ function coreFeatures ()
 						cc.setAttribute('title', new_state ? feature_on_text : feature_off_text);
 						cc.setAttribute('alt', new_state ? feature_on_text : feature_off_text);
 
-						token_name = xmlDoc.getElementsByTagName('tokens')[0].querySelector('[type="token"]').textContent;
-						token_value = xmlDoc.getElementsByTagName('tokens')[0].querySelector('[type="token_var"]').textContent;
+						token_name = xmlDoc.getElementsByTagName('tokens')[0].querySelector('[type="token_var"]').textContent;
+						token_value = xmlDoc.getElementsByTagName('tokens')[0].querySelector('[type="token"]').textContent;
 
 						let message = xmlDoc.getElementsByTagName('messages')[0].getElementsByTagName('message')[0].textContent;
 						ajax_infobar.isSuccess();
