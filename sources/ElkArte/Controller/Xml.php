@@ -207,11 +207,11 @@ class Xml extends AbstractController
 					$tokens = [
 						[
 							'value' => $context['admin-core_token'],
-							'attributes' => ['type' => 'token_var'],
+							'attributes' => ['type' => 'token'],
 						],
 						[
 							'value' => $context['admin-core_token_var'],
-							'attributes' => ['type' => 'token'],
+							'attributes' => ['type' => 'token_var'],
 						],
 					];
 				}

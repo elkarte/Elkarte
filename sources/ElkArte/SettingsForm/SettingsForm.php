@@ -161,11 +161,17 @@ class SettingsForm
 	 * It will read either Settings.php or the settings table
 	 * according to the adapter specified in the constructor.
 	 *
-	 * Creates the token `admin-ssc`
+	 * Creates the token `admin-ssc` or scoped `admin-ssc-{$area}`
+	 *
+	 * @param string|null $action Optional token action identifier
 	 */
-	public function prepare(): void
+	public function prepare(?string $action = null): void
 	{
-		createToken('admin-ssc');
+		global $context;
+
+		$action = $action ?? (!empty($context['admin_area']) ? 'admin-ssc-' . $context['admin_area'] : 'admin-ssc');
+		createToken($action);
+		$context['token_check'] = $action;
 		$this->adapter->prepare();
 	}
 
@@ -175,11 +181,16 @@ class SettingsForm
 	 * It will put them in Settings.php or in the settings table
 	 * according to the adapter specified in the constructor.
 	 *
-	 * Validates the token `admin-ssc`
+	 * Validates the token `admin-ssc` or scoped `admin-ssc-{$area}`
+	 *
+	 * @param string|null $action Optional token action identifier
 	 */
-	public function save(): void
+	public function save(?string $action = null): void
 	{
-		validateToken('admin-ssc');
+		global $context;
+
+		$action = $action ?? (!empty($context['admin_area']) ? 'admin-ssc-' . $context['admin_area'] : 'admin-ssc');
+		validateToken($action);
 
 		$this->adapter->save();
 	}

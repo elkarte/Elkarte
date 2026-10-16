@@ -994,13 +994,13 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 		// Might as well do some cleanup on this.
 		cleanTokens();
 
-		// I'm back baby.
-		createToken($action, $type);
-
 		if ($fatal)
 		{
 			throw new \ElkArte\Exceptions\Exception('token_verify_fail', false);
 		}
+
+		// I'm back baby.
+		createToken($action, $type);
 	}
 	// You don't get a new token
 	else
@@ -1037,7 +1037,7 @@ function cleanTokens($complete = false, $suffix = '')
 	// Clean up tokens, trying to give enough time still.
 	foreach ($_SESSION['token'] as $key => $data)
 	{
-		$force = empty($suffix) ? $complete : $complete || strpos($key, $suffix);
+		$force = empty($suffix) ? $complete : $complete || str_contains($key, $suffix);
 		$soft_expired = isset($data[4]) && $data[4] < time();
 
 		if ($data[2] + 10800 < time() || $soft_expired || $force)
