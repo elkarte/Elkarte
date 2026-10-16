@@ -551,7 +551,7 @@ class ManagePermissions extends AbstractController
 	public function action_quick(): void
 	{
 		checkSession();
-		validateToken('admin-mpq', 'quick');
+		validateToken('admin-mpq', 'post');
 
 		// we'll need to init illegal permissions, update permissions, etc.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');

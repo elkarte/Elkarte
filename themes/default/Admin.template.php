@@ -804,7 +804,12 @@ function template_show_settings()
 	}
 
 	// At least one token has to be used!
-	if (isset($context['admin-ssc_token']))
+	if (!empty($context['token_check']) && isset($context[$context['token_check'] . '_token']))
+	{
+		echo '
+			<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+	}
+	elseif (isset($context['admin-ssc_token']))
 	{
 		echo '
 			<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';

@@ -902,14 +902,29 @@ function createToken($action, $type = 'post')
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
 
-	// We need a user agent and the client IP
+	// We need user agent and the client IP
 	$req = Request::instance();
 	$secret = $_SESSION['session_value'] ?? session_id();
 	$secret = $secret === '' ? $req->client_ip() . $req->user_agent() : $secret;
 	$csrf_hash = hash_hmac('sha256', $token . $req->client_ip() . $req->user_agent(), $secret);
 
-	// Save the session token and make it available to the forms
-	$_SESSION['token'][$type . '-' . $action] = [$token_var, $csrf_hash, time(), $token];
+	$token_index = $type . '-' . $action;
+
+	// Ensure token storage exists
+	if (!isset($_SESSION['token'][$token_index]) || !is_array($_SESSION['token'][$token_index]))
+	{
+		$_SESSION['token'][$token_index] = [];
+	}
+
+	// Keep a ring buffer / pool of up to 6 active tokens per action
+	if (count($_SESSION['token'][$token_index]) >= 6)
+	{
+		array_shift($_SESSION['token'][$token_index]);
+	}
+
+	$token_data = [$token_var, $csrf_hash, time(), $token];
+	$_SESSION['token'][$token_index][] = $token_data;
+
 	$context[$action . '_token'] = $token;
 	$context[$action . '_token_var'] = $token_var;
 
@@ -941,30 +956,21 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	$type = ($type === 'get' || $type === 'request') ? $type : 'post';
 	$token_index = $type . '-' . $action;
 
-	// Logins are special: the token is used to have the password with JavaScript before POST it
+	if (!isset($_SESSION['token'][$token_index]) || empty($_SESSION['token'][$token_index]))
+	{
+		return false;
+	}
+
+	// Logins are special: the token is used to have the password with JavaScript before POSTing it
 	if ($action === 'login')
 	{
-		if (isset($_SESSION['token'][$token_index]))
+		$last_token = array_pop($_SESSION['token'][$token_index]);
+		if (empty($_SESSION['token'][$token_index]))
 		{
-			$return = $_SESSION['token'][$token_index][3];
 			unset($_SESSION['token'][$token_index]);
-
-			return $return;
 		}
 
-		return '';
-	}
-
-	if (!isset($_SESSION['token'][$token_index]))
-	{
-		return false;
-	}
-
-	// Check if this token has now expired
-	if (isset($_SESSION['token'][$token_index][4]) && $_SESSION['token'][$token_index][4] < time())
-	{
-		unset($_SESSION['token'][$token_index]);
-		return false;
+		return $last_token[3] ?? '';
 	}
 
 	// We need the user agent and client IP
@@ -972,44 +978,53 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	$secret = $_SESSION['session_value'] ?? session_id();
 	$secret = $secret === '' ? $req->client_ip() . $req->user_agent() : $secret;
 
-	// Shortcut
-	$passed_token_var = $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] ?? null;
-	$csrf_hash = hash_hmac('sha256', (string) $passed_token_var . $req->client_ip() . $req->user_agent(), $secret);
+	$source = $GLOBALS['_' . strtoupper($type)] ?? [];
+	$matched_key = null;
 
-	// Checked what was passed in combination with the user agent
-	if ($passed_token_var !== null && (hash_equals($_SESSION['token'][$token_index][1], $csrf_hash)))
+	// Search active tokens in pool for this action
+	foreach ($_SESSION['token'][$token_index] as $key => $token_entry)
 	{
-		// Soft-expire the token (allow a 60-second grace period for back navigation or retries)
-		if (!isset($_SESSION['token'][$token_index][4]))
+		$token_var = $token_entry[0];
+		if (!isset($source[$token_var]))
 		{
-			$_SESSION['token'][$token_index][4] = time() + 60;
+			continue;
+		}
+
+		$passed_token_val = (string) $source[$token_var];
+		$csrf_hash = hash_hmac('sha256', $passed_token_val . $req->client_ip() . $req->user_agent(), $secret);
+
+		// Checked what was passed in combination with user agent / IP, with raw token fallback for roaming IPs
+		if (hash_equals($token_entry[1], $csrf_hash) || (isset($token_entry[3]) && hash_equals($token_entry[3], $passed_token_val)))
+		{
+			$matched_key = $key;
+			break;
+		}
+	}
+
+	if ($matched_key !== null)
+	{
+		// Consume the token, let them pass
+		unset($_SESSION['token'][$token_index][$matched_key]);
+		if (empty($_SESSION['token'][$token_index]))
+		{
+			unset($_SESSION['token'][$token_index]);
 		}
 
 		return true;
 	}
 
 	// Patrons with invalid tokens get the boot.
+	cleanTokens();
+
 	if ($reset)
 	{
-		// Might as well do some cleanup on this.
-		cleanTokens();
-
-		// I'm back baby.
-		createToken($action, $type);
-
 		if ($fatal)
 		{
 			throw new \ElkArte\Exceptions\Exception('token_verify_fail', false);
 		}
-	}
-	// You don't get a new token
-	else
-	{
-		// Explicitly remove this token
-		unset($_SESSION['token'][$token_index]);
 
-		// Remove older tokens.
-		cleanTokens();
+		// I'm back baby.
+		createToken($action, $type);
 	}
 
 	return false;
@@ -1029,20 +1044,39 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 function cleanTokens($complete = false, $suffix = '')
 {
 	// We appreciate cleaning up after yourselves.
-	if (!isset($_SESSION['token']))
+	if (!isset($_SESSION['token']) || !is_array($_SESSION['token']))
 	{
 		return;
 	}
 
+	$now = time();
+
 	// Clean up tokens, trying to give enough time still.
 	foreach ($_SESSION['token'] as $key => $data)
 	{
-		$force = empty($suffix) ? $complete : $complete || strpos($key, $suffix);
-		$soft_expired = isset($data[4]) && $data[4] < time();
+		$force = empty($suffix) ? $complete : $complete || str_contains($key, $suffix);
 
-		if ($data[2] + 10800 < time() || $soft_expired || $force)
+		if ($force)
 		{
 			unset($_SESSION['token'][$key]);
+			continue;
+		}
+
+		// Clean up pool of tokens
+		if (is_array($data))
+		{
+			foreach ($data as $subKey => $token_entry)
+			{
+				if (is_array($token_entry) && isset($token_entry[2]) && $token_entry[2] + 10800 < $now)
+				{
+					unset($_SESSION['token'][$key][$subKey]);
+				}
+			}
+
+			if (empty($_SESSION['token'][$key]))
+			{
+				unset($_SESSION['token'][$key]);
+			}
 		}
 	}
 }
