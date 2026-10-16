@@ -64,6 +64,7 @@ class UserSettingsLoaderTestDouble extends UserSettingsLoader
 	protected function loadUserData($already_verified, $session_password): void
 	{
 		$this->id = $this->verified ? 1 : 0;
+		$this->initSettings($this->id !== 0 ? ['id_member' => 1, 'member_name' => 'Tester', 'is_activated' => 1] : null);
 	}
 
 	protected function initUser(): array

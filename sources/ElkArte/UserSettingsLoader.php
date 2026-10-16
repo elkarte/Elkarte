@@ -20,7 +20,6 @@ use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\ValuesContainer;
-use ElkArte\Helper\ValuesContainerReadOnly;
 
 /**
  * This class holds all the data belonging to a certain member.
@@ -172,7 +171,7 @@ class UserSettingsLoader
 			}
 
 			// Wrong password or not activated - either way, you're going nowhere.
-			$this->id = (int) $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
+			$this->id = (int) $check && ((int) $user_settings['is_activated'] === 1 || (int) $user_settings['is_activated'] === 11) ? $user_settings['id_member'] : 0;
 		}
 		else
 		{
@@ -215,12 +214,12 @@ class UserSettingsLoader
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
 		if (
 			ELK !== 'SSI'
-			&& !isset($_REQUEST['api']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== '.xml')
-			&& empty($_SESSION['id_msg_last_visit'])
-			&& (!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
+			 	&& !isset($_REQUEST['api'])
+				&& (!isset($_REQUEST['action']) || $_REQUEST['action'] !== '.xml')
+				&& empty($_SESSION['id_msg_last_visit'])
+				&& (!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
 		)
 		{
-			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$visitOpt = basicMessageInfo($this->settings['id_msg_last_visit'], true);
@@ -427,12 +426,12 @@ class UserSettingsLoader
 			$languages = getLanguages();
 
 			// Allow the user to change their language if it's valid.
-			if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
+			if (!empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
 			{
 				$user_lang = strtr($_GET['language'], './\\:', '____');
 				$_SESSION['language'] = $user_lang;
 			}
-			elseif (!empty($modSettings['userLanguage']) && !empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
+			elseif (!empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
 			{
 				$user_lang = strtr($_SESSION['language'], './\\:', '____');
 			}
