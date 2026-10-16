@@ -2,10 +2,12 @@
 
 namespace ElkArte\Security;
 
+use ElkArte\Cache\Cache;
 use ElkArte\Controller\Xml;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\HttpReq;
+use ElkArte\Request;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 use PHPUnit\Framework\TestCase;
@@ -79,7 +81,7 @@ class TokenTest extends TestCase
 			'permissions' => ['admin_forum'],
 		];
 		User::$info = new \ElkArte\UserInfo($userData);
-		$_SESSION['USER_AGENT'] = \ElkArte\Request::instance()->user_agent();
+		$_SESSION['USER_AGENT'] = Request::instance()->user_agent();
 
 		$queryResult = new class {
 			public $currentQuery = '';
@@ -426,7 +428,7 @@ class TokenTest extends TestCase
 
 		// Client switches IP on mobile/roaming network
 		$_SERVER['REMOTE_ADDR'] = '198.51.100.42';
-		$rc = new \ReflectionClass(\ElkArte\Request::class);
+		$rc = new \ReflectionClass(Request::class);
 		$prop = $rc->getProperty('_instance');
 		$prop->setAccessible(true);
 		$prop->setValue(null, null);
@@ -454,10 +456,10 @@ class TokenTest extends TestCase
 			$tokenVals[] = $context['admin-pool-test_token'];
 		}
 
-		// Pool size is capped at 10 active tokens
-		$this->assertCount(10, $_SESSION['token']['post-admin-pool-test']);
+		// Pool size is capped at 6 active tokens
+		$this->assertCount(6, $_SESSION['token']['post-admin-pool-test']);
 
-		// The first 2 generated tokens were shifted out of the pool
+		// The first 6 generated tokens were shifted out of the pool
 		$_POST = [$tokenVars[0] => $tokenVals[0]];
 		$this->assertFalse(validateToken('admin-pool-test', 'post', false, false));
 
@@ -468,5 +470,47 @@ class TokenTest extends TestCase
 		// Clean tokens with suffix
 		cleanTokens(true, 'admin-pool-test');
 		$this->assertArrayNotHasKey('post-admin-pool-test', $_SESSION['token']);
+	}
+
+	/**
+	 * Test guest user initialization when a login token is already present in session.
+	 */
+	public function testGuestUserInitWithExistingLoginToken()
+	{
+		global $context, $modSettings, $language;
+
+		// Pre-create login token in session
+		createToken('login');
+		$initialVar = $context['login_token_var'];
+		$initialVal = $context['login_token'];
+
+		$context = [];
+		$language = 'english';
+		$modSettings['spider_group'] = 0;
+		$modSettings['time_format'] = '%B %d, %Y, %I:%M:%S %p';
+
+		$dbMock = new class {
+			public function setSeeBoard($query) {}
+			public function setWannaSeeBoard($query) {}
+			public function quote($val, $type) { return $val; }
+			public function fetchQuery($query, $params = []) {
+				return new class {
+					public function fetch_callback($cb) { return []; }
+					public function fetch_assoc() { return false; }
+				};
+			}
+		};
+
+		$loader = new \ElkArte\UserSettingsLoader(
+			$dbMock,
+			Cache::instance(),
+			Request::instance()
+		);
+
+		$loader->loadUserById(0, true, '');
+		\ElkArte\User::reloadByUser($loader);
+		$this->assertInstanceOf(\ElkArte\UserInfo::class, \ElkArte\User::$info);
+		$this->assertSame($initialVar, $context['login_token_var']);
+		$this->assertSame($initialVal, $context['login_token']);
 	}
 }

@@ -307,13 +307,14 @@ class UserSettingsLoader
 		}
 
 		// Create a login token if it doesn't exist yet.
-		if (!isset($_SESSION['token']['post-login']))
+		if (empty($_SESSION['token']['post-login']))
 		{
 			createToken('login');
 		}
 		else
 		{
-			[$context['login_token_var'], , , $context['login_token']] = $_SESSION['token']['post-login'];
+			$login_token = end($_SESSION['token']['post-login']);
+			[$context['login_token_var'], , , $context['login_token']] = $login_token;
 		}
 
 		// Do we perhaps think this is a search robot?

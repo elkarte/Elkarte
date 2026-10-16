@@ -916,8 +916,8 @@ function createToken($action, $type = 'post')
 		$_SESSION['token'][$token_index] = [];
 	}
 
-	// Keep a ring buffer / pool of up to 4 active tokens per action
-	if (count($_SESSION['token'][$token_index]) >= 4)
+	// Keep a ring buffer / pool of up to 6 active tokens per action
+	if (count($_SESSION['token'][$token_index]) >= 6)
 	{
 		array_shift($_SESSION['token'][$token_index]);
 	}
