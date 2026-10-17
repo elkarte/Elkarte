@@ -96,6 +96,14 @@ class Emailmoderator extends AbstractController
 			'type' => $report_errors->getErrorType() === 0 ? 'minor' : 'serious',
 		];
 
+		// If they're posting, ...
+		if ((isset($this->_req->post->{$context['session_var']}) || $this->_req->hasPost('save')) && !$report_errors->hasErrors())
+		{
+			$this->action_reporttm2();
+
+			return;
+		}
+
 		// Retrieve the message id from either GET or POST
 		$message_id = $this->_req->getRequest('msg', 'intval', 0);
 		if (empty($message_id))
