@@ -65,7 +65,7 @@ QuickModifyTopic.prototype.modify_topic = function(topic_id, first_msg_id) {
 
 	// Get the topics current subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + first_msg_id + ';modify;api=xml', '', this.onDocReceived_modify_topic);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=quotefast;quote=' + first_msg_id + ';modify;api=xml', '', this.onDocReceived_modify_topic);
 };
 
 // Callback function from the modify_topic ajax call
@@ -147,7 +147,7 @@ QuickModifyTopic.prototype.modify_topic_save = function(cur_session_id, cur_sess
 	// Send in the call to save the updated topic subject
 	ajax_indicator(true);
 	let formData = serialize(document.forms.quickModForm); // includes sessionID
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;api=xml', formData, this.modify_topic_done);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=jsmodify;api=xml', formData, this.modify_topic_done);
 
 	return false;
 };
@@ -401,7 +401,7 @@ QuickModify.prototype.modifyMsg = function(iMessageId) {
 
 	// Send out the XMLhttp request to get more info
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + iMessageId + ';modify;api=xml', '', this.onMessageReceived);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=quotefast;quote=' + iMessageId + ';modify;api=xml', '', this.onMessageReceived);
 };
 
 // The callback function used for the XMLhttp request retrieving the message.
@@ -565,7 +565,7 @@ QuickModify.prototype.modifySave = function() {
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
 	formData = serialize(document.forms.quickModForm); // uses form sessionID
-	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=jsmodify;;api=xml', formData, this.onModifyDone);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;sa=jsmodify;api=xml', formData, this.onModifyDone);
 
 	return false;
 };
@@ -1160,7 +1160,7 @@ function ignore_toggles (msgids, text)
  */
 function topicSplitselect (direction, msg_id)
 {
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + start[0] + ';start2=' + start[1] + ';move=' + direction + ';msg=' + msg_id + ';api=xml', onTopicSplitReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=SplitTopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + start[0] + ';start2=' + start[1] + ';move=' + direction + ';msg=' + msg_id + ';api=xml', onTopicSplitReceived);
 
 	return false;
 }
@@ -1239,7 +1239,7 @@ function onTopicSplitReceived (XMLDoc)
 			newItem.innerHTML = '' +
 				'<div class="content">' +
 				'   <div class="message_header">' +
-				'       <a class="split_icon float' + (curSection === 'selected' ? 'left' : 'right') + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === 'selected' ? 'up' : 'down') + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === 'selected' ? 'up' : 'down') + '\', ' + curId + ');">' +
+				'       <a class="split_icon float' + (curSection === 'selected' ? 'left' : 'right') + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=SplitTopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === 'selected' ? 'up' : 'down') + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === 'selected' ? 'up' : 'down') + '\', ' + curId + ');">' +
 				(curSection === 'selected' ? left_arrow : right_arrow) +
 				'       </a>' +
 				'       <strong>' + curChange.getElementsByTagName('subject')[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName('poster')[0].firstChild.nodeValue + '</strong>' +

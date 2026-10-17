@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\BoardsList;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
@@ -46,8 +47,20 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	 */
 	public function action_index()
 	{
-		// What to do... boardindex, 'course!
-		$this->action_boardindex();
+		$subActions = [
+			'boardindex' => [$this, 'action_boardindex'],
+			'collapse' => [$this, 'action_collapse'],
+		];
+
+		// Set up the action handler
+		$action = new Action('boardindex');
+
+		// Default to collapse if requested via action=collapse, otherwise display the board index
+		$default = $this->_req->getQuery('action') === 'collapse' ? 'collapse' : 'boardindex';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -220,8 +233,9 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	 * from the cache or database and determines whether the like statistics
 	 * should be shown in the information center.
 	 *
+	 * @param bool $with_avatar whether to process avatar information
 	 */
-	public function getLikeStatsContext()
+	public function getLikeStatsContext($with_avatar = false)
 	{
 		global $context;
 
@@ -235,22 +249,22 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		];
 
 		// Use a unique key based on the user's view permissions to cache the like statistics for topics, boards, and messages.
-		$key = md5($this->user->query_wanna_see_board ?? '');
+		$key = md5($this->user->query_wanna_see_board ?? '') . ($with_avatar ? '_avatar' : '');
 		if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . $key, 1740) === false)
 		{
-			$context['likestats']['topics'] = dbMostLikedTopic(null, 5);
+			$context['likestats']['topics'] = dbMostLikedTopic(null, 5, $with_avatar);
 			Cache::instance()->put('ic_likestats_topic:' . $key, $context['likestats']['topics'], 1740);
 		}
 
 		if (Cache::instance()->getVar($context['likestats']['boards'], 'ic_likestats_board:' . $key, 3600) === false)
 		{
-			$context['likestats']['boards'] = dbMostLikedBoard(3);
+			$context['likestats']['boards'] = dbMostLikedBoard(3, $with_avatar);
 			Cache::instance()->put('ic_likestats_board:' . $key, $context['likestats']['boards'], 3600);
 		}
 
 		if (Cache::instance()->getVar($context['likestats']['messages'], 'ic_likestats_message:' . $key, 1800) === false)
 		{
-			$context['likestats']['messages'] = dbMostLikedMessage(5);
+			$context['likestats']['messages'] = dbMostLikedMessage(5, $with_avatar);
 			Cache::instance()->put('ic_likestats_message:' . $key, $context['likestats']['messages'], 1800);
 		}
 

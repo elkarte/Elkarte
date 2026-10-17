@@ -11,26 +11,42 @@
  */
 
 use ElkArte\AdminController\Admin;
+use ElkArte\AdminController\AdminDebug;
 use ElkArte\Controller\About;
 use ElkArte\Controller\Announce;
 use ElkArte\Controller\Attachment;
 use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
+use ElkArte\Controller\Emailmoderator;
 use ElkArte\Controller\Help;
 use ElkArte\Controller\MessageIndex;
 use ElkArte\Controller\ModerateAttachments;
+use ElkArte\Controller\News;
 use ElkArte\Controller\Post;
 use ElkArte\Controller\Register;
 use ElkArte\Controller\SplitTopics;
+use ElkArte\Controller\Unread;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
+use ElkArte\Profile\ProfileHistory;
 use ElkArte\SiteDispatcher;
 use ElkArte\User;
 use PHPUnit\Framework\TestCase;
 
-class DispatcherTest extends TestCase
+class SiteDispatcherTest extends TestCase
 {
 	protected $backupGlobalsExcludeList = ['user_info'];
+
+	public static function setUpBeforeClass(): void
+	{
+		if (!defined('ELK'))
+		{
+			define('ELK', '1');
+		}
+
+		require_once(__DIR__ . '/../../sources/Load.php');
+		require_once(__DIR__ . '/../../sources/Subs.php');
+	}
 	/**
 	 * Tests automagical routing to an action
 	 */
@@ -161,10 +177,125 @@ class DispatcherTest extends TestCase
 			// An existing one, action array
 			array(
 				'test_name' => 'action from actionarray',
-				'action' => 'splittopics',
+				'action' => 'SplitTopics',
 				'result' => array(
-					'function_name' => 'action_splittopics',
+					'function_name' => 'action_index',
 					'controller_name' => SplitTopics::class,
+				),
+			),
+			array(
+				'test_name' => 'ModerateAttachments from naming pattern',
+				'action' => 'ModerateAttachments',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => ModerateAttachments::class,
+				),
+			),
+			array(
+				'test_name' => 'Emailmoderator from naming pattern',
+				'action' => 'Emailmoderator',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Emailmoderator::class,
+				),
+			),
+			array(
+				'test_name' => 'unreadreplies from actionarray',
+				'action' => 'unreadreplies',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Unread::class,
+				),
+			),
+			array(
+				'test_name' => 'viewquery from actionarray',
+				'action' => 'viewquery',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => AdminDebug::class,
+				),
+			),
+			array(
+				'test_name' => '.xml from actionarray',
+				'action' => '.xml',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => News::class,
+				),
+			),
+			array(
+				'test_name' => 'collapse from actionarray',
+				'action' => 'collapse',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => BoardIndex::class,
+				),
+			),
+			array(
+				'test_name' => 'forum from actionarray',
+				'action' => 'forum',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => BoardIndex::class,
+				),
+			),
+			array(
+				'test_name' => 'quickhelp from actionarray',
+				'action' => 'quickhelp',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Help::class,
+				),
+			),
+			array(
+				'test_name' => 'post with jsmodify subaction from naming pattern',
+				'action' => 'post',
+				'sa' => 'jsmodify',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Post::class,
+				),
+			),
+			array(
+				'test_name' => 'post with post2 subaction from naming pattern',
+				'action' => 'post',
+				'sa' => 'post2',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Post::class,
+				),
+			),
+			array(
+				'test_name' => 'post with quotefast subaction from naming pattern',
+				'action' => 'post',
+				'sa' => 'quotefast',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Post::class,
+				),
+			),
+			array(
+				'test_name' => 'quickmod from actionarray',
+				'action' => 'quickmod',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => MessageIndex::class,
+				),
+			),
+			array(
+				'test_name' => 'quickmod2 from actionarray',
+				'action' => 'quickmod2',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => Display::class,
+				),
+			),
+			array(
+				'test_name' => 'trackip from actionarray',
+				'action' => 'trackip',
+				'result' => array(
+					'function_name' => 'action_index',
+					'controller_name' => ProfileHistory::class,
 				),
 			),
 			// An existing one, not in the action array, naming patterns, defer to action_index

@@ -267,7 +267,7 @@ function adminLogin($type = 'admin'): never
  *  - If 'value' is an array, the function is called recursively.
  *
  * @param string $k key
- * @param string|bool $v value
+ * @param array|string|bool $v value
  * @return string 'hidden' HTML form fields, containing key-value-pairs
  * @package Authorization
  */
@@ -481,7 +481,14 @@ function resetPassword($memID, $username = null)
 
 	// Create a db hash for the generated password
 	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
-	$db_hash = password_hash($newPassword_sha256, PASSWORD_BCRYPT, ['cost' => 8]);
+	try
+	{
+		$db_hash = password_hash($newPassword_sha256, PASSWORD_BCRYPT, ['cost' => 8]);
+	}
+	catch (\ValueError | \Error)
+	{
+		throw new \ElkArte\Exceptions\Exception('Password hashing failed.', false);
+	}
 
 	// Do some checks on the username if needed.
 	require_once(SUBSDIR . '/Members.subs.php');
@@ -492,9 +499,12 @@ function resetPassword($memID, $username = null)
 
 		// If there are "important" errors, and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
-		$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
-		$prepared_errors = $errors->prepareErrors($error_severity);
-		throw new \ElkArte\Exceptions\Exception(reset($prepared_errors), $error_severity === null ? false : 'general');
+		if ($errors->hasErrors())
+		{
+			$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
+			$prepared_errors = $errors->prepareErrors($error_severity);
+			throw new \ElkArte\Exceptions\Exception(reset($prepared_errors), $error_severity === null ? false : 'general');
+		}
 
 		// Update the database...
 		updateMemberData($memID, ['member_name' => $user, 'passwd' => $db_hash]);
@@ -664,7 +674,14 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	// They need a password hash, something to save in the db?
 	if ($returnhash)
 	{
-		return password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
+		try
+		{
+			return password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
+		}
+		catch (\ValueError | \Error)
+		{
+			return false;
+		}
 	}
 
 	// Doing a password check?

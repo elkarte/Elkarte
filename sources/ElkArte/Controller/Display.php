@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Helper\ValuesContainer;
@@ -62,8 +63,18 @@ class Display extends AbstractController
 	 */
 	public function action_index()
 	{
-		// what to do... display things!
-		$this->action_display();
+		$subActions = [
+			'display' => [$this, 'action_display'],
+			'quickmod2' => [$this, 'action_quickmod2'],
+		];
+
+		// Set up the action handler
+		$action = new Action('display');
+		$default = $this->_req->getQuery('action') === 'quickmod2' ? 'quickmod2' : 'display';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -1092,7 +1103,7 @@ class Display extends AbstractController
 			$mgsOptions = basicMessageInfo(min($messages), true);
 
 			$_SESSION['split_selection'][$topic] = $messages;
-			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' . urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=SplitTopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' . urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');

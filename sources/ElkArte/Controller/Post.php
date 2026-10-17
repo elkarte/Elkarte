@@ -21,6 +21,7 @@ namespace ElkArte\Controller;
 use BBC\ParserWrapper;
 use BBC\PreparseCode;
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
@@ -78,9 +79,19 @@ class Post extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Figure out the right action to do.
-		// hint: I'm post controller. :P
-		$this->action_post();
+		$subActions = [
+			'post' => [$this, 'action_post'],
+			'post2' => [$this, 'action_post2'],
+			'quotefast' => [$this, 'action_quotefast'],
+			'jsmodify' => [$this, 'action_jsmodify'],
+		];
+
+		// Set up the action handler
+		$action = new Action('post');
+		$subAction = $action->initialize($subActions, 'post');
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -441,7 +452,7 @@ class Post extends AbstractController
 
 		// Get a response prefix (like 'Re:') in the default forum language.
 		$context['response_prefix'] = response_prefix();
-		$context['destination'] = 'post2;start=' . $this->_req->getRequest('start', 'intval', 0);
+		$context['destination'] = 'post;sa=post2;start=' . $this->_req->getRequest('start', 'intval', 0);
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened?

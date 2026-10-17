@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
@@ -50,8 +51,21 @@ class Emailmoderator extends AbstractController
 	 */
 	public function action_index()
 	{
-		// just accept we haz a default action: action_reporttm()
-		$this->action_reporttm();
+		global $context;
+
+		// Subactions for reporting
+		$subActions = [
+			'report' => [$this, 'action_reporttm', 'permission' => 'report_any'],
+			'submit' => [$this, 'action_reporttm2', 'permission' => 'report_any'],
+		];
+
+		// Set up the action handler
+		$action = new Action('emailmoderator');
+		$default = (isset($this->_req->post->{$context['session_var']}) || $this->_req->hasPost('save')) ? 'submit' : 'report';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -82,11 +96,12 @@ class Emailmoderator extends AbstractController
 			'type' => $report_errors->getErrorType() === 0 ? 'minor' : 'serious',
 		];
 
-		// If they're posting, it should be processed by action_reporttm2.
-		// Note: keep the dynamic session var check
+		// If they're posting, ...
 		if ((isset($this->_req->post->{$context['session_var']}) || $this->_req->hasPost('save')) && !$report_errors->hasErrors())
 		{
 			$this->action_reporttm2();
+
+			return;
 		}
 
 		// Retrieve the message id from either GET or POST

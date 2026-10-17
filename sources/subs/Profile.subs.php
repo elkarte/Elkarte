@@ -815,7 +815,7 @@ function profileSendActivation()
 		$_COOKIE[$cookiename] = '';
 	}
 
-	User::load(true);
+	User::logOutUser(true);
 	User::$info['is_logged'] = $context['user']['is_logged'] = false;
 	User::$info['is_guest'] = $context['user']['is_guest'] = true;
 
@@ -1066,7 +1066,7 @@ function profileLoadLanguages()
 }
 
 /**
- * Reload a users settings.
+ * Reload a user's settings.
  */
 function profileReloadUser()
 {
@@ -1083,7 +1083,7 @@ function profileReloadUser()
 		}
 	}
 
-	User::load(true);
+	User::reload(true);
 	writeLog();
 }
 

@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 
 /**
@@ -308,8 +309,18 @@ class Unread extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Figure out what action to do ... Thinking, Thinking, OK unread
-		$this->action_unread();
+		$subActions = [
+			'unread' => [$this, 'action_unread'],
+			'unreadreplies' => [$this, 'action_unreadreplies'],
+		];
+
+		// Set up the action handler
+		$action = new Action('unread');
+		$default = $this->_req->getQuery('action') === 'unreadreplies' ? 'unreadreplies' : 'unread';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**

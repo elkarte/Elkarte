@@ -99,12 +99,12 @@ class UserSettings extends ValuesContainerReadOnly
 			$password = hash('sha256', Util::strtolower($this->member_name) . un_htmlspecialchars($password));
 		}
 
-		$passhash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
-
-		// Nothing is right
-		if ($passhash === false)
+		try
 		{
-			// @todo here we should throw an exception
+			$passhash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
+		}
+		catch (\ValueError | \Error)
+		{
 			return false;
 		}
 

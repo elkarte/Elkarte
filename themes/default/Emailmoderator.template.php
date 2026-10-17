@@ -68,7 +68,7 @@ function template_report()
 
 	echo '
 	<div id="report_topic">
-		<form action="', $scripturl, '?action=reporttm;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Emailmoderator;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['report_to_mod'], '</h2>
 			<div class="content">';
 
