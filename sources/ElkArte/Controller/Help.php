@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Hooks;
@@ -42,8 +43,18 @@ class Help extends AbstractController
 	 */
 	public function action_index()
 	{
-		// I need help!
-		$this->action_help();
+		$subActions = [
+			'help' => [$this, 'action_help'],
+			'quickhelp' => [$this, 'action_quickhelp'],
+		];
+
+		// Set up the action handler
+		$action = new Action('help');
+		$default = $this->_req->getQuery('action') === 'quickhelp' ? 'quickhelp' : 'help';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**

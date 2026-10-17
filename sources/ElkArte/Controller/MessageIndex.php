@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 
 use BBC\BoardDescriptionParser;
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\BoardsList;
 use ElkArte\EventManager;
 use ElkArte\FrontpageInterface;
@@ -140,8 +141,18 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 */
 	public function action_index()
 	{
-		// Forward to the message index, it's not like we know much more :P
-		$this->action_messageindex();
+		$subActions = [
+			'messageindex' => [$this, 'action_messageindex'],
+			'quickmod' => [$this, 'action_quickmod'],
+		];
+
+		// Set up the action handler
+		$action = new Action('messageindex');
+		$default = $this->_req->getQuery('action') === 'quickmod' ? 'quickmod' : 'messageindex';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**

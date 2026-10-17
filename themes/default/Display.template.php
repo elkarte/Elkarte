@@ -410,7 +410,7 @@ function template_quickreply_below()
 					<h4>', $txt['reply'], '</h4>
 				</header>
 				<div id="quickReplyOptions">
-					<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (empty($modSettings['mentions_enabled']) ? '' : "revalidateMentions('postmodify', '" . $context['post_box_name'] . "');"), '">
+					<form action="', getUrl('action', ['action' => 'post', 'sa' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (empty($modSettings['mentions_enabled']) ? '' : "revalidateMentions('postmodify', '" . $context['post_box_name'] . "');"), '">
 						<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 						<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 						<input type="hidden" name="icon" value="xx" />
@@ -807,7 +807,7 @@ function template_display_attachments($message, $ignoring)
 			if ($context['can_approve'])
 			{
 				echo '
-										&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>';
+										&nbsp;<a class="linkbutton" href="', $scripturl, '?action=ModerateAttachments;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>';
 			}
 
 			echo '
@@ -849,7 +849,7 @@ function template_display_attachments($message, $ignoring)
 		if (!$attachment['is_approved'] && $context['can_approve'])
 		{
 			echo '
-											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
+											<a class="linkbutton" href="', $scripturl, '?action=ModerateAttachments;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=ModerateAttachments;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
 		}
 
 		if ($attachment['is_image'])

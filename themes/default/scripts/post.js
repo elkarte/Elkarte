@@ -68,7 +68,7 @@ function previewPost ()
 	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;api=xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;api=xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';
@@ -489,7 +489,7 @@ function cleanFileInput (idElement)
  */
 function insertQuoteFast (messageid)
 {
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';api=xml;pb=' + post_box_name + ';mode=0', onDocReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=quotefast;quote=' + messageid + ';api=xml;pb=' + post_box_name + ';mode=0', onDocReceived);
 
 	return true;
 }
@@ -587,7 +587,7 @@ function loadDrafts ()
 		}
 	}
 
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2;api=xml', formValues.join('&'), onDraftsReturned);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=post2;api=xml', formValues.join('&'), onDraftsReturned);
 }
 
 /**

@@ -17,6 +17,7 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Debug;
 use ElkArte\Exceptions\Exception;
 
@@ -40,8 +41,44 @@ class AdminDebug extends AbstractController
 	 */
 	public function action_index()
 	{
-		// what to do first... viewquery! What, it'll work, or it won't.
-		// $this->action_viewquery();
+		$subActions = [
+			'view' => [$this, 'action_viewquery', 'permission' => 'admin_forum'],
+			'hide' => [$this, 'action_hidequery', 'permission' => 'admin_forum'],
+		];
+
+		// Set up the action handler
+		$action = new Action('viewquery');
+		$subAction = $action->initialize($subActions, 'view');
+
+		// Call the action
+		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Toggle the viewing of queries.
+	 */
+	public function action_hidequery(): void
+	{
+		global $db_show_debug;
+
+		// We should have debug mode enabled, as well as something to display!
+		if ($db_show_debug !== true || !isset($_SESSION['debug']))
+		{
+			throw new Exception('no_access', false);
+		}
+
+		// Don't allow except for administrators.
+		isAllowedTo('admin_forum');
+
+		$debug = Debug::instance();
+		$debug->toggleViewQueries();
+
+		if (str_contains($_SESSION['old_url'], 'action=viewquery'))
+		{
+			redirectexit();
+		}
+
+		redirectexit($_SESSION['old_url']);
 	}
 
 	/**
@@ -69,21 +106,6 @@ class AdminDebug extends AbstractController
 		isAllowedTo('admin_forum');
 
 		$debug = Debug::instance();
-
-		// If we're just hiding/showing, do it now.
-		if ($this->_req->compareQuery('sa', 'hide', 'trim|strval'))
-		{
-			$debug->toggleViewQueries();
-
-			if (str_contains($_SESSION['old_url'], 'action=viewquery'))
-			{
-				redirectexit();
-			}
-			else
-			{
-				redirectexit($_SESSION['old_url']);
-			}
-		}
 
 		// Looking at a specific query?
 		$query_id = $this->_req->getQuery('qq', 'intval', 0);

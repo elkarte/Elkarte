@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\BoardsList;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
@@ -46,8 +47,20 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	 */
 	public function action_index()
 	{
-		// What to do... boardindex, 'course!
-		$this->action_boardindex();
+		$subActions = [
+			'boardindex' => [$this, 'action_boardindex'],
+			'collapse' => [$this, 'action_collapse'],
+		];
+
+		// Set up the action handler
+		$action = new Action('boardindex');
+
+		// Default to collapse if requested via action=collapse, otherwise display the board index
+		$default = $this->_req->getQuery('action') === 'collapse' ? 'collapse' : 'boardindex';
+		$subAction = $action->initialize($subActions, $default);
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**

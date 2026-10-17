@@ -19,13 +19,12 @@ namespace ElkArte\Controller;
 use BBC\ParserWrapper;
 use BBC\PreparseCode;
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Cache\Cache;
-use ElkArte\Emoji;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
-use ElkArte\Mail\PreparseMail;
 use ElkArte\MembersList;
 
 /**
@@ -59,8 +58,16 @@ class News extends AbstractController
 	 */
 	public function action_index()
 	{
-		// do... something, of your favorite.
-		// $this->action_xmlnews();
+		$subActions = [
+			'showfeed' => [$this, 'action_showfeed'],
+		];
+
+		// Set up the action handler
+		$action = new Action('news_feed');
+		$subAction = $action->initialize($subActions, 'showfeed');
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
