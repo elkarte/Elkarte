@@ -21,7 +21,7 @@ function template_ask()
 
 	echo '
 	<div id="split_topics">
-		<form action="', $scripturl, '?action=splittopics;sa=execute;topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=SplitTopics;sa=execute;topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="at" value="', $context['message']['id'], '" />
 			<h2 class="category_header">', $txt['split_topic'], '</h2>
 			<div class="content">
@@ -116,7 +116,7 @@ function template_select()
 
 	echo '
 	<div id="split_topics">
-		<form action="', $scripturl, '?action=splittopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=SplitTopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
 			<div id="not_selected" class="floatleft">
 				<h2 class="category_header">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h2>
 				<div class="information">
@@ -130,7 +130,7 @@ function template_select()
 					<li id="not_selected_', $message['id'], '">
 						<div class="content">
 							<div class="message_header">
-								<a class="split_icon floatright" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=down;msg=', $message['id'], '" onclick="return topicSplitselect(\'down\', ', $message['id'], ');"><i class="icon icon-big i-chevron-circle-right"></i></a>
+								<a class="split_icon floatright" href="', $scripturl, '?action=SplitTopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=down;msg=', $message['id'], '" onclick="return topicSplitselect(\'down\', ', $message['id'], ');"><i class="icon icon-big i-chevron-circle-right"></i></a>
 								<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
 								<em>', $message['time'], '</em>
 							</div>
@@ -145,7 +145,7 @@ function template_select()
 			</div>
 			<div id="selected" class="floatright">
 				<h2 class="category_header">
-					', $txt['split_selected_posts'], '<a class="linkbutton floatright" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=reset;msg=0" onclick="return topicSplitselect(\'reset\', 0);">', $txt['split_reset_selection'], '</a>
+					', $txt['split_selected_posts'], '<a class="linkbutton floatright" href="', $scripturl, '?action=SplitTopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=reset;msg=0" onclick="return topicSplitselect(\'reset\', 0);">', $txt['split_reset_selection'], '</a>
 				</h2>
 				<div class="information">
 					', $txt['split_selected_posts_desc'], '
@@ -160,7 +160,7 @@ function template_select()
 					<li id="selected_', $message['id'], '">
 						<div class="content">
 							<div class="message_header">
-								<a class="split_icon floatleft" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=up;msg=', $message['id'], '" onclick="return topicSplitselect(\'up\', ', $message['id'], ');"><i class="icon icon-big i-chevron-circle-left"></i></a>
+								<a class="split_icon floatleft" href="', $scripturl, '?action=SplitTopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=up;msg=', $message['id'], '" onclick="return topicSplitselect(\'up\', ', $message['id'], ');"><i class="icon icon-big i-chevron-circle-left"></i></a>
 								<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
 								<em>', $message['time'], '</em>
 							</div>

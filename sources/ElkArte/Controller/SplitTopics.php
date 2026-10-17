@@ -40,21 +40,6 @@ class SplitTopics extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Call the right method.
-	}
-
-	/**
-	 * Splits a topic into two topics.
-	 *
-	 * What it does:
-	 *
-	 * - Delegates to the other functions (based on the URL parameter 'sa').
-	 * - Loads the SplitTopics template.
-	 * - Requires the split_any permission.
-	 * - Accessed with ?action=splittopics.
-	 */
-	public function action_splittopics(): void
-	{
 		global $topic;
 
 		// And... which topic were you splitting, again?
@@ -92,8 +77,8 @@ class SplitTopics extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Is accessed with ?action=splittopics or ?action=splittopics;sa=index
-	 * - Default sub action for ?action=splittopics.
+	 * - Is accessed with ?action=SplitTopics or ?action=SplitTopics;sa=index
+	 * - Default sub action for ?action=SplitTopics.
 	 * - Redirects to action_splitSelectTopics if the message given turns out to be
 	 * the first message of a topic.
 	 * - Shows the user three ways to split the current topic.
@@ -201,7 +186,7 @@ class SplitTopics extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Is accessed with ?action=splittopics;sa=selectTopics.
+	 * - Is accessed with ?action=SplitTopics;sa=selectTopics.
 	 * - Uses 'select' sub template of the SplitTopics template or (for
 	 * XMLhttp) the 'split' sub template of the XML template.
 	 * - Supports XMLhttp for adding/removing a message to the selection.
@@ -339,7 +324,7 @@ class SplitTopics extends AbstractController
 			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
 		}
 
-		$page_index_url = '{scripturl}?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_SESSION['new_topic_subject']), ['%' => '%%']) . ';topic=' . $topic;
+		$page_index_url = '{scripturl}?action=SplitTopics;sa=selectTopics;subname=' . strtr(urlencode($_SESSION['new_topic_subject']), ['%' => '%%']) . ';topic=' . $topic;
 
 		// Build a page list of the not-selected topics...
 		$context['not_selected']['page_index'] = constructPageIndex($page_index_url . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
@@ -403,7 +388,7 @@ class SplitTopics extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Is accessed with ?action=splittopics;sa=execute.
+	 * - Is accessed with ?action=SplitTopics;sa=execute.
 	 * - Supports three ways of splitting:
 	 *   (1) only one message is split off.
 	 *   (2) all messages after and including a given message are split off.
@@ -509,7 +494,7 @@ class SplitTopics extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Is accessed with ?action=splittopics;sa=splitSelection.
+	 * - Is accessed with ?action=SplitTopics;sa=splitSelection.
 	 * - Uses the main SplitTopics template.
 	 *
 	 * @uses splitTopic() function to do the actual splitting.

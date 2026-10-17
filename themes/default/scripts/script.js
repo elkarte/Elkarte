@@ -1354,7 +1354,7 @@ IconList.prototype.onItemMouseDown = function(oDiv, sNewIcon) {
 		// Allow this to be the current IconList in the callback
 		this.tmpMethod = fetchDocument;
 		this.oDiv = oDiv;
-		this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';api=xml', this.onIconResponse);
+		this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=post;sa=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';api=xml', this.onIconResponse);
 		delete this.tmpMethod;
 	}
 	else

@@ -42,9 +42,15 @@ class User
 	 * Load all the important user information.
 	 *
 	 * @param bool $compat_mode if true, sets the deprecated $user_info global
+	 * @param bool $force if true, forces resetting and reloading the user
 	 */
-	public static function load($compat_mode = false): void
+	public static function load($compat_mode = false, $force = false): void
 	{
+		if ($force)
+		{
+			self::reset($compat_mode);
+		}
+
 		if (self::$instance === null)
 		{
 			$db = database();
@@ -63,6 +69,37 @@ class User
 				$user_info = User::$info;
 			}
 		}
+	}
+
+	/**
+	 * Reset the user state and static properties.
+	 *
+	 * @param bool $compat_mode if true, clears the deprecated $user_info global
+	 */
+	public static function reset($compat_mode = false): void
+	{
+		self::$instance = null;
+		self::$settings = null;
+		self::$info = null;
+		self::$id = 0;
+		self::$session_password = '';
+
+		if ($compat_mode)
+		{
+			global $user_info;
+			$user_info = null;
+		}
+	}
+
+	/**
+	 * Explicitly reload the active user state from cookies/session and the database.
+	 *
+	 * @param bool $compat_mode if true, sets the deprecated $user_info global
+	 */
+	public static function reload($compat_mode = false): void
+	{
+		self::reset($compat_mode);
+		self::load($compat_mode);
 	}
 
 	/**
@@ -126,10 +163,21 @@ class User
 	/**
 	 * Logout by setting user to guest
 	 *
-	 * @param false $compat_mode
+	 * @param bool $compat_mode
 	 */
 	public static function logOutUser($compat_mode = false): void
 	{
+		if (self::$instance === null)
+		{
+			$db = database();
+			$cache = Cache::instance();
+			$req = Request::instance();
+
+			self::$instance = new UserSettingsLoader($db, $cache, $req);
+		}
+
+		self::$id = 0;
+		self::$session_password = '';
 		self::$instance->loadUserById(0, true, '');
 		self::reloadByUser(self::$instance, $compat_mode);
 	}

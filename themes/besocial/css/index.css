@@ -4278,12 +4278,12 @@ dl.merge_topic dd {
  */
 
 /* The debug view query item that you get by clicking on view querys when in debug mode */
-.action_viewquery a {
+.action_home .query a {
     font-weight: bold;
     text-decoration: none;
 }
 
-.action_viewquery .explain {
+.action_home .explain {
     font-family: serif;
     width: 70%;
     margin-bottom: 1.6rem;
@@ -4291,15 +4291,16 @@ dl.merge_topic dd {
     border-collapse: collapse;
 }
 
-.action_viewquery .explain th,
-.action_viewquery .explain td {
+.action_home .explain th,
+.action_home .explain td {
     width: 5%;
     padding: .13em;
     border: 1px solid;
 }
 
-.action_viewquery .query {
+.action_home .query {
     margin: 1.6rem;
+    font-size: var(--font14);
 }
 
 /* next two only in manage member groups?  Move to Admin */

@@ -510,7 +510,7 @@ function template_quicktopic_above()
 	if ($context['can_post_new'] && !empty($options['display_quick_topic']) && !$context['user']['is_guest'])
 	{
 		echo '
-		<form  id="postmodify" action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" onsubmit="submitonce(this);', (empty($modSettings['mentions_enabled']) ? '' : "revalidateMentions('postmodify', '" . $context['post_box_name'] . "');"), '">
+		<form  id="postmodify" action="', getUrl('action', ['action' => 'post', 'sa' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" onsubmit="submitonce(this);', (empty($modSettings['mentions_enabled']) ? '' : "revalidateMentions('postmodify', '" . $context['post_box_name'] . "');"), '">
 		<ul id="quicktopic" class="topic_listing">
 			<li class="basic_row">
 				<div class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-xx' : '', '">';

@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 
@@ -35,8 +36,18 @@ class ModerateAttachments extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Forward to our method(s) to do the job
-		$this->action_attachapprove();
+		$subActions = [
+			'approve' => [$this, 'action_attachapprove'],
+			'reject' => [$this, 'action_attachapprove'],
+			'all' => [$this, 'action_attachapprove'],
+		];
+
+		// Set up the action handler
+		$action = new Action('moderate_attachments');
+		$subAction = $action->initialize($subActions, 'approve');
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**

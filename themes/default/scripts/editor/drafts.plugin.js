@@ -84,7 +84,7 @@
 		oForm.appendChild(inputMessageMode);
 
 		// Send in the request to save the data
-		this.draftAjax(serialize(oForm), 'action=post2;board=' + this.opts.iBoard + ';api=xml');
+		this.draftAjax(serialize(oForm), 'action=post;sa=post2;board=' + this.opts.iBoard + ';api=xml');
 	};
 
 	/**

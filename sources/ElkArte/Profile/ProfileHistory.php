@@ -64,22 +64,29 @@ class ProfileHistory extends AbstractController
 		];
 
 		// Create the tabs for the template. (Mostly done by prepareTabData function of Menu)
-		$context[$context['profile_menu_name']]['object']->prepareTabData([
-			'title' => $txt['history'],
-			'description' => $txt['history_description'],
-			'class' => 'i-poll',
-		]);
+		if (!empty($context['profile_menu_name']) && isset($context[$context['profile_menu_name']]['object']))
+		{
+			$context[$context['profile_menu_name']]['object']->prepareTabData([
+				'title' => $txt['history'],
+				'description' => $txt['history_description'],
+				'class' => 'i-poll',
+			]);
+		}
 
 		// Set up action/subaction stuff.
 		$action = new Action('profile_history');
 
 		// Yep, sub-action time and call integrate_sa_profile_history as well
-		$subAction = $action->initialize($subActions, 'activity');
+		$default = $this->_req->getQuery('action') === 'trackip' ? 'ip' : 'activity';
+		$subAction = $action->initialize($subActions, $default);
 		$context['sub_action'] = $subAction;
 
 		// Set a page title.
 		$context['history_area'] = $subAction;
-		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $this->_profile['real_name'];
+		if (isset($subActions[$subAction]['label']))
+		{
+			$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . ($this->_profile['real_name'] ?? '');
+		}
 
 		// Pass on to the actual method.
 		$action->dispatch($subAction);

@@ -223,7 +223,7 @@ class DisplayRenderer extends Renderer
 			// What about splitting it off the rest of the topic?
 			'split' => [
 				'text' => 'split_topic',
-				'url' => getUrl('action', ['action' => 'splittopics', 'topic' => $topic . '.0', 'at' => $output['id']]),
+				'url' => getUrl('action', ['action' => 'SplitTopics', 'topic' => $topic . '.0', 'at' => $output['id']]),
 				'icon' => 'split',
 				'enabled' => $context['can_split'] && !empty($context['real_num_replies']) && $context['topic_first_message'] !== $output['id'],
 				'submenu' => true,
@@ -255,7 +255,7 @@ class DisplayRenderer extends Renderer
 			// Maybe they want to report this post to the moderator(s)?
 			'report' => [
 				'text' => 'report_to_mod',
-				'url' => getUrl('action', ['action' => 'reporttm', 'topic' =>  $topic . '.' . $output['counter'], 'msg' => $output['id']]),
+				'url' => getUrl('action', ['action' => 'Emailmoderator', 'topic' =>  $topic . '.' . $output['counter'], 'msg' => $output['id']]),
 				'icon' => 'comment',
 				'enabled' => $context['can_report_moderator'],
 				'submenu' => true,

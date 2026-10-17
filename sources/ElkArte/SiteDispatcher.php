@@ -21,14 +21,10 @@ use ElkArte\Controller\Attachment;
 use ElkArte\Controller\Auth;
 use ElkArte\Controller\BoardIndex;
 use ElkArte\Controller\Display;
-use ElkArte\Controller\Emailmoderator;
 use ElkArte\Controller\Help;
 use ElkArte\Controller\MessageIndex;
-use ElkArte\Controller\ModerateAttachments;
 use ElkArte\Controller\ModerationCenter;
 use ElkArte\Controller\News;
-use ElkArte\Controller\Post;
-use ElkArte\Controller\SplitTopics;
 use ElkArte\Controller\Unread;
 use ElkArte\Controller\Xml;
 use ElkArte\Exceptions\ControllerRedirectException;
@@ -86,28 +82,22 @@ class SiteDispatcher
 	 * use the action_index of the controller and let it dispatch normally */
 	protected $actionArray = [
 		'admin' => [Admin::class, 'action_index'],
-		'attachapprove' => [ModerateAttachments::class, 'action_attachapprove'],
-		'collapse' => [BoardIndex::class, 'action_collapse'],
+		'collapse' => [BoardIndex::class, 'action_index'],
 		'dlattach' => [Attachment::class, 'action_index'],
 		'forum' => [BoardIndex::class, 'action_index'],
-		'quickhelp' => [Help::class, 'action_quickhelp'],
-		'jsmodify' => [Post::class, 'action_jsmodify'],
+		'quickhelp' => [Help::class, 'action_index'],
 		'jsoption' => [ManageThemes::class, 'action_jsoption'],
 		'moderate' => [ModerationCenter::class, 'action_index'],
 		'pm' => [PersonalMessage::class, 'action_index'],
-		'post2' => [Post::class, 'action_post2'],
 		'profile' => [Profile::class, 'action_index'],
 		'profileinfo' => [ProfileInfo::class, 'action_index'],
-		'quotefast' => [Post::class, 'action_quotefast'],
-		'quickmod' => [MessageIndex::class, 'action_quickmod'],
-		'quickmod2' => [Display::class, 'action_quickmod2'],
-		'reporttm' => [Emailmoderator::class, 'action_reporttm'],
-		'splittopics' => [SplitTopics::class, 'action_splittopics'],
-		'trackip' => [ProfileHistory::class, 'action_trackip'],
-		'unreadreplies' => [Unread::class, 'action_unreadreplies'],
+		'quickmod' => [MessageIndex::class, 'action_index'],
+		'quickmod2' => [Display::class, 'action_index'],
+		'trackip' => [ProfileHistory::class, 'action_index'],
+		'unreadreplies' => [Unread::class, 'action_index'],
 		'viewprofile' => [Profile::class, 'action_index'],
-		'viewquery' => [AdminDebug::class, 'action_viewquery'],
-		'.xml' => [News::class, 'action_showfeed'],
+		'viewquery' => [AdminDebug::class, 'action_index'],
+		'.xml' => [News::class, 'action_index'],
 		'xmlhttp' => [Xml::class, 'action_index'],
 	];
 

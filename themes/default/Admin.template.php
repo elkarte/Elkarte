@@ -1279,6 +1279,9 @@ function template_viewquery()
 {
 	global $context;
 
+	echo '
+	<div class="content">';
+
 	foreach ($context['queries_data'] as $q => $query_data)
 	{
 		echo '
@@ -1317,4 +1320,7 @@ function template_viewquery()
 	</table>';
 		}
 	}
+
+	echo '
+	</div>';
 }

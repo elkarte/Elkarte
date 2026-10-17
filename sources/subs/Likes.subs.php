@@ -564,11 +564,12 @@ function messageLikeCount($message)
  * Function to get most liked messages
  *
  * @param int $limit the number of top-liked messages to fetch
+ * @param bool $with_avatar whether to process avatar information
  *
  * @return array
  * @package Likes
  */
-function dbMostLikedMessage($limit = 10)
+function dbMostLikedMessage($limit = 10, $with_avatar = true)
 {
 	global $txt;
 
@@ -582,8 +583,9 @@ function dbMostLikedMessage($limit = 10)
 			COALESCE(mem.real_name, m.poster_name) AS member_received_name,
 			lp.id_msg, lp.like_count AS like_count,
 			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time, m.smileys_enabled,
+			mem.posts' . ($with_avatar ? ',
 			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.avatar, mem.posts, mem.email_address
+			mem.avatar, mem.email_address' : '') . '
 		FROM (
 				SELECT
 					COUNT(lp.id_msg) AS like_count, lp.id_msg
@@ -594,8 +596,8 @@ function dbMostLikedMessage($limit = 10)
 			) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)' . ($with_avatar ? '
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' : '') . '
 		WHERE {query_wanna_see_board}
 		ORDER BY like_count DESC
 		LIMIT {int:limit}',
@@ -603,13 +605,12 @@ function dbMostLikedMessage($limit = 10)
 			'limit' => $limit,
 		]
 	)->fetch_callback(
-		function ($row) use (&$mostLikedMessages, $bbc_parser) {
+		function ($row) use (&$mostLikedMessages, $bbc_parser, $with_avatar) {
 			global $scripturl;
 
 			// Censor it!
 			$row['subject'] = censor($row['subject']);
 			$row['body'] = censor($row['body']);
-
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short and sweet
@@ -617,7 +618,7 @@ function dbMostLikedMessage($limit = 10)
 			$preview = Util::htmlspecialchars(strtr($msgString, ['<br />' => "\n", '&nbsp;' => ' ']));
 
 			// Love those avatars
-			$avatar = determineAvatar($row);
+			$avatar = $with_avatar ? determineAvatar($row) : [];
 
 			// Build it out
 			$mostLikedMessages[] = [
@@ -636,9 +637,9 @@ function dbMostLikedMessage($limit = 10)
 					'name' => $row['member_received_name'],
 					'total_posts' => $row['posts'],
 					'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-					'avatar' => $avatar['href'],
+					'avatar' => $avatar['href'] ?? '',
 				],
-				'member_liked_data' => postLikers(0, min($row['like_count'], 50), 'l.id_member DESC', $row['id_msg'], false),
+				'member_liked_data' => postLikers(0, min($row['like_count'], 50), 'l.id_member DESC', $row['id_msg'], !$with_avatar),
 			];
 		}
 	);
@@ -664,11 +665,12 @@ function dbMostLikedMessage($limit = 10)
  *
  * @param int|int[] $topic the topic_id or array of topic_ids we are going to look for liked posts within
  * @param int $limit the maximum number of liked posts to return per topic
+ * @param bool $with_avatar whether to process avatar information
  *
  * @return array
  * @package Likes
  */
-function dbMostLikedMessagesByTopic($topic, $limit = 5)
+function dbMostLikedMessagesByTopic($topic, $limit = 5, $with_avatar = true)
 {
 	global $scripturl;
 
@@ -709,7 +711,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			'type_avatar' => 1,
 		]
 	)->fetch_callback(
-		function ($row) use ($scripturl, $bbc_parser, &$messagesByTopic, $limit) {
+		function ($row) use ($scripturl, $bbc_parser, &$messagesByTopic, $limit, $with_avatar) {
 			if (isset($messagesByTopic[$row['id_topic']]) && count($messagesByTopic[$row['id_topic']]) >= $limit)
 			{
 				return;
@@ -725,7 +727,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			$msgString = Util::shorten_html($row['body'], 255);
 			$preview = Util::htmlspecialchars(strtr($msgString, ['<br />' => "\n", '&nbsp;' => ' ']));
 
-			$avatar = determineAvatar($row);
+			$avatar = $with_avatar ? determineAvatar($row) : [];
 
 			$messagesByTopic[$row['id_topic']][] = [
 				'id_msg' => $row['id_msg'],
@@ -743,7 +745,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 					'name' => $row['member_received_name'],
 					'total_posts' => $row['posts'],
 					'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-					'avatar' => $avatar['href'],
+					'avatar' => $avatar['href'] ?? '',
 				],
 			];
 		}
@@ -771,12 +773,13 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
  *  If omitted, {query_wanna_see_board} is used to return the most liked topics in the boards
  * they can see
  * @param int $limit - Optional, number of topics to return (default 10).
+ * @param bool $with_avatar - Optional, whether to process avatar information (default true).
  *
  * @return array
  * @package Likes
  *
  */
-function dbMostLikedTopic($board = null, $limit = 10)
+function dbMostLikedTopic($board = null, $limit = 10, $with_avatar = true)
 {
 	global $txt;
 
@@ -836,7 +839,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	if (!empty($mostLikedTopics))
 	{
 		$topic_ids = array_column($mostLikedTopics, 'id_topic');
-		$batchMessages = dbMostLikedMessagesByTopic($topic_ids, 5);
+		$batchMessages = dbMostLikedMessagesByTopic($topic_ids, 5, $with_avatar);
 
 		foreach ($mostLikedTopics as $key => $topic)
 		{
@@ -872,11 +875,12 @@ function sort_by_relevance($a, $b)
  * Function to get most liked board
  *
  * @param int $limit the number of top-liked boards to fetch
+ * @param bool $with_avatar whether to process avatar information
  *
  * @return array
  * @package Likes
  */
-function dbMostLikedBoard($limit = 3)
+function dbMostLikedBoard($limit = 3, $with_avatar = true)
 {
 	global $txt;
 
@@ -909,8 +913,8 @@ function dbMostLikedBoard($limit = 3)
 			'limit' => $limit
 		]
 	)->fetch_callback(
-		function ($row) use (&$mostLikedBoards) {
-			$mostLikedTopic = dbMostLikedTopic($row['id_board'], 1);
+		function ($row) use (&$mostLikedBoards, $with_avatar) {
+			$mostLikedTopic = dbMostLikedTopic($row['id_board'], 1, $with_avatar);
 			$row['topic_data'] = $mostLikedTopic[0]['msg_data'] ?? [];
 
 			$mostLikedBoards[] = $row;
@@ -931,12 +935,13 @@ function dbMostLikedBoard($limit = 3)
  * Function to get most liked members
  *
  * @param int $limit the number of most liked members to return
+ * @param bool $with_avatar whether to process avatar information
  *
  * @return array
  * @package Likes
  *
  */
-function dbMostLikesReceivedUser($limit = 10)
+function dbMostLikesReceivedUser($limit = 10, $with_avatar = true)
 {
 	global  $txt;
 
@@ -969,10 +974,10 @@ function dbMostLikesReceivedUser($limit = 10)
 			'limit' => $limit
 		]
 	)->fetch_callback(
-		function ($row) use (&$mostLikedMembers) {
+		function ($row) use (&$mostLikedMembers, $with_avatar) {
 			global $scripturl;
 
-			$avatar = determineAvatar($row);
+			$avatar = $with_avatar ? determineAvatar($row) : [];
 			$mostLikedMembers[] = [
 				'member_received' => [
 					'id_member' => $row['id_poster'],
@@ -980,7 +985,7 @@ function dbMostLikesReceivedUser($limit = 10)
 					'total_posts' => $row['posts'],
 					'date_registered' => $row['date_registered'],
 					'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-					'avatar' => $avatar['href'],
+					'avatar' => $avatar['href'] ?? '',
 				],
 				'like_count' => $row['like_count'],
 				'post_data' => dbMostLikedPostsByUser($row['id_poster']),
@@ -1059,12 +1064,13 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
  * Function to get most likes giving user
  *
  * @param int $limit the number of members to return
+ * @param bool $with_avatar whether to process avatar information
  *
  * @return array
  * @package Likes
  *
  */
-function dbMostLikesGivenUser($limit = 10)
+function dbMostLikesGivenUser($limit = 10, $with_avatar = true)
 {
 	global $txt;
 
@@ -1093,10 +1099,10 @@ function dbMostLikesGivenUser($limit = 10)
 			'limit' => $limit
 		]
 	)->fetch_callback(
-		function ($row) use (&$mostLikeGivingMembers) {
+		function ($row) use (&$mostLikeGivingMembers, $with_avatar) {
 			global $scripturl;
 
-			$avatar = determineAvatar($row);
+			$avatar = $with_avatar ? determineAvatar($row) : [];
 
 			$mostLikeGivingMembers[] = [
 				'member_given' => [
@@ -1105,7 +1111,7 @@ function dbMostLikesGivenUser($limit = 10)
 					'total_posts' => $row['posts'],
 					'date_registered' => $row['date_registered'],
 					'href' => !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
-					'avatar' => $avatar['href'],
+					'avatar' => $avatar['href'] ?? '',
 				],
 				'like_count' => $row['like_count'],
 				'post_data' => dbRecentlyLikedPostsGivenUser($row['id_member'])
