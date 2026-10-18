@@ -86,6 +86,6 @@ class SupportAuthController extends ElkArteWebSupport
 		$this->url('index.php?action=auth;sa=logout');
 
 		// Yeah, you're not logged in and without no session token
-		$this->assertEquals('An Error Has Occurred', $this->title());
+		$this->assertEquals('Log out', $this->title());
 	}
 }
