@@ -21,6 +21,8 @@ class ManageNotificationQueueTest extends ElkArteCommonSetupTest
 
 		global $txt, $boardurl;
 
+		new \ElkArte\Themes\ThemeLoader();
+
 		// Load languages used by the controller/settings
 		$lang = new Loader('english', $txt, database());
 		$lang->load('ManageNotificationQueue');
@@ -84,7 +86,7 @@ class ManageNotificationQueueTest extends ElkArteCommonSetupTest
 		global $context;
 
 		$queue = new \ElkArte\Notifications\PostNotificationQueue(database());
-		$queue->enqueue(\ElkArte\Notifications\PostNotificationQueue::TYPE_POST, 1, 1, 1, []);
+		$queue->enqueue(\ElkArte\Notifications\PostNotificationQueue::TYPE_TOPIC, 1, 1, 1, []);
 
 		$controller = new ManageNotificationQueue(new EventManager());
 		$controller->setUser(User::$info);

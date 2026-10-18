@@ -13,6 +13,7 @@ $txt['notificationqueue_in_grace'] = 'In delay window';
 $txt['notificationqueue_locked'] = 'Currently processing';
 
 $txt['notificationqueue_task_type'] = 'Task Type';
+$txt['notificationqueue_type_topic'] = 'New Topic';
 $txt['notificationqueue_type_post'] = 'New Topic';
 $txt['notificationqueue_type_reply'] = 'New Reply';
 $txt['notificationqueue_subject'] = 'Subject';
