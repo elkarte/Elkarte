@@ -15,6 +15,7 @@ use ElkArte\Helper\TokenHash;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Loader;
 use ElkArte\Notifications\Notifications;
+use ElkArte\Notifications\PostNotificationQueue;
 use ElkArte\Notifications\PostNotifications;
 use ElkArte\User;
 
@@ -913,4 +914,47 @@ function fetchApprovalNotifications($topics)
 	);
 
 	return $approvalNotifyData;
+}
+
+/**
+ * Grabs items from the post notification queue.
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @return array
+ */
+function list_getNotificationQueue($start, $items_per_page, $sort)
+{
+	return (new PostNotificationQueue())->getQueueItems($start, $items_per_page, $sort);
+}
+
+/**
+ * Returns the total count of items in the post notification queue.
+ *
+ * @return int
+ */
+function list_getNotificationQueueSize()
+{
+	return (new PostNotificationQueue())->getQueueSize();
+}
+
+/**
+ * Gets the current post notification queue status statistics.
+ *
+ * @return array
+ */
+function list_NotificationQueueStatus()
+{
+	return (new PostNotificationQueue())->getQueueStatus();
+}
+
+/**
+ * Deletes items from the post notification queue.
+ *
+ * @param array $items
+ */
+function deleteNotificationQueueItems($items)
+{
+	(new PostNotificationQueue())->deleteJobs((array) $items);
 }

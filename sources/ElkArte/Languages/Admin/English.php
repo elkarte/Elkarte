@@ -682,7 +682,7 @@ $txt['klipyLanguageURL'] = '<a href="https://klipy.com/docs#overview">Language C
 $txt['klipyApiURL'] = '<a href="https://klipy.com/login?redirect=https%3A%2F%2Fpartner.klipy.com">Request API Key</a>';
 
 $txt['nofollow_allowlist'] = 'Allow listed domains without nofollow attribute';
-$txt['nofollow_allowlist_desc'] = 'The domains listed here (one per line) will always be presented without the nofollow attribute';
+$txt['nofollow_allowlist_desc'] = 'The domains listed here (one per line) will always be presented without the nofollow attribute.  This is useful for allowing links to your own sites or other trusted sites to be followed by search engines.';
 
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
@@ -735,9 +735,14 @@ $txt['admin_news_select_excluded_groups_desc'] = 'Select groups who should defin
 // Use entities in below.
 $txt['admin_news_cannot_pm_emails_js'] = 'You cannot send a personal message to an email address. If you continue all entered email addresses will be ignored.\\n\\nAre you sure you wish to do this?';
 
+$txt['mailqueue_title'] = 'Mail Queue';
 $txt['mailqueue_browse'] = 'Browse Queue';
 $txt['mailqueue_settings'] = 'Settings';
 $txt['mailqueue_test'] = 'Test Email';
+
+$txt['notificationqueue_title'] = 'Notification Queue';
+$txt['notificationqueue_browse'] = 'Browse Queue';
+$txt['notificationqueue_settings'] = 'Settings';
 
 $txt['admin_search'] = 'Quick Search';
 $txt['admin_search_type_internal'] = 'Task/Setting';

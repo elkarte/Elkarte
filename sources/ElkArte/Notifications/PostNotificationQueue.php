@@ -87,9 +87,10 @@ class PostNotificationQueue extends AbstractModel
 	 *
 	 * @param int $limit Most jobs to claim
 	 * @param int $lock_seconds How long the claim lasts
+	 * @param bool $force Claim jobs regardless of locked_until timestamp (e.g. manual queue run)
 	 * @return array[] Jobs in the order they were added, each with a decoded payload
 	 */
-	public function claimBatch($limit = 10, $lock_seconds = self::LOCK_SECONDS): array
+	public function claimBatch($limit = 10, $lock_seconds = self::LOCK_SECONDS, bool $force = false): array
 	{
 		$now = time();
 
@@ -108,7 +109,7 @@ class PostNotificationQueue extends AbstractModel
 			SELECT 
 				id_job
 			FROM {db_prefix}post_notification_queue
-			WHERE locked_until < {int:now}
+			' . ($force ? '' : 'WHERE locked_until < {int:now}') . '
 			ORDER BY id_job
 			LIMIT {int:limit}',
 			[
@@ -127,8 +128,7 @@ class PostNotificationQueue extends AbstractModel
 			$result = $this->_db->query('', '
 				UPDATE {db_prefix}post_notification_queue
 				SET locked_until = {int:locked_until}, attempts = attempts + 1
-				WHERE id_job = {int:id_job}
-					AND locked_until < {int:now}',
+				WHERE id_job = {int:id_job}' . ($force ? '' : ' AND locked_until < {int:now}'),
 				[
 					'locked_until' => $now + (int) $lock_seconds,
 					'id_job' => $id_job,
@@ -267,5 +267,145 @@ class PostNotificationQueue extends AbstractModel
 		);
 
 		return $count;
+	}
+
+	/**
+	 * Get the total number of items in the notification queue
+	 *
+	 * @return int
+	 */
+	public function getQueueSize(): int
+	{
+		return $this->countPending();
+	}
+
+	/**
+	 * Fetch a paginated list of notification queue items with message and member info
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @return array
+	 */
+	public function getQueueItems(int $start, int $items_per_page, string $sort = 'id_job'): array
+	{
+		$allowed_sorts = [
+			'id_job' => 'q.id_job',
+			'id_job DESC' => 'q.id_job DESC',
+			'task_type' => 'q.task_type',
+			'task_type DESC' => 'q.task_type DESC',
+			'subject' => 'm.subject',
+			'subject DESC' => 'm.subject DESC',
+			'poster' => 'mem.real_name',
+			'poster DESC' => 'mem.real_name DESC',
+			'age' => 'q.created',
+			'age DESC' => 'q.created DESC',
+			'attempts' => 'q.attempts',
+			'attempts DESC' => 'q.attempts DESC',
+			'status' => 'q.locked_until',
+			'status DESC' => 'q.locked_until DESC',
+		];
+
+		$sort_clause = $allowed_sorts[$sort] ?? 'q.id_job DESC';
+
+		$items = [];
+		$this->_db->fetchQuery('
+			SELECT 
+				q.id_job, q.task_type, q.id_topic, q.id_msg, q.id_member, q.payload, q.attempts, q.created, q.locked_until,
+				COALESCE(m.subject, {string:empty_subject}) AS subject,
+				COALESCE(mem.real_name, mem.member_name, {string:empty_poster}) AS poster_name
+			FROM {db_prefix}post_notification_queue AS q
+				LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = q.id_msg)
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = q.id_member)
+			ORDER BY ' . $sort_clause . '
+			LIMIT {int:start}, {int:items_per_page}',
+			[
+				'empty_subject' => '',
+				'empty_poster' => '',
+				'start' => max(0, $start),
+				'items_per_page' => max(1, $items_per_page),
+			]
+		)->fetch_callback(
+			static function ($row) use (&$items) {
+				$payload = json_decode((string) $row['payload'], true);
+				$row['payload'] = is_array($payload) ? $payload : [];
+				$items[] = $row;
+			}
+		);
+
+		return $items;
+	}
+
+	/**
+	 * Get summary statistics for the notification queue
+	 *
+	 * @return array{queue_size: int, oldest: int, ready: int, in_grace: int, locked: int}
+	 */
+	public function getQueueStatus(): array
+	{
+		$now = time();
+		$status = [
+			'queue_size' => 0,
+			'oldest' => 0,
+			'ready' => 0,
+			'in_grace' => 0,
+			'locked' => 0,
+		];
+
+		$this->_db->fetchQuery('
+			SELECT 
+				COUNT(*) AS queue_size,
+				MIN(created) AS oldest,
+				SUM(CASE WHEN locked_until <= {int:now} THEN 1 ELSE 0 END) AS ready,
+				SUM(CASE WHEN locked_until > {int:now} AND attempts = 0 THEN 1 ELSE 0 END) AS in_grace,
+				SUM(CASE WHEN locked_until > {int:now} AND attempts > 0 THEN 1 ELSE 0 END) AS locked
+			FROM {db_prefix}post_notification_queue',
+			[
+				'now' => $now,
+			]
+		)->fetch_callback(
+			static function ($row) use (&$status) {
+				$status['queue_size'] = (int) $row['queue_size'];
+				$status['oldest'] = (int) $row['oldest'];
+				$status['ready'] = (int) $row['ready'];
+				$status['in_grace'] = (int) $row['in_grace'];
+				$status['locked'] = (int) $row['locked'];
+			}
+		);
+
+		return $status;
+	}
+
+	/**
+	 * Delete specific jobs by their IDs
+	 *
+	 * @param array $job_ids
+	 */
+	public function deleteJobs(array $job_ids): void
+	{
+		$job_ids = array_filter(array_map('intval', $job_ids));
+		if (empty($job_ids))
+		{
+			return;
+		}
+
+		$this->_db->query('', '
+			DELETE FROM {db_prefix}post_notification_queue
+			WHERE id_job IN ({array_int:job_ids})',
+			[
+				'job_ids' => $job_ids,
+			]
+		);
+	}
+
+	/**
+	 * Purge all jobs from the notification queue
+	 */
+	public function purgeQueue(): void
+	{
+		$this->_db->query('', '
+			DELETE FROM {db_prefix}post_notification_queue',
+			[]
+		);
 	}
 }

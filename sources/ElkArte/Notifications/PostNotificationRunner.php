@@ -53,11 +53,12 @@ class PostNotificationRunner extends AbstractModel
 	 * Claim a batch of jobs, run them in the order they were made, and complete or fail each one
 	 *
 	 * @param int $limit Jobs to run
+	 * @param bool $force Force claiming jobs regardless of lock/delay
 	 * @return int How many jobs were claimed, 0 when there was nothing to do
 	 */
-	public function runBatch($limit = 10): int
+	public function runBatch($limit = 10, bool $force = false): int
 	{
-		$jobs = $this->queue->claimBatch($limit);
+		$jobs = $this->queue->claimBatch($limit, PostNotificationQueue::LOCK_SECONDS, $force);
 
 		foreach ($jobs as $job)
 		{
