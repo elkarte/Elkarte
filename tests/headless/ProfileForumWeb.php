@@ -82,6 +82,6 @@ class ProfileForumController extends ElkArteWebSupport
 		sleep(2);
 
 		// We return to the forum profile page
-		$this->assertStringContainsString('A Signature', $this->byId('signature')->text());
+		$this->assertStringContainsString('A Signature', $this->byId('signature')->attribute('value'));
 	}
 }

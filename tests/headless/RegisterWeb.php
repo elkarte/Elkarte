@@ -23,6 +23,8 @@ class SupportRegisterController extends ElkArteWebSupport
 	 * Used by teardown();
 	 */
 	public $registration_method;
+	public $requireAgreement;
+	public $checkboxAgreement;
 
 	/**
 	 * Initialize or add whatever is necessary for these tests
@@ -38,10 +40,16 @@ class SupportRegisterController extends ElkArteWebSupport
 
 		// Let's remember about these
 		$this->registration_method = $modSettings['registration_method'] ?? '0';
+		$this->requireAgreement = $modSettings['requireAgreement'] ?? '0';
+		$this->checkboxAgreement = $modSettings['checkboxAgreement'] ?? '0';
 
-		// Set it to email activation
-		updateSettings(array('registration_method' => 1));
-		updateSettings(array('reg_verification' => 0));
+		// Set it to email activation and require agreement
+		updateSettings(array(
+			'registration_method' => 1,
+			'reg_verification' => 0,
+			'requireAgreement' => 1,
+			'checkboxAgreement' => 0,
+		));
 
 		$modSettings['postmod_active'] = $modSettings['postmod_active'] ?? '0';
 
@@ -70,7 +78,11 @@ class SupportRegisterController extends ElkArteWebSupport
 	protected function tearDown(): void
 	{
 		// Restore it to default
-		updateSettings(array('registration_method' => $this->registration_method));
+		updateSettings(array(
+			'registration_method' => $this->registration_method,
+			'requireAgreement' => $this->requireAgreement,
+			'checkboxAgreement' => $this->checkboxAgreement,
+		));
 
 		parent::tearDown();
 	}
@@ -192,7 +204,7 @@ class SupportRegisterController extends ElkArteWebSupport
 
 		// Select login from the main page
 		$this->adminLogout();
-		$this->clickit('#button_login > a');
+		$this->url('index.php?action=auth;sa=login');
 		$this->assertEquals('Log in', $this->title());
 
 		// Fill in the form, long hand style
