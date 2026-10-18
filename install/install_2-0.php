@@ -3029,6 +3029,7 @@ class InstallInstructions_install_2_0
 				array('name' => 'member_started', 'columns' => array('id_member_started', 'id_board'), 'type' => 'key'),
 				array('name' => 'last_message_sticky', 'columns' => array('id_board', 'is_sticky', 'id_last_msg'), 'type' => 'key'),
 				array('name' => 'board_news', 'columns' => array('id_board', 'id_first_msg'), 'type' => 'key'),
+				array('name' => 'num_likes', 'columns' => array('num_likes', 'id_board'), 'type' => 'key'),
 			),
 			array(),
 			'ignore'

@@ -201,14 +201,6 @@ if (class_exists(Table::class))
 		 *
 		 * @param string $table_name
 		 * @param string $statement
-		 * @todo this is still broken. The idea is that if the query is
-		 *       started and the index is not yet ready, SHOW FULL PROCESSLIST
-		 *       should list if the query is still running and we should be able to
-		 *       wait until the query is completed.
-		 *       While this is true for MySQL it may not be for other DBMS, so for
-		 *       there are a couple of options (like implement it for MySQL and hope
-		 *       others will not break), but for the timebeing I'll leave it here broken.
-		 *       See protected_alter in ToRefactrCode.php
 		 */
 		protected function _alter_table($table_name, $statement)
 		{
@@ -329,15 +321,6 @@ if (class_exists(\ElkArte\Database\Postgresql\Table::class))
 		 *
 		 * @param string $table_name
 		 * @param string $statement
-		 * @todo this is still broken. The idea is that if the query is
-		 *       started and the index is not yet ready, SHOW FULL PROCESSLIST
-		 *       should list if the query is still running and we should be able to
-		 *       wait until the query is completed.
-		 *       While this is true for MySQL it may not be for other DBMS, so for
-		 *       there are a couple of options (like implement it for MySQL and hope
-		 *       others will not break), but for the timebeing I'll leave it here broken.
-		 *       See protected_alter in ToRefactrCode.php
-		 *
 		 */
 		protected function _alter_table($table_name, $statement)
 		{
@@ -371,9 +354,9 @@ if (class_exists(\ElkArte\Database\Postgresql\Table::class))
 		{
 			/** PostgreSQL cases */
 			// Removing a column is: DROP COL UMN
-			// Rename a column is:   RENAME C OLUMN
+			// Rename a column is: RENAME C OLUMN
 			// Altering a column is: ALTER CO LUMN
-			// Adding a column is:   ADD COLU MN
+			// Adding a column is: ADD COLU MN
 			// Adding indexes:
 			//   - ADD PRIM ARY KEY
 			//   - CREATE

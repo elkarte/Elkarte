@@ -58,8 +58,6 @@ define('TMP_BOARDDIR', $upgrade_path);
 // Call in our support staff
 require_once(__DIR__ . '/CommonCode.php');
 require_once(__DIR__ . '/FTP-Install.php');
-require_once(__DIR__ . '/LegacyCode.php');
-require_once(__DIR__ . '/ToRefactorCode.php');
 require_once(__DIR__ . '/TemplateUpgrade.php');
 
 // Prevent access to the upgrader when an installed completion lock exists
@@ -1880,13 +1878,13 @@ function loadEssentialFunctions()
 
 function discoverCollation()
 {
-	global $databases, $db_type, $db_prefix, $db_connection;
+	global $db_type, $db_prefix;
 
 	$db_collation = '';
 
 	// If we're on MySQL supporting collations, then let's find out what the members table uses and put it in
 	// a global var - to allow the upgrade script to match collations!
-	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
+	if ($db_type === 'mysqli' || $db_type === 'mysql')
 	{
 		$db = load_database();
 
