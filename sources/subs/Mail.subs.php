@@ -818,6 +818,8 @@ function time_since($time_diff)
 {
 	global $txt;
 
+	Txt::load('ManageMail');
+
 	if ($time_diff < 0)
 	{
 		$time_diff = 0;
@@ -828,7 +830,7 @@ function time_since($time_diff)
 	{
 		$days = round($time_diff / 86400, 1);
 
-		return sprintf($days === 1.0 ? $txt['mq_day'] : $txt['mq_days'], $time_diff / 86400);
+		return sprintf($days === 1.0 ? ($txt['mq_day'] ?? '%1.1f Day') : ($txt['mq_days'] ?? '%1.1f Days'), $time_diff / 86400);
 	}
 
 	// Hours?
@@ -836,7 +838,7 @@ function time_since($time_diff)
 	{
 		$hours = round($time_diff / 3600, 1);
 
-		return sprintf($hours === 1.0 ? $txt['mq_hour'] : $txt['mq_hours'], $hours);
+		return sprintf($hours === 1.0 ? ($txt['mq_hour'] ?? '%1.1f Hour') : ($txt['mq_hours'] ?? '%1.1f Hours'), $hours);
 	}
 
 	// Minutes?
@@ -844,9 +846,9 @@ function time_since($time_diff)
 	{
 		$minutes = (int) ($time_diff / 60);
 
-		return sprintf($minutes === 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
+		return sprintf($minutes === 1 ? ($txt['mq_minute'] ?? '%1$d Minute') : ($txt['mq_minutes'] ?? '%1$d Minutes'), $minutes);
 	}
 
 	// Otherwise must be second
-	return sprintf($time_diff === 1 ? $txt['mq_second'] : $txt['mq_seconds'], $time_diff);
+	return sprintf($time_diff === 1 ? ($txt['mq_second'] ?? '%1$d Second') : ($txt['mq_seconds'] ?? '%1$d Seconds'), $time_diff);
 }

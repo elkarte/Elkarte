@@ -1178,7 +1178,7 @@ class UpgradeInstructions_upgrade_2_0
 					$this->table->create_table('{db_prefix}post_notification_queue',
 						array(
 							array('name' => 'id_job', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
-							array('name' => 'task_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+							array('name' => 'task_type', 'type' => 'varchar', 'size' => 20, 'default' => ''),
 							array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 							array('name' => 'id_msg', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),

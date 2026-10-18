@@ -146,6 +146,48 @@ class PostNotificationQueueTest extends ElkArteCommonSetupTest
 		$this->assertSame(0, $this->queue->countPending());
 	}
 
+	public function testGetQueueItemsEmptyQueue()
+	{
+		$items = $this->queue->getQueueItems(0, 10, 'id_job');
+		$this->assertSame([], $items);
+	}
+
+	public function testGetQueueItemsAndStatus()
+	{
+		$id1 = $this->queue->enqueue(PostNotificationQueue::TYPE_REPLY, 1, 10, 2, ['members_only' => [3]]);
+		$id2 = $this->queue->enqueue(PostNotificationQueue::TYPE_TOPIC, 2, 20, 2);
+
+		$this->assertSame(2, $this->queue->getQueueSize());
+
+		$status = $this->queue->getQueueStatus();
+		$this->assertSame(2, $status['queue_size']);
+		$this->assertGreaterThan(0, $status['oldest']);
+
+		$items = $this->queue->getQueueItems(0, 10, 'id_job');
+		$this->assertCount(2, $items);
+		$this->assertSame($id1, (int) $items[0]['id_job']);
+		$this->assertSame($id2, (int) $items[1]['id_job']);
+
+		$this->queue->deleteJobs([$id1]);
+		$this->assertSame(1, $this->queue->getQueueSize());
+
+		$this->queue->purgeQueue();
+		$this->assertSame(0, $this->queue->getQueueSize());
+	}
+
+	public function testForceClaimBatch()
+	{
+		// Enqueue with future delay (e.g. 180 seconds)
+		$this->queue->enqueue(PostNotificationQueue::TYPE_REPLY, 1, 10, 2, [], 180);
+
+		// Without force, locked item is not claimed
+		$this->assertSame([], $this->queue->claimBatch(10));
+
+		// With force, it is claimed immediately
+		$claimed = $this->queue->claimBatch(10, PostNotificationQueue::LOCK_SECONDS, true);
+		$this->assertCount(1, $claimed);
+	}
+
 	protected function expireLocks(): void
 	{
 		database()->query('', '

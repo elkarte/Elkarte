@@ -197,6 +197,16 @@ class Admin extends AbstractController
 							'settings' => [$txt['mailqueue_settings'], 'admin_forum'],
 						],
 					],
+					'notificationqueue' => [
+						'label' => $txt['notificationqueue_title'],
+						'controller' => ManageNotificationQueue::class,
+						'function' => 'action_index',
+						'class' => 'i-bell-blank i-admin',
+						'subsections' => [
+							'browse' => [$txt['notificationqueue_browse'], 'admin_forum'],
+							'settings' => [$txt['notificationqueue_settings'], 'admin_forum'],
+						],
+					],
 				],
 			],
 			'forum' => [
@@ -823,7 +833,7 @@ class Admin extends AbstractController
 
 		// Load a lot of language files.
 		$language_files = [
-			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
+			'Help', 'ManageMail', 'ManageNotificationQueue', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
 			'Login', 'ManageSmileys', 'Maillist', 'Mentions', 'Addons'
 		];
 
@@ -850,6 +860,7 @@ class Admin extends AbstractController
 			['signatureSettings_search', 'area=featuresettings;sa=sig', ManageSignature::class],
 			['settings_search', 'area=languages;sa=settings', ManageLanguages::class],
 			['settings_search', 'area=mailqueue;sa=settings', ManageMail::class],
+			['settings_search', 'area=notificationqueue;sa=settings', ManageNotificationQueue::class],
 			['settings_search', 'area=maillist;sa=emailsettings', ManageMaillist::class],
 			['filter_search', 'area=maillist;sa=emailsettings', ManageMaillist::class],
 			['parser_search', 'area=maillist;sa=emailsettings', ManageMaillist::class],
