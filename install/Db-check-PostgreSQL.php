@@ -12,17 +12,9 @@
 $GLOBALS['databases']['postgresql'] = [
 	'name' => 'PostgreSQL',
 	'extension' => 'PostgreSQL (PgSQL)',
-	'version' => '9.5',
-	'function_check' => 'pg_connect',
-	'version_check' => static function ($db_connection) {
-		$request = pg_query('SELECT version()');
-		[$version] = pg_fetch_row($request);
-		[$pgl, $version] = explode(" ", $version);
-		return $version;
-	},
+	'version' => '9.6',
 	'supported' => function_exists('pg_connect'),
 	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.php',
-	'test_collation' => false,
 	'validate_prefix' => static function (&$value) {
 		global $txt;
 

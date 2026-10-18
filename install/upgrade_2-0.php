@@ -1159,6 +1159,15 @@ class UpgradeInstructions_upgrade_2_0
 							);
 						}
 					);
+
+					// Add index on num_likes and id_board
+					$this->table->add_index('{db_prefix}topics',
+						array(
+							'name' => 'num_likes',
+							'columns' => array('num_likes', 'id_board'),
+							'type' => 'key',
+						)
+					);
 				}
 			)
 		);

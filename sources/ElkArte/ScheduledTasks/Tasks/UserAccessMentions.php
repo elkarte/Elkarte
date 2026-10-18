@@ -137,7 +137,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 				updateSettings(['user_access_mentions' => serialize($user_access_mentions)]);
 
 				// Count helps keep things correct
-				countUserMentions(false, '', $member);
+				countUserMentions(false, '', $member, true);
 
 				// Run this only once for each user, it may be quite heavy, let's split up the load
 				break;

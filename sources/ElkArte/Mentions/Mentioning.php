@@ -220,7 +220,7 @@ class Mentioning extends AbstractModel
 		// Deleting or unapproving may have been read or not, so a count is required
 		else
 		{
-			countUserMentions(false, '', $member_id);
+			countUserMentions(false, '', $member_id, true);
 		}
 	}
 

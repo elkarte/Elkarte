@@ -19,27 +19,29 @@ use ElkArte\User;
  * @param bool $all Specifies whether to count all mentions or only unread.
  * @param string $type Specifies the type of mention to count. Empty string to count all types.
  * @param int|null $id_member Specifies the ID of the member. If null, the current user's ID will be used.
+ * @param bool $recount Force a recount even if cached.
  *
  * @return int|array The total count of mentions if $type is empty, otherwise an array with counts for each type.
  */
-function countUserMentions($all = false, $type = '', $id_member = null)
+function countUserMentions($all = false, $type = '', $id_member = null, $recount = false)
 {
-	static $counts;
+	static $counts = [];
 
 	$db = database();
 	$id_member = $id_member === null ? User::$info->id : (int) $id_member;
+	$all_key = $all ? 1 : 0;
 
-	if (isset($counts[$id_member][$type]))
+	if (!$recount && isset($counts[$id_member][$all_key]))
 	{
-		return $counts[$id_member][$type];
+		return empty($type) ? $counts[$id_member][$all_key]['total'] : ($counts[$id_member][$all_key][$type] ?? 0);
 	}
 
 	$allTypes = getMentionTypes($id_member, $all === true ? 'system' : 'user');
 	foreach ($allTypes as $thisType)
 	{
-		$counts[$id_member][$thisType] = 0;
+		$counts[$id_member][$all_key][$thisType] = 0;
 	}
-	$counts[$id_member]['total'] = 0;
+	$counts[$id_member][$all_key]['total'] = 0;
 
 	$db->fetchQuery('
 		SELECT 
@@ -56,19 +58,19 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			'is_accessible' => 1,
 			'all_type' => empty($allTypes) ? [$type] : $allTypes,
 		]
-	)->fetch_callback(function ($row) use (&$counts, $id_member) {
-		$counts[$id_member][$row['mention_type']] = (int) $row['cnt'];
-		$counts[$id_member]['total'] += $row['cnt'];
+	)->fetch_callback(function ($row) use (&$counts, $id_member, $all_key) {
+		$counts[$id_member][$all_key][$row['mention_type']] = (int) $row['cnt'];
+		$counts[$id_member][$all_key]['total'] += $row['cnt'];
 	});
 
 	// Counts as maintenance! :P
 	if ($all === false)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($id_member, ['mentions' => $counts[$id_member]['total']]);
+		updateMemberData($id_member, ['mentions' => $counts[$id_member][$all_key]['total']]);
 	}
 
-	return empty($type) ? $counts[$id_member]['total'] : $counts[$id_member][$type] ?? 0;
+	return empty($type) ? $counts[$id_member][$all_key]['total'] : ($counts[$id_member][$all_key][$type] ?? 0);
 }
 
 /**
@@ -350,7 +352,7 @@ function updateMentionMenuCount($status, $member_id)
 	// Deleting or unapproving may have been read or not, so a count is required
 	else
 	{
-		countUserMentions(false, '', $member_id);
+		countUserMentions(false, '', $member_id, true);
 	}
 }
 
@@ -447,11 +449,18 @@ function getNewMentions($id_member, $timestamp)
  *
  * @return array The available mention types.
  */
-function getMentionTypes($user, $type = 'user')
+function getMentionTypes($user = null, $type = 'user')
 {
+	static $mentionTypes = [];
+
 	require_once(SUBSDIR . '/Notification.subs.php');
 
 	$user = $user ?? User::$info->id;
+
+	if (isset($mentionTypes[$user][$type]))
+	{
+		return $mentionTypes[$user][$type];
+	}
 
 	$enabled = getEnabledNotifications();
 
@@ -459,6 +468,7 @@ function getMentionTypes($user, $type = 'user')
 	if ($type !== 'user')
 	{
 		sort($enabled);
+		$mentionTypes[$user][$type] = $enabled;
 		return $enabled;
 	}
 
@@ -491,6 +501,7 @@ function getMentionTypes($user, $type = 'user')
 	}
 
 	sort($enabled);
+	$mentionTypes[$user][$type] = $enabled;
 	return $enabled;
 }
 
@@ -595,7 +606,7 @@ function changeStatus($id_mentions, $member_id, $status = 1, $update = true)
 		}
 
 		// A full recount is required
-		countUserMentions(false, '', $member_id);
+		countUserMentions(false, '', $member_id, true);
 	}
 
 	return $success;
