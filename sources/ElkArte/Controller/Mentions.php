@@ -485,7 +485,7 @@ class Mentions extends AbstractController
 		// Trigger an unread count update when needed
 		if ($all !== false)
 		{
-			countUserMentions();
+			countUserMentions(false, '', null, true);
 		}
 
 		return $mentions;

@@ -1078,7 +1078,7 @@ class MessagesDelete
 		require_once(SUBSDIR . '/Mentions.subs.php');
 		foreach ($changeMe as $member)
 		{
-			countUserMentions(false, '', $member);
+			countUserMentions(false, '', $member, true);
 		}
 	}
 
