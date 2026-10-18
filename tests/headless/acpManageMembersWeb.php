@@ -108,6 +108,19 @@ class SupportManageMembersController extends ElkArteWebSupport
 				$this->keys($this->keysHolder->specialKey('ENTER'));
 			}
 		}
+
+		// Wait for the action to complete and the member to be removed from the list
+		$this->waitUntil(function ($testCase) use ($mname) {
+			try
+			{
+				$elem = $testCase->byCssSelector('#list_approve_list_0 a');
+				return strpos($elem->text(), $mname) === false;
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return true;
+			}
+		}, 15000);
 	}
 
 	/**
@@ -174,14 +187,13 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$this->waitUntil(function ($testCase) {
 			try
 			{
-				$testCase->byId('member_list');
-				return true;
+				return $testCase->byId('member_list');
 			}
 			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
 			{
 				return false;
 			}
-		}, 10000);
+		}, 15000);
 
 		$this->assertStringNotContainsString('user0', $this->byId('member_list')->text(), $this->source());
 	}
