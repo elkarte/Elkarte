@@ -11,7 +11,7 @@
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
- * @version 2.0 Beta 1
+ * @version 2.0 Beta 2
  *
  */
 
@@ -40,7 +40,7 @@ class Sphinxql extends AbstractAPI
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/** @var string This won't work with versions of ElkArte less than this. */
-	public $min_elk_version = 'ElkArte 2.0 Beta 1';
+	public $min_elk_version = 'ElkArte 2.0 Beta 2';
 
 	/** @var bool Is it supported?  */
 	public $is_supported = true;

@@ -12,7 +12,7 @@
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
- * @version 2.0 Beta 1
+ * @version 2.0 Beta 2
  *
  * Creating and distributing theme packages:
  * There isn't that much required to package and distribute your own themes...

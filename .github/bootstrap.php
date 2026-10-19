@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version 2.0 Beta 1
+ * @version 2.0 Beta 2
  *
  */
 
@@ -35,7 +35,7 @@ global $ssi_db_user, $ssi_db_passwd;
 if (!defined('ELK'))
 {
 	define('ELK', '1');
-	define('CACHE_STALE', '?R20B1');
+	define('CACHE_STALE', '?R20B2');
 
 	// Get the forum's settings for database and file paths.
 	require_once('Settings.php');

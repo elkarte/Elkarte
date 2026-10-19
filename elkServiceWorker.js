@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version 2.0 Beta 1
+ * @version 2.0 Beta 2
  *
  * This is the service worker for ElkArte PWA and Push.
  *
@@ -13,7 +13,7 @@
 
 const OFFLINE = 'index.php?action=offline';
 const SW_PARAMS = new URL(location);
-const CID = SW_PARAMS.searchParams.get('cache_id') || 'elk20b1';
+const CID = SW_PARAMS.searchParams.get('cache_id') || 'elk20B2';
 
 let CACHE_ID = '::' + CID,
 	STATIC_CACHE_NAME = 'elk_sw_cache_static' + CACHE_ID,
@@ -45,7 +45,7 @@ self.addEventListener('install', event => {
 
 	const themeScope = SW_PARAMS.searchParams.get('theme_scope') || '/themes/default/',
 		defaultThemeScope = SW_PARAMS.searchParams.get('default_theme_scope') || '/themes/default/',
-		cache_stale = SW_PARAMS.searchParams.get('cache_stale') || '?R20B1',
+		cache_stale = SW_PARAMS.searchParams.get('cache_stale') || '?R20B2',
 		ASSETS = defineAssets(themeScope, cache_stale, defaultThemeScope);
 
 	event.waitUntil(
