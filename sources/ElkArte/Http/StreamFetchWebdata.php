@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD https://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version 2.0 Beta 1
+ * @version 2.0 Beta 2
  *
  */
 

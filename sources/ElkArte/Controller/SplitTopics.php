@@ -10,7 +10,7 @@
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
- * @version 2.0 Beta 1
+ * @version 2.0 Beta 2
  *
  * Original module by Mach8 - We'll never forget you.
  */
