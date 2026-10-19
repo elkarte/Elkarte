@@ -44,8 +44,11 @@ class Loader
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
 
-	/** @var bool[] Holds the name of the files already loaded from the database to query them only once */
-	protected $dbLoaded = [];
+	/** @var bool[][] Holds the names of the files already loaded from the database to query them only once */
+	protected static $dbLoaded = [];
+
+	/** @var array[][][] Holds custom strings loaded from the database: [language => [file => [key => val]]] */
+	protected static $dbCache = [];
 
 	/**
 	 * The constructor
@@ -104,12 +107,12 @@ class Loader
 	 */
 	public function load($file_name, $fatal = true, $fix_calendar_arrays = false): void
 	{
-		$file_names = explode('+', $file_name);
+		$file_names = array_map('ucfirst', array_map('trim', explode('+', $file_name)));
 
 		// For each file open it up and write it out!
 		foreach ($file_names as $file)
 		{
-			$this->handleFile(ucfirst($file), $fatal);
+			$this->handleFile($file, $fatal);
 		}
 
 		// Load custom strings from the database
@@ -133,7 +136,8 @@ class Loader
 	{
 		global $db_show_debug;
 
-		if (isset($this->loaded[$file]) || in_array($file, Editor::IGNORE_FILES, true))
+		$file = ucfirst(trim((string) $file));
+		if ($file === '' || isset($this->loaded[$file]) || in_array($file, Editor::IGNORE_FILES, true))
 		{
 			return;
 		}
@@ -208,6 +212,15 @@ class Loader
 	}
 
 	/**
+	 * Reset the database query cache for language files
+	 */
+	public static function resetDbCache(): void
+	{
+		self::$dbLoaded = [];
+		self::$dbCache = [];
+	}
+
+	/**
 	 * Load in a custom replacement string from the DB
 	 *
 	 * @param string[]|string $files
@@ -218,13 +231,27 @@ class Loader
 		$to_load = [];
 		foreach ($files as $file)
 		{
-			$file = trim((string) $file);
-			if ($file === '' || isset($this->dbLoaded[$file]))
+			$file = ucfirst(trim((string) $file));
+			if ($file === '' || in_array($file, Editor::IGNORE_FILES, true))
 			{
 				continue;
 			}
 
-			$this->dbLoaded[$file] = true;
+			// If we have already loaded this file for this language, use the cached values
+			if (isset(self::$dbLoaded[$this->language][$file]))
+			{
+				if (!empty(self::$dbCache[$this->language][$file]))
+				{
+					foreach (self::$dbCache[$this->language][$file] as $key => $val)
+					{
+						$this->variable[$key] = $val;
+					}
+				}
+				continue;
+			}
+
+			self::$dbLoaded[$this->language][$file] = true;
+			self::$dbCache[$this->language][$file] = [];
 			$to_load[] = $file;
 		}
 
@@ -235,7 +262,7 @@ class Loader
 
 		$result = $this->db->fetchQuery('
 			SELECT 
-				language_key, value
+				file, language_key, value
 			FROM {db_prefix}languages
 			WHERE language = {string:language}
 				AND file IN ({array_string:files})',
@@ -246,6 +273,11 @@ class Loader
 		);
 		while ($row = $result->fetch_assoc())
 		{
+			$file = !empty($row['file']) ? ucfirst(trim($row['file'])) : (count($to_load) === 1 ? $to_load[0] : '');
+			if ($file !== '')
+			{
+				self::$dbCache[$this->language][$file][$row['language_key']] = $row['value'];
+			}
 			$this->variable[$row['language_key']] = $row['value'];
 		}
 
