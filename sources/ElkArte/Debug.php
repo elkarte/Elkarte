@@ -97,7 +97,7 @@ class Debug
 	 * Adds a new database query
 	 *
 	 * @param array $value contains the relevant queries info, in the form:
-	 *     q => the query string (only for the first 50 queries, after that only a "...")
+	 *     q => the query string
 	 *     f => the file in which the query has been executed
 	 *     l => the line at which the query has been executed
 	 *     s => seconds at which the query has been executed into the request
@@ -112,6 +112,106 @@ class Debug
 
 		$this->_db_cache[] = $value;
 		$this->_db_count++;
+	}
+
+	/**
+	 * Summarize database usage for the current page.
+	 *
+	 * @param array|null $db_cache Optional array of queries info. Defaults to internal query cache.
+	 * @return array
+	 */
+	public function getQueryStats(?array $db_cache = null): array
+	{
+		$db_cache = $db_cache ?? $this->_db_cache;
+
+		$stats = [
+			'total' => count($db_cache),
+			'duplicate_queries' => 0,
+			'duplicate_sql' => [],
+			'longest_query_time' => 0.0,
+			'longest_query_index' => null,
+			'longest_query_location' => '',
+		];
+		$counts = [];
+		$first_seen = [];
+
+		foreach ($db_cache as $index => $query)
+		{
+			$sql = trim((string) ($query['q'] ?? ''));
+			if ($sql === '' || $sql === '...')
+			{
+				continue;
+			}
+
+			$normalized_sql = $this->_normalizeDuplicateSql($sql);
+			$counts[$normalized_sql] = ($counts[$normalized_sql] ?? 0) + 1;
+
+			if (!isset($first_seen[$normalized_sql]))
+			{
+				$first_seen[$normalized_sql] = [
+					'file' => $query['f'] ?? '',
+					'line' => $query['l'] ?? 0,
+				];
+			}
+
+			$time = (float) ($query['t'] ?? 0);
+			if ($time > $stats['longest_query_time'])
+			{
+				$stats['longest_query_time'] = $time;
+				$stats['longest_query_index'] = $index;
+				$stats['longest_query_location'] = '';
+
+				if (!empty($query['f']))
+				{
+					$stats['longest_query_location'] = $query['f'];
+
+					if (!empty($query['l']))
+					{
+						$stats['longest_query_location'] .= ' line ' . $query['l'];
+					}
+				}
+			}
+		}
+
+		foreach ($counts as $sql => $count)
+		{
+			if ($count > 1)
+			{
+				// Really how many can we avoid
+				$stats['duplicate_queries'] += $count - 1;
+				$location = $first_seen[$sql]['file'] ?? '';
+				if (!empty($first_seen[$sql]['line']))
+				{
+					$location .= ' line ' . $first_seen[$sql]['line'];
+				}
+
+				$stats['duplicate_sql'][] = [
+					'sql' => $sql,
+					'count' => $count,
+					'location' => $location,
+				];
+			}
+		}
+
+		return $stats;
+	}
+
+	/**
+	 * Normalize a SQL string for duplicate detection.
+	 *
+	 * We intentionally keep literal values so different parameterized calls
+	 * such as SELECT ... WHERE id_member = 12 and id_member = 34 are not treated
+	 * as the same query.
+	 *
+	 * @param string $sql The SQL string to normalize.
+	 * @return string The normalized SQL fingerprint.
+	 */
+	protected function _normalizeDuplicateSql(string $sql): string
+	{
+		$sql = preg_replace('/\s+/', ' ', trim($sql));
+		$sql = strtolower($sql);
+
+		return trim($sql);
 	}
 
 	/**
@@ -237,16 +337,43 @@ class Debug
 				', $txt['debug_cache_hits'], $this->cache_count(), ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a id="debug_cache_info" href="#">', $txt['debug_show'], '</a><span class="hide"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
 		}
 
+		$query_stats = $this->getQueryStats();
+
 		// Want to see the querys in a new window?
 		echo '
 				<a href="', getUrl('action', ['action' => 'viewquery']), '" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], $this->_db_count), '</a><br />';
+
+		if ($query_stats['duplicate_queries'] > 0)
+		{
+			echo '
+				<strong>Duplicate queries:</strong> ', $query_stats['duplicate_queries'], '<br />';
+
+			foreach ($query_stats['duplicate_sql'] as $duplicate)
+			{
+				echo ' 
+					location: ', htmlspecialchars($duplicate['location'], ENT_COMPAT, 'UTF-8'), ' count: ', $duplicate['count'], '<br />';
+			}
+		}
+
+		if ($query_stats['longest_query_time'] > 0.05)
+		{
+			echo '
+				<strong>Longest query:</strong> ', round($query_stats['longest_query_time'], 8), 's';
+
+			if (!empty($query_stats['longest_query_location']))
+			{
+				echo ' in ', htmlspecialchars($query_stats['longest_query_location'], ENT_COMPAT, 'UTF-8');
+			}
+
+			echo '<br />';
+		}
 
 		if ($_SESSION['view_queries'] == 1 && !empty($this->_db_cache))
 		{
 			$this->_show_queries();
 		}
 
-		// Or show/hide the querys in line with all of this data
+		// Or show/hide the query's in line with all of this data
 		echo '
 				<a href="' . getUrl('action', ['action' => 'viewquery', 'sa' => 'hide']), '">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
 			</div>

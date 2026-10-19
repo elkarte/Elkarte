@@ -228,5 +228,7 @@ class Editor
 				}
 			}
 		}
+
+		Loader::resetDbCache();
 	}
 }

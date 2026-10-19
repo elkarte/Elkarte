@@ -1023,7 +1023,7 @@ abstract class AbstractQuery implements QueryInterface
 			// Don't overload it.
 			$st = microtime(true);
 			$this->db_cache = [];
-			$this->db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
+			$this->db_cache['q'] = $this->_query_count < 75 ? $db_string : '...';
 			$this->db_cache['f'] = $file;
 			$this->db_cache['l'] = $line;
 			$this->db_cache['s'] = $st - $time_start;

@@ -70,7 +70,6 @@ class Profile extends AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		MembersList::load($this->_memID, false, 'profile');
 		$this->_profile = MembersList::get($this->_memID);
 	}
 
