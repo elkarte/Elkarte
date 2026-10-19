@@ -1282,6 +1282,41 @@ function template_viewquery()
 	echo '
 	<div class="content">';
 
+	if (!empty($context['query_stats']))
+	{
+		echo '
+		<div class="query_overview smalltext">';
+
+		if ($context['query_stats']['total'] > 0)
+		{
+			echo 'Queries: ', $context['query_stats']['total'];
+		}
+
+		// Show the number of duplicate queries and their locations if any exist
+		if ($context['query_stats']['duplicate_queries'] > 0)
+		{
+			echo '; <strong>Duplicate queries:</strong> ', $context['query_stats']['duplicate_queries'];
+
+			foreach ($context['query_stats']['duplicate_sql'] as $duplicate)
+			{
+				echo '; location: ', htmlspecialchars($duplicate['location'], ENT_COMPAT, 'UTF-8'), ' count: ', $duplicate['count'];
+			}
+		}
+
+		// Show the longest query time and location if it exceeds 0.05 seconds
+		if ($context['query_stats']['longest_query_time'] > 0.05)
+		{
+			echo '; <strong>Longest query:</strong> ', round($context['query_stats']['longest_query_time'], 8), 's';
+
+			if (!empty($context['query_stats']['longest_query_location']))
+			{
+				echo ' in ', htmlspecialchars($context['query_stats']['longest_query_location'], ENT_COMPAT, 'UTF-8');
+			}
+		}
+
+		echo '</div>';
+	}
+
 	foreach ($context['queries_data'] as $q => $query_data)
 	{
 		echo '
