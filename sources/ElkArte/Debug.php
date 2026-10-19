@@ -97,7 +97,7 @@ class Debug
 	 * Adds a new database query
 	 *
 	 * @param array $value contains the relevant queries info, in the form:
-	 *     q => the query string (only for the first 50 queries, after that only a "...")
+	 *     q => the query string
 	 *     f => the file in which the query has been executed
 	 *     l => the line at which the query has been executed
 	 *     s => seconds at which the query has been executed into the request
@@ -117,12 +117,15 @@ class Debug
 	/**
 	 * Summarize database usage for the current page.
 	 *
+	 * @param array|null $db_cache Optional array of queries info. Defaults to internal query cache.
 	 * @return array
 	 */
-	public function getQueryStats(): array
+	public function getQueryStats(?array $db_cache = null): array
 	{
+		$db_cache = $db_cache ?? $this->_db_cache;
+
 		$stats = [
-			'total' => count($this->_db_cache),
+			'total' => count($db_cache),
 			'duplicate_queries' => 0,
 			'duplicate_sql' => [],
 			'longest_query_time' => 0.0,
@@ -132,15 +135,15 @@ class Debug
 		$counts = [];
 		$first_seen = [];
 
-		foreach ($this->_db_cache as $index => $query)
+		foreach ($db_cache as $index => $query)
 		{
 			$sql = trim((string) ($query['q'] ?? ''));
-			if ($sql === '')
+			if ($sql === '' || $sql === '...')
 			{
 				continue;
 			}
 
-			$normalized_sql = preg_replace('/\s+/', ' ', $sql);
+			$normalized_sql = $this->_normalizeDuplicateSql($sql);
 			$counts[$normalized_sql] = ($counts[$normalized_sql] ?? 0) + 1;
 
 			if (!isset($first_seen[$normalized_sql]))
@@ -174,6 +177,7 @@ class Debug
 		{
 			if ($count > 1)
 			{
+				// Really how many can we avoid
 				$stats['duplicate_queries'] += $count - 1;
 				$location = $first_seen[$sql]['file'] ?? '';
 				if (!empty($first_seen[$sql]['line']))
@@ -190,6 +194,24 @@ class Debug
 		}
 
 		return $stats;
+	}
+
+	/**
+	 * Normalize a SQL string for duplicate detection.
+	 *
+	 * We intentionally keep literal values so different parameterized calls
+	 * such as SELECT ... WHERE id_member = 12 and id_member = 34 are not treated
+	 * as the same query.
+	 *
+	 * @param string $sql The SQL string to normalize.
+	 * @return string The normalized SQL fingerprint.
+	 */
+	protected function _normalizeDuplicateSql(string $sql): string
+	{
+		$sql = preg_replace('/\s+/', ' ', trim($sql));
+		$sql = strtolower($sql);
+
+		return trim($sql);
 	}
 
 	/**

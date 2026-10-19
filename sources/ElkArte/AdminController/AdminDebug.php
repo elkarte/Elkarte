@@ -119,6 +119,6 @@ class AdminDebug extends AbstractController
 
 		$context['sub_template'] = 'viewquery';
 		$context['queries_data'] = $debug->viewQueries($query_id);
-		$context['query_stats'] = $debug->getQueryStats();
+		$context['query_stats'] = $debug->getQueryStats($_SESSION['debug'] ?? null);
 	}
 }
