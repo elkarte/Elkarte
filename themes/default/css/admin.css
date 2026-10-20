@@ -300,8 +300,8 @@ h3.category_header form {
 }
 
 #support_credits dt {
-	float: left;
 	padding: .8rem 1.2rem 0 0;
+	font-weight: 600;
 }
 
 #support_credits dd {
