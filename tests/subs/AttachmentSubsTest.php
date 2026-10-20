@@ -103,7 +103,7 @@ class AttachmentSubsTest extends ElkArteCommonSetupTest
 
 		$result = getServerStoredAvatars('/Oxygen');
 
-		$this->assertCount(22, $result[0]['files']);
+		$this->assertCount(29, $result[0]['files']);
 		$this->assertSame([
 			'audio.png',
 			'ball.png',
