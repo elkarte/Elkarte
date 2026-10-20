@@ -95,7 +95,7 @@ function template_credits()
 			echo '
 		<dl>
 			<dt>
-				<strong>', $txt['credits_' . $section], '</strong>
+				', $txt['credits_' . $section], '
 			</dt>
 			<dd>', implode('</dd><dd>', $credits), '</dd>
 		</dl>';

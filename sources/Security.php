@@ -984,8 +984,13 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	// Search active tokens in pool for this action
 	foreach ($_SESSION['token'][$token_index] as $key => $token_entry)
 	{
-		$token_var = $token_entry[0];
-		if (!isset($source[$token_var]))
+		if (!is_array($token_entry))
+		{
+			continue;
+		}
+
+		$token_var = $token_entry[0] ?? null;
+		if ($token_var === null || !isset($source[$token_var]))
 		{
 			continue;
 		}

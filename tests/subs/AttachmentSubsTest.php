@@ -103,7 +103,37 @@ class AttachmentSubsTest extends ElkArteCommonSetupTest
 
 		$result = getServerStoredAvatars('/Oxygen');
 
-		$this->assertCount(22, $result[0]['files']);
-		//$this->assertEquals('invisible-user.png', $result[0]['files'][0]['filename']);
+		$this->assertCount(29, $result[0]['files']);
+		$this->assertSame([
+			'audio.png',
+			'ball.png',
+			'beaker.png',
+			'binoculars.png',
+			'bug.png',
+			'calculator.png',
+			'cards.png',
+			'clock.png',
+			'cog.png',
+			'compass.png',
+			'cookie.png',
+			'dice.png',
+			'formula.png',
+			'game.png',
+			'golf.png',
+			'hammer.png',
+			'hardhat.png',
+			'hardware.png',
+			'invisible-user.png',
+			'love.png',
+			'megaphone.png',
+			'pi.png',
+			'rocket.png',
+			'scope.png',
+			'smiley.png',
+			'tea.png',
+			'typewritter.png',
+			'wine.png',
+			'wrench.png',
+		], array_column($result[0]['files'], 'filename'));
 	}
 }

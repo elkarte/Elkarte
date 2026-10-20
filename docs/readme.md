@@ -37,7 +37,7 @@ Not sure if your server qualifies? Run the installer anyway, it catches most pro
 - **Database** (one of):
   - MySQL 5.7+
   - MariaDB 10.2+
-  - PostgreSQL 9.5+
+  - PostgreSQL 9.6+
 - **Database user privileges:** SELECT, INSERT, UPDATE, DELETE, ALTER, CREATE, DROP, TRUNCATE, INDEX
 - **Storage:** ~30 MB server space (more for attachments, avatars, and cache); 2 MB database minimum
 

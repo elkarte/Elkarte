@@ -43,7 +43,7 @@ class Admin extends AbstractController
 {
 	/** @var string[] areas to find current installed status and installed version */
 	private array $_checkFor = ['gd', 'imagick', 'db_server', 'php', 'server',
-		'zend', 'apc', 'memcache', 'memcached', 'opcache'];
+		'zend', 'apc', 'memcache', 'memcached', 'opcache', 'redis'];
 
 	/**
 	 * Pre-dispatch, called before other methods.

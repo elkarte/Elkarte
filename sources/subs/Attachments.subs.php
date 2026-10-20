@@ -701,6 +701,11 @@ function getServerStoredAvatars($directory)
 		\RecursiveIteratorIterator::SELF_FIRST,
 		\RecursiveIteratorIterator::CATCH_GET_CHILD
 	);
+	$serverAvatars = iterator_to_array($serverAvatars, false);
+	usort(
+		$serverAvatars,
+		static fn ($left, $right) => strnatcasecmp($left->getFilename(), $right->getFilename())
+	);
 	$key = 0;
 	foreach ($serverAvatars as $entry)
 	{
@@ -733,16 +738,30 @@ function getServerStoredAvatars($directory)
 
 			$result[$key]['files'][] = [
 				'filename' => htmlspecialchars($entry->getFilename(), ENT_COMPAT, 'UTF-8'),
-				'checked' => $entry->getFilename() == $context['member']['avatar']['server_pic'],
+				'checked' => $entry->getFilename() === $context['member']['avatar']['server_pic'],
 				'name' => htmlspecialchars(str_replace('_', ' ', $filename), ENT_COMPAT, 'UTF-8'),
 				'is_dir' => false
 			];
+			usort(
+				$result[$key]['files'],
+				static fn ($left, $right) => strnatcasecmp($left['name'], $right['name'])
+			);
 
 			if (dirname($entry->getPath()) === $modSettings['avatar_directory'])
 			{
 				$context['avatar_list'][] = str_replace($modSettings['avatar_directory'] . '/', '', $entry->getPathname());
 			}
 		}
+	}
+
+	if (count($result) > 1)
+	{
+		$directories = array_slice($result, 1);
+		usort(
+			$directories,
+			static fn ($left, $right) => strnatcasecmp(trim($left['name'], '[]'), trim($right['name'], '[]'))
+		);
+		$result = array_merge([$result[0]], $directories);
 	}
 
 	return $result;
