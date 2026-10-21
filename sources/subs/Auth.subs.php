@@ -90,7 +90,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		{
 			// Fake the $boardurl so we can set a different cookie.
 			$alias = strtr(trim($alias), ['http://' => '', 'https://' => '']);
-			$boardurl = 'http://' . $alias;
+			$boardurl = 'https://' . $alias;
 
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 

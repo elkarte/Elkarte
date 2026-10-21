@@ -39,12 +39,12 @@ function detectServerLoad()
 
 	$load_average = @file_get_contents('/proc/loadavg');
 
-	if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
+	if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) === 1)
 	{
 		return (float) $matches[1] / $cores;
 	}
 
-	if (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+	if (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) === 1)
 	{
 		return (float) $matches[1] / $cores;
 	}

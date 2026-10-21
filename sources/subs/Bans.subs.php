@@ -15,7 +15,6 @@
  */
 
 use ElkArte\Errors\ErrorContext;
-use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 

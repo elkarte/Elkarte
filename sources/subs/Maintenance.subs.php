@@ -190,7 +190,7 @@ function getElkTables()
 {
 	global $db_prefix;
 
-	$db = database();
+	$db_dump = db_dump();
 
 	$tables = [];
 
@@ -198,7 +198,7 @@ function getElkTables()
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
 	// Get a list of tables, as well as how many there are.
-	$temp_tables = $db->list_tables(false, $real_prefix . '%');
+	$temp_tables = $db_dump->list_tables(false, $real_prefix . '%');
 	foreach ($temp_tables as $table)
 	{
 		$tables[] = ['table_name' => $table];

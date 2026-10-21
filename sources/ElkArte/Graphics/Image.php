@@ -299,7 +299,7 @@ class Image
 	 * @param string $dstName name to save
 	 * @param null|int $format image format image constant value to save the thumbnail
 	 * @param null|bool $force if forcing the image resize
-	 * @param bool $type if the image being created is for an avatar image (used to maintain animation)
+	 * @param bool $thumbnail if the image being created is for an avatar image (used to maintain animation)
 	 * @return bool|Image On success returns an image class loaded with new image
 	 */
 	public function createThumbnail($max_width, $max_height, $dstName = '', $format = null, $force = null, $thumbnail = null)
