@@ -356,7 +356,7 @@ function validateTriggers(&$triggers)
 					LIMIT 1',
 					[
 						'admin_group' => 1,
-						'username' => $user,
+						'username' => $value,
 					]
 				);
 				if ($request->num_rows() === 0)
