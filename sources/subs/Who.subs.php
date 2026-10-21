@@ -11,7 +11,6 @@
  *
  */
 
-use ElkArte\Cache\Cache;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\User;

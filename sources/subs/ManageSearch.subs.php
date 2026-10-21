@@ -70,7 +70,7 @@ function detectFulltextIndex()
 	}
 
 	// innodb (since 5.6.4 and myisam) both support fulltext index
-	if ($request === false)
+	if (!$request->hasResults() || $request->num_rows() === 0)
 	{
 		$context['cannot_create_fulltext'] = true;
 	}

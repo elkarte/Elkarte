@@ -15,7 +15,6 @@
  */
 
 use ElkArte\Errors\ErrorContext;
-use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 
@@ -356,7 +355,7 @@ function validateTriggers(&$triggers)
 					LIMIT 1',
 					[
 						'admin_group' => 1,
-						'username' => $user,
+						'username' => $value,
 					]
 				);
 				if ($request->num_rows() === 0)

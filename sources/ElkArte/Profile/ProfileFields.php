@@ -22,7 +22,6 @@ use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\User;
-use ElkArte\PersonalMessage\PmHelper;
 
 /**
  * The ProfileFields class is responsible for loading and rendering profile fields.

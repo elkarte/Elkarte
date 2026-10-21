@@ -150,7 +150,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 					elseif (!empty($class))
 					{
 						$lastPart = substr($class, strrpos($class, '\\') + 1);
-						$regex = '~class\h*' . preg_quote(trim($lastPart)) . '.*function\h*' . preg_quote(trim($function), '~') . '\h*\(~i';
+						$regex = '~class\h*' . preg_quote(trim($lastPart), '~') . '.*function\h*' . preg_quote(trim($function), '~') . '\h*\(~i';
 						if (preg_match($regex, $fc) === 1)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;

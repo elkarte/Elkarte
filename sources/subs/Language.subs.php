@@ -127,7 +127,7 @@ function list_getLanguagesList()
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, ['ElkArte ' => '']));
+	$url = 'https://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, ['ElkArte ' => '']));
 
 	// Load the class file and stick it into an array.
 	$language_list = new XmlArray(fetch_web_data($url), true);

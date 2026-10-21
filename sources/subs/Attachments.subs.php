@@ -612,7 +612,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * the mime type.
  *
  * @param string $url
- * @return array|bool the image size as array(width, height), or false on failure
+ * @return array the image size as array(width, height), or -1,-1,-1 on failure
  */
 function url_image_size($url)
 {
@@ -851,7 +851,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  *
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
- * @return int[]|int
+ * @return int[]
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {

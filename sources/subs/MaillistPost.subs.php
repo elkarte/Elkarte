@@ -848,7 +848,7 @@ function pbe_email_attachments($pbe, $email_message)
 			]);
 
 			// Make sure it's valid
-			$temp_file->doChecks($attachmentDirectory);
+			$temp_file->doElkarteUploadChecks($attachmentDirectory);
 			$tmp_attachments->addAttachment($temp_file);
 		}
 	}

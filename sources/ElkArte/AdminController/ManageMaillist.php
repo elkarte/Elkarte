@@ -623,7 +623,7 @@ class ManageMaillist extends AbstractController
 		$context['warning_data'] = ['notify' => '', 'notify_subject' => '', 'notify_body' => ''];
 		$context['body'] = isset($fullerrortext) ? ParserWrapper::instance()->parseEmail($fullerrortext) : '';
 		$context['item'] = $this->_req->hasPost('item') ?? '';
-		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) !== '' ? $temp_email[0]['from'] : '';
+		$context['notice_to'] = !empty($temp_email[0]['from']) ? $txt['to'] . ' ' . $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
 		$context['sub_template'] = 'bounce_email';
 	}

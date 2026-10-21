@@ -1835,7 +1835,7 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 
 	$db = database();
 
-	$is_owner = $memID == User::$info->id;
+	$is_owner = (int) $memID === User::$info->id;
 	$user_posts = [];
 
 	// Find this user's posts. The left join on categories somehow makes this faster, weird as it looks.

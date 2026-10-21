@@ -322,7 +322,7 @@ class AttachmentsDirectory
 					}
 				}
 
-				if ($use_subdirectories == 0 && str_contains($this->attachmentUploadDir[$dir_id], BOARDDIR . DIRECTORY_SEPARATOR))
+				if ($use_subdirectories === 0 && str_contains($this->attachmentUploadDir[$dir_id], BOARDDIR . DIRECTORY_SEPARATOR))
 				{
 					$bid = 0;
 				}
@@ -333,7 +333,7 @@ class AttachmentsDirectory
 
 				updateSettings([
 					'last_attachments_directory' => serialize($this->last_dirs),
-					'basedirectory_for_attachments' => $bid == 0 ? $this->basedirectory_for_attachments : $this->attachmentUploadDir[$bid],
+					'basedirectory_for_attachments' => $bid === 0 ? $this->basedirectory_for_attachments : $this->attachmentUploadDir[$bid],
 					'use_subdirectories_for_attachments' => $use_subdirectories,
 				]);
 			}

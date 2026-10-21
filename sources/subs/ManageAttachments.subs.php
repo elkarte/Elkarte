@@ -21,10 +21,8 @@
 
 use BBC\ParserWrapper;
 use ElkArte\Attachments\AttachmentsDirectory;
-use ElkArte\Errors\Errors;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\Util;
-use ElkArte\Languages\Txt;
 
 /**
  * Approve an attachment, or maybe even more - no permission check!
