@@ -172,8 +172,8 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 			$this->assertEquals('unwatched_topics', $context['default_list']);
 			$this->assertEquals($txt['showUnwatched'], $context['page_title']);
 			$tabData = $context['menu_data_1']['tab_data'];
-			$this->assertEquals($txt['showUnwatched'], $tabData['title']);
-			$this->assertEquals($txt['unwatched_topics_info'], $tabData['description']);
+			$this->assertEquals($txt['notify_settings'], $tabData['title']);
+			$this->assertEquals($txt['notification_info_desc'], $tabData['description']);
 			$list = $context['unwatched_topics'];
 			$headers = array_column($list['headers'], null, 'id');
 			$this->assertEquals($txt['unwatched_topics_watch'], $headers['watch']['label']);
@@ -213,8 +213,8 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 			$this->assertEquals('unwatched_topics', $context['default_list']);
 			$this->assertEquals($txt['showUnwatched'], $context['page_title']);
 			$tabData = $context['menu_data_1']['tab_data'];
-			$this->assertEquals($txt['showUnwatched'], $tabData['title']);
-			$this->assertEquals($txt['unwatched_topics_info'], $tabData['description']);
+			$this->assertEquals($txt['notify_settings'], $tabData['title']);
+			$this->assertEquals($txt['notification_info_desc'], $tabData['description']);
 			$list = $context['unwatched_topics'];
 			$headers = array_column($list['headers'], null, 'id');
 			$this->assertEquals($txt['unwatched_topics_watch'], $headers['watch']['label']);

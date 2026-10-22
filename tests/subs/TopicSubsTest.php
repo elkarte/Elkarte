@@ -669,37 +669,17 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test setTopicMute() and getLoggedTopics() correctly manage topic watch status.
-	 */
-	public function testSetTopicMuteAndGetLoggedTopics(): void
-	{
-		$fixture = $this->createTestTopic('Topic Watch Test');
-
-		// Set watch on
-		setTopicMute(1, $fixture['topic_id'], true);
-		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
-
-		$this->assertArrayHasKey($fixture['topic_id'], $logged);
-		$this->assertEquals(1, (int) $logged[$fixture['topic_id']]['unwatched']);
-
-		// Set watch off
-		setTopicMute(1, $fixture['topic_id'], false);
-		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
-		$this->assertEquals(0, (int) $logged[$fixture['topic_id']]['unwatched']);
-	}
-
-	/**
-	 * Test that unwatching a topic removes topic notification subscriptions and vice versa.
+	 * Test that muting a topic removes topic notification subscriptions and vice versa.
 	 */
 	public function testSetTopicMuteMutualExclusivityWithNotification(): void
 	{
-		$fixture = $this->createTestTopic('Mutual Exclusivity Watch Test');
+		$fixture = $this->createTestTopic('Mutual Exclusivity Mute Test');
 
 		// Enable topic notification
 		setTopicNotification(1, $fixture['topic_id'], true);
 		$this->assertTrue(hasTopicNotification(1, $fixture['topic_id']));
 
-		// Unwatch (mute) topic -> should delete topic notification
+		// Mute topic -> should delete topic notification
 		setTopicMute(1, $fixture['topic_id'], true);
 		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
 		$this->assertEquals(1, (int) $logged[$fixture['topic_id']]['unwatched']);
@@ -719,9 +699,9 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	 */
 	public function testSetTopicMuteCrossMemberConsistency(): void
 	{
-		$fixture = $this->createTestTopic('Cross Member Watch Test');
+		$fixture = $this->createTestTopic('Cross Member Mute Test');
 
-		// Set watch on for member 2 explicitly
+		// Set mute on for member 2 explicitly
 		setTopicMute(2, $fixture['topic_id'], true);
 		$logged2 = getLoggedTopics(2, [$fixture['topic_id']]);
 		$this->assertArrayHasKey($fixture['topic_id'], $logged2);

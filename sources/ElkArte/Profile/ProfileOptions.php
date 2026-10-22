@@ -680,8 +680,12 @@ class ProfileOptions extends AbstractController
 					'description' => $txt['notify_topics_desc'],
 				],
 				'mutedtopics' => [
-					'title' => $txt['showUnwatched'],
-					'description' => $txt['unwatched_topics_info'],
+					'title' => $txt['showMuted'] ?? $txt['showUnwatched'],
+					'description' => $txt['muted_topics_info'] ?? $txt['unwatched_topics_info'],
+				],
+				'unwatchedtopics' => [
+					'title' => $txt['showMuted'] ?? $txt['showUnwatched'],
+					'description' => $txt['muted_topics_info'] ?? $txt['unwatched_topics_info'],
 				],
 			],
 		]);
