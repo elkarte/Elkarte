@@ -705,6 +705,10 @@ h2.hdicon {
 	border: none;
 }
 
+.generic_list_wrapper .additional_row.after_title.description {
+	padding: .6rem .4rem;
+}
+
 .generic_list_wrapper .information {
 	margin: 0;
 	padding: 0;
