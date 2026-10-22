@@ -361,7 +361,7 @@ class Profile extends AbstractController
 							'settings' => [$txt['notify_settings']],
 							'boards' => [$txt['notify_boards']],
 							'topics' => [$txt['notify_topics']],
-							'unwatchedtopics' => [$txt['showUnwatched'], 'enabled' => $context['user']['is_owner']],
+							'mutedtopics' => [$txt['showUnwatched'], 'enabled' => $context['user']['is_owner']],
 						],
 						'permission' => [
 							'own' => ['profile_extra_any', 'profile_extra_own'],

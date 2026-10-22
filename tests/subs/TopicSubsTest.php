@@ -649,21 +649,41 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test setTopicWatch() and getLoggedTopics() correctly manage topic watch status.
+	 * Test setTopicMute() and getLoggedTopics() correctly manage topic mute status.
 	 */
-	public function testSetTopicWatchAndGetLoggedTopics(): void
+	public function testSetTopicMuteAndGetLoggedTopics(): void
+	{
+		$fixture = $this->createTestTopic('Topic Mute Test');
+
+		// Set mute on
+		setTopicMute(1, $fixture['topic_id'], true);
+		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
+
+		$this->assertArrayHasKey($fixture['topic_id'], $logged);
+		$this->assertEquals(1, (int) $logged[$fixture['topic_id']]['unwatched']);
+
+		// Set mute off
+		setTopicMute(1, $fixture['topic_id'], false);
+		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
+		$this->assertEquals(0, (int) $logged[$fixture['topic_id']]['unwatched']);
+	}
+
+	/**
+	 * Test setTopicMute() and getLoggedTopics() correctly manage topic watch status.
+	 */
+	public function testSetTopicMuteAndGetLoggedTopics(): void
 	{
 		$fixture = $this->createTestTopic('Topic Watch Test');
 
 		// Set watch on
-		setTopicWatch(1, $fixture['topic_id'], true);
+		setTopicMute(1, $fixture['topic_id'], true);
 		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
 
 		$this->assertArrayHasKey($fixture['topic_id'], $logged);
 		$this->assertEquals(1, (int) $logged[$fixture['topic_id']]['unwatched']);
 
 		// Set watch off
-		setTopicWatch(1, $fixture['topic_id'], false);
+		setTopicMute(1, $fixture['topic_id'], false);
 		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
 		$this->assertEquals(0, (int) $logged[$fixture['topic_id']]['unwatched']);
 	}
@@ -671,7 +691,7 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	/**
 	 * Test that unwatching a topic removes topic notification subscriptions and vice versa.
 	 */
-	public function testSetTopicWatchMutualExclusivityWithNotification(): void
+	public function testSetTopicMuteMutualExclusivityWithNotification(): void
 	{
 		$fixture = $this->createTestTopic('Mutual Exclusivity Watch Test');
 
@@ -680,7 +700,7 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		$this->assertTrue(hasTopicNotification(1, $fixture['topic_id']));
 
 		// Unwatch (mute) topic -> should delete topic notification
-		setTopicWatch(1, $fixture['topic_id'], true);
+		setTopicMute(1, $fixture['topic_id'], true);
 		$logged = getLoggedTopics(1, [$fixture['topic_id']]);
 		$this->assertEquals(1, (int) $logged[$fixture['topic_id']]['unwatched']);
 		$this->assertFalse(hasTopicNotification(1, $fixture['topic_id']));
@@ -695,14 +715,14 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test setTopicWatch correctly sets unwatched for specified member rather than just current session.
+	 * Test setTopicMute correctly sets unwatched for specified member rather than just current session.
 	 */
-	public function testSetTopicWatchCrossMemberConsistency(): void
+	public function testSetTopicMuteCrossMemberConsistency(): void
 	{
 		$fixture = $this->createTestTopic('Cross Member Watch Test');
 
 		// Set watch on for member 2 explicitly
-		setTopicWatch(2, $fixture['topic_id'], true);
+		setTopicMute(2, $fixture['topic_id'], true);
 		$logged2 = getLoggedTopics(2, [$fixture['topic_id']]);
 		$this->assertArrayHasKey($fixture['topic_id'], $logged2);
 		$this->assertEquals(1, (int) $logged2[$fixture['topic_id']]['unwatched']);
@@ -711,7 +731,7 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		$logged1 = getLoggedTopics(1, [$fixture['topic_id']]);
 		$this->assertEmpty($logged1);
 
-		setTopicWatch(2, $fixture['topic_id'], false);
+		setTopicMute(2, $fixture['topic_id'], false);
 	}
 
 	/**

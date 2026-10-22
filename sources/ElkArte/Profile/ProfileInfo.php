@@ -829,9 +829,9 @@ class ProfileInfo extends AbstractController
 	}
 
 	/**
-	 * Show all the unwatched topics.
+	 * Show all the muted topics.
 	 */
-	public function action_showUnwatched(): void
+	public function action_showMuted(): void
 	{
 		global $txt, $modSettings, $context;
 
@@ -841,8 +841,9 @@ class ProfileInfo extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		$base_href = getUrl('action', ['action' => 'profile', 'area' => 'notification', 'sa' => 'unwatchedtopics', 'u' => $this->_memID]);
-		$id_topic = $this->_req->getQuery('watch', 'intval', 0);
+		$sa = $this->_req->getQuery('sa', 'trim|strval', 'mutedtopics');
+		$base_href = getUrl('action', ['action' => 'profile', 'area' => 'notification', 'sa' => $sa, 'u' => $this->_memID]);
+		$id_topic = $this->_req->getQuery('unmute', 'intval', $this->_req->getQuery('watch', 'intval', 0));
 		if ($id_topic > 0)
 		{
 			isAllowedTo(['profile_extra_own', 'profile_extra_any']);
@@ -851,7 +852,7 @@ class ProfileInfo extends AbstractController
 			$logged = getLoggedTopics($this->_memID, [$id_topic]);
 			if (!empty($logged[$id_topic]['unwatched']))
 			{
-				setTopicWatch($this->_memID, $id_topic, false);
+				setTopicMute($this->_memID, $id_topic, false);
 			}
 
 			redirectexit($base_href);
@@ -868,10 +869,10 @@ class ProfileInfo extends AbstractController
 			'base_href' => $base_href,
 			'default_sort_col' => 'started_on',
 			'get_items' => [
-				'function' => fn($start, $items_per_page, $sort) => $this->list_getUnwatched($start, $items_per_page, $sort),
+				'function' => fn($start, $items_per_page, $sort) => $this->list_getMuted($start, $items_per_page, $sort),
 			],
 			'get_count' => [
-				'function' => fn() => $this->list_getNumUnwatched(),
+				'function' => fn() => $this->list_getNumMuted(),
 			],
 			'columns' => [
 				'subject' => [
@@ -957,7 +958,7 @@ class ProfileInfo extends AbstractController
 					],
 					'data' => [
 						'function' => static function ($topic) use ($base_href, $context, $txt) {
-							return '<a href="' . $base_href . ';watch=' . (int) $topic['id_topic'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['unwatched_topics_watch'] . '</a>';
+							return '<a href="' . $base_href . ';unmute=' . (int) $topic['id_topic'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['unwatched_topics_watch'] . '</a>';
 						},
 						'class' => 'centertext',
 					],
@@ -973,7 +974,7 @@ class ProfileInfo extends AbstractController
 	}
 
 	/**
-	 * Get the relevant topics in the unwatched list
+	 * Get the relevant topics in the muted list
 	 * Callback for createList()
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
@@ -982,18 +983,18 @@ class ProfileInfo extends AbstractController
 	 *
 	 * @return array
 	 */
-	public function list_getUnwatched($start, $items_per_page, $sort): array
+	public function list_getMuted($start, $items_per_page, $sort): array
 	{
-		return getUnwatchedBy($start, $items_per_page, $sort, $this->_memID);
+		return getMutedBy($start, $items_per_page, $sort, $this->_memID);
 	}
 
 	/**
-	 * Count the number of topics in the unwatched list
+	 * Count the number of topics in the muted list
 	 * Callback for createList()
 	 */
-	public function list_getNumUnwatched(): int
+	public function list_getNumMuted(): int
 	{
-		return getNumUnwatchedBy($this->_memID);
+		return getNumMutedBy($this->_memID);
 	}
 
 	/**

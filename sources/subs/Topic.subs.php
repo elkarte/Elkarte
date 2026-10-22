@@ -1313,19 +1313,19 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 }
 
 /**
- * Set off/on unread reply subscription for a topic
+ * Set off/on topic mute state
  *
  * @param int $id_member
  * @param int $topic
- * @param bool $on = false
+ * @param bool $mute = true
  */
-function setTopicWatch($id_member, $topic, $on = false)
+function setTopicMute($id_member, $topic, $mute = true)
 {
 	$db = database();
 	$id_member = !empty($id_member) ? (int) $id_member : (int) User::$info->id;
 
-	// When unwatching (muting) a topic, remove any topic notification subscription.
-	if ($on)
+	// When muting a topic, remove any topic notification subscription.
+	if ($mute)
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
@@ -1341,11 +1341,11 @@ function setTopicWatch($id_member, $topic, $on = false)
 	// Find the current entry if it exists for this member
 	$was_set = getLoggedTopics($id_member, [$topic]);
 
-	// Set a topic unwatched on/off for this topic.
+	// Set a topic muted (unwatched) on/off for this topic.
 	$db->insert(empty($was_set[$topic]) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
 		['id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'unwatched' => 'int'],
-		[$id_member, $topic, !empty($was_set[$topic]['id_msg']) ? $was_set[$topic]['id_msg'] : 0, $on ? 1 : 0],
+		[$id_member, $topic, !empty($was_set[$topic]['id_msg']) ? $was_set[$topic]['id_msg'] : 0, $mute ? 1 : 0],
 		['id_member', 'id_topic']
 	);
 }

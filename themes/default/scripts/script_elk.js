@@ -159,21 +159,21 @@ function toggleButtonAJAX (btn, confirmation_msg_variable = '', onSuccessCallbac
 					}
 				}
 
-				// Update related unwatch button if present in response
-				let unwatch_text = oElement.getElementsByTagName('unwatch_text'),
-					unwatch_url = oElement.getElementsByTagName('unwatch_url');
+				// Update related mute (unwatch) button if present in response
+				let mute_text = oElement.getElementsByTagName('mute_text').length ? oElement.getElementsByTagName('mute_text') : oElement.getElementsByTagName('unwatch_text'),
+					mute_url = oElement.getElementsByTagName('mute_url').length ? oElement.getElementsByTagName('mute_url') : oElement.getElementsByTagName('unwatch_url');
 
-				if (unwatch_text.length === 1 || unwatch_url.length === 1)
+				if (mute_text.length === 1 || mute_url.length === 1)
 				{
-					let unwatch_elems = document.getElementsByClassName('button_strip_unwatch');
-					Array.prototype.forEach.call(unwatch_elems, function(el) {
-						if (unwatch_text.length === 1 && unwatch_text[0].firstChild !== null)
+					let mute_elems = document.getElementsByClassName('button_strip_mute');
+					Array.prototype.forEach.call(mute_elems, function(el) {
+						if (mute_text.length === 1 && mute_text[0].firstChild !== null)
 						{
-							el.innerHTML = '<span>' + unwatch_text[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'') + '</span>';
+							el.innerHTML = '<span>' + mute_text[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'') + '</span>';
 						}
-						if (unwatch_url.length === 1 && unwatch_url[0].firstChild !== null)
+						if (mute_url.length === 1 && mute_url[0].firstChild !== null)
 						{
-							el.href = unwatch_url[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
+							el.href = mute_url[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
 						}
 					});
 				}
@@ -334,15 +334,25 @@ function notifyboardButton (btn)
 }
 
 /**
- * Ajaxify the "unwatch" button in Display
+ * Ajaxify the "mute" button in Display
+ *
+ * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
+ */
+function muteButton (btn)
+{
+	toggleButtonAJAX(btn);
+
+	return false;
+}
+
+/**
+ * Ajaxify the "unwatch" button in Display (legacy alias for muteButton)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
 function unwatchButton (btn)
 {
-	toggleButtonAJAX(btn);
-
-	return false;
+	return muteButton(btn);
 }
 
 /**

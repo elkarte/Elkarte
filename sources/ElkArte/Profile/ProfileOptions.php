@@ -653,7 +653,8 @@ class ProfileOptions extends AbstractController
 			'settings' => [$this, 'action_editNotificationSettings'],
 			'boards' => [$this, 'action_editNotificationBoards'],
 			'topics' => [$this, 'action_editNotificationTopics'],
-			'unwatchedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showUnwatched'],
+			'mutedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showMuted'],
+			'unwatchedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showMuted'],
 		];
 
 		// Set a subaction
@@ -678,7 +679,7 @@ class ProfileOptions extends AbstractController
 					'title' => $txt['notify_topics'],
 					'description' => $txt['notify_topics_desc'],
 				],
-				'unwatchedtopics' => [
+				'mutedtopics' => [
 					'title' => $txt['showUnwatched'],
 					'description' => $txt['unwatched_topics_info'],
 				],

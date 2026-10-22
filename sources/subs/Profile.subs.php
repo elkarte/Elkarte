@@ -1566,7 +1566,7 @@ function getNumAttachments($boardsAllowed, $memID)
 }
 
 /**
- * Get the relevant topics in the unwatched list
+ * Get the relevant topics in the muted list
  * (used by createList() callbacks)
  *
  * @param int $start The item to start with (for pagination purposes)
@@ -1576,7 +1576,7 @@ function getNumAttachments($boardsAllowed, $memID)
  *
  * @return array
  */
-function getUnwatchedBy($start, $items_per_page, $sort, $memID)
+function getMutedBy($start, $items_per_page, $sort, $memID)
 {
 	$db = database();
 
@@ -1634,16 +1634,16 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 }
 
 /**
- * Count the number of topics in the unwatched list
+ * Count the number of topics in the muted list
  *
  * @param int $memID
  * @return int
  */
-function getNumUnwatchedBy($memID)
+function getNumMutedBy($memID)
 {
 	$db = database();
 
-	// Get the total number of attachments they have posted.
+	// Get the total number of muted topics
 	$request = $db->query('', '
 		SELECT
 		 	COUNT(*)
@@ -1657,10 +1657,10 @@ function getNumUnwatchedBy($memID)
 			'current_member' => $memID,
 		]
 	);
-	list ($unwatchedCount) = $request->fetch_row();
+	list ($mutedCount) = $request->fetch_row();
 	$request->free_result();
 
-	return $unwatchedCount;
+	return $mutedCount;
 }
 
 /**
