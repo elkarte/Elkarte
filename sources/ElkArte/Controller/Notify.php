@@ -195,7 +195,9 @@ class Notify extends AbstractController
 		$context['xml_data'] = [
 			'text' => $sa === 'on' ? $txt['unnotify'] : $txt['notify'],
 			'url' => getUrl('action', ['action' => 'notify', 'sa' => ($sa === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1']),
-			'confirm' => $sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
+			'confirm' => $sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic'],
+			'unwatch_text' => $txt['unwatch'],
+			'unwatch_url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => 'on', 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 		];
 	}
 
@@ -444,7 +446,10 @@ class Notify extends AbstractController
 		$start = $this->_req->getQuery('start', 'intval', 0);
 		$context['xml_data'] = [
 			'text' => $toggle === 'on' ? $txt['watch'] : $txt['unwatch'],
-			'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => ($toggle === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => ($toggle === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'notify_text' => $txt['notify'],
+			'notify_url' => getUrl('action', ['action' => 'notify', 'sa' => 'on', 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1']),
+			'notify_confirm' => $txt['notification_enable_topic'],
 		];
 	}
 

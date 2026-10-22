@@ -663,8 +663,26 @@ class ProfileOptions extends AbstractController
 		// Create the header for the template.
 		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['notify_settings'],
-			'description' => $txt['notification_info'],
+			'description' => $txt['notification_info_desc'],
 			'class' => 'i-contact',
+			'tabs' => [
+				'settings' => [
+					'title' => $txt['notify_settings'],
+					'description' => $txt['notification_info_desc'],
+				],
+				'boards' => [
+					'title' => $txt['notify_boards'],
+					'description' => $txt['notify_boards_desc'],
+				],
+				'topics' => [
+					'title' => $txt['notify_topics'],
+					'description' => $txt['notify_topics_desc'],
+				],
+				'unwatchedtopics' => [
+					'title' => $txt['showUnwatched'],
+					'description' => $txt['unwatched_topics_info'],
+				],
+			],
 		]);
 
 		// Pass on to the actual function.
@@ -781,6 +799,7 @@ class ProfileOptions extends AbstractController
 				],
 				[
 					'position' => 'after_title',
+					'class' => 'description',
 					'value' => getBoardNotificationsCount($this->_memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
 				],
 			],

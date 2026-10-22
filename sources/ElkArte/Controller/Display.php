@@ -969,7 +969,7 @@ class Display extends AbstractController
 			],
 			'unwatch' => [
 				'test' => 'can_unwatch',
-				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
+				'text' => ($context['topic_unwatched'] ? 'watch' : 'unwatch'),
 				'lang' => true,
 				'custom' => 'onclick="return unwatchButton(this);"',
 				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),

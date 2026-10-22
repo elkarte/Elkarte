@@ -963,13 +963,6 @@ class ProfileInfo extends AbstractController
 					],
 				],
 			],
-			'additional_rows' => [
-				[
-					'position' => 'top_of_list',
-					'value' => $txt['unwatched_topics_info'],
-					'class' => 'description',
-				],
-			],
 		];
 
 		// Create the request list.
