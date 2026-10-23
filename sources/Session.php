@@ -81,6 +81,7 @@ function loadSession()
 		{
 			@ini_set('session.serialize_handler', 'php');
 			@ini_set('session.gc_probability', '1');
+			@ini_set('session.gc_divisor', '1000');
 
 			$handler = new DatabaseHandler(database());
 			session_set_save_handler($handler, true);
