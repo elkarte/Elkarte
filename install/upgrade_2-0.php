@@ -1224,4 +1224,29 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function add_sessions_last_update_index_title()
+	{
+		return 'Adding session cleanup index...';
+	}
+
+	public function add_sessions_last_update_index()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding last_update index to the sessions table...',
+				'function' => function () {
+					$this->table->add_index('{db_prefix}sessions',
+						array(
+							'name' => 'last_update',
+							'columns' => array('last_update'),
+							'type' => 'key',
+						),
+						array(),
+						'exists'
+					);
+				}
+			)
+		);
+	}
 }

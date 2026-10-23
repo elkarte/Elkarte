@@ -2721,6 +2721,7 @@ class InstallInstructions_install_2_0
 			),
 			array(
 				array('name' => 'session_id', 'columns' => array('session_id'), 'type' => 'primary'),
+				array('name' => 'last_update', 'columns' => array('last_update'), 'type' => 'key'),
 			),
 			array(),
 			'ignore'

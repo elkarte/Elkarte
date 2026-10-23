@@ -114,7 +114,8 @@ class DatabaseHandler extends \SessionHandler
 
 		// Look for it in the database.
 		$result = $this->_db->query('', '
-			SELECT data
+			SELECT 
+				data
 			FROM {db_prefix}sessions
 			WHERE session_id = {string:session_id}
 			LIMIT 1',

@@ -189,55 +189,11 @@ class Removetopic extends AbstractController
 		// Can they see the message to remove it?
 		$this->_checkApproval();
 
-		// Ensure they can do this
-		$this->_verifyDeletePermissions();
-
 		// Do the removal, track if we removed the entire topic, so we redirect back to the board.
 		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		$full_topic = $remover->removeMessage($_msg);
 
 		$this->_redirectBack($full_topic);
-	}
-
-	/**
-	 * Verifies the user has the permissions needed to remove a message
-	 *
-	 * - @uses isAllowedTo() which will end processing if user lacks proper permissions.
-	 */
-	private function _verifyDeletePermissions(): void
-	{
-		global $modSettings;
-
-		if ($this->_topic_info['id_member'] == $this->user->id)
-		{
-			// Are you allowed to delete it
-			if (!allowedTo('delete_own'))
-			{
-				if ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('delete_any'))
-				{
-					isAllowedTo('delete_replies');
-				}
-				elseif (!allowedTo('delete_any'))
-				{
-					isAllowedTo('delete_own');
-				}
-			}
-			elseif (!allowedTo('delete_any')
-				&& ($this->_topic_info['id_member_started'] != $this->user->id || !allowedTo('delete_replies'))
-				&& !empty($modSettings['edit_disable_time'])
-				&& $this->_topic_info['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-			{
-				throw new Exception('modify_post_time_passed', false);
-			}
-		}
-		elseif ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('delete_any'))
-		{
-			isAllowedTo('delete_replies');
-		}
-		else
-		{
-			isAllowedTo('delete_any');
-		}
 	}
 
 	/**

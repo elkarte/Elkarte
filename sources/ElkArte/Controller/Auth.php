@@ -328,7 +328,7 @@ class Auth extends AbstractController
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
 
 			// Maybe we were too hasty... let's try some other authentication methods.
-			$other_passwords = $this->_other_passwords($_POST['passwrd'], $user_setting['password_salt'], $user_setting['passwd'], $user_setting['member_name']);
+			$other_passwords = $this->_other_passwords($_POST['passwrd'], $user_setting['member_name'], $user_setting['passwd'], $user_setting['password_salt']);
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_setting['passwd'], $other_passwords, true))

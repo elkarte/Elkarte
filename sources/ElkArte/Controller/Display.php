@@ -25,6 +25,7 @@ use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\DisplayRenderer;
 use ElkArte\MessagesDelete;
+use ElkArte\MessagePermission;
 use ElkArte\MessageTopicIcons;
 use ElkArte\User;
 
@@ -668,7 +669,11 @@ class Display extends AbstractController
 		// Set the class of the current topic, Hot, not so hot, locked, sticky
 		determineTopicClass($context);
 
-		$context['can_modify'] = (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $context['topic_starter_id'] == $this->user->id && (empty($modSettings['edit_disable_time']) || !$this->topicinfo['approved'] || $this->topicinfo['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())));
+		$permission = new MessagePermission((int) $this->user->id);
+		$context['can_modify'] = $permission->canModify([
+			'id_member' => $this->topicinfo['id_member_started'], 'poster_time' => $this->topicinfo['poster_time'], 'approved' => $this->topicinfo['approved']],
+			(int) $this->topicinfo['id_member_started'],
+			!empty($context['is_locked']));
 
 		// Set the topic's information for the template.
 		$context['subject'] = $this->topicinfo['subject'];

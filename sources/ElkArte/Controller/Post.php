@@ -28,6 +28,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
+use ElkArte\MessagePermission;
 use ElkArte\Notifications\Notifications;
 use ElkArte\Notifications\NotificationsTask;
 use ElkArte\Notifications\PostNotificationQueue;
@@ -1144,38 +1145,8 @@ class Post extends AbstractController
 				$sticky = null;
 			}
 
-			if ($msgInfo['id_member'] === $this->user->id && !allowedTo('modify_any'))
-			{
-				if ((!$modSettings['postmod_active'] || $msgInfo['approved']) && !empty($modSettings['edit_disable_time']) && $msgInfo['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-				{
-					throw new Exception('modify_post_time_passed', false);
-				}
-				if ($topic_info['id_member_started'] === $this->user->id && !allowedTo('modify_own'))
-				{
-					isAllowedTo('modify_replies');
-				}
-				else
-				{
-					isAllowedTo('modify_own');
-				}
-			}
-			elseif ($topic_info['id_member_started'] === $this->user->id && !allowedTo('modify_any'))
-			{
-				isAllowedTo('modify_replies');
-
-				// If you're modifying a reply, I say it better be logged...
-				$moderationAction = true;
-			}
-			else
-			{
-				isAllowedTo('modify_any');
-
-				// Log it, assuming you're not modifying your own post.
-				if ($msgInfo['id_member'] !== $this->user->id)
-				{
-					$moderationAction = true;
-				}
-			}
+			$permission = new MessagePermission((int) $this->user->id);
+			$moderationAction = $permission->checkModify($msgInfo, (int) $topic_info['id_member_started']);
 
 			$posterIsGuest = empty($msgInfo['id_member']);
 
@@ -1683,40 +1654,11 @@ class Post extends AbstractController
 			throw new Exception('no_board', false);
 		}
 
-		// Change either body or subject requires permissions to modify messages.
+		// Changing either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))
 		{
-			if (!empty($row['locked']))
-			{
-				isAllowedTo('moderate_board');
-			}
-
-			if ($row['id_member'] === $this->user->id && !allowedTo('modify_any'))
-			{
-				if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-				{
-					throw new Exception('modify_post_time_passed', false);
-				}
-				if ($row['id_member_started'] === $this->user->id && !allowedTo('modify_own'))
-				{
-					isAllowedTo('modify_replies');
-				}
-				else
-				{
-					isAllowedTo('modify_own');
-				}
-			}
-			elseif ($row['id_member_started'] === $this->user->id && !allowedTo('modify_any'))
-			{
-				isAllowedTo('modify_replies');
-			}
-			else
-			{
-				isAllowedTo('modify_any');
-			}
-
-			// Only log this action if it wasn't your message.
-			$moderationAction = $row['id_member'] !== $this->user->id;
+			$permission = new MessagePermission((int) $this->user->id);
+			$moderationAction = $permission->checkModify($row, (int) $row['id_member_started'], !empty($row['locked']));
 		}
 
 		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
