@@ -17,6 +17,7 @@
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Helper\Util;
+use ElkArte\MessagePermission;
 use ElkArte\User;
 
 /**
@@ -1561,23 +1562,18 @@ function warningDailyLimit($member)
  * @param string $approve_query additional condition for the query
  * @param string $current_view defined whether to return the topics (first messages)
  * or the messages. If set to 'topics' it returns the topics, otherwise the messages
- * @param array $boards_allowed array of arrays, it must contain three
- * indexes:
- *   - delete_own_boards
- *   - delete_any_boards
- *   - delete_own_replies
- * each of which must be an array of boards the user is allowed to perform a certain action (return of boardsAllowedTo)
  * @param int $start start of the query LIMIT
  * @param int $limit number of elements to return (default 10)
  *
  * @return array
  */
-function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $start, $limit = 10)
+function getUnapprovedPosts($approve_query, $current_view, $start, $limit = 10)
 {
 	$db = database();
 
 	$unapproved_items = [];
 	$bbc_parser = ParserWrapper::instance();
+	$permission = new MessagePermission((int) User::$info->id);
 	$i = 1;
 	$db->fetchQuery('
 		SELECT 
@@ -1600,28 +1596,12 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			'not_approved' => 0,
 		]
 	)->fetch_callback(
-		function ($row) use (&$unapproved_items, $bbc_parser, &$i, $boards_allowed) {
+		function ($row) use (&$unapproved_items, $bbc_parser, &$i, $permission, $current_view) {
 			global $context, $scripturl, $modSettings;
 
-			// Can delete is complicated, let's solve it first... is it their own post?
-			if ($row['id_member'] == User::$info->id && ($boards_allowed['delete_own_boards'] == [0] || in_array($row['id_board'], $boards_allowed['delete_own_boards'])))
-			{
-				$can_delete = true;
-			}
-			// Is it a reply to their own topic?
-			elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($boards_allowed['delete_own_replies'] == [0] || in_array($row['id_board'], $boards_allowed['delete_own_replies'])))
-			{
-				$can_delete = true;
-			}
-			// Someone else's?
-			elseif ($row['id_member'] != User::$info->id && ($boards_allowed['delete_any_boards'] == [0] || in_array($row['id_board'], $boards_allowed['delete_any_boards'])))
-			{
-				$can_delete = true;
-			}
-			else
-			{
-				$can_delete = false;
-			}
+			$can_delete = $current_view === 'topics'
+				? $permission->canRemoveTopic($row, (int) $row['id_board'])
+				: $permission->canDelete($row, (int) $row['id_member_started'], (int) $row['id_board'], false);
 
 			$unapproved_items[] = [
 				'id' => $row['id_msg'],

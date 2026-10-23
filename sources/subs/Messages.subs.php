@@ -18,6 +18,7 @@
  */
 
 use ElkArte\Database\AbstractResult;
+use ElkArte\MessagePermission;
 use ElkArte\MessagesDelete;
 use ElkArte\User;
 
@@ -216,40 +217,17 @@ function quoteMessageInfo($id_msg, $modify)
  * This function will give a fatal error if the current user
  * doesn't have permissions to modify the message.
  *
- * @param int $message
+ * @param array $message
  *
  * @return array|bool
  * @throws \ElkArte\Exceptions\Exception modify_post_time_passed
  */
 function checkMessagePermissions($message)
 {
-	global $modSettings, $context;
+	global $context;
 
-	if ($message['id_member'] == User::$info->id && !allowedTo('modify_any'))
-	{
-		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
-		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-		{
-			throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
-		}
-
-		if ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_own'))
-		{
-			isAllowedTo('modify_replies');
-		}
-		else
-		{
-			isAllowedTo('modify_own');
-		}
-	}
-	elseif ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_any'))
-	{
-		isAllowedTo('modify_replies');
-	}
-	else
-	{
-		isAllowedTo('modify_any');
-	}
+	$permission = new MessagePermission((int) User::$info->id);
+	$permission->checkModify($message, (int) $message['id_member_poster']);
 
 	if ($context['can_announce'] && !empty($message['id_action']))
 	{

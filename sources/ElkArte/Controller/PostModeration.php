@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
+use ElkArte\MessagePermission;
 
 /**
  * Handles post moderation actions. (approvals, unapproved)
@@ -93,19 +94,7 @@ class PostModeration extends AbstractController
 			$approve_query = ' AND 1=0';
 		}
 
-		// We also need to know where we can delete topics and/or replies to.
-		if ($context['current_view'] === 'topics')
-		{
-			$delete_own_boards = boardsAllowedTo('remove_own');
-			$delete_any_boards = boardsAllowedTo('remove_any');
-			$delete_own_replies = [];
-		}
-		else
-		{
-			$delete_own_boards = boardsAllowedTo('delete_own');
-			$delete_any_boards = boardsAllowedTo('delete_any');
-			$delete_own_replies = boardsAllowedTo('delete_own_replies');
-		}
+		$permission = new MessagePermission((int) $this->user->id);
 
 		// No action yet
 		$toAction = [];
@@ -144,9 +133,6 @@ class PostModeration extends AbstractController
 			require_once(SUBSDIR . '/Topic.subs.php');
 			require_once(SUBSDIR . '/Messages.subs.php');
 
-			// Handy shortcut.
-			$any_array = $curAction === 'approve' ? $approve_boards : $delete_any_boards;
-
 			// Now for each message work out whether it's actually a topic and what board it's on.
 			$request = loadMessageDetails(
 				['m.id_board', 't.id_topic', 't.id_first_msg', 't.id_member_started'],
@@ -177,28 +163,16 @@ class PostModeration extends AbstractController
 				$can_add = false;
 
 				// If we're approving, this is simple.
-				if ($curAction === 'approve' && ($any_array == [0] || in_array($row['id_board'], $any_array)))
+				if ($curAction === 'approve' && ($approve_boards == [0] || in_array($row['id_board'], $approve_boards)))
 				{
 					$can_add = true;
 				}
 				// Delete requires more permission checks...
 				elseif ($curAction === 'delete')
 				{
-					// Own post is easy!
-					if ($row['id_member'] == $this->user->id && ($delete_own_boards == [0] || in_array($row['id_board'], $delete_own_boards)))
-					{
-						$can_add = true;
-					}
-					// Is it a reply to their own topic?
-					elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == [0] || in_array($row['id_board'], $delete_own_replies)))
-					{
-						$can_add = true;
-					}
-					// Someone else's?
-					elseif ($row['id_member'] != $this->user->id && ($delete_any_boards == [0] || in_array($row['id_board'], $delete_any_boards)))
-					{
-						$can_add = true;
-					}
+					$can_add = $context['current_view'] === 'topics'
+						? $permission->canRemoveTopic($row, (int) $row['id_board'])
+						: $permission->canDelete($row, (int) $row['id_member_started'], (int) $row['id_board'], false);
 				}
 
 				if ($can_add)
@@ -260,11 +234,7 @@ class PostModeration extends AbstractController
 		}
 
 		// Get all unapproved posts.
-		$context['unapproved_items'] = getUnapprovedPosts($approve_query, $context['current_view'], [
-			'delete_own_boards' => $delete_own_boards,
-			'delete_any_boards' => $delete_any_boards,
-			'delete_own_replies' => $delete_own_replies,
-		], $context['start']);
+		$context['unapproved_items'] = getUnapprovedPosts($approve_query, $context['current_view'], $context['start']);
 
 		foreach ($context['unapproved_items'] as $key => $item)
 		{

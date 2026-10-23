@@ -1096,8 +1096,6 @@ class MessagesDelete
 	 */
 	protected function _checkDeletePermissions($row, $board)
 	{
-		global $modSettings;
-
 		$row['id_board'] = (int) $row['id_board'];
 		$row['id_member_poster'] = (int) $row['id_member_poster'];
 		$row['id_member'] = (int) $row['id_member'];
@@ -1105,142 +1103,9 @@ class MessagesDelete
 		$row['id_msg'] = (int) $row['id_msg'];
 		$board = (int) $board;
 
-		if (empty($board) || $row['id_board'] !== $board)
-		{
-			$delete_any = boardsAllowedTo('delete_any');
+		$permissionBoard = empty($board) || $row['id_board'] !== $board ? $row['id_board'] : null;
+		$permission = new MessagePermission((int) $this->user->id);
 
-			if (!in_array(0, $delete_any) && !in_array($row['id_board'], $delete_any))
-			{
-				$delete_own = boardsAllowedTo('delete_own');
-				$delete_own = in_array(0, $delete_own) || in_array($row['id_board'], $delete_own);
-				$delete_replies = boardsAllowedTo('delete_replies');
-				$delete_replies = in_array(0, $delete_replies) || in_array($row['id_board'], $delete_replies);
-
-				// Their own checks
-				if ($row['id_member'] === $this->user->id)
-				{
-					if (!$delete_own)
-					{
-						if ($row['id_member_poster'] === $this->user->id)
-						{
-							if (!$delete_replies)
-							{
-								throw new Exceptions\Exception('cannot_delete_replies', 'permission');
-							}
-						}
-						else
-						{
-							throw new Exceptions\Exception('cannot_delete_own', 'permission');
-						}
-					}
-					elseif (($row['id_member_poster'] !== $this->user->id || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-					{
-						throw new Exceptions\Exception('modify_post_time_passed', false);
-					}
-				}
-				elseif ($row['id_member_poster'] === $this->user->id)
-				{
-					if (!$delete_replies)
-					{
-						throw new Exceptions\Exception('cannot_delete_replies', 'permission');
-					}
-				}
-				else
-				{
-					throw new Exceptions\Exception('cannot_delete_any', 'permission');
-				}
-			}
-
-			// Can't delete an unapproved message if you can't see it!
-			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $this->user->id && (!in_array(0, $delete_any) && !in_array($row['id_board'], $delete_any)))
-			{
-				$approve_posts = empty($this->user->mod_cache['ap']) ? boardsAllowedTo('approve_posts') : $this->user->mod_cache['ap'];
-				if (!in_array(0, $approve_posts, true) && !in_array($row['id_board'], $approve_posts, true))
-				{
-					return 'exit';
-				}
-			}
-		}
-		else
-		{
-			// Check permissions to delete this message.
-			if ($row['id_member'] === $this->user->id)
-			{
-				if (!allowedTo('delete_own'))
-				{
-					if ($row['id_member_poster'] === $this->user->id && !allowedTo('delete_any'))
-					{
-						isAllowedTo('delete_replies');
-					}
-					elseif (!allowedTo('delete_any'))
-					{
-						isAllowedTo('delete_own');
-					}
-				}
-				elseif (!allowedTo('delete_any') && ($row['id_member_poster'] !== $this->user->id || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-				{
-					throw new Exceptions\Exception('modify_post_time_passed', false);
-				}
-			}
-			elseif ($row['id_member_poster'] === $this->user->id && !allowedTo('delete_any'))
-			{
-				isAllowedTo('delete_replies');
-			}
-			else
-			{
-				isAllowedTo('delete_any');
-			}
-
-			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] !== $this->user->id && !allowedTo('delete_own'))
-			{
-				isAllowedTo('approve_posts');
-			}
-		}
-
-		// Delete the *whole* topic, but only if the topic consists of one message.
-		if ($row['id_first_msg'] === $row['id_msg'])
-		{
-			if (empty($board) || $row['id_board'] !== $board)
-			{
-				$remove_own = false;
-				$remove_any = boardsAllowedTo('remove_any');
-				$remove_any = in_array(0, $remove_any) || in_array($row['id_board'], $remove_any, true);
-
-				if (!$remove_any)
-				{
-					$remove_own = boardsAllowedTo('remove_own');
-					$remove_own = in_array(0, $remove_own) || in_array($row['id_board'], $remove_own, true);
-				}
-
-				if ($row['id_member'] !== $this->user->id && !$remove_any)
-				{
-					throw new Exceptions\Exception('cannot_remove_any', 'permission');
-				}
-
-				if (!$remove_any && !$remove_own)
-				{
-					throw new Exceptions\Exception('cannot_remove_own', 'permission');
-				}
-			}
-			elseif ($row['id_member'] !== $this->user->id)
-			{
-				// Check permissions to delete a whole topic.
-				isAllowedTo('remove_any');
-			}
-			elseif (!allowedTo('remove_any'))
-			{
-				isAllowedTo('remove_own');
-			}
-
-			// ...if there is only one post.
-			if (!empty($row['num_replies']))
-			{
-				throw new Exceptions\Exception('delFirstPost', false);
-			}
-
-			return 'topic';
-		}
-
-		return true;
+		return $permission->checkDelete($row, $row['id_member_poster'], $permissionBoard, $permissionBoard === null);
 	}
 }
