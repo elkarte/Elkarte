@@ -804,7 +804,7 @@ function fetchTopicNotifications($user_id, $topics, $type, $members_only, $regul
 
 			if (validateNotificationAccess($clean, false))
 			{
-				$topicNotifyData[$clean['id_topic']] = $clean;
+				$topicNotifyData[] = $clean;
 			}
 		}
 	);
@@ -844,7 +844,7 @@ function updateLogNotify($user_id, $data, $board = false)
  *
  * What it does:
  * Finds notifications that meet:
- *    - Members has watch notifications enabled for these topics
+ *  - Members have watch notifications enabled for these topics
  *  - The notification type is not none/off (all, replies+moderation, moderation only)
  *  - Notification regularity of instantly or first unread
  *  - Member is activated

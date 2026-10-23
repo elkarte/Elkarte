@@ -584,11 +584,11 @@ class PostNotifications extends AbstractModel
 					$email_from = $this->_getEmailFrom($topicData[$notifyDatum['id_topic']]);
 					$from_wrapper = $this->_getFromWrapper();
 
-					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], $email_from, 'm' . $topicNotifications[$notifyDatum['id_topic']]['last_id'], true, 3, false, $from_wrapper, $notifyDatum['id_topic']);
+					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], $email_from, 'm' . $notifyDatum['last_id'], true, 3, false, $from_wrapper, $notifyDatum['id_topic']);
 				}
 				else
 				{
-					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicNotifications[$notifyDatum['id_topic']]['last_id'], true);
+					$sendMail->buildEmail($notifyDatum['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $notifyDatum['last_id'], true);
 				}
 
 				$this->sent++;
