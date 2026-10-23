@@ -653,7 +653,8 @@ class ProfileOptions extends AbstractController
 			'settings' => [$this, 'action_editNotificationSettings'],
 			'boards' => [$this, 'action_editNotificationBoards'],
 			'topics' => [$this, 'action_editNotificationTopics'],
-			'unwatchedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showUnwatched'],
+			'mutedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showMuted'],
+			'unwatchedtopics' => ['controller' => ProfileInfo::class, 'function' => 'action_showMuted'],
 		];
 
 		// Set a subaction
@@ -663,8 +664,30 @@ class ProfileOptions extends AbstractController
 		// Create the header for the template.
 		$context[$context['profile_menu_name']]['object']->prepareTabData([
 			'title' => $txt['notify_settings'],
-			'description' => $txt['notification_info'],
+			'description' => $txt['notification_info_desc'],
 			'class' => 'i-contact',
+			'tabs' => [
+				'settings' => [
+					'title' => $txt['notify_settings'],
+					'description' => $txt['notification_info_desc'],
+				],
+				'boards' => [
+					'title' => $txt['notify_boards'],
+					'description' => $txt['notify_boards_desc'],
+				],
+				'topics' => [
+					'title' => $txt['notify_topics'],
+					'description' => $txt['notify_topics_desc'],
+				],
+				'mutedtopics' => [
+					'title' => $txt['showMuted'] ?? $txt['showUnwatched'],
+					'description' => $txt['muted_topics_info'] ?? $txt['unwatched_topics_info'],
+				],
+				'unwatchedtopics' => [
+					'title' => $txt['showMuted'] ?? $txt['showUnwatched'],
+					'description' => $txt['muted_topics_info'] ?? $txt['unwatched_topics_info'],
+				],
+			],
 		]);
 
 		// Pass on to the actual function.
@@ -781,6 +804,7 @@ class ProfileOptions extends AbstractController
 				],
 				[
 					'position' => 'after_title',
+					'class' => 'description',
 					'value' => getBoardNotificationsCount($this->_memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
 				],
 			],

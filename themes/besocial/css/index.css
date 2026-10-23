@@ -700,6 +700,10 @@ h2.hdicon {
     border-bottom: 1px solid;
 }
 
+.generic_list_wrapper .additional_row.after_title.description {
+    padding: .6rem .4rem;
+}
+
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
     font-size: var(--font14);

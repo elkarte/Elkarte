@@ -49,7 +49,8 @@ class Notify extends AbstractController
 			'notify' => [$this, 'action_notify'], // to note there is no sa=notify, it is the default
 			'unsubscribe' => [$this, 'action_unsubscribe'],
 			'notifyboard' => [$this, 'action_notifyboard'],
-			'unwatchtopic' => [$this, 'action_unwatchtopic'],
+			'unmutetopic' => [$this, 'action_unmutetopic'],
+			'mutetopic' => [$this, 'action_unmutetopic'],
 		];
 
 		// We like action, so let's get ready for some
@@ -195,7 +196,11 @@ class Notify extends AbstractController
 		$context['xml_data'] = [
 			'text' => $sa === 'on' ? $txt['unnotify'] : $txt['notify'],
 			'url' => getUrl('action', ['action' => 'notify', 'sa' => ($sa === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1']),
-			'confirm' => $sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
+			'confirm' => $sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic'],
+			'mute_text' => $txt['unwatch'],
+			'mute_url' => getUrl('action', ['action' => 'notify', 'sa' => 'unmutetopic', 'toggle' => 'on', 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'unwatch_text' => $txt['unwatch'],
+			'unwatch_url' => getUrl('action', ['action' => 'notify', 'sa' => 'unmutetopic', 'toggle' => 'on', 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
 		];
 	}
 
@@ -356,17 +361,16 @@ class Notify extends AbstractController
 	}
 
 	/**
-	 * Turn off/on unread replies subscription for a topic
+	 * Turn off/on topic mute state
 	 *
 	 * What it does:
 	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - The sub-action can be 'on', 'off', or nothing for what to do.
-	 * - Requires the mark_any_notify permission.
 	 * - Upon successful completion of the action will direct the user back to the topic.
-	 * - Accessed via ?action=notify;sa=unwatchtopic.
+	 * - Accessed via ?action=notify;sa=unmutetopic or ?action=notify;sa=mutetopic.
 	 */
-	public function action_unwatchtopic(): void
+	public function action_unmutetopic(): void
 	{
 		global $topic;
 
@@ -374,13 +378,13 @@ class Notify extends AbstractController
 
 		if ($this->getApi() === 'xml')
 		{
-			$this->action_unwatchtopic_api();
+			$this->action_unmutetopic_api();
 			return;
 		}
 
 		checkSession('get');
 
-		$this->_toggle_topic_watch();
+		$this->_toggle_topic_mute();
 
 		// Back to the topic.
 		$start = $this->_req->getQuery('start', 'intval', 0);
@@ -388,22 +392,22 @@ class Notify extends AbstractController
 	}
 
 	/**
-	 * Toggle a watch topic on/off
+	 * Toggle a mute topic on/off
 	 */
-	private function _toggle_topic_watch(): void
+	private function _toggle_topic_mute(): void
 	{
 		global $topic;
 
 		$toggle = $this->_req->getQuery('toggle', 'trim|strval', '');
-		setTopicWatch($this->user->id, $topic, $toggle === 'on');
+		setTopicMute($this->user->id, $topic, $toggle === 'on');
 	}
 
 	/**
-	 * Turn off/on unread replies subscription for a topic
+	 * Turn off/on topic mute state
 	 *
 	 * - Intended for use in XML or JSON calls
 	 */
-	public function action_unwatchtopic_api(): void
+	public function action_unmutetopic_api(): void
 	{
 		global $topic, $txt, $context;
 
@@ -432,19 +436,22 @@ class Notify extends AbstractController
 			$start = $this->_req->getQuery('start', 'intval', 0);
 			$context['xml_data'] = [
 				'error' => 1,
-				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => ($toggle === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $start, '{session_data}'])
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unmutetopic', 'toggle' => ($toggle === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $start, '{session_data}'])
 			];
 
 			return;
 		}
 
-		$this->_toggle_topic_watch();
+		$this->_toggle_topic_mute();
 
 		$toggle = $this->_req->getQuery('toggle', 'trim|strval', '');
 		$start = $this->_req->getQuery('start', 'intval', 0);
 		$context['xml_data'] = [
-			'text' => $toggle === 'on' ? $txt['watch'] : $txt['unwatch'],
-			'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => ($toggle === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'text' => $toggle === 'on' ? $txt['unmute'] : $txt['mute'],
+			'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unmutetopic', 'toggle' => ($toggle === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1'] + (isset($_REQUEST['json']) ? ['json'] : [])),
+			'notify_text' => $txt['notify'],
+			'notify_url' => getUrl('action', ['action' => 'notify', 'sa' => 'on', 'topic' => $topic . '.' . $start, '{session_data}', 'api' => '1']),
+			'notify_confirm' => $txt['notification_enable_topic'],
 		];
 	}
 

@@ -926,7 +926,8 @@ class Display extends AbstractController
 		$context['can_reply'] = $context['can_reply'] || $context['can_reply_unapproved'];
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']), true));
 		$context['can_mark_unread'] = $this->user->is_guest === false && $settings['show_mark_read'];
-		$context['can_unwatch'] = $this->user->is_guest === false;
+		$context['can_mute_topic'] = $this->user->is_guest === false;
+		$context['can_unwatch'] = $context['can_mute_topic'];
 		$context['can_print'] = empty($modSettings['disable_print_topic']);
 
 		// Start this off for quick moderation - it will be or'd for each post.
@@ -967,12 +968,12 @@ class Display extends AbstractController
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'topic', 't' => $context['mark_unread_time'], 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
 			],
-			'unwatch' => [
-				'test' => 'can_unwatch',
-				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
+			'mute' => [
+				'test' => 'can_mute_topic',
+				'text' => ($context['topic_unwatched'] ? 'unmute' : 'mute'),
 				'lang' => true,
-				'custom' => 'onclick="return unwatchButton(this);"',
-				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unwatchtopic', 'toggle' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
+				'custom' => 'onclick="return muteButton(this);"',
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => 'unmutetopic', 'toggle' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
 				'submenu' => true,
 			],
 			'print' => [

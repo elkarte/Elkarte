@@ -101,33 +101,82 @@ function toggleButtonAJAX (btn, confirmation_msg_variable = '', onSuccessCallbac
 				let text = oElement.getElementsByTagName('text'),
 					url = oElement.getElementsByTagName('url'),
 					confirm_elem = oElement.getElementsByTagName('confirm'),
-					confirm_text;
+					confirm_text = '';
 
 				// Update the page so button/link/confirm/etc. reflect the new on or off status
-				if (confirm_elem.length === 1)
+				if (confirm_elem.length === 1 && confirm_elem[0].firstChild !== null)
 				{
 					confirm_text = confirm_elem[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
 				}
 
 				let elems = document.getElementsByClassName(btn.className.replace(/(list|link)level\d/g, '').trim());
 				Array.prototype.forEach.call(elems, function(el) {
-					if (text.length === 1)
+					if (text.length === 1 && text[0].firstChild !== null)
 					{
 						el.innerHTML = '<span>' + text[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'') + '</span>';
 					}
 
-					if (url.length === 1)
+					if (url.length === 1 && url[0].firstChild !== null)
 					{
 						el.href = url[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
 					}
 
 					// Replaces the confirmation var text with the new one from the response to allow swapping on/off
-					// @todo this appears to be the start of a confirmation dialog... needs finished.
-					if (confirm_text !== '')
+					if (confirm_text !== '' && confirmation_msg_variable !== '')
 					{
 						window[confirmation_msg_variable] = confirm_text.replace(/[\\']/g, '\\$&');
 					}
 				});
+
+				// Update any related notification button if present in response
+				let notify_text = oElement.getElementsByTagName('notify_text'),
+					notify_url = oElement.getElementsByTagName('notify_url'),
+					notify_confirm = oElement.getElementsByTagName('notify_confirm');
+
+				if (notify_text.length === 1 || notify_url.length === 1)
+				{
+					let notify_elems = document.getElementsByClassName('button_strip_notify');
+					Array.prototype.forEach.call(notify_elems, function(el) {
+						if (notify_text.length === 1 && notify_text[0].firstChild !== null)
+						{
+							el.innerHTML = '<span>' + notify_text[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'') + '</span>';
+						}
+						if (notify_url.length === 1 && notify_url[0].firstChild !== null)
+						{
+							el.href = notify_url[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
+						}
+					});
+
+					if (notify_confirm.length === 1 && notify_confirm[0].firstChild !== null && typeof notification_topic_notice !== 'undefined')
+					{
+						window.notification_topic_notice = notify_confirm[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'').replace(/[\\']/g, '\\$&');
+					}
+
+					let notify_input = document.querySelector('input[name=\'notify\']');
+					if (notify_input)
+					{
+						notify_input.value = 0;
+					}
+				}
+
+				// Update related mute (unwatch) button if present in response
+				let mute_text = oElement.getElementsByTagName('mute_text').length ? oElement.getElementsByTagName('mute_text') : oElement.getElementsByTagName('unwatch_text'),
+					mute_url = oElement.getElementsByTagName('mute_url').length ? oElement.getElementsByTagName('mute_url') : oElement.getElementsByTagName('unwatch_url');
+
+				if (mute_text.length === 1 || mute_url.length === 1)
+				{
+					let mute_elems = document.getElementsByClassName('button_strip_mute');
+					Array.prototype.forEach.call(mute_elems, function(el) {
+						if (mute_text.length === 1 && mute_text[0].firstChild !== null)
+						{
+							el.innerHTML = '<span>' + mute_text[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'') + '</span>';
+						}
+						if (mute_url.length === 1 && mute_url[0].firstChild !== null)
+						{
+							el.href = mute_url[0].firstChild.nodeValue.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, '\'');
+						}
+					});
+				}
 			}
 			else
 			{
@@ -252,24 +301,18 @@ function notifyButton (btn)
 	}
 
 	return toggleButtonAJAX(btn, 'notification_topic_notice', function(btn, request, errors) {
-		var toggle = 0;
-
 		if (errors.length > 0)
 		{
 			return;
 		}
 
-		// This is a "turn notifications on"
-		if (btn.href.indexOf('sa=on') !== -1)
+		// btn.href was updated by toggleButtonAJAX to the next action URL
+		let toggle = btn.href.indexOf('sa=off') !== -1 ? 1 : 0;
+		let notify_input = document.querySelector('input[name=\'notify\']');
+		if (notify_input)
 		{
-			toggle = 1;
+			notify_input.value = toggle;
 		}
-		else
-		{
-			toggle = 0;
-		}
-
-		document.querySelector('input[name=\'notify\']').value = toggle;
 	});
 }
 
@@ -291,15 +334,25 @@ function notifyboardButton (btn)
 }
 
 /**
- * Ajaxify the "unwatch" button in Display
+ * Ajaxify the "mute" button in Display
+ *
+ * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
+ */
+function muteButton (btn)
+{
+	toggleButtonAJAX(btn);
+
+	return false;
+}
+
+/**
+ * Ajaxify the "unwatch" button in Display (legacy alias for muteButton)
  *
  * @param {HTMLLinkElement} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */
 function unwatchButton (btn)
 {
-	toggleButtonAJAX(btn);
-
-	return false;
+	return muteButton(btn);
 }
 
 /**

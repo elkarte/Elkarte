@@ -122,7 +122,7 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 
 	public function testNotification()
 	{
-		global $context;
+		global $context, $txt;
 
 		$context['menu_item_selected'] = 'notification';
 		$context['token_check'] = 'profile-u1';
@@ -139,6 +139,55 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 		// Lets see some items loaded into $context['profile_fields']
 		$this->assertArrayHasKey('mentionmem', $context['mention_types'], 'Missing mention type');
 		$this->assertEquals('0', $context['member']['notify_announcements']);
+
+		$tabData = $context['menu_data_1']['tab_data'];
+		$this->assertEquals($txt['notify_settings'], $tabData['title']);
+		$this->assertEquals($txt['notification_info_desc'], $tabData['description']);
+		$this->assertEquals($txt['notify_boards_desc'], $tabData['tabs']['boards']['description']);
+		$this->assertEquals($txt['notify_topics_desc'], $tabData['tabs']['topics']['description']);
+		$this->assertEquals($txt['unwatched_topics_info'], $tabData['tabs']['mutedtopics']['description']);
+		$this->assertEquals($txt['unwatched_topics_info'], $tabData['tabs']['unwatchedtopics']['description']);
+	}
+
+	public function testNotificationMutedTopics(): void
+	{
+		global $context, $txt;
+
+		$req = HttpReq::instance();
+		$previous_sa = $req->query->sa;
+		$req->query->sa = 'mutedtopics';
+		$context['menu_item_selected'] = 'notification';
+		$context['profile_menu_name'] = 'menu_data_1';
+		$context['menu_data_1']['object'] = new Menu();
+		parent::setSession();
+
+		try
+		{
+			$controller = new ProfileOptions(new EventManager());
+			$controller->setUser(User::$info);
+			$controller->pre_dispatch();
+			$controller->action_notification();
+
+			$this->assertEquals('show_list', $context['sub_template']);
+			$this->assertEquals('unwatched_topics', $context['default_list']);
+			$this->assertEquals($txt['showUnwatched'], $context['page_title']);
+			$tabData = $context['menu_data_1']['tab_data'];
+			$this->assertEquals($txt['notify_settings'], $tabData['title']);
+			$this->assertEquals($txt['notification_info_desc'], $tabData['description']);
+			$list = $context['unwatched_topics'];
+			$headers = array_column($list['headers'], null, 'id');
+			$this->assertEquals($txt['unwatched_topics_watch'], $headers['watch']['label']);
+			foreach (['subject', 'started_on', 'last_post_on'] as $column)
+			{
+				$this->assertStringContainsString('area=notification', $headers[$column]['href']);
+				$this->assertStringContainsString('sa=mutedtopics', $headers[$column]['href']);
+				$this->assertStringNotContainsString('area=showposts', $headers[$column]['href']);
+			}
+		}
+		finally
+		{
+			$req->query->sa = $previous_sa;
+		}
 	}
 
 	public function testNotificationUnwatchedTopics(): void
@@ -163,6 +212,9 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 			$this->assertEquals('show_list', $context['sub_template']);
 			$this->assertEquals('unwatched_topics', $context['default_list']);
 			$this->assertEquals($txt['showUnwatched'], $context['page_title']);
+			$tabData = $context['menu_data_1']['tab_data'];
+			$this->assertEquals($txt['notify_settings'], $tabData['title']);
+			$this->assertEquals($txt['notification_info_desc'], $tabData['description']);
 			$list = $context['unwatched_topics'];
 			$headers = array_column($list['headers'], null, 'id');
 			$this->assertEquals($txt['unwatched_topics_watch'], $headers['watch']['label']);
@@ -191,7 +243,7 @@ class ProfileOptionsTest extends ElkArteCommonSetupTest
 		{
 			$this->expectException(Exception::class);
 			$this->expectExceptionMessage((new Exception('no_access', false))->getMessage());
-			$controller->action_showUnwatched();
+			$controller->action_showMuted();
 		}
 		finally
 		{

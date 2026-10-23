@@ -446,8 +446,10 @@ $txt['valid_email'] = 'This must be a valid email address.';
 $txt['info_center_title'] = '%1$s - Info Center';
 
 $txt['send_topic'] = 'Share';
-$txt['unwatch'] = 'Unwatch';
-$txt['watch'] = 'Watch';
+$txt['mute'] = 'Mute';
+$txt['unmute'] = 'Unmute';
+$txt['unwatch'] = 'Mute';
+$txt['watch'] = 'Unmute';
 
 $txt['allow_user_email'] = 'Allow users to email me';
 
