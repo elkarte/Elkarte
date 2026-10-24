@@ -22,8 +22,8 @@ use ElkArte\Helper\ValuesContainer;
 
 class MessagePermission
 {
-	/** @var UserInfo|null The user info object */
-	protected ?UserInfo $user;
+	/** @var UserInfo The user info object */
+	protected UserInfo $user;
 
 	/** @var int The ID of the user for whom permissions are being checked */
 	protected int $userId;
@@ -36,11 +36,10 @@ class MessagePermission
 	 */
 	public function __construct()
 	{
-		$this->user = User::$info;
-		$this->userId = (int) (User::$info->id ?? 0);
-
 		global $modSettings;
 
+		$this->user = User::$info;
+		$this->userId = (int) (User::$info->id ?? 0);
 		$this->modSettings = $modSettings instanceof ValuesContainer ? $modSettings : new ValuesContainer($modSettings ?? []);
 	}
 
