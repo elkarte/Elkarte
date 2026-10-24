@@ -2,7 +2,6 @@
 
 namespace ElkArte;
 
-use ElkArte\Helper\ValuesContainer;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -44,7 +43,7 @@ class AbstractControllerTest extends TestCase
 
 	public function testDefaultUserPopulatedFromUserInfo()
 	{
-		$userData = new ValuesContainer([
+		$userData = new UserInfo([
 			'id' => 42,
 			'name' => 'TestUser',
 			'is_admin' => true,
@@ -62,10 +61,10 @@ class AbstractControllerTest extends TestCase
 
 	public function testExplicitUserPassedToConstructor()
 	{
-		$defaultUser = new ValuesContainer(['id' => 1, 'name' => 'Default']);
+		$defaultUser = new UserInfo(['id' => 1, 'name' => 'Default']);
 		User::$info = $defaultUser;
 
-		$customUser = new ValuesContainer(['id' => 99, 'name' => 'Custom']);
+		$customUser = new UserInfo(['id' => 99, 'name' => 'Custom']);
 
 		$eventManager = new EventManager();
 		$controller = new class($eventManager, $customUser) extends AbstractController {
@@ -84,7 +83,7 @@ class AbstractControllerTest extends TestCase
 
 		$this->assertNull($controller->getUser());
 
-		$newUser = new ValuesContainer(['id' => 10, 'name' => 'UpdatedUser']);
+		$newUser = new UserInfo(['id' => 10, 'name' => 'UpdatedUser']);
 		$controller->setUser($newUser);
 
 		$this->assertSame($newUser, $controller->getUser());

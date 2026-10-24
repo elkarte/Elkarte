@@ -14,7 +14,6 @@
 namespace ElkArte;
 
 use ElkArte\Helper\HttpReq;
-use ElkArte\Helper\ValuesContainer;
 
 /**
  * AbstractController class
@@ -314,9 +313,9 @@ abstract class AbstractController
 	/**
 	 * Returns the user object.
 	 *
-	 * @return ValuesContainer|null the user object.
+	 * @return UserInfo|null the user object.
 	 */
-	public function getUser(): ?ValuesContainer
+	public function getUser(): ?UserInfo
 	{
 		return $this->user;
 	}
@@ -324,9 +323,9 @@ abstract class AbstractController
 	/**
 	 * Sets the $this->user property to the current user
 	 *
-	 * @param ValuesContainer|null $user
+	 * @param UserInfo|null $user
 	 */
-	public function setUser($user): void
+	public function setUser(?UserInfo $user): void
 	{
 		$this->user = $user;
 	}
