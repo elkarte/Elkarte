@@ -133,6 +133,26 @@ class Headers
 	}
 
 	/**
+	 * Returns the currently set headers.
+	 *
+	 * @return array
+	 */
+	public function getHeaders(): array
+	{
+		return $this->headers;
+	}
+
+	/**
+	 * Returns the currently set content type.
+	 *
+	 * @return string
+	 */
+	public function getContentType(): string
+	{
+		return $this->contentType;
+	}
+
+	/**
 	 * Converts / Fixes header names to a standard format, so we have consistent search replace etc.
 	 *
 	 * @param string $name
@@ -172,8 +192,24 @@ class Headers
 	 */
 	public function setAttachmentFileParams($mime_type, $fileName, $disposition = 'attachment'): self
 	{
-		// If an image, set the content type to the image/type defined in the mime_type
-		if (!empty($mime_type) && str_starts_with($mime_type, 'image/'))
+		// Safe image MIME types allowed for inline rendering
+		$safe_image_types = [
+			'image/gif',
+			'image/jpeg',
+			'image/pjpeg',
+			'image/png',
+			'image/x-png',
+			'image/webp',
+			'image/avif',
+			'image/bmp',
+			'image/x-ms-bmp',
+			'image/tiff',
+			'image/x-icon',
+			'image/vnd.microsoft.icon',
+		];
+
+		// If a safe image, set the content type to the image/type defined in the mime_type
+		if (!empty($mime_type) && in_array(strtolower($mime_type), $safe_image_types, true))
 		{
 			$this->contentType($mime_type, '');
 		}
@@ -181,6 +217,7 @@ class Headers
 		else
 		{
 			$this->contentType('application/octet-stream', '');
+			$disposition = 'attachment';
 		}
 
 		// Set the content disposition and name
@@ -197,7 +234,7 @@ class Headers
 	 */
 	private function setDownloadFileNameHeader($fileName, $disposition = false): void
 	{
-		$type = ($disposition ? 'inline' : 'attachment');
+		$type = ($disposition === true || $disposition === 'inline') ? 'inline' : 'attachment';
 
 		$fileName = str_replace('"', '', $fileName);
 
