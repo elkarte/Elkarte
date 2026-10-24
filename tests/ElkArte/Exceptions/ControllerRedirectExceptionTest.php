@@ -9,11 +9,11 @@ namespace ElkArte\Exceptions;
 use ElkArte\AbstractController;
 use ElkArte\EventManager;
 use ElkArte\Helper\HttpReq;
-use ElkArte\Helper\ValuesContainer;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use ElkArte\SiteDispatcher;
 use ElkArte\User;
+use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
 
 class ControllerRedirectExceptionTest extends TestCase
@@ -68,7 +68,7 @@ class ControllerRedirectExceptionTest extends TestCase
 
 	protected function setUp(): void
 	{
-		User::$info = new ValuesContainer([
+		User::$info = new UserInfo([
 			'id' => 1,
 			'name' => 'Tester',
 			'is_admin' => true,

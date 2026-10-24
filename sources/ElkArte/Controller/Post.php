@@ -1145,7 +1145,7 @@ class Post extends AbstractController
 				$sticky = null;
 			}
 
-			$permission = new MessagePermission((int) $this->user->id);
+			$permission = new MessagePermission();
 			$moderationAction = $permission->checkModify($msgInfo, (int) $topic_info['id_member_started']);
 
 			$posterIsGuest = empty($msgInfo['id_member']);
@@ -1657,7 +1657,7 @@ class Post extends AbstractController
 		// Changing either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))
 		{
-			$permission = new MessagePermission((int) $this->user->id);
+			$permission = new MessagePermission();
 			$moderationAction = $permission->checkModify($row, (int) $row['id_member_started'], !empty($row['locked']));
 		}
 

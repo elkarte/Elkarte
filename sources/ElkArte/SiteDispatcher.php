@@ -30,7 +30,6 @@ use ElkArte\Controller\Xml;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\HttpReq;
-use ElkArte\Helper\ValuesContainer;
 use ElkArte\PersonalMessage\PersonalMessage;
 use ElkArte\Profile\Profile;
 use ElkArte\Profile\ProfileHistory;
@@ -376,7 +375,7 @@ class SiteDispatcher
 	/**
 	 * Passes the \ElkArte\User::$info variable to the controller
 	 *
-	 * @param ValuesContainer $user
+	 * @param UserInfo|null $user
 	 */
 	public function setUser($user): void
 	{

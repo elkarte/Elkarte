@@ -1573,7 +1573,7 @@ function getUnapprovedPosts($approve_query, $current_view, $start, $limit = 10)
 
 	$unapproved_items = [];
 	$bbc_parser = ParserWrapper::instance();
-	$permission = new MessagePermission((int) User::$info->id);
+	$permission = new MessagePermission();
 	$i = 1;
 	$db->fetchQuery('
 		SELECT 

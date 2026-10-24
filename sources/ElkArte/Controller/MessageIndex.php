@@ -1129,6 +1129,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				$all_actions[(int) $topic] = $action;
 			}
 		}
+		unset($action);
 
 		$stickyCache = [];
 		$moveCache = [0 => [], 1 => []];
@@ -1177,7 +1178,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				}
 
 				// Separate the actions.
-				switch ($action)
+				switch ($all_actions[$row['id_topic']])
 				{
 					case 'markread':
 						$markCache[] = $row['id_topic'];

@@ -26,7 +26,7 @@ use ElkArte\Exceptions\Exception;
  */
 class MessagesDelete
 {
-	/** @var User The current user deleting something */
+	/** @var UserInfo The current user deleting something */
 	protected $user;
 
 	/** @var int[] Id of the messages not found. */
@@ -43,7 +43,7 @@ class MessagesDelete
 	 *
 	 * @param int|bool $recycle_enabled if the recycling is enabled.
 	 * @param int|null $recycle_board the id of the recycle board (if any)
-	 * @param User $user the user::info making the request
+	 * @param UserInfo $user the user::info making the request
 	 */
 	public function __construct($recycle_enabled, $recycle_board, $user = null)
 	{
@@ -1104,7 +1104,7 @@ class MessagesDelete
 		$board = (int) $board;
 
 		$permissionBoard = empty($board) || $row['id_board'] !== $board ? $row['id_board'] : null;
-		$permission = new MessagePermission((int) $this->user->id);
+		$permission = new MessagePermission();
 
 		return $permission->checkDelete($row, $row['id_member_poster'], $permissionBoard, $permissionBoard === null);
 	}

@@ -23,7 +23,7 @@ use ElkArte\Helper\ValuesContainerReadOnly;
  */
 class User
 {
-	/** @var ValuesContainer Contains data regarding the user in a form that may be useful in the code Basically the former $user_info */
+	/** @var UserInfo Contains data regarding the user in a form that may be useful in the code */
 	public static $info;
 
 	/** @var ValuesContainerReadOnly Contains the data read from the db. Read-only by means of ValuesContainerReadOnly */
