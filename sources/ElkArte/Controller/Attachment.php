@@ -29,7 +29,6 @@ use ElkArte\Graphics\TextImage;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
-use ElkArte\Request;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
@@ -415,15 +414,15 @@ class Attachment extends AbstractController
 		$id_attach = $this->_req->getQuery('attach', 'intval', $this->_req->getQuery('id', 'intval', 0));
 
 		// This is just a regular attachment... Avatars are no longer a dlattach option
-		if (empty($topic) && !empty($id_attach))
+		if (empty($topic))
 		{
-			$id_board = 0;
-			$id_topic = 0;
-			$attachPos = getAttachmentPosition($id_attach);
-			if ($attachPos !== false)
+			$attachPos = !empty($id_attach) ? getAttachmentPosition($id_attach) : false;
+			if ($attachPos === false)
 			{
-				[$id_board, $id_topic] = array_values($attachPos);
+				$this->action_text_to_image('attachment_not_found');
 			}
+
+			[$id_board, $id_topic] = array_values($attachPos);
 		}
 		else
 		{
@@ -470,7 +469,7 @@ class Attachment extends AbstractController
 					$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
 				}
 
-				if (!str_starts_with(getMimeType($filename), 'image'))
+				if (empty(getValidMimeImageType(getMimeType($filename))))
 				{
 					$attachment['fileext'] = 'png';
 					$attachment['mime_type'] = 'image/png';
@@ -506,14 +505,15 @@ class Attachment extends AbstractController
 			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
 		}
 
-		$possibleMobi = strpos(Request::instance()->user_agent(), 'Mobi');
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
 		$reqQueryHasImage = $this->_req->hasQuery('image');
 		$imageRequested = $reqQueryHasImage || $forceImage;
-		$do_cache = !(!$imageRequested && getValidMimeImageType($file_ext) !== '');
+		$validMime = getValidMimeImageType($mime_type);
+		$validExtMime = getValidMimeImageType($file_ext);
+		$do_cache = !(!$imageRequested && $validExtMime !== '');
 
 		// Make sure the mime type warrants an inline display.
-		if ($imageRequested && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
+		if ($imageRequested && (empty($mime_type) || empty($validMime)))
 		{
 			if ($reqQueryHasImage)
 			{
@@ -524,7 +524,7 @@ class Attachment extends AbstractController
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || (!$imageRequested && getValidMimeImageType($file_ext) !== ''))
+		elseif (empty($mime_type) || (!$imageRequested && $validExtMime !== ''))
 		{
 			$mime_type = '';
 			if ($reqQueryHasImage)
@@ -536,7 +536,7 @@ class Attachment extends AbstractController
 		}
 
 		// Show this content inline or download?
-		$disposition = (($reqQueryHasImage || $forceImage) || ($possibleMobi && (str_starts_with($mime_type, 'audio/') || str_starts_with($mime_type, 'video/')))) ? 'inline' : 'attachment';
+		$disposition = ($reqQueryHasImage || $forceImage) ? 'inline' : 'attachment';
 		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
 
 		// Update the download counter (unless it's a thumbnail, and only after 304 validation passes).
@@ -673,7 +673,8 @@ class Attachment extends AbstractController
 			->header('Last-Modified', gmdate('D, d M Y H:i:s', $check_filename ? filemtime($filename) : time() - 525600 * 60) . ' GMT')
 			->header('Accept-Ranges', 'bytes')
 			->header('Connection', 'close')
-			->header('ETag', $eTag);
+			->header('ETag', $eTag)
+			->header('X-Content-Type-Options', 'nosniff');
 
 		// Different browsers like different standards...
 		$headers->setAttachmentFileParams($mime_type, $real_filename, $disposition);
@@ -831,7 +832,7 @@ class Attachment extends AbstractController
 		$resize = true;
 
 		// Return mime type ala mimetype extension
-		if (!str_starts_with(getMimeType($filename), 'image'))
+		if (empty(getValidMimeImageType(getMimeType($filename))))
 		{
 			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';

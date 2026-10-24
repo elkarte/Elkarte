@@ -1102,12 +1102,10 @@ function returnMimeThumb($file_ext, $url = false)
 }
 
 /**
- * From either a mime type, an extension or an IMAGETYPE_* constant
- * returns a valid image mime type
+ * Returns the valid mime type for an image based on the given mime or extension.
  *
- * @param string $mime
- *
- * @return string
+ * @param string|int $mime The mime type or extension to check.
+ * @return string The valid mime type for the image, or an empty string if not valid.
  */
 function getValidMimeImageType($mime)
 {
@@ -1130,12 +1128,13 @@ function getValidMimeImageType($mime)
 	];
 
 	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';
-	if (empty($ext))
+	if (empty($ext) && is_string($mime))
 	{
-		$ext = strtolower(trim(substr($mime, strpos($mime, '/')), '/'));
+		$pos = strpos($mime, '/');
+		$ext = strtolower(trim($pos !== false ? substr($mime, $pos + 1) : $mime, '/'));
 	}
 
-	return in_array($ext, $validImageTypes) ? 'image/' . $ext : '';
+	return in_array($ext, $validImageTypes, true) ? 'image/' . $ext : '';
 }
 
 /**
