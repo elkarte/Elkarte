@@ -2,21 +2,27 @@
 
 namespace ElkArte;
 
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\ValuesContainer;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class MessagePermissionTest extends TestCase
 {
 	private ?array $originalModSettings = null;
+	private $originalUserInfo = null;
 
 	protected function setUp(): void
 	{
 		$this->originalModSettings = $GLOBALS['modSettings'] ?? null;
 		$GLOBALS['modSettings'] = [];
+		$this->originalUserInfo = User::$info ?? null;
+		User::$info = new UserInfo(['id' => 1]);
 	}
 
 	protected function tearDown(): void
 	{
+		User::$info = $this->originalUserInfo;
 		if ($this->originalModSettings === null)
 		{
 			unset($GLOBALS['modSettings']);
@@ -253,18 +259,58 @@ class MessagePermissionTest extends TestCase
 		]));
 	}
 
-	private function permission(array $allowed, array $modSettings = []): MessagePermission
+	public function testConstructorInitializesFromGlobals()
 	{
-		$GLOBALS['modSettings'] = $modSettings;
+		User::$info = new UserInfo(['id' => 42]);
+		global $modSettings;
+		$modSettings = new ValuesContainer(['edit_disable_time' => 15]);
 
-		return new MessagePermission(1, $this->isAllowed($allowed), $this->assertAllowed($allowed));
+		$permission = new class extends MessagePermission {
+			public function getUserId(): int
+			{
+				return $this->userId;
+			}
+
+			public function getUser(): ?UserInfo
+			{
+				return $this->user;
+			}
+
+			public function getModSettings(): ValuesContainer
+			{
+				return $this->modSettings;
+			}
+		};
+
+		$this->assertSame(42, $permission->getUserId());
+		$this->assertSame(User::$info, $permission->getUser());
+		$this->assertSame(15, (int) $permission->getModSettings()['edit_disable_time']);
 	}
 
-	private function permissionThatThrows(array $allowed, array $modSettings = []): MessagePermission
+	private function permission(array $allowed, array $customModSettings = []): MessagePermission
 	{
-		$GLOBALS['modSettings'] = $modSettings;
+		User::$info = new UserInfo(['id' => 1]);
+		$GLOBALS['modSettings'] = $customModSettings;
 
-		return new class(1, $this->isAllowed($allowed), $this->assertAllowed($allowed)) extends MessagePermission {
+		return new class($allowed) extends MessagePermission {
+			public function __construct(private array $allowed)
+			{
+				parent::__construct();
+			}
+
+			protected function isAllowed(string $permission, ?int $board = null): bool
+			{
+				return !empty($this->allowed[$permission]);
+			}
+
+			protected function assertAllowed(string $permission, ?int $board = null): void
+			{
+				if (empty($this->allowed[$permission]))
+				{
+					$this->throwException('Missing permission: ' . $permission);
+				}
+			}
+
 			protected function throwException(string $message): void
 			{
 				throw new RuntimeException($message);
@@ -272,18 +318,8 @@ class MessagePermissionTest extends TestCase
 		};
 	}
 
-	private function isAllowed(array $allowed): callable
+	private function permissionThatThrows(array $allowed, array $customModSettings = []): MessagePermission
 	{
-		return static fn (string $permission, ?int $board = null): bool => !empty($allowed[$permission]);
-	}
-
-	private function assertAllowed(array $allowed): callable
-	{
-		return static function (string $permission, ?int $board = null) use ($allowed): void {
-			if (empty($allowed[$permission]))
-			{
-				throw new RuntimeException('Missing permission: ' . $permission);
-			}
-		};
+		return $this->permission($allowed, $customModSettings);
 	}
 }

@@ -44,7 +44,7 @@ class UserSettingsLoader
 	/** @var ValuesContainer The settings data */
 	protected $settings;
 
-	/** @var ValuesContainer The into data */
+	/** @var UserInfo The into data */
 	protected $info;
 
 	/**
@@ -71,9 +71,9 @@ class UserSettingsLoader
 	/**
 	 * Returns the user into
 	 *
-	 * @return ValuesContainer
+	 * @return UserInfo
 	 */
-	public function getInfo(): ValuesContainer
+	public function getInfo(): UserInfo
 	{
 		return $this->info;
 	}

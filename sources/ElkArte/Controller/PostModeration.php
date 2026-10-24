@@ -94,7 +94,7 @@ class PostModeration extends AbstractController
 			$approve_query = ' AND 1=0';
 		}
 
-		$permission = new MessagePermission((int) $this->user->id);
+		$permission = new MessagePermission();
 
 		// No action yet
 		$toAction = [];

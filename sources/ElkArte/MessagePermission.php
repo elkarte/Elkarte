@@ -4,7 +4,8 @@
  * Class MessagePermission
  *
  * This class is responsible for checking if a user has permission to modify or delete messages.
- * It provides methods to check if a user can modify or delete, and throws exceptions if the user does not have permission.
+ * It provides methods to check if a user can modify or delete, and throws exceptions if the user
+ * does not have permission.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -17,58 +18,30 @@
 namespace ElkArte;
 
 use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\ValuesContainer;
 
 class MessagePermission
 {
+	/** @var UserInfo|null The user info object */
+	protected ?UserInfo $user;
+
 	/** @var int The ID of the user for whom permissions are being checked */
-	private int $userId;
-	/** @var array The modSettings array */
-	private array $modSettings;
-	/** @var callable A callable to check if a user has a specific permission */
-	private $isAllowed;
-	/** @var callable A callable to assert that a user has a specific permission, throwing an exception if not */
-	private $assertAllowed;
+	protected int $userId;
+
+	/** @var ValuesContainer The modSettings container */
+	protected ValuesContainer $modSettings;
 
 	/**
 	 * MessagePermission constructor.
-	 *
-	 * @param int $userId The ID of the user for whom permissions are being checked
-	 * @param callable|null $isAllowed A callable to check if a user has a specific permission
-	 * @param callable|null $assertAllowed A callable to assert that a user has a specific permission, throwing an exception if not
 	 */
-	public function __construct(int $userId, ?callable $isAllowed = null, ?callable $assertAllowed = null)
+	public function __construct()
 	{
-		$this->userId = $userId;
-		$this->modSettings = $GLOBALS['modSettings'] ?? [];
-		$boardsCache = [];
+		$this->user = User::$info;
+		$this->userId = (int) (User::$info->id ?? 0);
 
-		$this->isAllowed = $isAllowed ?? static function (string $permission, ?int $board = null) use (&$boardsCache): bool {
-			if ($board === null)
-			{
-				return allowedTo($permission);
-			}
+		global $modSettings;
 
-			if (!isset($boardsCache[$permission]))
-			{
-				$boardsCache[$permission] = boardsAllowedTo($permission);
-			}
-
-			return in_array(0, $boardsCache[$permission], true) || in_array($board, $boardsCache[$permission], true);
-		};
-
-		$this->assertAllowed = $assertAllowed ?? function (string $permission, ?int $board = null): void {
-			if ($board === null)
-			{
-				isAllowedTo($permission);
-
-				return;
-			}
-
-			if (!($this->isAllowed)($permission, $board))
-			{
-				$this->throwException('cannot_' . $permission);
-			}
-		};
+		$this->modSettings = $modSettings instanceof ValuesContainer ? $modSettings : new ValuesContainer($modSettings ?? []);
 	}
 
 	/**
@@ -81,7 +54,7 @@ class MessagePermission
 	 */
 	public function canModify(array $message, int $topicStarterId, bool $locked = false): bool
 	{
-		if ($locked && !($this->isAllowed)('moderate_board'))
+		if ($locked && !$this->isAllowed('moderate_board'))
 		{
 			return false;
 		}
@@ -102,9 +75,9 @@ class MessagePermission
 	 */
 	public function checkModify(array $message, int $topicStarterId, bool $locked = false): bool
 	{
-		if ($locked && !($this->isAllowed)('moderate_board'))
+		if ($locked && !$this->isAllowed('moderate_board'))
 		{
-			($this->assertAllowed)('moderate_board');
+			$this->assertAllowed('moderate_board');
 		}
 
 		$decision = $this->modifyDecision($message, $topicStarterId);
@@ -116,7 +89,7 @@ class MessagePermission
 
 		if (!$decision['allowed'])
 		{
-			($this->assertAllowed)($decision['permission']);
+			$this->assertAllowed($decision['permission']);
 		}
 
 		return $decision['moderation'];
@@ -152,12 +125,12 @@ class MessagePermission
 			return false;
 		}
 
-		if (($this->isAllowed)('remove_any', $board))
+		if ($this->isAllowed('remove_any', $board))
 		{
 			return true;
 		}
 
-		return (int) ($message['id_member'] ?? 0) === $this->userId && ($this->isAllowed)('remove_own', $board);
+		return (int) ($message['id_member'] ?? 0) === $this->userId && $this->isAllowed('remove_own', $board);
 	}
 
 	/**
@@ -181,7 +154,7 @@ class MessagePermission
 
 		if (!$decision['allowed'])
 		{
-			($this->assertAllowed)($decision['permission'], $board);
+			$this->assertAllowed($decision['permission'], $board);
 		}
 
 		if ($decision['needs_approval'])
@@ -191,12 +164,12 @@ class MessagePermission
 				return 'exit';
 			}
 
-			($this->assertAllowed)('approve_posts', $board);
+			$this->assertAllowed('approve_posts', $board);
 		}
 
 		if ($decision['remove_permission'] !== null)
 		{
-			($this->assertAllowed)($decision['remove_permission'], $board);
+			$this->assertAllowed($decision['remove_permission'], $board);
 		}
 
 		if ($decision['del_first_post'])
@@ -218,7 +191,7 @@ class MessagePermission
 	{
 		$isOwnMessage = (int) ($message['id_member'] ?? 0) === $this->userId;
 		$isTopicStarter = $topicStarterId === $this->userId;
-		$canModifyAny = ($this->isAllowed)('modify_any');
+		$canModifyAny = $this->isAllowed('modify_any');
 
 		if ($isOwnMessage && !$canModifyAny)
 		{
@@ -227,17 +200,17 @@ class MessagePermission
 				return $this->modifyResult(false, null, true, false);
 			}
 
-			if ($isTopicStarter && !($this->isAllowed)('modify_own'))
+			if ($isTopicStarter && !$this->isAllowed('modify_own'))
 			{
-				return $this->modifyResult(($this->isAllowed)('modify_replies'), 'modify_replies', false, false);
+				return $this->modifyResult($this->isAllowed('modify_replies'), 'modify_replies', false, false);
 			}
 
-			return $this->modifyResult(($this->isAllowed)('modify_own'), 'modify_own', false, false);
+			return $this->modifyResult($this->isAllowed('modify_own'), 'modify_own', false, false);
 		}
 
 		if ($isTopicStarter && !$canModifyAny)
 		{
-			return $this->modifyResult(($this->isAllowed)('modify_replies'), 'modify_replies', false, true);
+			return $this->modifyResult($this->isAllowed('modify_replies'), 'modify_replies', false, true);
 		}
 
 		return $this->modifyResult($canModifyAny, 'modify_any', false, !$isOwnMessage);
@@ -275,9 +248,9 @@ class MessagePermission
 	{
 		$isOwnMessage = (int) ($message['id_member'] ?? 0) === $this->userId;
 		$isTopicStarter = $topicStarterId === $this->userId;
-		$canDeleteAny = ($this->isAllowed)('delete_any', $board);
-		$canDeleteOwn = ($this->isAllowed)('delete_own', $board);
-		$canDeleteReplies = ($this->isAllowed)('delete_replies', $board);
+		$canDeleteAny = $this->isAllowed('delete_any', $board);
+		$canDeleteOwn = $this->isAllowed('delete_own', $board);
+		$canDeleteReplies = $this->isAllowed('delete_replies', $board);
 
 		$allowed = $canDeleteAny;
 		$permission = null;
@@ -319,7 +292,7 @@ class MessagePermission
 			&& empty($message['approved'])
 			&& !$isOwnMessage
 			&& !$canDeleteAny
-			&& !($this->isAllowed)('approve_posts', $board);
+			&& !$this->isAllowed('approve_posts', $board);
 
 		$removePermission = null;
 		$removeTopic = false;
@@ -327,7 +300,7 @@ class MessagePermission
 
 		if ($allowed && !$needsApproval && (int) ($message['id_first_msg'] ?? 0) === (int) ($message['id_msg'] ?? 0))
 		{
-			$canRemoveAny = ($this->isAllowed)('remove_any', $board);
+			$canRemoveAny = $this->isAllowed('remove_any', $board);
 
 			if (!$canRemoveAny)
 			{
@@ -335,7 +308,7 @@ class MessagePermission
 				{
 					$removePermission = 'remove_any';
 				}
-				elseif (!($this->isAllowed)('remove_own', $board))
+				elseif (!$this->isAllowed('remove_own', $board))
 				{
 					$removePermission = 'remove_own';
 				}
@@ -390,6 +363,40 @@ class MessagePermission
 		}
 
 		return (int) ($message['poster_time'] ?? 0) + $editDisableTime * 60 < time();
+	}
+
+	/**
+	 * Checks if a user has a specific permission.
+	 *
+	 * @param string $permission The permission name
+	 * @param int|null $board The board ID, if applicable
+	 * @return bool True if allowed, false otherwise
+	 */
+	protected function isAllowed(string $permission, ?int $board = null): bool
+	{
+		return allowedTo($permission, $board);
+	}
+
+	/**
+	 * Asserts that a user has a specific permission, throwing an exception if not.
+	 *
+	 * @param string $permission The permission name
+	 * @param int|null $board The board ID, if applicable
+	 * @throws Exception
+	 */
+	protected function assertAllowed(string $permission, ?int $board = null): void
+	{
+		if ($board === null)
+		{
+			isAllowedTo($permission);
+
+			return;
+		}
+
+		if (!$this->isAllowed($permission, $board))
+		{
+			$this->throwException('cannot_' . $permission);
+		}
 	}
 
 	/**

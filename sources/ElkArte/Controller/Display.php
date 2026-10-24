@@ -669,11 +669,17 @@ class Display extends AbstractController
 		// Set the class of the current topic, Hot, not so hot, locked, sticky
 		determineTopicClass($context);
 
-		$permission = new MessagePermission((int) $this->user->id);
-		$context['can_modify'] = $permission->canModify([
-			'id_member' => $this->topicinfo['id_member_started'], 'poster_time' => $this->topicinfo['poster_time'], 'approved' => $this->topicinfo['approved']],
-			(int) $this->topicinfo['id_member_started'],
-			!empty($context['is_locked']));
+		// Can the user modify this topic?
+		$permission = new MessagePermission();
+		$checkMessage = [
+			'id_topic' => $this->topicinfo['id_topic'],
+			'id_board' => $this->topicinfo['id_board'],
+			'id_member' => $this->topicinfo['id_member_started'],
+			'locked' => $this->topicinfo['locked'],
+			'is_sticky' => $this->topicinfo['is_sticky'],
+			'approved' => $this->topicinfo['approved'],
+		];
+		$context['can_modify'] = $permission->canModify($checkMessage, (int) $this->topicinfo['id_member_started'], !empty($context['is_locked']));
 
 		// Set the topic's information for the template.
 		$context['subject'] = $this->topicinfo['subject'];

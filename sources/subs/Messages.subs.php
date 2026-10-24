@@ -226,7 +226,7 @@ function checkMessagePermissions($message)
 {
 	global $context;
 
-	$permission = new MessagePermission((int) User::$info->id);
+	$permission = new MessagePermission();
 	$permission->checkModify($message, (int) $message['id_member_poster']);
 
 	if ($context['can_announce'] && !empty($message['id_action']))

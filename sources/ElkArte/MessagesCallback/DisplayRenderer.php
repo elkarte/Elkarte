@@ -40,7 +40,7 @@ class DisplayRenderer extends Renderer
 	{
 		global $context, $modSettings;
 
-		$this->_permission = new MessagePermission((int) $this->user->id);
+		$this->_permission = new MessagePermission();
 		$context['can_remove_post'] |= $this->_permission->canDelete($this->_this_message, (int) ($context['topic_starter_id'] ?? 0), null, false);
 
 		// Have you liked this post, can you?

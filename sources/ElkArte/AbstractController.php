@@ -37,16 +37,16 @@ abstract class AbstractController
 	/** @var HttpReq Holds instance of \ElkArte\Helper\HttpReq object */
 	protected $_req;
 
-	/** @var ValuesContainer|null Holds instance of \ElkArte\User::$info object */
+	/** @var UserInfo|null Holds instance of \ElkArte\User::$info object */
 	protected $user;
 
 	/**
 	 * Constructor for the class.
 	 *
 	 * @param EventManager $eventManager The event manager object.
-	 * @param ValuesContainer|null $user The user object (optional, defaults to User::$info).
+	 * @param UserInfo|null $user The user object (optional, defaults to User::$info).
 	 */
-	public function __construct($eventManager, ?ValuesContainer $user = null)
+	public function __construct($eventManager, ?UserInfo $user = null)
 	{
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();

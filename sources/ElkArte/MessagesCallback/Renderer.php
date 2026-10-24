@@ -17,6 +17,7 @@ namespace ElkArte\MessagesCallback;
 use ElkArte\Helper\ValuesContainer;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
+use ElkArte\UserInfo;
 
 /**
  * Class Renderer
@@ -53,11 +54,11 @@ abstract class Renderer
 	 * Renderer constructor starts everything.
 	 *
 	 * @param Object $_dbRequest
-	 * @param Object $user
+	 * @param UserInfo $user
 	 * @param BodyParserInterface $_bodyParser
 	 * @param ValuesContainer $opt
 	 */
-	public function __construct(protected $_dbRequest, protected $user, protected $_bodyParser, $opt = null)
+	public function __construct(protected $_dbRequest, protected UserInfo $user, protected $_bodyParser, $opt = null)
 	{
 		$this->_db = database();
 		$this->_idx_mapper = new ValuesContainer([
