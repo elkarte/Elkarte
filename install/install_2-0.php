@@ -146,6 +146,7 @@ class InstallInstructions_install_2_0
 			array(
 				array('name' => 'id_ban', 'columns' => array('id_ban'), 'type' => 'primary'),
 				array('name' => 'id_ban_group', 'columns' => array('id_ban_group'), 'type' => 'key'),
+				array('name' => 'id_member', 'columns' => array('id_member'), 'type' => 'key'),
 			),
 			array(),
 			'ignore'

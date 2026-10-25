@@ -999,15 +999,26 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
+	static $localCache = [];
+
+	if (empty($ip))
+	{
+		return '';
+	}
+
+	if (isset($localCache[$ip]))
+	{
+		return $localCache[$ip];
+	}
+
 	$cache = Cache::instance();
 
 	$host = '';
-	if (empty($ip) || $cache->getVar($host, 'hostlookup-' . $ip, 600))
+	if ($cache->getVar($host, 'hostlookup-' . $ip, 1800))
 	{
+		$localCache[$ip] = $host;
 		return $host;
 	}
-
-	$t = microtime(true);
 
 	// Check if shell_exec is on the list of disabled functions.
 	if (function_exists('shell_exec'))
@@ -1060,16 +1071,18 @@ function host_from_ip($ip)
 	}
 
 	// This is the last try :/.
-	if (!isset($host))
+	if (empty($host))
 	{
 		$host = @gethostbyaddr($ip);
+		if ($host === $ip || $host === false)
+		{
+			$host = '';
+		}
 	}
 
-	// It took a long time, so let's cache it!
-	if (microtime(true) - $t > 0.5)
-	{
-		$cache->put('hostlookup-' . $ip, $host, 600);
-	}
+	// Persist all resolution results (positive and negative) to avoid redundant lookups.
+	$cache->put('hostlookup-' . $ip, $host, 1800);
+	$localCache[$ip] = $host;
 
 	return $host;
 }
