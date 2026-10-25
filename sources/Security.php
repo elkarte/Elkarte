@@ -291,6 +291,7 @@ function is_not_banned($forceCheck = false)
 			'ip' => User::$info->ip,
 			'ip2' => User::$info->ip2,
 			'email' => User::$info->email,
+			'host' => [],
 		];
 
 		$ban_query = [];
@@ -313,8 +314,9 @@ function is_not_banned($forceCheck = false)
 				$hostname = host_from_ip(User::$info->{$ip_number});
 				if ($hostname !== '')
 				{
-					$ban_query[] = '({string:hostname} LIKE bi.hostname)';
-					$ban_query_vars['hostname'] = $hostname;
+					$_SESSION['ban']['host'][$ip_number] = $hostname;
+					$ban_query[] = '({string:hostname_' . $ip_number . '} LIKE bi.hostname)';
+					$ban_query_vars['hostname_' . $ip_number] = $hostname;
 				}
 			}
 		}

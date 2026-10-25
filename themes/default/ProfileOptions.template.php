@@ -503,20 +503,9 @@ function template_profile_options()
 				echo '
 						<select name="', $key, '" id="', $key, '">';
 
-				if (isset($field['options']))
+				if (is_callable($field['options']))
 				{
-					// Is this some code to generate the options?
-					if (!is_array($field['options']))
-					{
-						try
-						{
-							$field['options'] = eval($field['options']);
-						}
-						catch (ParseError)
-						{
-							$field['options'] = '';
-						}
-					}
+					$field['options'] = $field['options']();
 
 					// Assuming we now have some!
 					if (is_array($field['options']))

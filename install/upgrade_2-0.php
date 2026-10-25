@@ -1249,4 +1249,29 @@ class UpgradeInstructions_upgrade_2_0
 			)
 		);
 	}
+
+	public function add_ban_items_id_member_index_title()
+	{
+		return 'Adding member index to ban items...';
+	}
+
+	public function add_ban_items_id_member_index()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding id_member index to the ban_items table...',
+				'function' => function () {
+					$this->table->add_index('{db_prefix}ban_items',
+						array(
+							'name' => 'id_member',
+							'columns' => array('id_member'),
+							'type' => 'key',
+						),
+						array(),
+						'exists'
+					);
+				}
+			)
+		);
+	}
 }
