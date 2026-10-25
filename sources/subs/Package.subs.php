@@ -22,6 +22,7 @@ use ElkArte\Http\CurlFetchWebdata;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\Http\FtpConnection;
 use ElkArte\Http\StreamFetchWebdata;
+use ElkArte\Http\UrlValidator;
 use ElkArte\Packages\PackageChmod;
 use ElkArte\Packages\PackageParser;
 use ElkArte\User;
@@ -1635,6 +1636,13 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 
 	if ($match[1] === 'ftp')
 	{
+		// Validate host for FTP too
+		$ips = UrlValidator::resolveAndValidateHost($match[3]);
+		if ($ips === false)
+		{
+			return false;
+		}
+
 		// Establish a connection and attempt to enable passive mode.
 		$ftp = new FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())

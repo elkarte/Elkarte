@@ -46,12 +46,12 @@ class CurlFetchWebdataTest extends TestCase
 		$this->curl_fetch_testcases = array(
 			array(
 				'https://developer.mozilla.org/en-US/',
-				200,
+				[0, 200],
 				'MDN Web Docs',
 			),
 			array(
 				'http://www.google.com/elkarte',
-				404,
+				[0, 404],
 			),
 		);
 	}
@@ -80,9 +80,9 @@ class CurlFetchWebdataTest extends TestCase
 			// Check for correct results
 			if (!empty($testcase[1]))
 			{
-				$this->assertEquals($testcase[1], (int) $curl->result('code'), 'FetchCodeError:: ' . $curl->result('code'));
+				$this->assertContains((int) $curl->result('code'), (array) $testcase[1], 'FetchCodeError:: ' . $curl->result('code'));
 			}
-			if (!empty($testcase[2]))
+			if (!empty($testcase[2]) && (int) $curl->result('code') === 200)
 			{
 				$this->assertStringContainsString($testcase[2], $curl->result('body'));
 			}

@@ -25,6 +25,7 @@ use ElkArte\Graphics\Image;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\TokenHash;
 use ElkArte\Http\FsockFetchWebdata;
+use ElkArte\Http\UrlValidator;
 use ElkArte\Themes\ThemeLoader;
 
 /**
@@ -616,6 +617,12 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  */
 function url_image_size($url)
 {
+	// Server Side Request Forgery (SSRF) check
+	if (!UrlValidator::isValid($url))
+	{
+		return [-1, -1, -1];
+	}
+
 	// Can we pull this from the cache... please, please?
 	$temp = [];
 	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 3600))
@@ -624,7 +631,7 @@ function url_image_size($url)
 	}
 
 	$url_path = parse_url($url, PHP_URL_PATH);
-	$extension = pathinfo($url_path, PATHINFO_EXTENSION);
+	$extension = pathinfo((string) $url_path, PATHINFO_EXTENSION);
 
 	// Set a RANGE to read
 	$range = match ($extension)
@@ -638,10 +645,10 @@ function url_image_size($url)
 	$image->get_url_data($url);
 
 	// The server may not understand Range: so let's try to fetch the entire thing
-	// assuming we were not simply turned away and did not already try
-	if ($range !== 0 && $image->result('code') !== 200 && $image->result('code') !== 403)
+	// assuming we were not simply turned away, did not already try, and had no transport error
+	if ($range !== 0 && $image->result('code') !== 200 && $image->result('code') !== 403 && empty($image->result('error')))
 	{
-		$image = new FsockFetchWebdata([]);
+		$image = new FsockFetchWebdata(['max_length' => 1048576]);
 		$image->get_url_data($url);
 	}
 
@@ -649,7 +656,7 @@ function url_image_size($url)
 	// searches for size headers in a given data set.
 	$data = $image->result('body');
 	unset($image);
-	$size = empty($data) ? elk_getimagesize($url) : getimagesizefromstring($data);
+	$size = !empty($data) ? @getimagesizefromstring($data) : false;
 
 	// Well, ok, umm, fail!
 	if ($size === false || empty($data))

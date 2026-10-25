@@ -86,6 +86,8 @@ class StreamFetchWebdata
 			}
 		}
 
+		$this->_response['redirects'] = 0;
+
 		// Set the options and get it
 		$this->_openRequest($url);
 	}
@@ -118,6 +120,34 @@ class StreamFetchWebdata
 			$this->_parseRequest();
 			$this->_processHeaders();
 
+			// Check for redirects manually so each hop is validated against SSRF
+			if (!empty($this->_response['headers']['location'])
+				&& $this->_response['redirects'] < $this->_max_redirect
+				&& preg_match('~30[12378]~', (string) $this->_response['code']) === 1)
+			{
+				if (is_resource($this->_fp))
+				{
+					fclose($this->_fp);
+					$this->_fp = null;
+				}
+
+				$this->_response['redirects']++;
+				$location = is_array($this->_response['headers']['location'])
+					? end($this->_response['headers']['location'])
+					: $this->_response['headers']['location'];
+
+				$redirectUrl = UrlValidator::buildAbsoluteUrl($this->_response['url'], $location);
+				if (UrlValidator::isValid($redirectUrl, $this->_user_options['validator_options'] ?? []))
+				{
+					return $this->_openRequest($redirectUrl);
+				}
+
+				$this->_response['error'] = 'Redirect to prohibited target host blocked';
+				$this->_response['code'] = 400;
+
+				return false;
+			}
+
 			return $this->_fetchData();
 		}
 
@@ -133,31 +163,41 @@ class StreamFetchWebdata
 	{
 		$this->_url = [];
 
-		// Ensure the url is valid
-		if (filter_var($url, FILTER_VALIDATE_URL))
+		$validated = UrlValidator::validate($url, $this->_user_options['validator_options'] ?? []);
+		if ($validated === false)
 		{
-			// Get the elements for the url
-			$this->_url = parse_url($url);
+			$this->_response['error'] = 'Invalid URL or target host not allowed';
+			$this->_response['code'] = 400;
 
-			$this->_url['path'] = ($this->_url['path'] ?? '/') . (isset($this->_url['query']) ? '?' . $this->_url['query'] : '');
-			$this->_response['url'] = $this->_url['scheme'] . '://' . $this->_url['host'] . $this->_url['path'];
+			return;
 		}
+
+		$this->_url = [
+			'host_raw' => $validated['host'],
+			'scheme' => $validated['scheme'],
+			'port' => $validated['port'],
+			'path' => $validated['path'],
+			'ip' => $validated['valid_ip'],
+		];
+		$this->_response['url'] = $validated['url'];
 
 		// Build out the options for our context stream
 		$this->_options = [
 			'ssl' => [
-				'verify_peer' => false,
-				'verify_peername' => false
+				'verify_peer' => $this->_user_options['verify_peer'] ?? false,
+				'verify_peername' => false,
+				'peer_name' => $validated['host'],
+				'SNI_enabled' => true,
+				'SNI_server_name' => $validated['host'],
 			],
-			'http' =>
-				[
-					'method' => 'GET',
-					'max_redirects' => $this->_max_redirect,
-					'ignore_errors' => true,
-					'protocol_version' => 1.1,
-					'follow_location' => 1,
-					'timeout' => 10,
-				]
+			'http' => [
+				'method' => 'GET',
+				'max_redirects' => 0,
+				'ignore_errors' => true,
+				'protocol_version' => 1.1,
+				'follow_location' => 0,
+				'timeout' => 10,
+			],
 		];
 
 		$headers = [
@@ -214,7 +254,6 @@ class StreamFetchWebdata
 		// header information as well as meta-data
 		$headers = stream_get_meta_data($this->_fp);
 		$this->_response['headers'] = [];
-		$this->_response['redirects'] = 0;
 		$this->_response['code'] = '???';
 
 		// Loop and process the headers
@@ -226,12 +265,6 @@ class StreamFetchWebdata
 			// Normalize / clean
 			$name = isset($temp[0]) ? strtolower($temp[0]) : '';
 			$value = isset($temp[1]) ? trim($temp[1]) : null;
-
-			// How many redirects
-			if ($name === 'location')
-			{
-				$this->_response['redirects']++;
-			}
 
 			// Server response is mixed in with the real headers
 			if ($value === null)
