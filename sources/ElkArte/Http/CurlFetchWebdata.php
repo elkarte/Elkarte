@@ -38,12 +38,6 @@ namespace ElkArte\Http;
  */
 class CurlFetchWebdata
 {
-	/** @var string Error message for invalid or disallowed URL / host */
-	public const ERR_INVALID_URL = 'Invalid URL or target host not allowed';
-
-	/** @var string Error message for blocked redirects */
-	public const ERR_PROHIBITED_REDIRECT = 'Redirect to prohibited target host blocked';
-
 	/**
 	 * Set the default items for this class
 	 *
@@ -134,7 +128,7 @@ class CurlFetchWebdata
 		$validated = UrlValidator::validate($url, $this->_user_options['validator_options'] ?? []);
 		if ($validated === false)
 		{
-			$this->_setErrorResponse($url, self::ERR_INVALID_URL, 400, true);
+			$this->_setErrorResponse($url, 'Invalid URL or target host not allowed', 400, true);
 
 			return $this;
 		}
@@ -262,7 +256,7 @@ class CurlFetchWebdata
 		$validated = UrlValidator::validate($url, $this->_user_options['validator_options'] ?? []);
 		if ($validated === false)
 		{
-			$this->_setErrorResponse($url, self::ERR_INVALID_URL, 400);
+			$this->_setErrorResponse($url, 'Invalid URL or target host not allowed', 400);
 
 			return false;
 		}
@@ -270,11 +264,17 @@ class CurlFetchWebdata
 		$this->_options[CURLOPT_URL] = $validated['url'];
 
 		// DNS rebinding protection via CURLOPT_RESOLVE if IP is resolved
-		if (!empty($validated['valid_ip']) && defined('CURLOPT_RESOLVE'))
+		if (defined('CURLOPT_RESOLVE'))
 		{
-			$this->_options[CURLOPT_RESOLVE] = [
-				$validated['host'] . ':' . $validated['port'] . ':' . $validated['valid_ip'],
-			];
+			$resolveEntry = UrlValidator::resolveEntry($validated);
+			if ($resolveEntry !== '')
+			{
+				$this->_options[CURLOPT_RESOLVE] = [$resolveEntry];
+			}
+			else
+			{
+				unset($this->_options[CURLOPT_RESOLVE]);
+			}
 		}
 
 		// If we have not already been redirected, set it up so we can
@@ -319,7 +319,7 @@ class CurlFetchWebdata
 			}
 			else
 			{
-				$this->_setErrorResponse($redirectUrl, self::ERR_PROHIBITED_REDIRECT, 400);
+				$this->_setErrorResponse($redirectUrl, 'Redirect to prohibited target host blocked', 400);
 			}
 		}
 

@@ -22,7 +22,44 @@ class UrlValidator
 	public const DEFAULT_ALLOWED_SCHEMES = ['http', 'https'];
 
 	/** @var array Default allowed ports */
-	public const DEFAULT_ALLOWED_PORTS = [80, 443, 8080, 8443];
+	public const DEFAULT_ALLOWED_PORTS = [80, 443];
+
+	/** @var string[] Blocked IPv4 ranges (CIDR) */
+	protected const IPV4_BLOCKED_CIDRS = [
+		'0.0.0.0/8',
+		'10.0.0.0/8',
+		'100.64.0.0/10',
+		'127.0.0.0/8',
+		'169.254.0.0/16',
+		'172.16.0.0/12',
+		'192.0.0.0/24',
+		'192.0.2.0/24',
+		'192.168.0.0/16',
+		'198.18.0.0/15',
+		'198.51.100.0/24',
+		'203.0.113.0/24',
+		'224.0.0.0/4',
+		'240.0.0.0/4',
+	];
+
+	/** @var string[] Blocked IPv6 ranges (CIDR) */
+	protected const IPV6_BLOCKED_CIDRS = [
+		'fc00::/7',
+		'fe80::/10',
+		'ff00::/8',
+		'2001:db8::/32',
+		'2001:10::/28',
+		'2001:20::/28',
+	];
+
+	/** @var array IPv6 prefixes with an embedded IPv4 and its byte offset */
+	protected const IPV6_EMBEDDED_CIDRS = [
+		'::/96' => 12,
+		'::ffff:0:0/96' => 12,
+		'::ffff:0:0:0/96' => 12,
+		'64:ff9b::/96' => 12,
+		'2002::/16' => 2,
+	];
 
 	/**
 	 * Check if a URL is valid and safe from SSRF.
@@ -30,7 +67,7 @@ class UrlValidator
 	 * @param string $url The URL to check
 	 * @param array $options Optional rules:
 	 *   - allowed_schemes: array of schemes (default ['http', 'https'])
-	 *   - allowed_ports: array of ports or null for any port (default [80, 443, 8080, 8443])
+	 *   - allowed_ports: array of ports or null for any port (default [80, 443])
 	 *   - allow_private: bool (default false)
 	 *   - dns_resolve: bool (default true)
 	 * @return bool
@@ -68,7 +105,7 @@ class UrlValidator
 		}
 
 		$scheme = strtolower($parsed['scheme'] ?? '');
-		$allowedSchemes = $options['allowed_schemes'] ?? self::DEFAULT_ALLOWED_SCHEMES;
+		$allowedSchemes = (array) ($options['allowed_schemes'] ?? self::DEFAULT_ALLOWED_SCHEMES);
 		if (!in_array($scheme, $allowedSchemes, true))
 		{
 			return false;
@@ -81,14 +118,19 @@ class UrlValidator
 		}
 
 		$allowedPorts = array_key_exists('allowed_ports', $options) ? $options['allowed_ports'] : self::DEFAULT_ALLOWED_PORTS;
-		if ($allowedPorts !== null && !in_array($port, $allowedPorts, true))
+		if ($allowedPorts !== null)
 		{
-			return false;
+			$allowedPorts = array_map('intval', (array) $allowedPorts);
+			if (!in_array($port, $allowedPorts, true))
+			{
+				return false;
+			}
 		}
 
 		$host = $parsed['host'];
-		$allowPrivate = (bool) ($options['allow_private'] ?? false);
-		$dnsResolve = (bool) ($options['dns_resolve'] ?? true);
+		$hostBare = trim($host, '[]');
+		$allowPrivate = filter_var($options['allow_private'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+		$dnsResolve = filter_var($options['dns_resolve'] ?? true, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
 
 		$ips = [];
 		if ($dnsResolve)
@@ -114,6 +156,7 @@ class UrlValidator
 		return [
 			'scheme' => $scheme,
 			'host' => $host,
+			'host_bare' => $hostBare,
 			'port' => $port,
 			'path' => $path . $query,
 			'path_only' => $path,
@@ -133,13 +176,15 @@ class UrlValidator
 	 */
 	public static function resolveAndValidateHost(string $host, bool $allowPrivate = false): array|false
 	{
+		static $resolved = [];
+
 		$cleanHost = trim($host, '[]');
 		if ($cleanHost === '')
 		{
 			return false;
 		}
 
-		// Direct IP check
+		// Direct IP check xxx.xxx.xxx.xxx or IPv6 literal
 		if (filter_var($cleanHost, FILTER_VALIDATE_IP))
 		{
 			if (!$allowPrivate && !self::isIpAllowed($cleanHost))
@@ -150,7 +195,7 @@ class UrlValidator
 			return [$cleanHost];
 		}
 
-		// Disallow localhost and special internal TLDs
+		// Not a direct IP, first check for localhost and special internal TLDs
 		$lowerHost = strtolower($cleanHost);
 		if ($lowerHost === 'localhost'
 			|| str_ends_with($lowerHost, '.localhost')
@@ -165,6 +210,13 @@ class UrlValidator
 			{
 				return false;
 			}
+		}
+
+		// Begin to resolve the hostname and check the IPs
+		$cacheKey = ($allowPrivate ? '1|' : '0|') . $lowerHost;
+		if (isset($resolved[$cacheKey]))
+		{
+			return $resolved[$cacheKey];
 		}
 
 		$ips = [];
@@ -192,8 +244,8 @@ class UrlValidator
 			}
 		}
 
-		// Fallback / supplement with gethostbynamel for IPv4
-		if (function_exists('gethostbynamel'))
+		// Fallback to gethostbynamel for IPv4 when no records were returned
+		if (empty($ips) && function_exists('gethostbynamel'))
 		{
 			$v4 = @gethostbynamel($cleanHost);
 			if (is_array($v4))
@@ -218,6 +270,11 @@ class UrlValidator
 					return false;
 				}
 			}
+		}
+
+		if (count($resolved) < 32)
+		{
+			$resolved[$cacheKey] = $ips;
 		}
 
 		return $ips;
@@ -270,84 +327,12 @@ class UrlValidator
 	 */
 	protected static function isIpv4Allowed(string $packed): bool
 	{
-		$bytes = array_values(unpack('C4', $packed));
-
-		// 0.0.0.0/8 (Current network)
-		if ($bytes[0] === 0)
+		foreach (self::IPV4_BLOCKED_CIDRS as $cidr)
 		{
-			return false;
-		}
-
-		// 10.0.0.0/8 (Private RFC 1918)
-		if ($bytes[0] === 10)
-		{
-			return false;
-		}
-
-		// 100.64.0.0/10 (Carrier-grade NAT RFC 6598)
-		if ($bytes[0] === 100 && ($bytes[1] >= 64 && $bytes[1] <= 127))
-		{
-			return false;
-		}
-
-		// 127.0.0.0/8 (Loopback)
-		if ($bytes[0] === 127)
-		{
-			return false;
-		}
-
-		// 169.254.0.0/16 (Link-local / Cloud metadata RFC 3927)
-		if ($bytes[0] === 169 && $bytes[1] === 254)
-		{
-			return false;
-		}
-
-		// 172.16.0.0/12 (Private RFC 1918)
-		if ($bytes[0] === 172 && ($bytes[1] >= 16 && $bytes[1] <= 31))
-		{
-			return false;
-		}
-
-		// 192.0.0.0/24 (IETF Protocol Assignments RFC 6890)
-		if ($bytes[0] === 192 && $bytes[1] === 0 && $bytes[2] === 0)
-		{
-			return false;
-		}
-
-		// 192.0.2.0/24 (TEST-NET-1 RFC 5737)
-		if ($bytes[0] === 192 && $bytes[1] === 0 && $bytes[2] === 2)
-		{
-			return false;
-		}
-
-		// 192.168.0.0/16 (Private RFC 1918)
-		if ($bytes[0] === 192 && $bytes[1] === 168)
-		{
-			return false;
-		}
-
-		// 198.18.0.0/15 (Benchmarking RFC 2544)
-		if ($bytes[0] === 198 && ($bytes[1] === 18 || $bytes[1] === 19))
-		{
-			return false;
-		}
-
-		// 198.51.100.0/24 (TEST-NET-2 RFC 5737)
-		if ($bytes[0] === 198 && $bytes[1] === 51 && $bytes[2] === 100)
-		{
-			return false;
-		}
-
-		// 203.0.113.0/24 (TEST-NET-3 RFC 5737)
-		if ($bytes[0] === 203 && $bytes[1] === 0 && $bytes[2] === 113)
-		{
-			return false;
-		}
-
-		// 224.0.0.0/4 (Multicast) and 240.0.0.0/4 (Reserved) and 255.255.255.255 (Broadcast)
-		if ($bytes[0] >= 224)
-		{
-			return false;
+			if (self::matchesCidr($packed, $cidr))
+			{
+				return false;
+			}
 		}
 
 		return true;
@@ -361,8 +346,6 @@ class UrlValidator
 	 */
 	protected static function isIpv6Allowed(string $packed): bool
 	{
-		$bytes = array_values(unpack('C16', $packed));
-
 		// ::/128 (Unspecified)
 		if ($packed === str_repeat("\0", 16))
 		{
@@ -375,58 +358,105 @@ class UrlValidator
 			return false;
 		}
 
-		// ::ffff:0:0/96 (IPv4-mapped IPv6)
-		if (substr($packed, 0, 10) === str_repeat("\0", 10) && substr($packed, 10, 2) === "\xff\xff")
+		// Addresses with an embedded IPv4 address
+		foreach (self::IPV6_EMBEDDED_CIDRS as $cidr => $offset)
 		{
-			return self::isIpv4Allowed(substr($packed, 12, 4));
+			if (self::matchesCidr($packed, $cidr))
+			{
+				return self::isIpv4Allowed(substr($packed, $offset, 4));
+			}
 		}
 
-		// 64:ff9b::/96 (IPv4/IPv6 translation RFC 6052)
-		if (substr($packed, 0, 4) === "\x00\x64\xff\x9b" && substr($packed, 4, 8) === str_repeat("\0", 8))
+		foreach (self::IPV6_BLOCKED_CIDRS as $cidr)
 		{
-			return self::isIpv4Allowed(substr($packed, 12, 4));
-		}
-
-		// 2002::/16 (6to4 RFC 3056) - contains embedded IPv4 in bytes 2..5
-		if ($bytes[0] === 0x20 && $bytes[1] === 0x02)
-		{
-			if (!self::isIpv4Allowed(substr($packed, 2, 4)))
+			if (self::matchesCidr($packed, $cidr))
 			{
 				return false;
 			}
 		}
 
-		// fc00::/7 (Unique Local Address - ULA RFC 4193)
-		if (($bytes[0] & 0xfe) === 0xfc)
-		{
-			return false;
-		}
-
-		// fe80::/10 (Link-Local RFC 4291)
-		if ($bytes[0] === 0xfe && ($bytes[1] & 0xc0) === 0x80)
-		{
-			return false;
-		}
-
-		// ff00::/8 (Multicast RFC 4291)
-		if ($bytes[0] === 0xff)
-		{
-			return false;
-		}
-
-		// 2001:db8::/32 (Documentation RFC 3849)
-		if ($bytes[0] === 0x20 && $bytes[1] === 0x01 && $bytes[2] === 0x0d && $bytes[3] === 0xb8)
-		{
-			return false;
-		}
-
-		// 2001:10::/28 and 2001:20::/28 (ORCHID RFC 4843 / RFC 7343)
-		if ($bytes[0] === 0x20 && $bytes[1] === 0x01 && ($bytes[2] === 0x00 && ($bytes[3] >= 0x10 && $bytes[3] <= 0x2f)))
-		{
-			return false;
-		}
-
 		return true;
+	}
+
+	/**
+	 * Check a packed IP address against a CIDR range.
+	 *
+	 * @param string $packed
+	 * @param string $cidr
+	 * @return bool
+	 */
+	protected static function matchesCidr(string $packed, string $cidr): bool
+	{
+		static $networks = [];
+
+		[$network, $bits] = array_pad(explode('/', $cidr, 2), 2, null);
+		$bits = $bits === null ? strlen($packed) * 8 : (int) $bits;
+
+		if (!isset($networks[$network]))
+		{
+			$networks[$network] = inet_pton($network);
+		}
+
+		$networkPacked = $networks[$network];
+		if ($networkPacked === false)
+		{
+			return false;
+		}
+
+		$wholeBytes = intdiv($bits, 8);
+		if ($wholeBytes > 0 && substr($packed, 0, $wholeBytes) !== substr($networkPacked, 0, $wholeBytes))
+		{
+			return false;
+		}
+
+		$remainingBits = $bits % 8;
+		if ($remainingBits === 0)
+		{
+			return true;
+		}
+
+		$mask = (0xff << (8 - $remainingBits)) & 0xff;
+
+		return (ord($packed[$wholeBytes]) & $mask) === (ord($networkPacked[$wholeBytes]) & $mask);
+	}
+
+	/**
+	 * Wrap an IPv6 literal in brackets for URLs and socket addresses.
+	 *
+	 * @param string $ip
+	 * @return string
+	 */
+	public static function bracketIp(string $ip): string
+	{
+		return str_contains($ip, ':') ? '[' . $ip . ']' : $ip;
+	}
+
+	/**
+	 * Build a CURLOPT_RESOLVE entry for a validated URL.
+	 *
+	 * IP-literal URLs need no pinning because no name resolution takes place.
+	 *
+	 * @param array $validated Result of validate()
+	 * @return string Resolve entry, or an empty string when not applicable
+	 */
+	public static function resolveEntry(array $validated): string
+	{
+		$host = $validated['host_bare'] ?? '';
+		$ip = $validated['valid_ip'] ?? '';
+		$port = (int) ($validated['port'] ?? 0);
+
+		if ($host === '' || $ip === '' || $port < 1)
+		{
+			return '';
+		}
+
+		// A literal IP is connected to directly, so there is no name to pin
+		if (filter_var($host, FILTER_VALIDATE_IP))
+		{
+			return '';
+		}
+
+		return $host . ':' . $port . ':' . self::bracketIp($ip);
 	}
 
 	/**
@@ -439,33 +469,175 @@ class UrlValidator
 	public static function buildAbsoluteUrl(string $baseUrl, string $relativeUrl): string
 	{
 		$relativeUrl = trim($relativeUrl);
-		$lastUrlParse = parse_url($baseUrl);
-		$newUrlParse = parse_url($relativeUrl);
 
-		if ($newUrlParse === false)
+		// Reject header-injection / control characters
+		if (preg_match('~[\x00-\x1F\x7F]~', $relativeUrl))
 		{
-			return $baseUrl;
+			return '';
 		}
 
-		if (!empty($newUrlParse['scheme']) && !empty($newUrlParse['host']))
+		$base = parse_url($baseUrl);
+		$ref = parse_url($relativeUrl);
+
+		if ($base === false || $ref === false || empty($base['scheme']) || empty($base['host']))
 		{
-			return $relativeUrl;
+			return '';
 		}
 
-		$scheme = $newUrlParse['scheme'] ?? ($lastUrlParse['scheme'] ?? 'http');
-		$host = $newUrlParse['host'] ?? ($lastUrlParse['host'] ?? '');
-		$port = isset($newUrlParse['port']) ? ':' . $newUrlParse['port'] : (isset($lastUrlParse['port']) ? ':' . $lastUrlParse['port'] : '');
-
-		$path = $newUrlParse['path'] ?? '';
-		if ($path === '' || $path[0] !== '/')
+		$baseScheme = strtolower($base['scheme']);
+		if (!in_array($baseScheme, self::DEFAULT_ALLOWED_SCHEMES, true))
 		{
-			$lastPath = $lastUrlParse['path'] ?? '/';
-			$lastDir = substr($lastPath, 0, (int) strrpos($lastPath, '/') + 1);
-			$path = $lastDir . $path;
+			return '';
 		}
 
-		$query = !empty($newUrlParse['query']) ? '?' . $newUrlParse['query'] : '';
+		// Absolute URI
+		if (isset($ref['scheme']))
+		{
+			return in_array(strtolower($ref['scheme']), self::DEFAULT_ALLOWED_SCHEMES, true) && !empty($ref['host'])
+				? $relativeUrl
+				: '';
+		}
 
-		return $scheme . '://' . $host . $port . $path . $query;
+		// Network-path reference: //host/path
+		if (isset($ref['host']))
+		{
+			return self::formatUrl($baseScheme, $ref, $ref['path'] ?? '', $ref['query'] ?? null, $ref['fragment'] ?? null);
+		}
+
+		$refPath = $ref['path'] ?? '';
+		if ($refPath === '')
+		{
+			// Query-only and fragment-only references keep the base path
+			$path = $base['path'] ?? '/';
+			$query = $ref['query'] ?? ($base['query'] ?? null);
+		}
+		else
+		{
+			if ($refPath[0] === '/')
+			{
+				$path = self::removeDotSegments($refPath);
+			}
+			else
+			{
+				$basePath = $base['path'] ?? '/';
+				$lastSlash = strrpos($basePath, '/');
+				$baseDir = $lastSlash === false ? '/' : substr($basePath, 0, $lastSlash + 1);
+				$path = self::removeDotSegments($baseDir . $refPath);
+			}
+
+			$query = $ref['query'] ?? null;
+		}
+
+		if ($path === '')
+		{
+			$path = '/';
+		}
+
+		return self::formatUrl($baseScheme, $base, $path, $query, $ref['fragment'] ?? null);
+	}
+
+	/**
+	 * Assemble a URL from its components.
+	 *
+	 * @param string $scheme
+	 * @param array $authority Parsed URL providing host, optional port and user info
+	 * @param string $path
+	 * @param string|null $query
+	 * @param string|null $fragment
+	 * @return string
+	 */
+	protected static function formatUrl(string $scheme, array $authority, string $path, ?string $query, ?string $fragment = null): string
+	{
+		$userInfo = '';
+		if (isset($authority['user']))
+		{
+			$userInfo = $authority['user'] . (isset($authority['pass']) ? ':' . $authority['pass'] : '') . '@';
+		}
+
+		$url = $scheme . '://' . $userInfo . $authority['host'];
+		if (isset($authority['port']))
+		{
+			$url .= ':' . $authority['port'];
+		}
+
+		$url .= $path;
+		if ($query !== null)
+		{
+			$url .= '?' . $query;
+		}
+
+		if ($fragment !== null)
+		{
+			$url .= '#' . $fragment;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Remove "." and ".." segments from a URL path (RFC 3986 section 5.2.4).
+	 *
+	 * @param string $path
+	 * @return string
+	 */
+	protected static function removeDotSegments(string $path): string
+	{
+		$output = '';
+
+		while ($path !== '')
+		{
+			if (str_starts_with($path, '../'))
+			{
+				$path = substr($path, 3);
+			}
+			elseif (str_starts_with($path, './'))
+			{
+				$path = substr($path, 2);
+			}
+			elseif (str_starts_with($path, '/./'))
+			{
+				$path = '/' . substr($path, 3);
+			}
+			elseif ($path === '/.')
+			{
+				$path = '/';
+			}
+			elseif (str_starts_with($path, '/../'))
+			{
+				$path = '/' . substr($path, 4);
+				$output = self::popLastSegment($output);
+			}
+			elseif ($path === '/..')
+			{
+				$path = '/';
+				$output = self::popLastSegment($output);
+			}
+			elseif ($path === '.' || $path === '..')
+			{
+				$path = '';
+			}
+			else
+			{
+				$nextSlash = $path[0] === '/' ? strpos($path, '/', 1) : strpos($path, '/');
+				$segment = $nextSlash === false ? $path : substr($path, 0, $nextSlash);
+				$output .= $segment;
+				$path = substr($path, strlen($segment));
+			}
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Remove the last segment from a URL path.
+	 *
+	 * @param string $output
+	 * @return string
+	 */
+	protected static function popLastSegment(string $output): string
+	{
+		$lastSlash = strrpos($output, '/');
+
+		return $lastSlash === false ? '' : substr($output, 0, $lastSlash);
 	}
 }

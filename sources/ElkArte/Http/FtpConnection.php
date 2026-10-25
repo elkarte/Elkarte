@@ -114,17 +114,43 @@ class FtpConnection
 	 */
 	public function getServer($ftp_server): string
 	{
-		$location = parse_url($ftp_server);
-		$location['host'] = $location['host'] ?? $ftp_server;
-		$location['scheme'] = $location['scheme'] ?? '';
+		$ftp_scheme = preg_match('~^(ftps|https|ssl)://~i', $ftp_server) === 1 ? 'ssl://' : '';
 
-		$ftp_scheme = '';
-		if ($location['scheme'] === 'ftps' || $location['scheme'] === 'https')
+		// Strip any scheme and user info before inspecting the host
+		$host = preg_replace('~^[a-z][a-z0-9+.-]*://~i', '', (string) $ftp_server);
+		if (str_contains($host, '@'))
 		{
-			$ftp_scheme = 'ssl://';
+			$host = substr($host, strrpos($host, '@') + 1);
 		}
 
-		return $ftp_scheme . strtr($location['host'], ['/' => '', ':' => '', '@' => '']);
+		// Unwrap a bracketed IPv6 literal, optionally followed by a port or path
+		if (preg_match('~^\[([0-9a-f:.]+)\]~i', $host, $match) === 1)
+		{
+			$host = $match[1];
+		}
+		else
+		{
+			$host = trim($host, '[]');
+		}
+
+		// Bare IPv4/IPv6 literals
+		if (filter_var($host, FILTER_VALIDATE_IP))
+		{
+			return $ftp_scheme . (str_contains($host, ':') ? '[' . $host . ']' : $host);
+		}
+
+		// Hostname, possibly with a port or path
+		$location = parse_url($host);
+		if ($location !== false && isset($location['host']))
+		{
+			$host = $location['host'];
+		}
+		else
+		{
+			$host = explode('/', $host, 2)[0];
+		}
+
+		return $ftp_scheme . strtr($host, ['/' => '', ':' => '', '@' => '', '[' => '', ']' => '']);
 	}
 
 	/**
