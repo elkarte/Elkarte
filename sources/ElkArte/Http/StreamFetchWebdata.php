@@ -118,6 +118,7 @@ class StreamFetchWebdata
 		if ($this->_makeRequest())
 		{
 			$this->_parseRequest();
+			$baseUrl = $this->_response['url'];
 			$this->_processHeaders();
 
 			// Check for redirects manually so each hop is validated against SSRF
@@ -136,7 +137,7 @@ class StreamFetchWebdata
 					? end($this->_response['headers']['location'])
 					: $this->_response['headers']['location'];
 
-				$redirectUrl = UrlValidator::buildAbsoluteUrl($this->_response['url'], $location);
+				$redirectUrl = UrlValidator::buildAbsoluteUrl($baseUrl, $location);
 				if (UrlValidator::isValid($redirectUrl, $this->_user_options['validator_options'] ?? []))
 				{
 					return $this->_openRequest($redirectUrl);
@@ -172,12 +173,20 @@ class StreamFetchWebdata
 			return;
 		}
 
+		$defaultPort = $validated['scheme'] === 'https' ? 443 : 80;
+		$connectHost = !empty($validated['valid_ip'])
+			? UrlValidator::bracketIp((string) $validated['valid_ip'])
+			: $validated['host'];
 		$this->_url = [
 			'host_raw' => $validated['host'],
 			'scheme' => $validated['scheme'],
 			'port' => $validated['port'],
 			'path' => $validated['path'],
 			'ip' => $validated['valid_ip'],
+			'connect_url' => $validated['scheme'] . '://'
+				. $connectHost
+				. ($validated['port'] !== $defaultPort ? ':' . $validated['port'] : '')
+				. $validated['path'],
 		];
 		$this->_response['url'] = $validated['url'];
 
@@ -185,10 +194,10 @@ class StreamFetchWebdata
 		$this->_options = [
 			'ssl' => [
 				'verify_peer' => $this->_user_options['verify_peer'] ?? false,
-				'verify_peername' => false,
-				'peer_name' => $validated['host'],
+				'verify_peer_name' => false,
+				'peer_name' => $validated['host_bare'],
 				'SNI_enabled' => true,
-				'SNI_server_name' => $validated['host'],
+				'SNI_server_name' => $validated['host_bare'],
 			],
 			'http' => [
 				'method' => 'GET',
@@ -206,6 +215,14 @@ class StreamFetchWebdata
 			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'Accept-Language: en-US,en;q=0.9',
 		];
+
+		$hostHeader = $validated['host'];
+		if ($validated['port'] !== $defaultPort)
+		{
+			$hostHeader .= ':' . $validated['port'];
+		}
+
+		$headers[] = 'Host: ' . $hostHeader;
 
 		if (!empty($this->_user_options['max_length']))
 		{
@@ -234,7 +251,7 @@ class StreamFetchWebdata
 		try
 		{
 			$context = stream_context_create($this->_options);
-			$this->_fp = fopen($this->_response['url'], 'rb', false, $context);
+			$this->_fp = fopen($this->_url['connect_url'], 'rb', false, $context);
 		}
 		catch (Exception $exception)
 		{

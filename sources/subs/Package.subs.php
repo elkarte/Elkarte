@@ -1643,11 +1643,33 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 			return false;
 		}
 
-		// Establish a connection and attempt to enable passive mode.
-		$ftp = new FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
+		// Prefer IPv4: PASV is IPv4-only, so an IPv6-only host cannot transfer data
+		$ftpHost = '';
+		foreach ($ips as $ip)
+		{
+			if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+			{
+				$ftpHost = $ip;
+				break;
+			}
+		}
+
+		if ($ftpHost === '')
+		{
+			return false;
+		}
+
+		// Connect to the validated IP (prevents DNS rebinding) and enable passive mode.
+		$ftp = new FtpConnection(($match[2] ? 'ssl://' : '') . $ftpHost, empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
 		{
 			return false;
+		}
+
+		// Never let the server bounce the data connection to an internal address
+		if (!UrlValidator::isIpAllowed($ftp->pasv['ip']))
+		{
+			$ftp->pasv['ip'] = $ftpHost;
 		}
 
 		// I want that one *points*!

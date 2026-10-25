@@ -191,11 +191,12 @@ class FsockFetchWebdata
 		}
 
 		$this->_url['host_raw'] = $validated['host'];
+		$this->_url['host_bare'] = $validated['host_bare'];
 		$this->_url['scheme'] = $validated['scheme'];
 		$this->_url['ip'] = $validated['valid_ip'];
 		$this->_url['port'] = $validated['port'];
 		$this->_url['path'] = $validated['path'];
-		$this->_url['host'] = ($validated['scheme'] === 'https' ? 'ssl://' : '') . $this->_url['ip'];
+		$this->_url['host'] = ($validated['scheme'] === 'https' ? 'ssl://' : '') . ($validated['valid_ip'] ?? $validated['host']);
 		$this->_response['url'] = $validated['url'];
 	}
 
@@ -219,11 +220,11 @@ class FsockFetchWebdata
 			if ($this->_url['scheme'] === 'https')
 			{
 				$contextOptions['ssl'] = [
-					'peer_name' => $this->_url['host_raw'],
+					'peer_name' => $this->_url['host_bare'],
 					'verify_peer' => $this->_user_options['verify_peer'] ?? false,
 					'verify_peer_name' => false,
 					'SNI_enabled' => true,
-					'SNI_server_name' => $this->_url['host_raw'],
+					'SNI_server_name' => $this->_url['host_bare'],
 				];
 			}
 
@@ -233,7 +234,10 @@ class FsockFetchWebdata
 			});
 			try
 			{
-				$remoteSocket = ($this->_url['scheme'] === 'https' ? 'ssl://' : 'tcp://') . $this->_url['ip'] . ':' . $this->_url['port'];
+				$connectHost = !empty($this->_url['ip'])
+					? UrlValidator::bracketIp((string) $this->_url['ip'])
+					: $this->_url['host_raw'];
+				$remoteSocket = ($this->_url['scheme'] === 'https' ? 'ssl://' : 'tcp://') . $connectHost . ':' . $this->_url['port'];
 				$this->_fp = stream_socket_client($remoteSocket, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $context);
 				$this->_response['error'] = empty($errstr) ? false : $errno . ' :: ' . $errstr;
 			}
