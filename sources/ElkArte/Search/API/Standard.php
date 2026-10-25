@@ -143,7 +143,6 @@ class Standard extends AbstractAPI
 
 			$numTables = 0;
 			$prev_join = 0;
-			$numSubjectResults = 0;
 			foreach ($words['subject_words'] as $subjectWord)
 			{
 				$numTables++;
