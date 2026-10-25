@@ -458,7 +458,7 @@ class ProfileFields
 			],
 			'lngfile' => [
 				'type' => 'select',
-				'options' => 'return $context[\'profile_languages\'];',
+				'options' => static fn() => $context['profile_languages'] ?? [],
 				'label' => $txt['preferred_language'],
 				'permission' => 'profile_identity',
 				'preload' => 'profileLoadLanguages',
