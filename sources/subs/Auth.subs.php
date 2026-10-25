@@ -483,7 +483,7 @@ function resetPassword($memID, $username = null)
 	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
 	try
 	{
-		$db_hash = password_hash($newPassword_sha256, PASSWORD_BCRYPT, ['cost' => 8]);
+		$db_hash = password_hash($newPassword_sha256, PASSWORD_BCRYPT, ['cost' => 10]);
 	}
 	catch (\ValueError | \Error)
 	{
