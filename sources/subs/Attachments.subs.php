@@ -1175,7 +1175,8 @@ function getMimeType($filename)
 	// Try using an exec call
 	elseif (function_exists('exec'))
 	{
-		$mimeType = @exec("/usr/bin/file -i -b $filename");
+		$mineFilename = escapeshellarg($filename);
+		$mimeType = @exec("/usr/bin/file -i -b $mineFilename");
 	}
 
 	// Still nothing? We should at least be able to get images correct

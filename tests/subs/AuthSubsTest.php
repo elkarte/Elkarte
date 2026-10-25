@@ -28,6 +28,15 @@ class AuthSubsTest extends TestCase
 	 */
 	protected function setUp(): void
 	{
+		if (!defined('SUBSDIR'))
+		{
+			define('SUBSDIR', dirname(__DIR__, 2) . '/sources/subs');
+		}
+		if (!function_exists('un_htmlspecialchars'))
+		{
+			require_once(dirname(__DIR__, 2) . '/sources/Subs.php');
+		}
+
 		require_once(SUBSDIR . '/Auth.subs.php');
 	}
 
@@ -97,5 +106,46 @@ class AuthSubsTest extends TestCase
 
 		// Or just a plain text one
 		$this->assertFalse(validateLoginPassword($this->passwd, $user_data['passwd']));
+	}
+
+	/**
+	 * Test that validateLoginPassword returns a hash with cost 12
+	 */
+	public function test_validateLoginPassword_cost()
+	{
+		$pwd = $this->passwd;
+		$hash = validateLoginPassword($pwd, '', $this->user, true);
+
+		$this->assertIsString($hash);
+		$info = password_get_info($hash);
+		$this->assertSame(PASSWORD_BCRYPT, $info['algo']);
+		$this->assertSame(12, $info['options']['cost']);
+
+		// Verify that the generated hash validates the original password
+		$pwdCheck = $this->passwd;
+		$this->assertTrue(validateLoginPassword($pwdCheck, $hash, $this->user));
+		$wrongPwd = 'wrong_password';
+		$this->assertFalse(validateLoginPassword($wrongPwd, $hash, $this->user));
+	}
+
+	/**
+	 * Test password_needs_rehash triggers for legacy cost-10 hashes and not for cost-12
+	 */
+	public function test_password_needs_rehash_migration()
+	{
+		$sha = hash('sha256', Util::strtolower($this->user) . un_htmlspecialchars($this->passwd));
+
+		// Legacy cost-10 hash
+		$cost10Hash = password_hash($sha, PASSWORD_BCRYPT, ['cost' => 10]);
+		$pwdCheck = $this->passwd;
+		$this->assertTrue(validateLoginPassword($pwdCheck, $cost10Hash, $this->user));
+		$this->assertTrue(password_needs_rehash($cost10Hash, PASSWORD_BCRYPT, ['cost' => 12]));
+
+		// Current cost-12 hash
+		$pwd = $this->passwd;
+		$cost12Hash = validateLoginPassword($pwd, '', $this->user, true);
+		$pwdCheck2 = $this->passwd;
+		$this->assertTrue(validateLoginPassword($pwdCheck2, $cost12Hash, $this->user));
+		$this->assertFalse(password_needs_rehash($cost12Hash, PASSWORD_BCRYPT, ['cost' => 12]));
 	}
 }

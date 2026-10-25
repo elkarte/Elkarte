@@ -361,13 +361,25 @@ class Auth extends AbstractController
 				}
 			}
 		}
-		elseif (!empty($user_setting['passwd_flood']))
+		else
 		{
-			// Let's be sure they weren't a little hacker.
-			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood'], true);
+			if (password_needs_rehash($user_setting['passwd'], PASSWORD_BCRYPT, ['cost' => 12]))
+			{
+				$user->rehashPassword($sha_passwd);
+				updateMemberData($user_setting['id_member'], [
+					'passwd' => $user_setting['passwd'],
+					'password_salt' => $user_setting['password_salt'],
+				]);
+			}
 
-			// If we got here, then we can reset the flood counter.
-			updateMemberData($user_setting['id_member'], ['passwd_flood' => '']);
+			if (!empty($user_setting['passwd_flood']))
+			{
+				// Let's be sure they weren't a little hacker.
+				validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood'], true);
+
+				// If we got here, then we can reset the flood counter.
+				updateMemberData($user_setting['id_member'], ['passwd_flood' => '']);
+			}
 		}
 
 		if ($user_setting->fixSalt() === true)
