@@ -143,6 +143,11 @@ class FsockFetchWebdata
 		$location = $this->_checkRedirect();
 		if (empty($location))
 		{
+			if (!empty($this->_response['error']) && $this->_response['code'] === 400)
+			{
+				return false;
+			}
+
 			preg_match('~^HTTP/\S+\s+(\d{3})~i', $this->_server_response, $code);
 			$this->_response['code'] = isset($code[1]) ? (int) $code[1] : '???';
 
@@ -176,28 +181,22 @@ class FsockFetchWebdata
 		$this->_response['url'] = $url;
 		$this->_content_length = $this->_user_options['max_length'] ?? 0;
 
-		// Use parse_url only once and cache results
-		if (filter_var($url, FILTER_VALIDATE_URL))
+		$validated = UrlValidator::validate($url, $this->_user_options['validator_options'] ?? []);
+		if ($validated === false)
 		{
-			$url_parse = parse_url($url);
-			if ($url_parse === false)
-			{
-				return;
-			}
+			$this->_response['error'] = 'Invalid URL or target host not allowed';
+			$this->_response['code'] = 400;
 
-			$this->_url['host_raw'] = $url_parse['host'];
-			$scheme_is_https = ($url_parse['scheme'] === 'https');
-
-			$this->_url['host'] = ($scheme_is_https ? 'ssl://' : '') . $url_parse['host'];
-			$this->_url['port'] = $url_parse['port'] ?? ($scheme_is_https ? 443 : 80);
-
-			// Combine path and query efficiently
-			$this->_url['path'] = $url_parse['path'] ?? '/';
-			if (isset($url_parse['query']))
-			{
-				$this->_url['path'] .= '?' . $url_parse['query'];
-			}
+			return;
 		}
+
+		$this->_url['host_raw'] = $validated['host'];
+		$this->_url['scheme'] = $validated['scheme'];
+		$this->_url['ip'] = $validated['valid_ip'];
+		$this->_url['port'] = $validated['port'];
+		$this->_url['path'] = $validated['path'];
+		$this->_url['host'] = ($validated['scheme'] === 'https' ? 'ssl://' : '') . $this->_url['ip'];
+		$this->_response['url'] = $validated['url'];
 	}
 
 
@@ -211,17 +210,31 @@ class FsockFetchWebdata
 		// no socket, then we need to open one to do much
 		if (!is_resource($this->_fp))
 		{
-			stream_context_create([
+			$contextOptions = [
 				'socket' => [
 					'tcp_nodelay' => true,
-				]
-			]);
+				],
+			];
+
+			if ($this->_url['scheme'] === 'https')
+			{
+				$contextOptions['ssl'] = [
+					'peer_name' => $this->_url['host_raw'],
+					'verify_peer' => $this->_user_options['verify_peer'] ?? false,
+					'verify_peer_name' => false,
+					'SNI_enabled' => true,
+					'SNI_server_name' => $this->_url['host_raw'],
+				];
+			}
+
+			$context = stream_context_create($contextOptions);
 
 			set_error_handler(static function () { /* ignore errors */
 			});
 			try
 			{
-				$this->_fp = fsockopen($this->_url['host'], $this->_url['port'], $errno, $errstr, 5);
+				$remoteSocket = ($this->_url['scheme'] === 'https' ? 'ssl://' : 'tcp://') . $this->_url['ip'] . ':' . $this->_url['port'];
+				$this->_fp = stream_socket_client($remoteSocket, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $context);
 				$this->_response['error'] = empty($errstr) ? false : $errno . ' :: ' . $errstr;
 			}
 			catch (Exception)
@@ -242,8 +255,15 @@ class FsockFetchWebdata
 	 */
 	private function _makeRequest(): void
 	{
+		$hostHeader = $this->_url['host_raw'];
+		$defaultPort = ($this->_url['scheme'] === 'https') ? 443 : 80;
+		if ($this->_url['port'] !== $defaultPort)
+		{
+			$hostHeader .= ':' . $this->_url['port'];
+		}
+
 		$request = (empty($this->_post_data) ? 'GET ' : 'POST ') . $this->_url['path'] . ' HTTP/1.1' . "\r\n";
-		$request .= 'Host: ' . $this->_url['host_raw'] . "\r\n";
+		$request .= 'Host: ' . $hostHeader . "\r\n";
 		$request .= $this->_keepAlive();
 		$request .= 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' . "\r\n";
 		$request .= 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . "\r\n";
@@ -358,9 +378,20 @@ class FsockFetchWebdata
 			if (!$this->_keep_alive)
 			{
 				fclose($this->_fp);
+				$this->_fp = null;
 			}
 
-			return $this->_headers['location'];
+			$location = is_array($this->_headers['location']) ? end($this->_headers['location']) : $this->_headers['location'];
+			$redirectUrl = UrlValidator::buildAbsoluteUrl($this->_response['url'], $location);
+			if (!UrlValidator::isValid($redirectUrl, $this->_user_options['validator_options'] ?? []))
+			{
+				$this->_response['error'] = 'Redirect to prohibited target host blocked';
+				$this->_response['code'] = 400;
+
+				return '';
+			}
+
+			return $redirectUrl;
 		}
 
 		return '';

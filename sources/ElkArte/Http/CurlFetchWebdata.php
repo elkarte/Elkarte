@@ -21,7 +21,7 @@ namespace ElkArte\Http;
  * Load class
  * Initiate as
  *  - $fetch_data = new CurlFetchWebdata();
- *  - optionally pass an array of cURL options and redirect count
+ *  - Optionally pass an array of cURL options and redirect count
  *  - CurlFetchWebdata(cURL options array, Max redirects);
  *  - $fetch_data = new CurlFetchWebdata(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
  *
@@ -38,6 +38,12 @@ namespace ElkArte\Http;
  */
 class CurlFetchWebdata
 {
+	/** @var string Error message for invalid or disallowed URL / host */
+	public const ERR_INVALID_URL = 'Invalid URL or target host not allowed';
+
+	/** @var string Error message for blocked redirects */
+	public const ERR_PROHIBITED_REDIRECT = 'Redirect to prohibited target host blocked';
+
 	/**
 	 * Set the default items for this class
 	 *
@@ -124,9 +130,18 @@ class CurlFetchWebdata
 			$this->_post_data = trim($post_data);
 		}
 
+		$url = str_replace(' ', '%20', $url);
+		$validated = UrlValidator::validate($url, $this->_user_options['validator_options'] ?? []);
+		if ($validated === false)
+		{
+			$this->_setErrorResponse($url, self::ERR_INVALID_URL, 400, true);
+
+			return $this;
+		}
+
 		// Set the options and get it
 		$this->_setOptions();
-		$this->_curlRequest(str_replace(' ', '%20', $url));
+		$this->_curlRequest($validated['url']);
 
 		return $this;
 	}
@@ -244,14 +259,23 @@ class CurlFetchWebdata
 			return false;
 		}
 
-		// Not a secure site?
-		if (parse_url($url,PHP_URL_SCHEME ) === 'http')
+		$validated = UrlValidator::validate($url, $this->_user_options['validator_options'] ?? []);
+		if ($validated === false)
 		{
-			$this->_options[CURLOPT_SSL_VERIFYPEER] = false; // stop cURL from verifying the peer's certificate
-			$this->_options[CURLOPT_SSL_VERIFYHOST] = 0; // stop cURL from verifying the peer's host
+			$this->_setErrorResponse($url, self::ERR_INVALID_URL, 400);
+
+			return false;
 		}
 
-		$this->_options[CURLOPT_URL] = $url;
+		$this->_options[CURLOPT_URL] = $validated['url'];
+
+		// DNS rebinding protection via CURLOPT_RESOLVE if IP is resolved
+		if (!empty($validated['valid_ip']) && defined('CURLOPT_RESOLVE'))
+		{
+			$this->_options[CURLOPT_RESOLVE] = [
+				$validated['host'] . ':' . $validated['port'] . ':' . $validated['valid_ip'],
+			];
+		}
 
 		// If we have not already been redirected, set it up so we can
 		if (!$redirect)
@@ -272,14 +296,14 @@ class CurlFetchWebdata
 		curl_close($cr);
 
 		// Store this 'loops' data, someone may want all of these :O
-		$this->_response[] = [
-			'url' => $curl_info['url'],
-			'code' => (int) $curl_info['http_code'],
-			'error' => $error,
-			'size' => $curl_info['download_content_length'] ?: 0,
-			'headers' => $this->_headers ?: false,
-			'body' => $body,
-		];
+		$this->_response[] = $this->_buildResponse(
+			$curl_info['url'],
+			(int) $curl_info['http_code'],
+			$error,
+			$curl_info['download_content_length'] ?: 0,
+			$this->_headers ?: false,
+			$body
+		);
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
 		if (!empty($this->_headers['location'])
@@ -287,59 +311,76 @@ class CurlFetchWebdata
 			&& preg_match('~30[12378]~', (string) $curl_info['http_code']) === 1)
 		{
 			$this->_current_redirect++;
-			$this->_redirect(
-				$this->_getRedirectURL($curl_info['url'], $this->_headers['location']),
-				$curl_info['url']
-			);
+			$location = is_array($this->_headers['location']) ? end($this->_headers['location']) : $this->_headers['location'];
+			$redirectUrl = $this->_getRedirectURL($curl_info['url'], $location);
+			if (UrlValidator::isValid($redirectUrl, $this->_user_options['validator_options'] ?? []))
+			{
+				$this->_redirect($redirectUrl, $curl_info['url']);
+			}
+			else
+			{
+				$this->_setErrorResponse($redirectUrl, self::ERR_PROHIBITED_REDIRECT, 400);
+			}
 		}
 
 		return true;
 	}
 
-
 	/**
-	 * Used if being redirected to ensure we have a fully qualified address
+	 * Build fully qualified redirect URL from location header
 	 *
-	 * - Returns the new url location for the redirect
-	 *
-	 * @param string $last_url URL where we went to
-	 * @param string $new_url URL where we were redirected to
-	 *
+	 * @param string $last_url
+	 * @param string $new_url
 	 * @return string
 	 */
 	private function _getRedirectURL($last_url = '', $new_url = ''): string
 	{
-		// Get the elements for these urls
-		$last_url_parse = parse_url($last_url);
-		$new_url_parse = parse_url($new_url);
+		return UrlValidator::buildAbsoluteUrl($last_url, $new_url);
+	}
 
-		if ($new_url_parse === false)
+	/**
+	 * Build a standardized response structure array
+	 *
+	 * @param string $url The URL for this response
+	 * @param int $code HTTP response code
+	 * @param string|false $error Error string or false if no error
+	 * @param int $size Download size
+	 * @param array|false $headers Response headers or false
+	 * @param string|false $body Response body or false
+	 * @return array
+	 */
+	private function _buildResponse(string $url, int $code = 400, $error = false, int $size = 0, $headers = false, $body = false): array
+	{
+		return [
+			'url' => $url,
+			'code' => $code,
+			'error' => $error,
+			'size' => $size,
+			'headers' => $headers,
+			'body' => $body,
+		];
+	}
+
+	/**
+	 * Set or append an error response
+	 *
+	 * @param string $url The target URL
+	 * @param string $error Error message description
+	 * @param int $code HTTP status code (default 400)
+	 * @param bool $overwrite Whether to overwrite the entire response array (true) or append (false)
+	 */
+	private function _setErrorResponse(string $url, string $error, int $code = 400, bool $overwrite = false): void
+	{
+		$response = $this->_buildResponse($url, $code, $error, 0, false, false);
+
+		if ($overwrite)
 		{
-			return $last_url;
+			$this->_response = [$response];
 		}
-
-		if (!empty($new_url_parse['scheme']) && !empty($new_url_parse['host']))
+		else
 		{
-			return $new_url;
+			$this->_response[] = $response;
 		}
-
-		// Redirect headers are often incomplete / relative, so we need to make sure they are fully qualified
-		$scheme = $new_url_parse['scheme'] ?? ($last_url_parse['scheme'] ?? 'http');
-		$host = $new_url_parse['host'] ?? ($last_url_parse['host'] ?? '');
-		$port = isset($new_url_parse['port']) ? ':' . $new_url_parse['port'] : (isset($last_url_parse['port']) ? ':' . $last_url_parse['port'] : '');
-
-		$path = $new_url_parse['path'] ?? '';
-		if ($path === '' || $path[0] !== '/')
-		{
-			$last_path = $last_url_parse['path'] ?? '/';
-			$last_dir = substr($last_path, 0, (int) strrpos($last_path, '/') + 1);
-			$path = $last_dir . $path;
-		}
-
-		$query = !empty($new_url_parse['query']) ? '?' . $new_url_parse['query'] : '';
-
-		// Build the new URL that was in the http header
-		return $scheme . '://' . $host . $port . $path . $query;
 	}
 
 	/**
