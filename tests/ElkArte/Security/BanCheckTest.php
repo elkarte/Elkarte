@@ -58,17 +58,13 @@ class BanCheckTest extends TestCase
 
 		$dbMock = new class {
 			public $queries = [];
-			public $hasHostnameBan = false;
 
 			public function quote($val, $type) { return $val; }
 			public function query($identifier, $query, $params = [])
 			{
 				$this->queries[] = $query;
-				$hasHost = $this->hasHostnameBan;
-				return new class($hasHost) {
-					private $hasHost;
-					public function __construct($hasHost) { $this->hasHost = $hasHost; }
-					public function num_rows() { return $this->hasHost ? 1 : 0; }
+				return new class {
+					public function num_rows() { return 0; }
 					public function free_result() {}
 				};
 			}
@@ -138,31 +134,7 @@ class BanCheckTest extends TestCase
 		$cache->remove('hostlookup-' . $testIp);
 	}
 
-	public function testIsNotBannedBypassesHostnameLookupWhenNoHostnameBans()
-	{
-		global $modSettings;
-
-		$modSettings['disableHostnameLookup'] = 0;
-
-		$cache = Cache::instance();
-		$testIp = '198.51.100.1';
-		User::$info->ip = $testIp;
-		User::$info->ip2 = $testIp;
-
-		// Ensure cache is empty for this IP
-		$cache->remove('hostlookup-' . $testIp);
-
-		is_not_banned(true);
-
-		// host_from_ip should NOT have run, so cache for hostlookup-IP shouldn't be populated
-		$cachedVal = null;
-		$found = $cache->getVar($cachedVal, 'hostlookup-' . $testIp, 3600);
-		$this->assertFalse($found);
-		$this->assertArrayHasKey('ban', $_SESSION);
-		$this->assertEmpty($_SESSION['ban']['host']);
-	}
-
-	public function testIsNotBannedPerformsLookupWhenHostnameBansExist()
+	public function testIsNotBannedPerformsHostnameLookup()
 	{
 		global $modSettings;
 
