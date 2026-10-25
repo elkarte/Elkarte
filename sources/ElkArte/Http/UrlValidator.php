@@ -22,7 +22,7 @@ class UrlValidator
 	public const DEFAULT_ALLOWED_SCHEMES = ['http', 'https'];
 
 	/** @var array Default allowed ports */
-	public const DEFAULT_ALLOWED_PORTS = [80, 443];
+	public const DEFAULT_ALLOWED_PORTS = [80, 443, 8080, 8443];
 
 	/** @var string[] Blocked IPv4 ranges (CIDR) */
 	protected const IPV4_BLOCKED_CIDRS = [

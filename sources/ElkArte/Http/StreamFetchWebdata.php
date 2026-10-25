@@ -194,7 +194,7 @@ class StreamFetchWebdata
 		$this->_options = [
 			'ssl' => [
 				'verify_peer' => $this->_user_options['verify_peer'] ?? false,
-				'verify_peername' => false,
+				'verify_peer_name' => false,
 				'peer_name' => $validated['host_bare'],
 				'SNI_enabled' => true,
 				'SNI_server_name' => $validated['host_bare'],
