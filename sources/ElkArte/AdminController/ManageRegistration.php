@@ -177,7 +177,7 @@ class ManageRegistration extends AbstractController
 			{
 				$context['new_member'] = [
 					'id' => $memberID,
-					'name' => $this->_req->post->user,
+					'name' => Util::htmlspecialchars($this->_req->post->user, ENT_QUOTES),
 					'href' => getUrl('profile', ['action' => 'profile', 'u' => $memberID, 'name' => $this->_req->post->user]),
 					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $memberID, 'name' => $this->_req->post->user]) . '">' . $this->_req->post->user . '</a>',
 				];
