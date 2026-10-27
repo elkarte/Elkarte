@@ -130,6 +130,7 @@ class ModerationCenter extends AbstractController
 						'function' => 'action_modEndSession',
 						'enabled' => empty($modSettings['securityDisable_moderate']),
 						'class' => 'i-sign-out i-admin',
+						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'modlogoff', '{session_data}'])
 					],
 					'notice' => [
 						'controller' => ModerationCenter::class,
@@ -380,6 +381,7 @@ class ModerationCenter extends AbstractController
 	public function action_modEndSession(): void
 	{
 		// This is so easy!
+		checkSession('get');
 		unset($_SESSION['moderate_time']);
 
 		// Clean any moderator tokens as well.
