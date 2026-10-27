@@ -1542,7 +1542,7 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
 	];
 
 	// Just moved notice topics?
-	if ($delete_type == 'moved')
+	if ($delete_type === 'moved')
 	{
 		$condition .= '
 			AND m.icon = {string:icon}
@@ -1551,7 +1551,7 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
 		$condition_params['locked'] = 1;
 	}
 	// Otherwise, maybe locked topics only?
-	elseif ($delete_type == 'locked')
+	elseif ($delete_type === 'locked')
 	{
 		$condition .= '
 			AND t.locked = {int:locked}';
@@ -2199,6 +2199,93 @@ function topicsDetails($topics)
 }
 
 /**
+ * Retrieve the board id for a topic.
+ *
+ * @param int $topic
+ * @return int
+ */
+function getTopicBoard($topic)
+{
+	$attr = topicAttribute($topic, ['id_board']);
+	return !empty($attr['id_board']) ? (int) $attr['id_board'] : 0;
+}
+
+/**
+ * Check if the current user is allowed a permission on a given topic's board.
+ *
+ * @param string|string[] $permission Permission name or composite base (e.g. 'lock', 'remove')
+ * @param int $topic Topic ID
+ * @param int|null $board Optional board ID; if omitted, resolved from topic
+ * @return bool
+ */
+function allowedToTopic($permission, $topic, $board = null)
+{
+	$starter = null;
+	if (empty($board) || in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
+	{
+		$attr = topicAttribute($topic, ['id_board', 'id_member_started']);
+		if (empty($attr['id_board']))
+		{
+			return false;
+		}
+		$board = (int) $attr['id_board'];
+		$starter = isset($attr['id_member_started']) ? (int) $attr['id_member_started'] : 0;
+	}
+
+	if (in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
+	{
+		$is_owner = !empty(User::$info->id) && $starter === (int) User::$info->id;
+		if ($is_owner && allowedTo($permission . '_own', $board))
+		{
+			return true;
+		}
+
+		return allowedTo($permission . '_any', $board);
+	}
+
+	return allowedTo($permission, $board);
+}
+
+/**
+ * Asserts that the current user is allowed a permission on a given topic's board.
+ * Throws Exception if unauthorized or if topic board cannot be found.
+ *
+ * @param string|string[] $permission Permission name or composite base (e.g. 'lock', 'remove')
+ * @param int $topic Topic ID
+ * @param int|null $board Optional board ID; if omitted, resolved from topic
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function assertTopicPermission($permission, $topic, $board = null)
+{
+	$starter = null;
+	if (empty($board) || in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
+	{
+		$attr = topicAttribute($topic, ['id_board', 'id_member_started']);
+		if (empty($attr['id_board']))
+		{
+			throw new \ElkArte\Exceptions\Exception('no_board');
+		}
+		$board = (int) $attr['id_board'];
+		$starter = isset($attr['id_member_started']) ? (int) $attr['id_member_started'] : 0;
+	}
+
+	if (in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
+	{
+		$is_owner = !empty(User::$info->id) && $starter === (int) User::$info->id;
+		if ($is_owner && !allowedTo($permission . '_any', $board))
+		{
+			isAllowedTo($permission . '_own', $board);
+			return;
+		}
+
+		isAllowedTo($permission . '_any', $board);
+		return;
+	}
+
+	isAllowedTo($permission, $board);
+}
+
+/**
  * Toggle sticky status for the passed topics and logs the action.
  *
  * @param int[] $topics
@@ -2450,7 +2537,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  * @param bool $approve = true
  * @param bool $log if true, logs the action.
  *
- * @return bool|void
+ * @return bool
  */
 function approveTopics($topics, $approve = true, $log = false)
 {
@@ -2881,24 +2968,33 @@ function splitAttemptMove($boards, $totopic)
 
 	$db = database();
 
-	if ((int) $boards['destination']['id'] === $board)
+	$origin_board = isset($boards['current']['id']) ? (int) $boards['current']['id'] : (int) $board;
+	$dest_board = (int) $boards['destination']['id'];
+
+	if ($dest_board === $origin_board)
 	{
 		return $boards['destination'];
 	}
 
 	// The starting and final boards are different we have to check some permissions and stuff
 	$doMove = false;
-	if (allowedTo('move_any'))
+	if (allowedTo('move_any', $origin_board))
 	{
 		$doMove = true;
 	}
 	else
 	{
 		$new_topic = getTopicInfo($totopic);
-		if ($new_topic['id_member_started'] === User::$info->id && allowedTo('move_own'))
+		if ($new_topic['id_member_started'] === User::$info->id && allowedTo('move_own', $origin_board))
 		{
 			$doMove = true;
 		}
+	}
+
+	// Also verify destination board permission
+	if ($doMove && !allowedTo(['move_any', 'post_new'], $dest_board))
+	{
+		$doMove = false;
 	}
 
 	if ($doMove)
@@ -3534,25 +3630,37 @@ function updateTopicStats($increment = null)
  */
 function toggleTopicsLock($topics, $log = false)
 {
-	global $board;
-
 	$db = database();
 
-	$needs_check = !empty($board) && !allowedTo('lock_any');
-	$lockCache = [];
+	$lockCacheAny = [];
+	$lockCacheOwn = [];
 
 	$topicAttribute = topicAttribute($topics, ['id_topic', 'locked', 'id_board', 'id_member_started']);
 
 	foreach ($topicAttribute as $row)
 	{
-		// Skip the entry if it needs to be checked and the user is not the owen and
-		// the topic was not locked or locked by someone with more permissions
-		if ($needs_check && (User::$info->id != $row['id_member_started'] || !in_array($row['locked'], [0, 2])))
+		$rowBoard = (int) $row['id_board'];
+		$can_lock_any = allowedTo('lock_any', $rowBoard);
+		$can_lock_own = allowedTo('lock_own', $rowBoard) && User::$info->id == $row['id_member_started'];
+
+		if (!$can_lock_any && !$can_lock_own)
 		{
 			continue;
 		}
 
-		$lockCache[] = $row['id_topic'];
+		if (!$can_lock_any && !in_array($row['locked'], [0, 2]))
+		{
+			continue;
+		}
+
+		if ($can_lock_any)
+		{
+			$lockCacheAny[] = $row['id_topic'];
+		}
+		else
+		{
+			$lockCacheOwn[] = $row['id_topic'];
+		}
 
 		if ($log)
 		{
@@ -3563,17 +3671,29 @@ function toggleTopicsLock($topics, $log = false)
 		}
 	}
 
-	// It could just be that *none* were their own topics...
-	if (!empty($lockCache))
+	if (!empty($lockCacheAny))
 	{
-		// Alternate the locked value.
 		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET 
-				locked = CASE WHEN locked = {int:is_locked} THEN ' . (allowedTo('lock_any') ? '1' : '2') . ' ELSE 0 END
+				locked = CASE WHEN locked = {int:is_locked} THEN 1 ELSE 0 END
 			WHERE id_topic IN ({array_int:locked_topic_ids})',
 			[
-				'locked_topic_ids' => $lockCache,
+				'locked_topic_ids' => $lockCacheAny,
+				'is_locked' => 0,
+			]
+		);
+	}
+
+	if (!empty($lockCacheOwn))
+	{
+		$db->query('', '
+			UPDATE {db_prefix}topics
+			SET 
+				locked = CASE WHEN locked = {int:is_locked} THEN 2 ELSE 0 END
+			WHERE id_topic IN ({array_int:locked_topic_ids})',
+			[
+				'locked_topic_ids' => $lockCacheOwn,
 				'is_locked' => 0,
 			]
 		);

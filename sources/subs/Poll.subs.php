@@ -214,7 +214,7 @@ function pollInfoForTopic($topicID)
 	// Check if a poll currently exists on this topic and get the id, question and starter.
 	$request = $db->query('', '
 		SELECT
-			t.id_member_started, p.id_poll, p.voting_locked, p.question,
+			t.id_member_started, t.id_board, p.id_poll, p.voting_locked, p.question,
 			p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 			m.subject, p.guest_vote, p.id_member AS poll_starter
 		FROM {db_prefix}topics AS t
@@ -550,7 +550,7 @@ function pollStarters($id_topic)
 	$pollStarters = [];
 	$request = $db->query('', '
 		SELECT 
-			t.id_member_started, p.id_member AS poll_starter
+			t.id_member_started, p.id_member AS poll_starter, t.id_board
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
 		WHERE t.id_topic = {int:current_topic}
@@ -824,7 +824,7 @@ function getPollStarter($id_topic)
 
 	$request = $db->query('', '
 		SELECT 
-			t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
+			t.id_member_started, t.id_board, t.id_poll, p.id_member AS poll_starter, p.expire_time
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
 		WHERE t.id_topic = {int:current_topic}

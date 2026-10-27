@@ -24,8 +24,8 @@ use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 
 /**
- * This receives requests for voting, locking, removing and editing polls.
- * Note that that posting polls is done in Post.controller.php.
+ * This receives requests for voting, locking, removing, and editing polls.
+ * Note that posting polls is done in Post.controller.php.
  */
 class Poll extends AbstractController
 {
@@ -136,7 +136,7 @@ class Poll extends AbstractController
 		{
 			throw new Exception('poll_error', false);
 		}
-		// If they have already voted and aren't allowed to change their vote - hence they are outta here!
+		// If they have already voted and aren't allowed to change their vote, hence they are outta here!
 		if ($this->user->is_guest === false && $row['selected'] != -1 && empty($row['change_vote']))
 		{
 			throw new Exception('poll_error', false);
@@ -241,30 +241,35 @@ class Poll extends AbstractController
 
 		// Get the poll starter, ID, and whether it is locked.
 		$poll = pollInfoForTopic($topic);
+		if (empty($poll) || empty($poll['id_board']))
+		{
+			throw new Exception('no_access', false);
+		}
+		$poll_board = (int) $poll['id_board'];
 
 		// If the user _can_ modify the poll...
-		if (!allowedTo('poll_lock_any'))
+		if (!allowedTo('poll_lock_any', $poll_board))
 		{
-			isAllowedTo('poll_lock_' . ($this->user->id == $poll['id_member_started'] ? 'own' : 'any'));
+			isAllowedTo('poll_lock_' . ($this->user->id == $poll['id_member_started'] ? 'own' : 'any'), $poll_board);
 		}
 
 		// It's been locked by a non-moderator.
-		if ($poll['voting_locked'] == '1')
+		if ($poll['voting_locked'] === '1')
 		{
 			$poll['voting_locked'] = '0';
 		}
 		// Locked by a moderator, and this is a moderator.
-		elseif ($poll['voting_locked'] == '2' && allowedTo('moderate_board'))
+		elseif ($poll['voting_locked'] === '2' && allowedTo('moderate_board', $poll_board))
 		{
 			$poll['voting_locked'] = '0';
 		}
 		// Sorry, a moderator locked it.
-		elseif ($poll['voting_locked'] == '2' && !allowedTo('moderate_board'))
+		elseif ($poll['voting_locked'] === '2' && !allowedTo('moderate_board', $poll_board))
 		{
 			throw new Exception('locked_by_admin', 'user');
 		}
 		// A moderator *is* locking it.
-		elseif ($poll['voting_locked'] == '0' && allowedTo('moderate_board'))
+		elseif ($poll['voting_locked'] === '0' && allowedTo('moderate_board', $poll_board))
 		{
 			$poll['voting_locked'] = '2';
 		}
@@ -328,6 +333,7 @@ class Poll extends AbstractController
 
 		// Get the starter and the poll's ID - if it's an edit.
 		$bcinfo = getPollStarter($topic);
+		$poll_board = !empty($bcinfo['id_board']) ? (int) $bcinfo['id_board'] : (int) $board;
 
 		// Check their adding/editing is valid.
 		if (!$isEdit && !empty($bcinfo['id_poll']))
@@ -342,13 +348,13 @@ class Poll extends AbstractController
 		}
 
 		// Check if they have the power to add or edit the poll.
-		if ($isEdit && !allowedTo('poll_edit_any'))
+		if ($isEdit && !allowedTo('poll_edit_any', $poll_board))
 		{
-			isAllowedTo('poll_edit_' . ($this->user->id == $bcinfo['id_member_started'] || ($bcinfo['poll_starter'] != 0 && $this->user->id == $bcinfo['poll_starter']) ? 'own' : 'any'));
+			isAllowedTo('poll_edit_' . ($this->user->id == $bcinfo['id_member_started'] || ($bcinfo['poll_starter'] != 0 && $this->user->id == $bcinfo['poll_starter']) ? 'own' : 'any'), $poll_board);
 		}
-		elseif (!$isEdit && !allowedTo('poll_add_any'))
+		elseif (!$isEdit && !allowedTo('poll_add_any', $poll_board))
 		{
-			isAllowedTo('poll_add_' . ($this->user->id == $bcinfo['id_member_started'] ? 'own' : 'any'));
+			isAllowedTo('poll_add_' . ($this->user->id == $bcinfo['id_member_started'] ? 'own' : 'any'), $poll_board);
 		}
 
 		$optionCount = 0;
@@ -404,7 +410,7 @@ class Poll extends AbstractController
 		if ($poll_guest_vote !== 0)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$allowedGroups = groupsAllowedTo('poll_vote', $board);
+			$allowedGroups = groupsAllowedTo('poll_vote', $poll_board);
 			if (!in_array(-1, $allowedGroups['allowed']))
 			{
 				$poll_guest_vote = 0;
@@ -412,7 +418,7 @@ class Poll extends AbstractController
 		}
 
 		// Ensure that the number of options allowed makes sense, and the expiration date is valid.
-		if (!$isEdit || allowedTo('moderate_board'))
+		if (!$isEdit || allowedTo('moderate_board', $poll_board))
 		{
 			$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
 
@@ -569,12 +575,14 @@ class Poll extends AbstractController
 		$pollinfo = pollInfoForTopic($topic);
 
 		// Assume it all exists, right?
-		if (empty($pollinfo))
+		if (empty($pollinfo) || empty($pollinfo['id_board']))
 		{
 			throw new Exception('no_board');
 		}
 
-		// If we are adding a new poll - make sure that there isn't already a poll there.
+		$poll_board = (int) $pollinfo['id_board'];
+
+		// If we are adding a new poll, make sure that there isn't already a poll there.
 		if (!$context['is_edit'] && !empty($pollinfo['id_poll']))
 		{
 			throw new Exception('poll_already_exists');
@@ -587,20 +595,20 @@ class Poll extends AbstractController
 		}
 
 		// Can you do this?
-		if ($context['is_edit'] && !allowedTo('poll_edit_any'))
+		if ($context['is_edit'] && !allowedTo('poll_edit_any', $poll_board))
 		{
-			isAllowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'));
+			isAllowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'), $poll_board);
 		}
-		elseif (!$context['is_edit'] && !allowedTo('poll_add_any'))
+		elseif (!$context['is_edit'] && !allowedTo('poll_add_any', $poll_board))
 		{
-			isAllowedTo('poll_add_' . ($this->user->id == $pollinfo['id_member_started'] ? 'own' : 'any'));
+			isAllowedTo('poll_add_' . ($this->user->id == $pollinfo['id_member_started'] ? 'own' : 'any'), $poll_board);
 		}
 
-		$context['can_moderate_poll'] = isset($this->_req->post->add) || allowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'));
+		$context['can_moderate_poll'] = isset($this->_req->post->add) || allowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'), $poll_board);
 
 		// Do we enable guest voting?
 		require_once(SUBSDIR . '/Members.subs.php');
-		$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
+		$groupsAllowedVote = groupsAllowedTo('poll_vote', $poll_board);
 
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
 		if ($poll_errors->hasErrors())
@@ -842,18 +850,25 @@ class Poll extends AbstractController
 		require_once(SUBSDIR . '/Poll.subs.php');
 
 		// Check permissions.
-		if (!allowedTo('poll_remove_any'))
+		$pollStarters = pollStarters($topic);
+		if (empty($pollStarters))
 		{
-			$pollStarters = pollStarters($topic);
-			if (empty($pollStarters))
-			{
-				throw new Exception('no_access', false);
-			}
+			throw new Exception('no_access', false);
+		}
 
-			[$topicStarter, $pollStarter] = $pollStarters;
+		$topicStarter = $pollStarters[0];
+		$pollStarter = $pollStarters[1];
+		$pollBoard = isset($pollStarters[2]) ? (int) $pollStarters[2] : null;
+
+		if (!allowedTo('poll_remove_any', $pollBoard))
+		{
 			if ($topicStarter == $this->user->id || ($pollStarter != 0 && $pollStarter == $this->user->id))
 			{
-				isAllowedTo('poll_remove_own');
+				isAllowedTo('poll_remove_own', $pollBoard);
+			}
+			else
+			{
+				isAllowedTo('poll_remove_any', $pollBoard);
 			}
 		}
 

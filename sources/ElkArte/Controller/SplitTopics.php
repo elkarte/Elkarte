@@ -48,22 +48,31 @@ class SplitTopics extends AbstractController
 			throw new Exception('numbers_one_to_nine', false);
 		}
 
+		// Need some utilities to deal with topics
+		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		$topic_board = getTopicBoard($topic);
+		if (empty($topic_board))
+		{
+			throw new Exception('no_board');
+		}
+
+		isAllowedTo('split_any', $topic_board);
+
 		// Load up the "dependencies" - the template, getMsgMemberID().
 		if (!$this->getApi())
 		{
 			theme()->getTemplates()->load('SplitTopics');
 		}
 
-		// Need some utilities to deal with topics
-		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
-
 		// The things we know to do
 		$subActions = [
-			'selectTopics' => [$this, 'action_splitSelectTopics', 'permission' => 'split_any'],
-			'execute' => [$this, 'action_splitExecute', 'permission' => 'split_any'],
-			'index' => [$this, 'action_splitIndex', 'permission' => 'split_any'],
-			'splitSelection' => [$this, 'action_splitSelection', 'permission' => 'split_any'],
+			'selectTopics' => [$this, 'action_splitSelectTopics'],
+			'execute' => [$this, 'action_splitExecute'],
+			'index' => [$this, 'action_splitIndex'],
+			'splitSelection' => [$this, 'action_splitSelection'],
 		];
 
 		// To the right sub action or index if an invalid choice was submitted
@@ -115,17 +124,17 @@ class SplitTopics extends AbstractController
 		// If not approved validate, they can approve it.
 		if ($modSettings['postmod_active'] && !$messageInfo['topic_approved'])
 		{
-			isAllowedTo('approve_posts');
+			isAllowedTo('approve_posts', $messageInfo['id_board']);
 		}
 
 		// If this topic has unapproved posts, we need to count them too...
-		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
+		if ($modSettings['postmod_active'] && allowedTo('approve_posts', $messageInfo['id_board']))
 		{
 			$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['topic_approved'] ? 0 : 1);
 		}
 
 		// If they can move it as well, allow the template to give them a move to the board list
-		$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
+		$context['can_move'] = allowedTo('move_any', $messageInfo['id_board']) || allowedTo('move_own', $messageInfo['id_board']);
 
 		// Check if there is more than one message in the topic.  (there should be.)
 		if ($messageInfo['num_replies'] < 1)
@@ -134,7 +143,7 @@ class SplitTopics extends AbstractController
 		}
 
 		// Check if this is the first message in the topic (if so, the first and second option won't be available)
-		if ($messageInfo['id_first_msg'] == $splitAt)
+		if ($messageInfo['id_first_msg'] === $splitAt)
 		{
 			$this->_new_topic_subject = $messageInfo['subject'];
 			$this->_set_session_values();
@@ -142,7 +151,7 @@ class SplitTopics extends AbstractController
 		}
 		else
 		{
-			// Basic template information....
+			// Basic template information...
 			$context['message'] = [
 				'id' => $splitAt,
 				'subject' => $messageInfo['subject']
@@ -217,6 +226,8 @@ class SplitTopics extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
+		$topic_board = getTopicBoard($topic);
+
 		$context['not_selected'] = [
 			'num_messages' => 0,
 			'start' => $this->_req->getPost('start', 'intval', 0),
@@ -255,7 +266,7 @@ class SplitTopics extends AbstractController
 			$original_msgs = [
 				'not_selected' => messageAt($context['not_selected']['start'], $topic, [
 					'not_in' => empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic],
-					'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts'),
+					'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts', $topic_board),
 					'limit' => $context['messages_per_page'],
 				]),
 				'selected' => [],
@@ -270,8 +281,8 @@ class SplitTopics extends AbstractController
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
 				$original_msgs['selected'] = messageAt($context['selected']['start'], $topic, [
-					'include' => empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic],
-					'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts'),
+					'include' => $_SESSION['split_selection'][$topic],
+					'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts', $topic_board),
 					'limit' => $context['messages_per_page'],
 				]);
 			}
@@ -300,8 +311,8 @@ class SplitTopics extends AbstractController
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
 			$_SESSION['split_selection'][$topic] = messageAt(0, $topic, [
-				'include' => empty($_SESSION['split_selection'][$topic]) ? [] : $_SESSION['split_selection'][$topic],
-				'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts'),
+				'include' => $_SESSION['split_selection'][$topic],
+				'only_approved' => !$modSettings['postmod_active'] || !allowedTo('approve_posts', $topic_board),
 				'limit' => false,
 			]);
 			$selection = $_SESSION['split_selection'][$topic];
@@ -312,7 +323,7 @@ class SplitTopics extends AbstractController
 		}
 
 		// Get the number of messages (not) selected to be split.
-		$split_counts = countSplitMessages($topic, !$modSettings['postmod_active'] || allowedTo('approve_posts'), $selection);
+		$split_counts = countSplitMessages($topic, !$modSettings['postmod_active'] || allowedTo('approve_posts', $topic_board), $selection);
 		foreach ($split_counts as $key => $num_messages)
 		{
 			$context[$key]['num_messages'] = $num_messages;
@@ -333,12 +344,12 @@ class SplitTopics extends AbstractController
 		$context['selected']['page_index'] = constructPageIndex($page_index_url . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
 
 		// Retrieve the unselected messages.
-		$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? [] : ['excluded' => $_SESSION['split_selection'][$topic]], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+		$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? [] : ['excluded' => $_SESSION['split_selection'][$topic]], $modSettings['postmod_active'] && !allowedTo('approve_posts', $topic_board));
 
 		// Now retrieve the selected messages.
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
-			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], ['included' => $_SESSION['split_selection'][$topic]], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], ['included' => $_SESSION['split_selection'][$topic]], $modSettings['postmod_active'] && !allowedTo('approve_posts', $topic_board));
 		}
 
 		// The XMLhttp method only needs the stuff that changed, so let's compare.
