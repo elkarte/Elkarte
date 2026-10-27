@@ -400,8 +400,9 @@ function template_generic_xml_buttons()
 	{
 		if ($key !== 'error')
 		{
+			$safe_val = str_replace(']]>', ']]]]><![CDATA[>', (string) $val);
 			echo '
-			<', $key, '><![CDATA[', cleanXml($val), ']]></', $key, '>';
+			<', $key, '><![CDATA[', cleanXml($safe_val), ']]></', $key, '>';
 		}
 	}
 
@@ -454,11 +455,12 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
 			{
 				foreach ($data['attributes'] as $k => $v)
 				{
-					echo ' ' . $k . '="' . $v . '"';
+					echo ' ' . htmlspecialchars((string) $k, ENT_QUOTES, 'UTF-8') . '="' . htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8') . '"';
 				}
 			}
 
-			echo '><![CDATA[', cleanXml($data['value']), ']]></', $child_ident, '>';
+			$safe_value = str_replace(']]>', ']]]]><![CDATA[>', (string) $data['value']);
+			echo '><![CDATA[', cleanXml($safe_value), ']]></', $child_ident, '>';
 		}
 	}
 
@@ -504,7 +506,7 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss2')
 		// If it's empty/0/nothing simply output an empty tag.
 		if ($xml_format === 'atom' && $key === 'category')
 		{
-			echo '<', $key, ' term="', $val, '" />';
+			echo '<', $key, ' term="', htmlspecialchars((string) $val, ENT_QUOTES, 'UTF-8'), '" />';
 		}
 		else
 		{
@@ -630,7 +632,7 @@ function template_xml_draft()
 
 	echo '<?xml version="1.0" encoding="UTF-8"?>
 <drafts>
-	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', standardTime($context['draft_saved_on']), ']]></draft>
+	<draft id="', htmlspecialchars((string) $context['id_draft'], ENT_QUOTES, 'UTF-8'), '"><![CDATA[', str_replace(']]>', ']]]]><![CDATA[>', (string) ($txt['draft_saved_on'] . ': ' . standardTime($context['draft_saved_on']))), ']]></draft>
 </drafts>';
 }
 
@@ -647,10 +649,10 @@ function template_xml_load_draft()
 	foreach ($context['drafts'] as $key => $draft)
 	{
 		echo '
-	<draft id="', $key, '">
-		<subject><![CDATA[', cleanXml($draft['subject']), ']]></subject>
-		<time><![CDATA[', cleanXml($draft['poster_time']), ']]></time>
-		<link><![CDATA[', cleanXml($draft['link']), ']]></link>
+	<draft id="', htmlspecialchars((string) $key, ENT_QUOTES, 'UTF-8'), '">
+		<subject><![CDATA[', cleanXml(str_replace(']]>', ']]]]><![CDATA[>', (string) $draft['subject'])), ']]></subject>
+		<time><![CDATA[', cleanXml(str_replace(']]>', ']]]]><![CDATA[>', (string) $draft['poster_time'])), ']]></time>
+		<link><![CDATA[', cleanXml(str_replace(']]>', ']]]]><![CDATA[>', (string) $draft['link'])), ']]></link>
 	</draft>';
 	}
 
