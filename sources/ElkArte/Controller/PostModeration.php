@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MessagePermission;
@@ -492,33 +493,51 @@ class PostModeration extends AbstractController
 		checkSession('get');
 
 		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
+		$req_topic = $this->_req->getQuery('topic', 'intval', 0);
 
 		// Needy baby, Greedy baby
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		isAllowedTo('approve_posts');
-
 		$message_info = basicMessageInfo($current_msg, false, true);
 
-		// If it's the first in a topic, then the whole topic gets approved!
-		if ($message_info['id_first_msg'] == $current_msg)
+		if (empty($message_info))
 		{
-			approveTopics($topic, !$message_info['approved'], $message_info['id_member_started'] != $this->user->id);
+			throw new Exception('cant_find_messages', false);
+		}
+
+		// Validate that the user is allowed to approve posts in this specific board
+		isAllowedTo('approve_posts', (int) $message_info['id_board']);
+
+		// Ensure request topic matches message topic if provided
+		if (!empty($req_topic) && $req_topic !== (int) $message_info['id_topic'])
+		{
+			throw new Exception('no_access', false);
+		}
+
+		$target_topic = $message_info['id_topic'];
+		$target_board = $message_info['id_board'];
+		$topic = $target_topic;
+		$board = $target_board;
+
+		// If it's the first in a topic, then the whole topic gets approved!
+		if ($message_info['id_first_msg'] === $current_msg)
+		{
+			approveTopics($target_topic, !$message_info['approved'], (int) $message_info['id_member_started'] !== (int) $this->user->id);
 		}
 		else
 		{
 			approvePosts($current_msg, !$message_info['approved']);
 
-			if ($message_info['id_member'] != $this->user->id)
+			if ($message_info['id_member'] !== (int) $this->user->id)
 			{
-				logAction(($message_info['approved'] ? 'un' : '') . 'approve', ['topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board]);
+				logAction(($message_info['approved'] ? 'un' : '') . 'approve', ['topic' => $target_topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $target_board]);
 			}
 		}
 
 		Cache::instance()->remove('num_menu_errors');
 
-		redirectexit('topic=' . $topic . '.msg' . $current_msg . '#msg' . $current_msg);
+		redirectexit('topic=' . $target_topic . '.msg' . $current_msg . '#msg' . $current_msg);
 	}
 }

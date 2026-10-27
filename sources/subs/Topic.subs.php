@@ -2446,7 +2446,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
 /**
  * Approve topics, all we got.
  *
- * @param int[] $topics array of topics ids
+ * @param int[]|int $topics topics
  * @param bool $approve = true
  * @param bool $log if true, logs the action.
  *
