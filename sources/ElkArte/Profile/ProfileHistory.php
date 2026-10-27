@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the access and viewing of a users history
+ * Handles the access and viewing of a user's history
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -24,7 +24,7 @@ use ElkArte\Member;
 use ElkArte\MembersList;
 
 /**
- * Show a users login, profile edits, IP history
+ * Show a user's login, profile edits, IP history
  */
 class ProfileHistory extends AbstractController
 {
@@ -44,6 +44,7 @@ class ProfileHistory extends AbstractController
 
 		$this->_memID = currentMemberID();
 		$this->_profile = MembersList::get($this->_memID);
+		Txt::load('Profile');
 	}
 
 	/**
@@ -272,7 +273,6 @@ class ProfileHistory extends AbstractController
 
 		theme()->getTemplates()->load('Profile');
 		theme()->getTemplates()->load('ProfileHistory');
-		Txt::load('Profile');
 
 		if ($this->_memID === 0)
 		{
