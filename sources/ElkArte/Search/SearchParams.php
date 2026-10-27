@@ -102,7 +102,121 @@ class SearchParams extends ValuesContainer
 			restore_error_handler();
 		}
 
-		$this->_search_params = json_decode($check, true);
+		$decoded = json_decode($check, true);
+		$this->_search_params = is_array($decoded) ? $this->sanitizeDecodedParams($decoded) : [];
+	}
+
+	/**
+	 * Whitelist and sanitize parameters decoded from a search blob.
+	 *
+	 * @param array $params
+	 * @return array
+	 */
+	protected function sanitizeDecodedParams(array $params): array
+	{
+		$validator = new DataValidator();
+		$validator->sanitation_rules([
+			'search' => 'trim',
+			'topic' => 'intval',
+			'minage' => 'intval',
+			'maxage' => 'intval',
+			'advanced' => 'intval',
+			'searchtype' => 'intval',
+			'userspec' => 'trim',
+			'show_complete' => 'boolval',
+			'subject_only' => 'boolval',
+			'sort' => 'trim',
+			'sort_dir' => 'trim',
+			'search_selection' => 'trim',
+			'sd_topic' => 'intval',
+			'brd' => 'intval',
+			'sd_brd' => 'intval',
+		]);
+		$validator->input_processing([
+			'brd' => 'array',
+			'sd_brd' => 'array',
+		]);
+		$validator->validate($params);
+		$data = $validator->validation_data();
+
+		$clean = [];
+
+		if (!empty($params['search']) && is_string($params['search']))
+		{
+			$clean['search'] = $data['search'];
+		}
+
+		if (!empty($params['topic']) && !empty($data['topic']) && $data['topic'] > 0)
+		{
+			$clean['topic'] = $data['topic'];
+		}
+
+		if (isset($params['minage']) && is_numeric($params['minage']))
+		{
+			$clean['minage'] = $data['minage'];
+		}
+
+		if (isset($params['maxage']) && is_numeric($params['maxage']))
+		{
+			$clean['maxage'] = $data['maxage'];
+		}
+
+		if (isset($params['advanced']))
+		{
+			$clean['advanced'] = empty($data['advanced']) ? 0 : 1;
+		}
+
+		if (isset($params['searchtype']))
+		{
+			$clean['searchtype'] = $data['searchtype'] === 2 ? 2 : 1;
+		}
+
+		if (!empty($params['userspec']) && is_string($params['userspec']) && $data['userspec'] !== '')
+		{
+			$clean['userspec'] = $data['userspec'];
+		}
+
+		if (!empty($data['show_complete']))
+		{
+			$clean['show_complete'] = true;
+		}
+
+		if (!empty($data['subject_only']))
+		{
+			$clean['subject_only'] = true;
+		}
+
+		if (!empty($params['sort']) && is_string($params['sort']) && $data['sort'] !== '')
+		{
+			$clean['sort'] = $data['sort'];
+		}
+
+		if (!empty($params['sort_dir']) && is_string($params['sort_dir']))
+		{
+			$clean['sort_dir'] = strtolower($data['sort_dir']) === 'asc' ? 'asc' : 'desc';
+		}
+
+		if (!empty($params['brd']) && is_array($params['brd']) && is_array($data['brd'] ?? null))
+		{
+			$clean['brd'] = array_values(array_filter($data['brd']));
+		}
+
+		if (!empty($params['search_selection']) && is_string($params['search_selection']) && $data['search_selection'] !== '')
+		{
+			$clean['search_selection'] = $data['search_selection'];
+		}
+
+		if (!empty($params['sd_topic']) && !empty($data['sd_topic']) && $data['sd_topic'] > 0)
+		{
+			$clean['sd_topic'] = $data['sd_topic'];
+		}
+
+		if (!empty($params['sd_brd']) && is_array($params['sd_brd']) && is_array($data['sd_brd'] ?? null))
+		{
+			$clean['sd_brd'] = array_values(array_filter($data['sd_brd']));
+		}
+
+		return $clean;
 	}
 
 	/**
@@ -218,7 +332,7 @@ class SearchParams extends ValuesContainer
 			'searchtype' => 'intval',
 			'minage' => 'intval',
 			'maxage' => 'intval',
-			'search_selection' => 'intval',
+			'search_selection' => 'trim',
 			'topic' => 'intval',
 			'sd_topic' => 'intval',
 			'userspec' => 'trim',
@@ -329,8 +443,12 @@ class SearchParams extends ValuesContainer
 		// Searching for a specific topic?
 		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
 		{
-			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) ($params['topic'] ?? 0) : (int) ($params['sd_topic'] ?? 0);
+			$this->_search_params['topic'] = (empty($params['search_selection']) || $params['search_selection'] !== 'topic') ? (int) ($params['topic'] ?? 0) : (int) ($params['sd_topic'] ?? 0);
 			$this->_search_params['show_complete'] = true;
+		}
+		elseif (!empty($this->_search_params['topic']))
+		{
+			$this->_search_params['topic'] = (int) $this->_search_params['topic'];
 		}
 	}
 

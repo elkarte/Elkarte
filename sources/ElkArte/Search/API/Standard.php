@@ -170,7 +170,8 @@ class Standard extends AbstractAPI
 
 			if (!empty($this->_searchParams['topic']))
 			{
-				$subject_query['where'][] = 't.id_topic = ' . $this->_searchParams['topic'];
+				$subject_query['where'][] = 't.id_topic = {int:search_topic_id}';
+				$subject_query_params['search_topic_id'] = (int) $this->_searchParams['topic'];
 			}
 
 			if (!empty($this->_searchParams->_minMsgID))
@@ -913,7 +914,7 @@ class Standard extends AbstractAPI
 		$participants = [];
 		$request = $this->_db_search->search_query('', '
 			SELECT ' .
-			(empty($this->_searchParams['topic']) ? 'lsr.id_topic' : $this->_searchParams->topic . ' AS id_topic') . ',
+			(empty($this->_searchParams['topic']) ? 'lsr.id_topic' : '{int:topic} AS id_topic') . ',
 				lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($this->_searchParams->sort === 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
@@ -922,6 +923,7 @@ class Standard extends AbstractAPI
 			LIMIT {int:limit} OFFSET {int:start}',
 			[
 				'id_search' => $id_search,
+				'topic' => (int) ($this->_searchParams['topic'] ?? 0),
 				'sort' => $this->_searchParams->sort,
 				'sort_dir' => $this->_searchParams->sort_dir,
 				'start' => $start,
