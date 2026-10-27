@@ -37,7 +37,7 @@ then
   # Functions declared with ": never" cannot return; adjust signatures to allow testbed returns
   sudo sed -i 's/): never/)/g' ./sources/Subs.php
   # Provide a way to return from actions previous :never redirectexit & obexit, so we can get results for Unit Test
-  sudo sed -i '/global $db_show_debug;/a \\n\tif (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}' ./sources/Subs.php
+  sudo sed -i '/obExit(false);/i \\n\tif (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;}' ./sources/Subs.php
   sudo sed -i '/call_integration_hook('"'"'integrate_exit'"'"', \[$do_footer\]);/a \\n\tif (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return;}' ./sources/Subs.php
   # Allow tests to proceed when a token fails
   sudo sed -i '0,/^\t\tif(\$fatal)/{s/^\(\t\t\)if(\$fatal)/\1if (\$fatal && defined("PHPUNITBOOTSTRAP") && defined("STDIN")){cleanTokens();createToken($action, $type);return true;}\n\1if(\$fatal)/}' ./sources/Security.php

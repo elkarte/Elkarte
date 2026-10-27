@@ -42,6 +42,34 @@ use PHPUnit\Framework\TestCase;
 
 class SearchParamsTest extends TestCase
 {
+	private ?array $originalModSettings = null;
+
+	protected function setUp(): void
+	{
+		global $modSettings, $context;
+
+		$this->originalModSettings = $modSettings ?? null;
+
+		$modSettings = is_array($modSettings) ? $modSettings : [];
+		$modSettings['disableCheckUA'] = 1;
+
+		$_GET['elk_test_session'] = 'test_token_123';
+		$_SESSION['session_var'] = 'elk_test_session';
+		$_SESSION['session_value'] = 'test_token_123';
+		$_SESSION['USER_AGENT'] = 'elkarte_test';
+		$context['session_var'] = 'elk_test_session';
+		$context['session_value'] = 'test_token_123';
+		$context['session_id'] = 'test_token_123';
+	}
+
+	protected function tearDown(): void
+	{
+		global $modSettings;
+
+		$modSettings = $this->originalModSettings;
+
+		unset($_GET['elk_test_session'], $_SESSION['session_var'], $_SESSION['session_value'], $_SESSION['USER_AGENT']);
+	}
 	/**
 	 * Helper to create a base64url compressed search params string
 	 */

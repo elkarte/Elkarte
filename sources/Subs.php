@@ -592,9 +592,6 @@ function redirectexit($setLocation = ''): never
 {
 	global $db_show_debug;
 
-	// Note to developers.  The testbed will automatically add the following, allowing phpunit test returns
-	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;} see setup-elkarte.sh
-
 	// Send headers, call integration, do maintenance
 	Headers::instance()
 		->removeHeader('all')
@@ -607,6 +604,8 @@ function redirectexit($setLocation = ''): never
 		$_SESSION['debug_redirect'] = Debug::instance()->get_db();
 	}
 
+	// Note to developers.  The testbed will automatically add the following, allowing phpunit test returns
+	//if (defined("PHPUNITBOOTSTRAP") && defined("STDIN")){return $setLocation;} see setup-elkarte.sh
 	obExit(false);
 }
 
