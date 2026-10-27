@@ -32,15 +32,17 @@ function loadSession()
 	global $modSettings, $boardurl, $context;
 
 	// Attempt to change a few PHP settings.
-	@ini_set('session.use_cookies', true);
-	@ini_set('session.use_only_cookies', true);
+	@ini_set('session.use_cookies', '1');
+	@ini_set('session.use_only_cookies', '1');
 	@ini_set('arg_separator.output', '&amp;');
 	@ini_set('session.cookie_samesite', 'Lax');
+	@ini_set('session.cookie_httponly', '1');
+	@ini_set('session.use_strict_mode', '1');
 
 	// Secure PHPSESSIONID
 	if (parse_url($boardurl, PHP_URL_SCHEME) === 'https')
 	{
-		@ini_set('session.cookie_secure', true);
+		@ini_set('session.cookie_secure', '1');
 	}
 
 	if (!empty($modSettings['globalCookies']))

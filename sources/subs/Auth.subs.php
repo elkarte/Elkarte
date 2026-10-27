@@ -804,11 +804,6 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	// Intercept cookie?
 	call_integration_hook('integrate_cookie', [$name, $value, $expire, $path, $domain, $secure, $httponly, $samesite]);
 
-	if (PHP_VERSION_ID < 70300)
-	{
-		return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
-	}
-
 	return setcookie($name, $value, [
 		'expires' => $expire,
 		'path' => $path,
