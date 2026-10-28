@@ -1110,4 +1110,42 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		removeTopicsPermissions($fixture2['topic_id']);
 		$this->assertEmpty(getTopicInfo($fixture2['topic_id']));
 	}
+
+	/**
+	 * Test getTopicBoard(), allowedToTopic(), and assertTopicPermission().
+	 */
+	public function testTopicBoardScopedHelpers(): void
+	{
+		$fixture = $this->createTestTopic('Topic Board Scoped Helper Test', 1, 1, 0);
+
+		// getTopicBoard returns expected board ID
+		$boardId = getTopicBoard($fixture['topic_id']);
+		$this->assertEquals(1, $boardId);
+
+		// Non-existent topic returns 0
+		$this->assertEquals(0, getTopicBoard(99999999));
+
+		// Admin user is allowed on any topic board
+		$this->assertTrue(allowedToTopic('lock_any', $fixture['topic_id']));
+		$this->assertTrue(allowedToTopic('lock', $fixture['topic_id']));
+		$this->assertTrue(allowedToTopic('remove', $fixture['topic_id']));
+		$this->assertTrue(allowedToTopic('move', $fixture['topic_id']));
+
+		// assertTopicPermission succeeds without exception for admin
+		assertTopicPermission('lock_any', $fixture['topic_id']);
+		assertTopicPermission('lock', $fixture['topic_id']);
+
+		// assertTopicPermission on invalid topic throws 'no_board'
+		try
+		{
+			assertTopicPermission('lock_any', 99999999);
+			$this->fail('Expected Exception no_board');
+		}
+		catch (\ElkArte\Exceptions\Exception $e)
+		{
+			global $txt;
+
+			$this->assertEquals($txt['no_board'] ?? 'no_board', $e->getMessage());
+		}
+	}
 }

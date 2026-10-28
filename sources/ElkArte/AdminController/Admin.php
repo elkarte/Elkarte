@@ -1001,6 +1001,7 @@ class Admin extends AbstractController
 	public function action_endsession(): void
 	{
 		// This is so easy!
+		checkSession('get');
 		unset($_SESSION['admin_time']);
 
 		// Clean any admin tokens as well.

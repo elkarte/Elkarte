@@ -41,7 +41,7 @@ class Topic extends AbstractController
 		// Call the right method
 		$subActions = [
 			'lock' => [$this, 'action_lock'],
-			'sticky' => [$this, 'action_sticky', 'permission' => 'make_sticky'],
+			'sticky' => [$this, 'action_sticky'],
 			'printpage' => [$this, 'action_printpage'],
 		];
 
@@ -70,7 +70,7 @@ class Topic extends AbstractController
 	 */
 	public function action_lock(): void
 	{
-		global $topic, $board;
+		global $topic;
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
@@ -84,19 +84,26 @@ class Topic extends AbstractController
 		require_once(SUBSDIR . '/Notification.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Find out who started the topic and its current lock status
-		[$starter, $locked] = topicStatus($topic);
+		// Find out the topic's board, who started the topic and its current lock status
+		$topic_info = topicAttribute($topic, ['id_board', 'id_member_started', 'locked']);
+		if (empty($topic_info['id_board']))
+		{
+			throw new Exception('not_a_topic', false);
+		}
+		$starter = (int) $topic_info['id_member_started'];
+		$locked = (int) $topic_info['locked'];
+		$topic_board = (int) $topic_info['id_board'];
 
 		// Can you lock topics here, mister?
-		$user_lock = !allowedTo('lock_any');
+		$user_lock = !allowedTo('lock_any', $topic_board);
 
 		if ($user_lock && $starter == $this->user->id)
 		{
-			isAllowedTo('lock_own');
+			isAllowedTo('lock_own', $topic_board);
 		}
 		else
 		{
-			isAllowedTo('lock_any');
+			isAllowedTo('lock_any', $topic_board);
 		}
 
 		// Locking with high privileges.
@@ -126,7 +133,7 @@ class Topic extends AbstractController
 		// If they are allowed a "moderator" permission, log it in the moderator log.
 		if (!$user_lock)
 		{
-			logAction($locked !== 0 ? 'lock' : 'unlock', ['topic' => $topic, 'board' => $board]);
+			logAction($locked !== 0 ? 'lock' : 'unlock', ['topic' => $topic, 'board' => $topic_board]);
 		}
 
 		// Notify people that this topic has been locked?
@@ -150,10 +157,7 @@ class Topic extends AbstractController
 	 */
 	public function action_sticky(): void
 	{
-		global $topic, $board;
-
-		// Make sure the user can sticky it, and they are stickying *something*.
-		isAllowedTo('make_sticky');
+		global $topic;
 
 		// You can't sticky a board or something!
 		if (empty($topic))
@@ -170,14 +174,22 @@ class Topic extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
-		$sticky = topicAttribute($topic, 'is_sticky');
+		$sticky = topicAttribute($topic, ['id_board', 'is_sticky']);
+		if (empty($sticky['id_board']))
+		{
+			throw new Exception('not_a_topic', false);
+		}
+		$topic_board = (int) $sticky['id_board'];
 		$is_sticky = $sticky['is_sticky'];
+
+		// Make sure the user can sticky it on this topic's board.
+		isAllowedTo('make_sticky', $topic_board);
 
 		// Toggle the sticky value.
 		setTopicAttribute($topic, ['is_sticky' => (empty($is_sticky) ? 1 : 0)]);
 
 		// Log this sticky action - always a moderator thing.
-		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', ['topic' => $topic, 'board' => $board]);
+		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', ['topic' => $topic, 'board' => $topic_board]);
 
 		// Notify people that this topic has been stickied?
 		if (empty($is_sticky))

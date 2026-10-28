@@ -91,8 +91,8 @@ class Movetopic extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - It must be called with a topic specified. (that is, global $topic must
-	 * be set... @todo fix this thing.)
+	 * - It must be called with a topic specified. (that is, global $topic must be set)
+	 *  @todo fix this thing.
 	 * - Validates access
 	 * - Accessed via ?action=movetopic.
 	 *
@@ -157,24 +157,26 @@ class Movetopic extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$this->_topic_info = getTopicInfo($this->_topic, 'message');
 
-		if (empty($this->_topic_info))
+		if (empty($this->_topic_info) || empty($this->_topic_info['id_board']))
 		{
 			throw new Exception('topic_gone', false);
 		}
 
+		$source_board = (int) $this->_topic_info['id_board'];
+
 		// Can they see it - if not approved?
 		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
 		{
-			isAllowedTo('approve_posts');
+			isAllowedTo('approve_posts', $source_board);
 		}
 
 		// Are they allowed to actually move any topics or even their own?
-		if (allowedTo('move_any'))
+		if (allowedTo('move_any', $source_board))
 		{
 			return;
 		}
 
-		if (!($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
+		if (!($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own', $source_board)))
 		{
 			return;
 		}
@@ -277,10 +279,12 @@ class Movetopic extends AbstractController
 		// Do the move (includes statistics update needed for the redirect topic).
 		moveTopics($this->_topic, $this->_toboard);
 
+		$source_board = !empty($this->_topic_info['id_board']) ? (int) $this->_topic_info['id_board'] : $board;
+
 		// Log that they moved this topic.
-		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] !== $this->user->id)
+		if (!allowedTo('move_own', $source_board) || $this->_topic_info['id_member_started'] !== $this->user->id)
 		{
-			logAction('move', ['topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard]);
+			logAction('move', ['topic' => $this->_topic, 'board_from' => $source_board, 'board_to' => $this->_toboard]);
 		}
 
 		// Notify people that this topic has been moved?
@@ -290,7 +294,7 @@ class Movetopic extends AbstractController
 		// Why not go back to the original board in case they want to keep moving?
 		if (!$this->_req->hasPost('goback'))
 		{
-			redirectexit('board=' . $board . '.0');
+			redirectexit('board=' . $source_board . '.0');
 		}
 		else
 		{
@@ -345,23 +349,39 @@ class Movetopic extends AbstractController
 
 		// Get the basic details on this topic (again)
 		$this->_topic_info = getTopicInfo($this->_topic);
+		if (empty($this->_topic_info) || empty($this->_topic_info['id_board']))
+		{
+			throw new Exception('topic_gone', false);
+		}
+
+		$source_board = (int) $this->_topic_info['id_board'];
+		$this->_toboard = $this->_req->getPost('toboard', 'intval', 0);
 
 		// Not approved, then you need approval permissions to move it as well
 		if (!$this->_topic_info['approved'])
 		{
-			isAllowedTo('approve_posts');
+			isAllowedTo('approve_posts', $source_board);
 		}
 
 		// Can they move topics on this board?
-		if (!allowedTo('move_any'))
+		if (!allowedTo('move_any', $source_board))
 		{
 			if ($this->_topic_info['id_member_started'] == $this->user->id)
 			{
-				isAllowedTo('move_own');
+				isAllowedTo('move_own', $source_board);
 			}
 			else
 			{
-				isAllowedTo('move_any');
+				isAllowedTo('move_any', $source_board);
+			}
+		}
+
+		// Verify destination board permission
+		if (!empty($this->_toboard))
+		{
+			if (!allowedTo(['move_any', 'post_new'], $this->_toboard))
+			{
+				isAllowedTo('move_any', $this->_toboard);
 			}
 		}
 

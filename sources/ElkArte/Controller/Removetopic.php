@@ -48,7 +48,7 @@ class Removetopic extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $topic, $context;
+		global $context;
 
 		// Call the right method
 		$subActions = [
@@ -74,7 +74,7 @@ class Removetopic extends AbstractController
 	 */
 	public function action_removetopic2(): void
 	{
-		global $topic, $board, $modSettings;
+		global $topic, $modSettings;
 
 		// Make sure they aren't being lead around by someone. (:@)
 		checkSession('get');
@@ -92,19 +92,24 @@ class Removetopic extends AbstractController
 		removeDeleteConcurrence();
 
 		$this->_topic_info = getTopicInfo($topic, 'message');
+		if (empty($this->_topic_info['id_board']))
+		{
+			redirectexit();
+		}
+		$topic_board = (int) $this->_topic_info['id_board'];
 
 		// Can you remove your own or any topic
-		if ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('remove_any'))
+		if ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('remove_any', $topic_board))
 		{
-			isAllowedTo('remove_own');
+			isAllowedTo('remove_own', $topic_board);
 		}
 		else
 		{
-			isAllowedTo('remove_any');
+			isAllowedTo('remove_any', $topic_board);
 		}
 
 		// Can they see the topic to remove it?
-		$this->_checkApproval();
+		$this->_checkApproval($topic_board);
 
 		// Notify people that this topic has been removed.
 		sendNotifications($topic, 'remove');
@@ -113,24 +118,24 @@ class Removetopic extends AbstractController
 		removeTopics($topic);
 
 		// Note, only log topic ID in native form if it's not gone forever.
-		if (allowedTo('remove_any') || (allowedTo('remove_own') && $this->_topic_info['id_member_started'] == $this->user->id))
+		if (allowedTo('remove_any', $topic_board) || (allowedTo('remove_own', $topic_board) && $this->_topic_info['id_member_started'] == $this->user->id))
 		{
 			logAction('remove', [
-					(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
+					(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $topic_board ? 'topic' : 'old_topic_id') => $topic,
 					'subject' => $this->_topic_info['subject'],
 					'member' => $this->_topic_info['id_member_started'],
-					'board' => $board]
+					'board' => $topic_board]
 			);
 		}
 
 		// Back to the board where the topic was removed from
-		redirectexit('board=' . $board . '.0');
+		redirectexit('board=' . $topic_board . '.0');
 	}
 
 	/**
 	 * Verifies the user has permissions to remove an unapproved message/topic
 	 */
-	private function _checkApproval(): void
+	private function _checkApproval(?int $board = null): void
 	{
 		global $modSettings;
 
@@ -140,7 +145,8 @@ class Removetopic extends AbstractController
 			&& !empty($this->_topic_info['id_member'])
 			&& $this->_topic_info['id_member'] != $this->user->id)
 		{
-			isAllowedTo('approve_posts');
+			$board = $board ?: (isset($this->_topic_info['id_board']) ? (int) $this->_topic_info['id_board'] : null);
+			isAllowedTo('approve_posts', $board);
 		}
 	}
 
@@ -181,29 +187,34 @@ class Removetopic extends AbstractController
 
 		// Load the message details
 		$this->_topic_info = loadMessageDetails(
-			['t.id_member_started'],
+			['t.id_member_started', 'm.id_board'],
 			['LEFT JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)'],
 			['message_list' => $_msg]
 		);
 
+		$topic_board = !empty($this->_topic_info['id_board']) ? (int) $this->_topic_info['id_board'] : null;
+
 		// Can they see the message to remove it?
-		$this->_checkApproval();
+		$this->_checkApproval($topic_board);
 
 		// Do the removal, track if we removed the entire topic, so we redirect back to the board.
 		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		$full_topic = $remover->removeMessage($_msg);
 
-		$this->_redirectBack($full_topic);
+		$this->_redirectBack($full_topic, $topic_board);
 	}
 
 	/**
 	 * After deleting a message(s) returns the user to the best possible location
 	 *
 	 * @param bool $full_topic if the entire topic was removed
+	 * @param int|null $topic_board
 	 */
-	private function _redirectBack($full_topic): void
+	private function _redirectBack($full_topic, ?int $topic_board = null): void
 	{
 		global $topic, $board;
+
+		$board_id = $topic_board ?: $board;
 
 		// We want to redirect back to recent action.
 		if ($this->_req->hasQuery('recent'))
@@ -220,7 +231,7 @@ class Removetopic extends AbstractController
 		// Back to the board if the topic was removed
 		elseif ($full_topic)
 		{
-			redirectexit('board=' . $board . '.0');
+			redirectexit('board=' . $board_id . '.0');
 		}
 		// Back to the topic where the message was removed
 		else
