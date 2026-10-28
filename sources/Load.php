@@ -1312,7 +1312,7 @@ function determineAvatar($profile)
 	}
 
 	$avatar_protocol = empty($profile['avatar']) ? '' : strtolower(substr($profile['avatar'], 0, 7));
-	$alt = $profile['member_name'] ?? '';
+	$alt = Util::htmlspecialchars($profile['member_name'] ?? '', ENT_QUOTES, 'UTF-8', false);
 
 	// Build the gravatar request at once.
 	$gravatar = '//www.gravatar.com/avatar/' .
@@ -1341,11 +1341,12 @@ function determineAvatar($profile)
 	// remote avatar?
 	elseif ($avatar_protocol === 'http://' || $avatar_protocol === 'https:/')
 	{
+		$remote = Util::htmlspecialchars($profile['avatar'], ENT_QUOTES, 'UTF-8', false);
 		$avatar = [
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
-			'href' => $profile['avatar'],
-			'url' => $profile['avatar'],
+			'image' => '<img class="avatar avatarresize" src="' . $remote . '" alt="' . $alt . '" loading="lazy" />',
+			'href' => $remote,
+			'url' => $remote,
 		];
 	}
 	// Gravatar instead?
@@ -1363,11 +1364,12 @@ function determineAvatar($profile)
 	// an avatar from the gallery?
 	elseif (!empty($profile['avatar']))
 	{
+		$gallery = Util::htmlspecialchars($profile['avatar'], ENT_QUOTES, 'UTF-8', false);
 		$avatar = [
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
-			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
-			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $gallery . '" alt="' . $alt . '" loading="lazy" />',
+			'href' => $modSettings['avatar_url'] . '/' . $gallery,
+			'url' => $modSettings['avatar_url'] . '/' . $gallery,
 		];
 	}
 	// no custom avatar found yet, maybe a default avatar?

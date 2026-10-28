@@ -21,6 +21,8 @@ use ElkArte\Graphics\Image;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
+use ElkArte\Http\UrlValidator;
 use ElkArte\Languages\Txt;
 
 /**
@@ -216,19 +218,26 @@ class Avatars
 		// Supplying an external url for use
 		$this->_resetAvatarData(true);
 
+		// Did the user leave just a placeholder in the box?
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
-		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $userPicPersonal));
-		if (preg_match('~^https?:///?$~i', $profile_vars['avatar']) === 1)
+		if (preg_match('~^https?:///?$~i', $userPicPersonal) === 1)
 		{
 			$profile_vars['avatar'] = '';
+
+			return true;
 		}
+
 		// Trying to make us do something we'll regret?
-		elseif ((!$this->_isValidHttp() && !$this->_isValidHttps()) || ($this->_isValidHttp() && detectServer()->supportsSSL()))
+		$validated = $this->_validateExternalUrl($userPicPersonal);
+		if ($validated === false || ($this->_isValidHttp() && detectServer()->supportsSSL()))
 		{
 			return false;
 		}
+
+		$profile_vars['avatar'] = $validated;
+
 		// Should we check dimensions?
-		elseif (!empty($modSettings['avatar_max_height']) || !empty($modSettings['avatar_max_width']))
+		if (!empty($modSettings['avatar_max_height']) || !empty($modSettings['avatar_max_width']))
 		{
 			// Now let's validate the avatar is an image and accessible
 			$sizes = url_image_size($profile_vars['avatar']);
@@ -254,6 +263,41 @@ class Avatars
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate an external avatar URL and return its entity-encoded form.
+	 *
+	 * @param string $encodedInput
+	 * @return string|false
+	 */
+	private function _validateExternalUrl(string $encodedInput): string|false
+	{
+		$raw = un_htmlspecialchars(Util::htmltrim($encodedInput));
+		$raw = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $raw));
+
+		if (preg_match('~[\x00-\x20\x7F"\'<>`\\\\]|%(?:0[0-9a-f]|1[0-9a-f]|7f)~i', $raw) === 1)
+		{
+			return false;
+		}
+
+		if (UrlValidator::validate($raw, ['dns_resolve' => false, 'allowed_ports' => null]) === false)
+		{
+			return false;
+		}
+
+		if (parse_url($raw, PHP_URL_USER) !== null || parse_url($raw, PHP_URL_PASS) !== null)
+		{
+			return false;
+		}
+
+		$encoded = Util::htmlspecialchars($raw, ENT_QUOTES);
+		if (strlen($encoded) > 255)
+		{
+			return false;
+		}
+
+		return $encoded;
 	}
 
 	/**

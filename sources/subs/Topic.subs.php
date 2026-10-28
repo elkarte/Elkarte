@@ -2480,8 +2480,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
 {
 	global $modSettings;
 
-	// @todo something's not right, removeMessage() does check permissions,
-	// removeTopics() doesn't
+	// @todo something's not right, removeMessage() does check permissions, removeTopics() doesn't
 	if ($type === 'topics')
 	{
 		removeTopics($messages);
@@ -3000,7 +2999,6 @@ function splitAttemptMove($boards, $totopic)
 	if ($doMove)
 	{
 		// Update member statistics if needed
-		// @todo this should probably go into a function...
 		if ($boards['destination']['count_posts'] != $boards['current']['count_posts'])
 		{
 			$posters = [];

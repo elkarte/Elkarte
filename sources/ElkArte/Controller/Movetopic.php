@@ -92,7 +92,6 @@ class Movetopic extends AbstractController
 	 * What it does:
 	 *
 	 * - It must be called with a topic specified. (that is, global $topic must be set)
-	 *  @todo fix this thing.
 	 * - Validates access
 	 * - Accessed via ?action=movetopic.
 	 *
@@ -162,7 +161,7 @@ class Movetopic extends AbstractController
 			throw new Exception('topic_gone', false);
 		}
 
-		$source_board = (int) $this->_topic_info['id_board'];
+		$source_board = $this->_topic_info['id_board'];
 
 		// Can they see it - if not approved?
 		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
@@ -354,7 +353,7 @@ class Movetopic extends AbstractController
 			throw new Exception('topic_gone', false);
 		}
 
-		$source_board = (int) $this->_topic_info['id_board'];
+		$source_board = $this->_topic_info['id_board'];
 		$this->_toboard = $this->_req->getPost('toboard', 'intval', 0);
 
 		// Not approved, then you need approval permissions to move it as well

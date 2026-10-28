@@ -262,4 +262,33 @@ class UtilTest extends TestCase
 		$this->assertSame('', $password);
 		$this->assertSame(0, $span);
 	}
+
+	public function testEscapesHtmlBreakoutCharactersForCssStrings(): void
+	{
+		$escaped = Util::escapeCssUrl('https://x/&lt;/style&gt;&lt;script&gt;a&quot;');
+
+		$this->assertStringNotContainsString('<', $escaped);
+		$this->assertStringNotContainsString('>', $escaped);
+		$this->assertStringNotContainsString('"', $escaped);
+	}
+
+	public function testDecodesEntitiesInQueryStrings(): void
+	{
+		$this->assertSame('https://x/p.png?a=1&b=2', Util::escapeCssUrl('https://x/p.png?a=1&amp;b=2'));
+	}
+
+	public function testLeavesSafeAsciiUrlUnchanged(): void
+	{
+		$url = 'https://images.example.test/avatar.png?size=64&mode=crop';
+
+		$this->assertSame($url, Util::escapeCssUrl($url));
+	}
+
+	public function testHexEscapesCssStringTerminatorsAndControls(): void
+	{
+		$this->assertSame(
+			'\000022 \00005C \000028 \000029 \00003C \00003E \000020 \00000A ',
+			Util::escapeCssUrl("\"\\()<> \n")
+		);
+	}
 }

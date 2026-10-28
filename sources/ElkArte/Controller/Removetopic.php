@@ -96,7 +96,7 @@ class Removetopic extends AbstractController
 		{
 			redirectexit();
 		}
-		$topic_board = (int) $this->_topic_info['id_board'];
+		$topic_board = $this->_topic_info['id_board'];
 
 		// Can you remove your own or any topic
 		if ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('remove_any', $topic_board))

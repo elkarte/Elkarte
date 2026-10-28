@@ -421,8 +421,6 @@ class ModerationCenter extends AbstractController
 
 	/**
 	 * Browse all the reported posts.
-	 *
-	 * @todo this needs to be given its own file?
 	 */
 	public function action_reportedPosts(): void
 	{
