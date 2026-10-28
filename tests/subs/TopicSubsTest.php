@@ -1143,7 +1143,9 @@ class TopicSubsTest extends ElkArteCommonSetupTest
 		}
 		catch (\ElkArte\Exceptions\Exception $e)
 		{
-			$this->assertEquals('no_board', $e->getMessage());
+			global $txt;
+
+			$this->assertEquals($txt['no_board'] ?? 'no_board', $e->getMessage());
 		}
 	}
 }
