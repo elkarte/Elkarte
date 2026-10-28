@@ -729,7 +729,6 @@ class Poll extends AbstractController
 			}
 
 			// Check the question/option count for errors.
-			// @todo: why !$poll_errors->hasErrors()?
 			if (trim($this->_req->post->question) === '' && !$poll_errors->hasErrors())
 			{
 				$poll_errors->addError('no_question');

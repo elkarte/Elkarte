@@ -15,8 +15,6 @@ namespace ElkArte\Errors;
 
 /**
  * Class Error context for attachments
- *
- * @todo Can this be simplified and extend ErrorContext?
  */
 class AttachmentErrorContext
 {

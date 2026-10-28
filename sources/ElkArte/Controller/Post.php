@@ -596,7 +596,6 @@ class Post extends AbstractController
 		}
 		elseif (isset($last_msg))
 		{
-			// @todo: sort out what kind of combinations are actually possible
 			// Posting a quoted reply?
 			if ((!empty($topic) && !empty($quote))
 				|| (!empty($modSettings['enableFollowup']) && !empty($followup)))
@@ -695,7 +694,6 @@ class Post extends AbstractController
 
 		$context['submit_label'] = $txt['post'];
 
-		// @todo: sort out what kind of combinations are actually possible
 		// Posting a quoted reply?
 		if ((!empty($topic) && $quote !== 0)
 			|| (!empty($modSettings['enableFollowup']) && $followup !== 0))

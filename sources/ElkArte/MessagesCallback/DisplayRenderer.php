@@ -213,7 +213,7 @@ class DisplayRenderer extends Renderer
 				'enabled' => $output['can_remove'] && ($context['topic_first_message'] !== $output['id']),
 				'submenu' => true,
 			],
-			// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
+			// Can they quote to a new topic?
 			'followup' => [
 				'text' => 'quote_new',
 				'url' => getUrl('action', ['action' => 'post', 'board' => $board, 'quote' => $output['id'], 'followup' => $output['id']]),

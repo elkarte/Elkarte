@@ -38,7 +38,6 @@ class PostModeration extends AbstractController
 	 */
 	public function action_index()
 	{
-		// @todo We'll shift these later bud.
 		Txt::load('ModerationCenter');
 
 		theme()->getTemplates()->load('ModerationCenter');
@@ -74,7 +73,6 @@ class PostModeration extends AbstractController
 		$_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval'));
 
 		// If we filtered by board remove ones outside of this board.
-		// @todo Put a message saying we're filtered?
 		if ($_brd !== null)
 		{
 			$filter_board = [$_brd];
