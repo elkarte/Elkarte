@@ -17,6 +17,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\HttpReq;
 use ElkArte\Helper\SiteCombiner;
+use ElkArte\Helper\Util;
 
 /**
  * Class AssetManager
@@ -96,7 +97,7 @@ class AssetManager
 			$this->css->addCSSRules('
 		.i-menu-profile::before, .i-menu-profile.enabled::before {
 			content: "";
-			background-image: url("' . htmlspecialchars_decode($user['avatar']['href']) . '");
+			background-image: url("' . Util::escapeCssUrl($user['avatar']['href']) . '");
 			background-position: center;
 			filter: unset;
 		}');

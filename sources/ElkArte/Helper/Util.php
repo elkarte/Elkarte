@@ -92,6 +92,25 @@ class Util
 	}
 
 	/**
+	 * Escapes a (possibly HTML-entity-encoded) URL for use inside a CSS url("...") string
+	 * emitted in an inline style block. Decodes entities first, then hex-escapes bytes outside
+	 * a conservative URL character allow-list.
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	public static function escapeCssUrl(string $url): string
+	{
+		$raw = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+		return preg_replace_callback(
+			'~[^A-Za-z0-9\-_.\~:/?#\[\]@!$&*+,;=%]~',
+			static fn (array $m): string => sprintf('\\%06X ', ord($m[0])),
+			$raw
+		) ?? '';
+	}
+
+	/**
 	 * Adds HTML entities to the array/variable.  Uses two underscores to guard against overloading.
 	 *
 	 * What it does:
