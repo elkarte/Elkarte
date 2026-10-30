@@ -20,16 +20,30 @@ class Util
 {
 	protected static $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
 	protected static $_entity_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
-	private const DATE_EQUIVALENTS = [
+	private const DIRECTIVES = [
+		// Day
 		'%a' => 'D', '%A' => 'l', '%d' => 'd', '%e' => 'j', '%j' => 'z',
-		'%u' => 'N', '%w' => 'w', '%U' => 'W', '%V' => 'W', '%W' => 'W',
+		'%u' => 'N', '%w' => 'w',
+		// Week — the three are different; %V is the only date() letter
+		'%U' => [self::class, 'weekU'],
+		'%V' => 'W',
+		'%W' => [self::class, 'weekW'],
+		// Month
 		'%b' => 'M', '%B' => 'F', '%h' => 'M', '%m' => 'm',
-		'%C' => 'y', '%g' => 'y', '%G' => 'y', '%y' => 'y', '%Y' => 'Y',
+		// Year
+		'%C' => [self::class, 'century'],
+		'%g' => [self::class, 'weekYear2'],
+		'%G' => 'o',
+		'%y' => 'y', '%Y' => 'Y',
+		// Time
 		'%H' => 'H', '%k' => 'G', '%I' => 'h', '%l' => 'g', '%M' => 'i',
-		'%p' => 'A', '%P' => 'a', '%r' => 'H:i:s a', '%R' => 'H:i',
+		'%p' => 'A', '%P' => 'a', '%r' => 'h:i:s A', '%R' => 'H:i',
 		'%S' => 's', '%T' => 'H:i:s', '%X' => 'h:i:s',
-		'%z' => 'O', '%Z' => 'T', '%c' => 'c', '%D' => 'm/d/y',
-		'%F' => 'y/m/d', '%s' => 'U', '%x' => '',
+		'%z' => 'O', '%Z' => 'T',
+		// Time and date stamps
+		'%c' => 'c', '%D' => 'm/d/y', '%F' => 'Y-m-d', '%s' => 'U',
+		// %x intentionally omitted — see below
+		// Misc
 		'%n' => "\n", '%t' => "\t", '%%' => '%',
 	];
 
@@ -117,7 +131,7 @@ class Util
 
 		return preg_replace_callback(
 			'~[^A-Za-z0-9\-_.\~:/?#\[\]@!$&*+,;=%]~',
-			static fn (array $m): string => sprintf('\\%06X ', ord($m[0])),
+			static fn(array $m): string => sprintf('\\%06X ', ord($m[0])),
 			$raw
 		) ?? '';
 	}
@@ -672,21 +686,77 @@ class Util
 	 * @param int|null $timestamp to convert
 	 * @return string|false
 	 */
-	public static function strftime(string $format, int $timestamp = null)
+	public static function strftime(string $format, ?int $timestamp = null): string|false
 	{
-		if (PHP_VERSION_ID < 80100 && function_exists('strftime')) {
+		if (PHP_VERSION_ID < 80100 && function_exists('strftime'))
+		{
 			return \strftime($format, $timestamp);
 		}
 
-		if ($timestamp === null) {
-			$timestamp = time();
+		$timestamp ??= time();
+
+		// Build directive => rendered-value map once, then a single strtr pass.
+		$map = [];
+		foreach (self::DIRECTIVES as $directive => $spec)
+		{
+			$map[$directive] = is_string($spec)
+				? date($spec, $timestamp)
+				: $spec($timestamp);
 		}
 
-		return preg_replace_callback(
-			'/%[A-Za-z]/',
-			static fn(array $m): string => date(self::DATE_EQUIVALENTS[$m[0]] ?? $m[0], $timestamp),
-			$format
-		);
+		return strtr($format, $map);
+	}
+
+	/**
+	 * %U Sunday-based, week 00 before first Sunday
+	 *
+	 * @param int $ts
+	 * @return string
+	 */
+	private static function weekU(int $ts): string
+	{
+		$yday = (int) date('z', $ts);
+		$wday = (int) date('w', $ts);
+		$jan1 = $yday - $wday;
+
+		return sprintf('%02d', intdiv($jan1 + 7, 7));
+	}
+
+	/**
+	 * %W Monday-based, week 00 before first Monday
+	 *
+	 * @param int $ts
+	 * @return string
+	 */
+	private static function weekW(int $ts): string
+	{
+		$yday = (int) date('z', $ts);
+		$wday = ((int) date('w', $ts) + 6) % 7;
+		$jan1 = $yday - $wday;
+
+		return sprintf('%02d', intdiv($jan1 + 7, 7));
+	}
+
+	/**
+	 * %C century number (the year divided by 100 and truncated to an integer, range 00 to 99)
+	 *
+	 * @param int $ts
+	 * @return string
+	 */
+	private static function century(int $ts): string
+	{
+		return sprintf('%02d', intdiv((int) date('Y', $ts), 100));
+	}
+
+	/**
+	 * %g 2-digit year corresponding to the ISO week number
+	 *
+	 * @param int $ts
+	 * @return string
+	 */
+	private static function weekYear2(int $ts): string
+	{
+		return substr(date('o', $ts), -2);
 	}
 
 	/**
