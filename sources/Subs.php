@@ -397,7 +397,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
 	if ($is_win && str_contains($str, '%e'))
 	{
-		$str = str_replace('%e', ltrim(Util::strftime('%d', $time), '0'), $str);
+		$str = str_replace('%e', ltrim(date('d', $time), '0'), $str);
 	}
 
 	// Format any other characters.

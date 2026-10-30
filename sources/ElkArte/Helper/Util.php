@@ -20,6 +20,18 @@ class Util
 {
 	protected static $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
 	protected static $_entity_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
+	private const DATE_EQUIVALENTS = [
+		'%a' => 'D', '%A' => 'l', '%d' => 'd', '%e' => 'j', '%j' => 'z',
+		'%u' => 'N', '%w' => 'w', '%U' => 'W', '%V' => 'W', '%W' => 'W',
+		'%b' => 'M', '%B' => 'F', '%h' => 'M', '%m' => 'm',
+		'%C' => 'y', '%g' => 'y', '%G' => 'y', '%y' => 'y', '%Y' => 'Y',
+		'%H' => 'H', '%k' => 'G', '%I' => 'h', '%l' => 'g', '%M' => 'i',
+		'%p' => 'A', '%P' => 'a', '%r' => 'H:i:s a', '%R' => 'H:i',
+		'%S' => 's', '%T' => 'H:i:s', '%X' => 'h:i:s',
+		'%z' => 'O', '%Z' => 'T', '%c' => 'c', '%D' => 'm/d/y',
+		'%F' => 'y/m/d', '%s' => 'U', '%x' => '',
+		'%n' => "\n", '%t' => "\t", '%%' => '%',
+	];
 
 	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
@@ -662,72 +674,17 @@ class Util
 	 */
 	public static function strftime(string $format, int $timestamp = null)
 	{
-		if (function_exists('strftime') && (PHP_VERSION_ID < 80100))
-		{
+		if (PHP_VERSION_ID < 80100 && function_exists('strftime')) {
 			return \strftime($format, $timestamp);
 		}
 
-		if (is_null($timestamp))
-		{
+		if ($timestamp === null) {
 			$timestamp = time();
 		}
 
-		$date_equivalents = [
-			'%a' => 'D',
-			'%A' => 'l',
-			'%d' => 'd',
-			'%e' => 'j',
-			'%j' => 'z',
-			'%u' => 'N',
-			'%w' => 'w',
-			// Week
-			'%U' => 'W', // Week Number of the given year
-			'%V' => 'W',
-			'%W' => 'W',
-			// Month
-			'%b' => 'M',
-			'%B' => 'F',
-			'%h' => 'M',
-			'%m' => 'm',
-			// Year
-			'%C' => 'y', // Two-digit representation of the century
-			'%g' => 'y',
-			'%G' => 'y',
-			'%y' => 'y',
-			'%Y' => 'Y',
-			// Time
-			'%H' => 'H',
-			'%k' => 'G',
-			'%I' => 'h',
-			'%l' => 'g',
-			'%M' => 'i',
-			'%p' => 'A',
-			'%P' => 'a',
-			'%r' => 'H:i:s a',
-			'%R' => 'H:i',
-			'%S' => 's',
-			'%T' => 'H:i:s',
-			'%X' => 'h:i:s', // Preferred time representation based upon locale
-			'%z' => 'O',
-			'%Z' => 'T',
-			// Time and Date Stamps
-			'%c' => 'c',
-			'%D' => 'm/d/y',
-			'%F' => 'y/m/d',
-			'%s' => 'U',
-			'%x' => '', // Locale based date representation
-			// Misc
-			'%n' => "\n",
-			'%t' => "\t",
-			'%%' => '%',
-		];
-
 		return preg_replace_callback(
-			'/%[A-Za-z]{1}/',
-			static function ($matches) use ($timestamp, $date_equivalents) {
-				$new_format = str_replace(array_keys($date_equivalents), array_values($date_equivalents), $matches[0]);
-				return date($new_format, $timestamp);
-			},
+			'/%[A-Za-z]/',
+			static fn(array $m): string => date(self::DATE_EQUIVALENTS[$m[0]] ?? $m[0], $timestamp),
 			$format
 		);
 	}

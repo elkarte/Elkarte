@@ -2899,7 +2899,7 @@ function registerAgreementAccepted($id_member, $ip, $agreement_version)
 			[
 				'version' => $agreement_version,
 				'id_member' => $id_member,
-				'accepted_date' => Util::strftime('%Y-%m-%d', forum_time(false)),
+				'accepted_date' => date('Y-m-d', forum_time(false)),
 				'accepted_ip' => $ip,
 			]
 		],
