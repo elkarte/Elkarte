@@ -59,47 +59,6 @@ function installedThemes()
 }
 
 /**
- * Validates a theme name
- *
- * @param array $indexes
- * @param array $value_data
- *
- * @return array
- */
-function validateThemeName($indexes, $value_data)
-{
-	$db = database();
-
-	$themes = [];
-	$db->fetchQuery('
-		SELECT 
-			id_theme, value
-		FROM {db_prefix}themes
-		WHERE id_member = {int:no_member}
-			AND variable = {string:theme_dir}
-			AND (' . implode(' OR ', $value_data['query']) . ')',
-		array_merge($value_data['params'], [
-			'no_member' => 0,
-			'theme_dir' => 'theme_dir',
-			'index_compare_explode' => 'value LIKE \'%' . implode('\' OR value LIKE \'%', $indexes) . '\'',
-		])
-	)->fetch_callback(
-		function ($row) use (&$themes, $indexes) {
-			// Find the right one.
-			foreach ($indexes as $index)
-			{
-				if (str_contains($row['value'], $index))
-				{
-					$themes[$row['id_theme']] = $index;
-				}
-			}
-		}
-	);
-
-	return $themes;
-}
-
-/**
  * Get a basic list of themes
  *
  * @param int|int[] $themes

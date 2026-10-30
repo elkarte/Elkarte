@@ -2475,56 +2475,6 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 }
 
 /**
- * Determine if the current user (User::$info) can contact another user ($who)
- *
- * @param int $who The id of the user to contact
- *
- * @return bool
- * @package Members
- *
- */
-function canContact($who)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT 
-			receive_from, buddy_list, pm_ignore_list
-		FROM {db_prefix}members
-		WHERE id_member = {int:member}',
-		[
-			'member' => $who,
-		]
-	);
-	list ($receive_from, $buddies, $ignore) = $request->fetch_row();
-	$request->free_result();
-
-	$buddy_list = array_map('intval', explode(',', $buddies));
-	$ignore_list = array_map('intval', explode(',', $ignore));
-
-	// 0 = all members
-	if ($receive_from == 0)
-	{
-		return true;
-	}
-
-	// 1 = all except ignore
-	if ($receive_from == 1)
-	{
-		return !(!empty($ignore_list) && in_array(User::$info->id, $ignore_list));
-	}
-
-	// 2 = buddies and admin
-	if ($receive_from == 2)
-	{
-		return (User::$info->is_admin || (!empty($buddy_list) && in_array(User::$info->id, $buddy_list)));
-	}
-
-	// 3 = admin only
-	return (bool) User::$info->is_admin;
-}
-
-/**
  * This function updates the latest member, the total membercount, and the
  * number of unapproved members.
  *
@@ -2874,35 +2824,4 @@ function loadMembersIPs($ip_string, $ip_var)
 	ksort($ips);
 
 	return $ips;
-}
-
-/**
- * Logs when the user accepted the site agreement
- *
- * @param int $id_member
- * @param string $ip
- * @param string $agreement_version
- */
-function registerAgreementAccepted($id_member, $ip, $agreement_version)
-{
-	$db = database();
-
-	$db->insert('',
-		'{db_prefix}log_agreement_accept',
-		[
-			'version' => 'date',
-			'id_member' => 'int',
-			'accepted_date' => 'date',
-			'accepted_ip' => 'string-255',
-		],
-		[
-			[
-				'version' => $agreement_version,
-				'id_member' => $id_member,
-				'accepted_date' => date('Y-m-d', forum_time(false)),
-				'accepted_ip' => $ip,
-			]
-		],
-		['version', 'id_member']
-	);
 }
