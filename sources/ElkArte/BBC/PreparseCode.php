@@ -650,7 +650,7 @@ class PreparseCode
 		$me_regex = '~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i';
 		$footnote_regex = '~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i';
 
-		if (preg_match('~[\[\]"]~', $this->user_name) !== false)
+		if (preg_match('~[\[\]"]~', $this->user_name) === 1)
 		{
 			$this->message = preg_replace($me_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]', $this->message);
 			$this->message = preg_replace($footnote_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]$3', $this->message);

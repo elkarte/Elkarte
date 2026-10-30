@@ -120,18 +120,13 @@ class Bootstrap
 	}
 
 	/**
-	 * If they glo, they need to be cleaned.
+	 * This is a hack to get rid of globals that are set in Settings.php
+	 * and are not needed.
 	 */
 	private function clearGlobals()
 	{
-		// We don't need no globals. (a bug in "old" versions of PHP)
-		foreach (['db_character_set', 'cachedir'] as $variable)
-		{
-			if (isset($GLOBALS[$variable]))
-			{
-				unset($GLOBALS[$variable], $GLOBALS[$variable]);
-			}
-		}
+		// We don't need no globals.
+		unset($GLOBALS['db_character_set'], $GLOBALS['cachedir']);
 	}
 
 	/**
@@ -237,7 +232,7 @@ class Bootstrap
 			$boarddir = __DIR__;
 		}
 
-		if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
+		if (!file_exists($sourcedir . '/Security.php') && file_exists($boarddir . '/sources'))
 		{
 			$sourcedir = $boarddir . '/sources';
 		}
@@ -344,7 +339,7 @@ class Bootstrap
 		if ($db_show_debug === true)
 		{
 			Debug::instance()->rusage('start', $this->rusage_start);
-			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
+			$ssi_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED);
 		}
 	}
 
