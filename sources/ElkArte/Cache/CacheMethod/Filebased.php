@@ -129,12 +129,8 @@ class Filebased extends AbstractCacheMethod
 	{
 		if (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
 		{
-			$opcache = ini_get('opcache.restrict_api');
-			if ($opcache === false || $opcache === '')
-			{
-				opcache_invalidate(CACHEDIR . '/' . $fName, true);
-			}
-			elseif (stripos(BOARDDIR, $opcache) !== 0)
+			$opcache = trim((string) ini_get('opcache.restrict_api'));
+			if ($opcache === '' || stripos(rtrim(BOARDDIR, '/\\') . '/', rtrim($opcache, '/\\') . '/') === 0)
 			{
 				opcache_invalidate(CACHEDIR . '/' . $fName, true);
 			}
