@@ -686,56 +686,67 @@ class PreparseCode
 	 */
 	private function _fixMistakes(): void
 	{
-		$mistake_fixes = [
-			// Find [table]s not followed by [tr].
-			'~\[table\](?![\s' . self::NBS . ']*\[tr\])~su' => '[table][tr]',
-			// Find [tr]s not followed by [td] or [th]
-			'~\[tr\](?![\s' . self::NBS . ']*\[t[dh]\])~su' => '[tr][td]',
-			// Find [/td] and [/th]s not followed by something valid.
-			'~\[/t([dh])\](?![\s' . self::NBS . ']*(?:\[t[dh]\]|\[/tr\]|\[/table\]))~su' => '[/t$1][/tr]',
-			// Find [/tr]s not followed by something valid.
-			'~\[/tr\](?![\s' . self::NBS . ']*(?:\[tr\]|\[/table\]))~su' => '[/tr][/table]',
-			// Find [/td] [/th]s incorrectly followed by [/table].
-			'~\[/t([dh])\][\s' . self::NBS . ']*\[/table\]~su' => '[/t$1][/tr][/table]',
-			// Find [table]s, [tr]s, and [/td]s (possibly correctly) followed by [td].
-			'~\[(table|tr|/td)\]([\s' . self::NBS . ']*)\[td\]~su' => '[$1]$2[_td_]',
-			// Now, any [td]s left should have a [tr] before them.
-			'~\[td\]~s' => '[tr][td]',
-			// Look for [tr]s which are correctly placed.
-			'~\[(table|/tr)\]([\s' . self::NBS . ']*)\[tr\]~su' => '[$1]$2[_tr_]',
-			// Any remaining [tr]s should have a [table] before them.
-			'~\[tr\]~s' => '[table][tr]',
-			// Look for [/td]s or [/th]s followed by [/tr].
-			'~\[/t([dh])\]([\s' . self::NBS . ']*)\[/tr\]~su' => '[/t$1]$2[_/tr_]',
-			// Any remaining [/tr]s should have a [/td].
-			'~\[/tr\]~s' => '[/td][/tr]',
-			// Look for properly opened [li]s which aren't closed.
-			'~\[li\]([^\[\]]+?)\[li\]~s' => '[li]$1[_/li_][_li_]',
-			'~\[li\]([^\[\]]+?)\[/list\]~s' => '[_li_]$1[_/li_][/list]',
-			'~\[li\]([^\[\]]+?)$~s' => '[li]$1[/li]',
-			// Lists - find correctly closed items/lists.
-			'~\[/li\]([\s' . self::NBS . ']*)\[/list\]~su' => '[_/li_]$1[/list]',
-			// Find list items closed and then opened.
-			'~\[/li\]([\s' . self::NBS . ']*)\[li\]~su' => '[_/li_]$1[_li_]',
-			// Now, find any [list]s or [/li]s followed by [li].
-			'~\[(list(?: [^\]]*?)?|/li)\]([\s' . self::NBS . ']*)\[li\]~su' => '[$1]$2[_li_]',
-			// Allow for sub lists.
-			'~\[/li\]([\s' . self::NBS . ']*)\[list\]~u' => '[_/li_]$1[list]',
-			'~\[/list\]([\s' . self::NBS . ']*)\[li\]~u' => '[/list]$1[_li_]',
-			// Any remaining [li]s weren't inside a [list].
-			'~\[li\]~' => '[list][li]',
-			// Any remaining [/li]s weren't before a [/list].
-			'~\[/li\]~' => '[/li][/list]',
-			// Put the correct ones back how we found them.
-			'~\[_(li|/li|td|tr|/tr)_\]~' => '[$1]',
-			// Images with no real url.
-			'~\[img\]https?://.{0,7}\[/img\]~' => '',
-		];
+		static $mistake_fixes;
 
-		// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)
-		for ($j = 0; $j < 3; $j++)
+		if ($mistake_fixes === null)
 		{
-			$this->message = preg_replace(array_keys($mistake_fixes), $mistake_fixes, $this->message);
+			// This is a static array of regex replacements to fix common mistakes in BBC.
+			// The keys are the regex patterns to search for, and the values are the replacements.
+			$mistake_fixes = [
+				// Find [table]s not followed by [tr].
+				'~\[table\](?![\s' . self::NBS . ']*\[tr\])~su' => '[table][tr]',
+				// Find [tr]s not followed by [td] or [th]
+				'~\[tr\](?![\s' . self::NBS . ']*\[t[dh]\])~su' => '[tr][td]',
+				// Find [/td] and [/th]s not followed by something valid.
+				'~\[/t([dh])\](?![\s' . self::NBS . ']*(?:\[t[dh]\]|\[/tr\]|\[/table\]))~su' => '[/t$1][/tr]',
+				// Find [/tr]s not followed by something valid.
+				'~\[/tr\](?![\s' . self::NBS . ']*(?:\[tr\]|\[/table\]))~su' => '[/tr][/table]',
+				// Find [/td] [/th]s incorrectly followed by [/table].
+				'~\[/t([dh])\][\s' . self::NBS . ']*\[/table\]~su' => '[/t$1][/tr][/table]',
+				// Find [table]s, [tr]s, and [/td]s (possibly correctly) followed by [td].
+				'~\[(table|tr|/td)\]([\s' . self::NBS . ']*)\[td\]~su' => '[$1]$2[_td_]',
+				// Now, any [td]s left should have a [tr] before them.
+				'~\[td\]~s' => '[tr][td]',
+				// Look for [tr]s which are correctly placed.
+				'~\[(table|/tr)\]([\s' . self::NBS . ']*)\[tr\]~su' => '[$1]$2[_tr_]',
+				// Any remaining [tr]s should have a [table] before them.
+				'~\[tr\]~s' => '[table][tr]',
+				// Look for [/td]s or [/th]s followed by [/tr].
+				'~\[/t([dh])\]([\s' . self::NBS . ']*)\[/tr\]~su' => '[/t$1]$2[_/tr_]',
+				// Any remaining [/tr]s should have a [/td].
+				'~\[/tr\]~s' => '[/td][/tr]',
+				// Look for properly opened [li]s which aren't closed.
+				'~\[li\]([^\[\]]+?)\[li\]~s' => '[li]$1[_/li_][_li_]',
+				'~\[li\]([^\[\]]+?)\[/list\]~s' => '[_li_]$1[_/li_][/list]',
+				'~\[li\]([^\[\]]+?)$~s' => '[li]$1[/li]',
+				// Lists - find correctly closed items/lists.
+				'~\[/li\]([\s' . self::NBS . ']*)\[/list\]~su' => '[_/li_]$1[/list]',
+				// Find list items closed and then opened.
+				'~\[/li\]([\s' . self::NBS . ']*)\[li\]~su' => '[_/li_]$1[_li_]',
+				// Now, find any [list]s or [/li]s followed by [li].
+				'~\[(list(?: [^\]]*?)?|/li)\]([\s' . self::NBS . ']*)\[li\]~su' => '[$1]$2[_li_]',
+				// Allow for sub lists.
+				'~\[/li\]([\s' . self::NBS . ']*)\[list\]~u' => '[_/li_]$1[list]',
+				'~\[/list\]([\s' . self::NBS . ']*)\[li\]~u' => '[/list]$1[_li_]',
+				// Any remaining [li]s weren't inside a [list].
+				'~\[li\]~' => '[list][li]',
+				// Any remaining [/li]s weren't before a [/list].
+				'~\[/li\]~' => '[/li][/list]',
+				// Put the correct ones back how we found them.
+				'~\[_(li|/li|td|tr|/tr)_\]~' => '[$1]',
+				// Images with no real url.
+				'~\[img\]https?://.{0,7}\[/img\]~' => '',
+			];
+		}
+
+		// Only do this if we have a table, tr, td, th, li, list or img tag in the message.
+		if (preg_match('~\[(?:/?(?:table|tr|t[dh]|li|list)|img)\]~i', $this->message) === 1)
+		{
+			// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)
+			for ($j = 0; $j < 3; $j++)
+			{
+				$this->message = preg_replace(array_keys($mistake_fixes), $mistake_fixes, $this->message);
+			}
 		}
 	}
 
