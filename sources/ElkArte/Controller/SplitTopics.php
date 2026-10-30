@@ -53,11 +53,13 @@ class SplitTopics extends AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		$topic_board = getTopicBoard($topic);
-		if (empty($topic_board))
+		$topic_info = topicAttribute($topic, ['id_board']);
+		if (empty($topic_info['id_board']))
 		{
 			throw new Exception('no_board');
 		}
+
+		$topic_board = (int) $topic_info['id_board'];
 
 		isAllowedTo('split_any', $topic_board);
 
@@ -226,7 +228,8 @@ class SplitTopics extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		$topic_board = getTopicBoard($topic);
+		$topic_info = topicAttribute($topic, ['id_board']);
+		$topic_board = !empty($topic_info['id_board']) ? (int) $topic_info['id_board'] : 0;
 
 		$context['not_selected'] = [
 			'num_messages' => 0,
