@@ -728,11 +728,10 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5, $with_avatar = true)
 			) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = {int:type_avatar})
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		ORDER BY lp.like_count DESC',
 		[
 			'id_topic' => $topics,
-			'type_avatar' => 1,
 		]
 	)->fetch_callback(
 		function ($row) use ($scripturl, $bbc_parser, &$messagesByTopic, $limit, $with_avatar) {

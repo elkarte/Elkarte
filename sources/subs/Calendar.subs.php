@@ -165,11 +165,11 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 		{
 			// Attempt to avoid DST problems.
 			// @todo Resolve this properly at some point.
-			if (Util::strftime('%Y-%m-%d', $date) == $lastDate)
+			if (date('Y-m-d', $date) == $lastDate)
 			{
 				$date += 3601;
 			}
-			$lastDate = Util::strftime('%Y-%m-%d', $date);
+			$lastDate = date('Y-m-d', $date);
 			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
 
 			// If we're using permissions (calendar pages?) then just output normal contextual style information.
@@ -184,7 +184,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					$modify_href = ['action' => 'post', 'msg' => $row['id_first_msg'], 'topic' => $row['id_topic'] . '.0', 'calendar', 'eventid' => $row['id_event'], '{session_data}'];
 				}
 
-				$events[Util::strftime('%Y-%m-%d', $date)][] = [
+				$events[date('Y-m-d', $date)][] = [
 					'id' => $row['id_event'],
 					'title' => $row['title'],
 					'start_date' => $row['start_date'],
@@ -203,7 +203,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			// Otherwise, this is going to be cached, and the VIEWER'S permissions should apply... just put together some info.
 			else
 			{
-				$events[Util::strftime('%Y-%m-%d', $date)][] = [
+				$events[date('Y-m-d', $date)][] = [
 					'id' => $row['id_event'],
 					'title' => $row['title'],
 					'start_date' => $row['start_date'],
@@ -358,10 +358,10 @@ function canLinkEvent()
 function getTodayInfo()
 {
 	return [
-		'day' => (int) Util::strftime('%d', forum_time()),
-		'month' => (int) Util::strftime('%m', forum_time()),
-		'year' => (int) Util::strftime('%Y', forum_time()),
-		'date' => Util::strftime('%Y-%m-%d', forum_time()),
+		'day' => (int) date('d', forum_time()),
+		'month' => (int) date('m', forum_time()),
+		'year' => (int) date('Y', forum_time()),
+		'date' => date('Y-m-d', forum_time()),
 	];
 }
 
@@ -410,16 +410,16 @@ function getCalendarGrid($month, $year, $calendarOptions)
 	// Get information about this month.
 	$month_info = [
 		'first_day' => [
-			'day_of_week' => (int) Util::strftime('%w', mktime(0, 0, 0, $month, 1, $year)),
+			'day_of_week' => (int) date('w', mktime(0, 0, 0, $month, 1, $year)),
 			'week_num' => (int) Util::strftime('%U', mktime(0, 0, 0, $month, 1, $year)),
-			'date' => Util::strftime('%Y-%m-%d', mktime(0, 0, 0, $month, 1, $year)),
+			'date' => date('Y-m-d', mktime(0, 0, 0, $month, 1, $year)),
 		],
 		'last_day' => [
-			'day_of_month' => (int) Util::strftime('%d', mktime(0, 0, 0, $month == 12 ? 1 : $month + 1, 0, $month == 12 ? $year + 1 : $year)),
-			'date' => Util::strftime('%Y-%m-%d', mktime(0, 0, 0, $month == 12 ? 1 : $month + 1, 0, $month == 12 ? $year + 1 : $year)),
+			'day_of_month' => (int) date('d', mktime(0, 0, 0, $month == 12 ? 1 : $month + 1, 0, $month == 12 ? $year + 1 : $year)),
+			'date' => date('Y-m-d', mktime(0, 0, 0, $month == 12 ? 1 : $month + 1, 0, $month == 12 ? $year + 1 : $year)),
 		],
-		'first_day_of_year' => (int) Util::strftime('%w', mktime(0, 0, 0, 1, 1, $year)),
-		'first_day_of_next_year' => (int) Util::strftime('%w', mktime(0, 0, 0, 1, 1, $year + 1)),
+		'first_day_of_year' => (int) date('w', mktime(0, 0, 0, 1, 1, $year)),
+		'first_day_of_next_year' => (int) date('w', mktime(0, 0, 0, 1, 1, $year + 1)),
 	];
 
 	// The number of days the first row is shifted to the right for the starting day.
@@ -564,7 +564,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 	// What is the actual "start date" for the passed day?
 	$calendarOptions['start_day'] = empty($calendarOptions['start_day']) ? 0 : (int) $calendarOptions['start_day'];
-	$day_of_week = (int) Util::strftime('%w', mktime(0, 0, 0, $month, $day, $year));
+	$day_of_week = (int) date('w', mktime(0, 0, 0, $month, $day, $year));
 	if ($day_of_week != $calendarOptions['start_day'])
 	{
 		// Here we offset accordingly to get things to the real start of a week.
@@ -574,9 +574,9 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 			$date_diff += 7;
 		}
 		$new_timestamp = mktime(0, 0, 0, $month, $day, $year) - $date_diff * 86400;
-		$day = (int) Util::strftime('%d', $new_timestamp);
-		$month = (int) Util::strftime('%m', $new_timestamp);
-		$year = (int) Util::strftime('%Y', $new_timestamp);
+		$day = (int) date('d', $new_timestamp);
+		$month = (int) date('m', $new_timestamp);
+		$year = (int) date('Y', $new_timestamp);
 	}
 
 	// Now start filling in the calendar grid.
@@ -597,13 +597,13 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 	// The next week calculation requires a bit more work.
 	$curTimestamp = mktime(0, 0, 0, $month, $day, $year);
 	$nextWeekTimestamp = $curTimestamp + 604800;
-	$calendarGrid['next_week']['day'] = (int) Util::strftime('%d', $nextWeekTimestamp);
-	$calendarGrid['next_week']['month'] = (int) Util::strftime('%m', $nextWeekTimestamp);
-	$calendarGrid['next_week']['year'] = (int) Util::strftime('%Y', $nextWeekTimestamp);
+	$calendarGrid['next_week']['day'] = (int) date('d', $nextWeekTimestamp);
+	$calendarGrid['next_week']['month'] = (int) date('m', $nextWeekTimestamp);
+	$calendarGrid['next_week']['year'] = (int) date('Y', $nextWeekTimestamp);
 
 	// Fetch the arrays for birthdays, posted events, and holidays.
-	$startDate = Util::strftime('%Y-%m-%d', $curTimestamp);
-	$endDate = Util::strftime('%Y-%m-%d', $nextWeekTimestamp);
+	$startDate = date('Y-m-d', $curTimestamp);
+	$endDate = date('Y-m-d', $nextWeekTimestamp);
 	$bday = $calendarOptions['show_birthdays'] ? getBirthdayRange($startDate, $endDate) : [];
 	$events = $calendarOptions['show_events'] ? getEventRange($startDate, $endDate) : [];
 	$holidays = $calendarOptions['show_holidays'] ? getHolidayRange($startDate, $endDate) : [];
@@ -611,10 +611,10 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 	// An adjustment value to apply to all calculated week numbers.
 	if (!empty($calendarOptions['show_week_num']))
 	{
-		$first_day_of_year = (int) Util::strftime('%w', mktime(0, 0, 0, 1, 1, $year));
-		$first_day_of_next_year = (int) Util::strftime('%w', mktime(0, 0, 0, 1, 1, $year + 1));
+		$first_day_of_year = (int) date('w', mktime(0, 0, 0, 1, 1, $year));
+		$first_day_of_next_year = (int) date('w', mktime(0, 0, 0, 1, 1, $year + 1));
 		// this one is not used in its scope
-		// $last_day_of_last_year = (int) Util::strftime('%w', mktime(0, 0, 0, 12, 31, $year - 1));
+		// $last_day_of_last_year = (int) date('w', mktime(0, 0, 0, 12, 31, $year - 1));
 
 		// All this is as getCalendarGrid.
 		if ($calendarOptions['start_day'] === 0)
@@ -629,7 +629,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 		$calendarGrid['week_number'] = (int) Util::strftime('%U', mktime(0, 0, 0, $month, $day, $year)) + $nWeekAdjust;
 
 		// If this crosses a year boundary and includes January, it should be week one.
-		if ((int) Util::strftime('%Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
+		if ((int) date('Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
 		{
 			$calendarGrid['week_number'] = 1;
 		}
@@ -670,7 +670,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 		// Make the last day what the current day is and work out what the next day is.
 		$lastDay = $curDay;
 		$curTimestamp += 86400;
-		$curDay = (int) Util::strftime('%d', $curTimestamp);
+		$curDay = (int) date('d', $curTimestamp);
 
 		// Also increment the current day of the week.
 		$curDayOfWeek = $curDayOfWeek >= 6 ? 0 : ++$curDayOfWeek;
@@ -698,8 +698,8 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
  */
 function cache_getOffsetIndependentEvents($days_to_index)
 {
-	$low_date = Util::strftime('%Y-%m-%d', forum_time(false) - 24 * 3600);
-	$high_date = Util::strftime('%Y-%m-%d', forum_time(false) + $days_to_index * 24 * 3600);
+	$low_date = date('Y-m-d', forum_time(false) - 24 * 3600);
+	$high_date = date('Y-m-d', forum_time(false) + $days_to_index * 24 * 3600);
 
 	return [
 		'data' => [
@@ -763,21 +763,21 @@ function cache_getRecentEvents($eventOptions)
 	// Holidays between now and now + days.
 	for ($i = $now; $i < $now + $days_for_index; $i += 86400)
 	{
-		if (isset($cached_data['holidays'][Util::strftime('%Y-%m-%d', $i)]))
+		if (isset($cached_data['holidays'][date('Y-m-d', $i)]))
 		{
-			$return_data['calendar_holidays'] = array_merge($return_data['calendar_holidays'], $cached_data['holidays'][Util::strftime('%Y-%m-%d', $i)]);
+			$return_data['calendar_holidays'] = array_merge($return_data['calendar_holidays'], $cached_data['holidays'][date('Y-m-d', $i)]);
 		}
 	}
 
 	// Happy Birthday, guys and gals!
 	for ($i = $now; $i < $now + $days_for_index; $i += 86400)
 	{
-		$loop_date = Util::strftime('%Y-%m-%d', $i);
+		$loop_date = date('Y-m-d', $i);
 		if (isset($cached_data['birthdays'][$loop_date]))
 		{
 			foreach ($cached_data['birthdays'][$loop_date] as $index => $dummy)
 			{
-				$cached_data['birthdays'][Util::strftime('%Y-%m-%d', $i)][$index]['is_today'] = $loop_date === $today['date'];
+				$cached_data['birthdays'][date('Y-m-d', $i)][$index]['is_today'] = $loop_date === $today['date'];
 			}
 			$return_data['calendar_birthdays'] = array_merge($return_data['calendar_birthdays'], $cached_data['birthdays'][$loop_date]);
 		}
@@ -787,7 +787,7 @@ function cache_getRecentEvents($eventOptions)
 	for ($i = $now; $i < $now + $days_for_index; $i += 86400)
 	{
 		// Determine the date of the current loop step.
-		$loop_date = Util::strftime('%Y-%m-%d', $i);
+		$loop_date = date('Y-m-d', $i);
 
 		// No events today? Check the next day.
 		if (empty($cached_data['events'][$loop_date]))
@@ -999,7 +999,7 @@ function insertEvent(&$eventOptions)
 	// Set the end date (if not yet given)
 	if (!isset($eventOptions['end_date']))
 	{
-		$eventOptions['end_date'] = Util::strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
+		$eventOptions['end_date'] = date('Y-m-d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
 	}
 
 	// If no topic and board are given, they are not linked to a topic.
@@ -1066,7 +1066,7 @@ function modifyEvent($event_id, &$eventOptions)
 	// Set the end date to the start date + span (if the end date wasn't already given).
 	if (!isset($eventOptions['end_date']))
 	{
-		$eventOptions['end_date'] = Util::strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
+		$eventOptions['end_date'] = date('Y-m-d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
 	}
 
 	$event_columns = [
@@ -1198,7 +1198,7 @@ function getEventProperties($event_id, $calendar_only = false)
 			],
 		];
 
-		$return_value['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
+		$return_value['last_day'] = (int) date('d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
 	}
 
 	return $return_value;

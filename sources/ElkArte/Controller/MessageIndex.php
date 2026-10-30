@@ -727,21 +727,32 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			// Can we restore topics?
 			$context['can_restore'] = $this->currentUserCanRestore();
 
-			// Set permissions for all the topics.
+			// Set permissions for all the topics once, so we don't have to keep checking them for each topic.
+			$can = [
+				'lock_any' => allowedTo('lock_any'),
+				'lock_own' => allowedTo('lock_own'),
+				'sticky' => allowedTo('make_sticky'),
+				'move_any' => allowedTo('move_any'),
+				'move_own' => allowedTo('move_own'),
+				'modify_any' => allowedTo('modify_any'),
+				'modify_own' => allowedTo('modify_own'),
+				'remove_any' => allowedTo('remove_any'),
+				'remove_own' => allowedTo('remove_own'),
+			];
 			foreach ($context['topics'] as $t => $topic)
 			{
 				$started = (int) $topic['first_post']['member']['id'] === $this->user->id;
 				$context['topics'][$t]['quick_mod'] = [
-					'lock' => allowedTo('lock_any') || ($started && allowedTo('lock_own')),
-					'sticky' => allowedTo('make_sticky'),
-					'move' => allowedTo('move_any') || ($started && allowedTo('move_own')),
-					'modify' => allowedTo('modify_any') || ($started && allowedTo('modify_own')),
-					'remove' => allowedTo('remove_any') || ($started && allowedTo('remove_own')),
+					'lock' => $can['lock_any'] || ($started && $can['lock_own']),
+					'sticky' => $can['sticky'],
+					'move' => $can['move_any'] || ($started && $can['move_own']),
+					'modify' => $can['modify_any'] || ($started && $can['modify_own']),
+					'remove' => $can['remove_any'] || ($started && $can['remove_own']),
 					'approve' => $context['can_approve'] && $topic['unapproved_posts']
 				];
-				$context['can_lock'] |= ($started && allowedTo('lock_own'));
-				$context['can_move'] |= ($started && allowedTo('move_own'));
-				$context['can_remove'] |= ($started && allowedTo('remove_own'));
+				$context['can_lock'] |= ($started && $can['lock_own']);
+				$context['can_move'] |= ($started && $can['move_own']);
+				$context['can_remove'] |= ($started && $can['remove_own']);
 			}
 
 			// Can we even use quick moderation on this batch?

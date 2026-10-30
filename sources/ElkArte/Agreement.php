@@ -216,7 +216,7 @@ class Agreement
 				[
 					'version' => $version,
 					'id_member' => $id_member,
-					'accepted_date' => Util::strftime('%Y-%m-%d', forum_time(false)),
+					'accepted_date' => date('Y-m-d', forum_time(false)),
 					'accepted_ip' => $ip,
 				]
 			],
@@ -235,7 +235,7 @@ class Agreement
 	 */
 	protected function _backupId(): string
 	{
-		$backup_id = Util::strftime('%Y-%m-%d', forum_time(false));
+		$backup_id = date('Y-m-d', forum_time(false));
 		$counter = '';
 		$merger = '';
 

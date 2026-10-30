@@ -277,7 +277,7 @@ class Post extends AbstractModule
 		}
 
 		// Find the last day of the month.
-		$context['event']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, (int) $context['event']['month'] === 12 ? 1 : $context['event']['month'] + 1, 0, (int) $context['event']['month'] === 12 ? $context['event']['year'] + 1 : $context['event']['year']));
+		$context['event']['last_day'] = (int) date('d', mktime(0, 0, 0, (int) $context['event']['month'] === 12 ? 1 : $context['event']['month'] + 1, 0, (int) $context['event']['month'] === 12 ? $context['event']['year'] + 1 : $context['event']['year']));
 
 		$context['event']['board'] = empty($board) ? $modSettings['cal_defaultboard'] : $board;
 	}

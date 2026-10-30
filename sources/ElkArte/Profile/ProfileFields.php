@@ -327,7 +327,7 @@ class ProfileFields
 			],
 			'date_registered' => [
 				'type' => 'date',
-				'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600),
+				'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : date('Y-m-d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600),
 				'label' => $txt['date_registered'],
 				'log_change' => true,
 				'permission' => 'moderate_forum',
@@ -343,7 +343,7 @@ class ProfileFields
 					}
 
 					// As long as it doesn't equal "N/A"...
-					if ($value !== $txt['not_applicable'] && $value !== strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
+					if ($value !== $txt['not_applicable'] && $value !== strtotime(date('Y-m-d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
 					{
 						$value -= (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 					}
@@ -795,7 +795,7 @@ class ProfileFields
 					];
 					$context['member']['time_format'] = $cur_profile['time_format'];
 					$context['current_forum_time'] = standardTime(time() - User::$info->time_offset * 3600, false);
-					$context['current_forum_time_js'] = Util::strftime('%Y,' . ((int) Util::strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
+					$context['current_forum_time_js'] = Util::strftime('%Y,' . ((int) date('m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
 					$context['current_forum_time_hour'] = (int) Util::strftime('%H', forum_time(false));
 
 					return true;

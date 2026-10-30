@@ -1060,6 +1060,16 @@ abstract class AbstractQuery implements QueryInterface
 		$clean = '';
 		if (empty($modSettings['disableQueryCheck']))
 		{
+			// Fast path: if none of the risky tokens are present in the raw string, cleanup cannot create them.
+			if (strpos($db_string, '/*') === false
+				&& strpos($db_string, '--') === false
+				&& strpos($db_string, ';') === false
+				&& stripos($db_string, 'sleep') === false
+				&& stripos($db_string, 'benchmark') === false)
+			{
+				return;
+			}
+
 			$old_pos = 0;
 			$pos = -1;
 			while (true)

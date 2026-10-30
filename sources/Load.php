@@ -1278,19 +1278,6 @@ function loadDatabase()
 	{
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 	}
-	// Case-sensitive database? Let's define a constant.
-	// @NOTE: I think it is already taken care of by the abstraction, it should be possible to remove
-	if (!$db->case_sensitive())
-	{
-		return;
-	}
-
-	if (defined('DB_CASE_SENSITIVE'))
-	{
-		return;
-	}
-
-	define('DB_CASE_SENSITIVE', '1');
 }
 
 /**
@@ -1326,7 +1313,7 @@ function determineAvatar($profile)
 			: '');
 
 	// uploaded avatar?
-	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
+	if (($profile['id_attach'] ?? 0) > 0 && empty($profile['avatar']))
 	{
 		// where are those pesky avatars?
 		$avatar_url = empty($profile['attachment_type']) ? getUrl('action', ['action' => 'dlattach', 'attach' => $profile['id_attach'], 'type' => 'avatar']) : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];

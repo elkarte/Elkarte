@@ -286,8 +286,9 @@ function saveFileSettings($config_vars, $settingsArray)
 	$result = file_put_contents(BOARDDIR . '/Settings.php', implode('', $settingsArray), LOCK_EX);
 
 	// Don't let the OPcache fool us, we need the new file
+	$opcache = trim((string) ini_get('opcache.restrict_api'));
 	if ($result !== false && extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-		((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, (string) ini_get('opcache.restrict_api')) !== 0)))
+		($opcache === '' || stripos(rtrim(BOARDDIR, '/\\') . '/', rtrim($opcache, '/\\') . '/') === 0))
 	{
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 	}

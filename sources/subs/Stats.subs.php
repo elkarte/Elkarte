@@ -699,44 +699,6 @@ function monthlyActivity()
 }
 
 /**
- * Loads the statistics on a daily basis in $context.
- *
- * - Called by action_stats().
- *
- * @param string $condition_string
- * @param array $condition_parameters = array()
- */
-function getDailyStats($condition_string, $condition_parameters = [])
-{
-	$db = database();
-
-	// Activity by day.
-	$db->fetchQuery('
-		SELECT 
-			YEAR(date) AS stats_year, MONTH(date) AS stats_month, DAYOFMONTH(date) AS stats_day, topics, posts, registers, most_on, hits
-		FROM {db_prefix}log_activity
-		WHERE ' . $condition_string . '
-		ORDER BY stats_day DESC',
-		$condition_parameters
-	)->fetch_callback(
-		function ($row) {
-			global $context;
-
-			$context['yearly'][$row['stats_year']]['months'][(int) $row['stats_month']]['days'][] = [
-				'day' => sprintf('%02d', $row['stats_day']),
-				'month' => sprintf('%02d', $row['stats_month']),
-				'year' => $row['stats_year'],
-				'new_topics' => comma_format($row['topics']),
-				'new_posts' => comma_format($row['posts']),
-				'new_members' => comma_format($row['registers']),
-				'most_members_online' => comma_format($row['most_on']),
-				'hits' => comma_format($row['hits'])
-			];
-		}
-	);
-}
-
-/**
  * Returns the number of topics a user has started, including ones on boards
  * they may no longer have access to.
  *

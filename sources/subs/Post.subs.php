@@ -1066,67 +1066,6 @@ function updateLastMessages($setboards, $id_msg = 0)
 }
 
 /**
- * Get the latest post made on the system
- *
- * - Respects approved, recycled, and board permissions
- *
- * @return array
- * @package Posts
- */
-function lastPost()
-{
-	global $scripturl, $modSettings;
-
-	$db = database();
-
-	// Find it by the board - better to order by board than sort the entire messages table.
-	$request = $db->fetchQuery('
-		SELECT 
-			ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
-			ml.smileys_enabled
-		FROM {db_prefix}boards AS b
-			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = b.id_last_msg)
-		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_board}' : '') . '
-			AND ml.approved = {int:is_approved}
-		ORDER BY b.id_msg_updated DESC
-		LIMIT 1',
-		[
-			'recycle_board' => $modSettings['recycle_board'],
-			'is_approved' => 1,
-		]
-	);
-	if ($request->num_rows() === 0)
-	{
-		return [];
-	}
-	$row = $request->fetch_assoc();
-	$request->free_result();
-
-	// Censor the subject and post...
-	$row['subject'] = censor($row['subject']);
-	$row['body'] = censor($row['body']);
-
-	$bbc_parser = ParserWrapper::instance();
-
-	$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), ['<br />' => '&#10;']));
-	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
-
-	// Send the data.
-	return [
-		'topic' => $row['id_topic'],
-		'subject' => $row['subject'],
-		'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32) . '</a>',
-		'preview' => $row['body'],
-		'time' => standardTime($row['poster_time']),
-		'html_time' => htmlTime($row['poster_time']),
-		'timestamp' => forum_time(true, $row['poster_time']),
-		'href' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-		'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new">' . $row['subject'] . '</a>'
-	];
-}
-
-/**
  * Prepares a post for the post form
  *
  * What it does:

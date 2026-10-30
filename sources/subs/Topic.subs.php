@@ -2107,12 +2107,6 @@ function topicAttribute($id_topic, $attributes)
 {
 	$db = database();
 
-	// @todo maybe add a filer for known attributes... or not
-// 	$attributes = array(
-// 		'locked' => 'locked',
-// 		'sticky' => 'is_sticky',
-// 	);
-
 	// check the lock status
 	$request = $db->query('', '
 		SELECT 
@@ -2196,93 +2190,6 @@ function topicUserAttributes($id_topic, $user)
 function topicsDetails($topics)
 {
 	return topicAttribute($topics, ['id_topic', 'id_member_started', 'id_board', 'locked', 'approved', 'unapproved_posts']);
-}
-
-/**
- * Retrieve the board id for a topic.
- *
- * @param int $topic
- * @return int
- */
-function getTopicBoard($topic)
-{
-	$attr = topicAttribute($topic, ['id_board']);
-	return !empty($attr['id_board']) ? (int) $attr['id_board'] : 0;
-}
-
-/**
- * Check if the current user is allowed a permission on a given topic's board.
- *
- * @param string|string[] $permission Permission name or composite base (e.g. 'lock', 'remove')
- * @param int $topic Topic ID
- * @param int|null $board Optional board ID; if omitted, resolved from topic
- * @return bool
- */
-function allowedToTopic($permission, $topic, $board = null)
-{
-	$starter = null;
-	if (empty($board) || in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
-	{
-		$attr = topicAttribute($topic, ['id_board', 'id_member_started']);
-		if (empty($attr['id_board']))
-		{
-			return false;
-		}
-		$board = (int) $attr['id_board'];
-		$starter = isset($attr['id_member_started']) ? (int) $attr['id_member_started'] : 0;
-	}
-
-	if (in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
-	{
-		$is_owner = !empty(User::$info->id) && $starter === (int) User::$info->id;
-		if ($is_owner && allowedTo($permission . '_own', $board))
-		{
-			return true;
-		}
-
-		return allowedTo($permission . '_any', $board);
-	}
-
-	return allowedTo($permission, $board);
-}
-
-/**
- * Asserts that the current user is allowed a permission on a given topic's board.
- * Throws Exception if unauthorized or if topic board cannot be found.
- *
- * @param string|string[] $permission Permission name or composite base (e.g. 'lock', 'remove')
- * @param int $topic Topic ID
- * @param int|null $board Optional board ID; if omitted, resolved from topic
- * @throws \ElkArte\Exceptions\Exception
- */
-function assertTopicPermission($permission, $topic, $board = null)
-{
-	$starter = null;
-	if (empty($board) || in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
-	{
-		$attr = topicAttribute($topic, ['id_board', 'id_member_started']);
-		if (empty($attr['id_board']))
-		{
-			throw new \ElkArte\Exceptions\Exception('no_board');
-		}
-		$board = (int) $attr['id_board'];
-		$starter = isset($attr['id_member_started']) ? (int) $attr['id_member_started'] : 0;
-	}
-
-	if (in_array($permission, ['lock', 'remove', 'move', 'poll_edit', 'poll_lock', 'poll_remove'], true))
-	{
-		$is_owner = !empty(User::$info->id) && $starter === (int) User::$info->id;
-		if ($is_owner && !allowedTo($permission . '_any', $board))
-		{
-			isAllowedTo($permission . '_own', $board);
-			return;
-		}
-
-		isAllowedTo($permission . '_any', $board);
-		return;
-	}
-
-	isAllowedTo($permission, $board);
 }
 
 /**

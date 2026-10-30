@@ -572,8 +572,9 @@ class File extends Db
 				}
 			}
 
+			$opcache = trim((string) ini_get('opcache.restrict_api'));
 			if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-				((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, (string) ini_get('opcache.restrict_api')) !== 0)))
+				($opcache === '' || stripos(rtrim(BOARDDIR, '/\\') . '/', rtrim($opcache, '/\\') . '/') === 0))
 			{
 				opcache_invalidate(BOARDDIR . '/Settings.php', true);
 			}

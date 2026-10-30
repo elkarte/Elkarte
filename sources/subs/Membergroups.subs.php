@@ -1977,53 +1977,6 @@ function prepareMembergroupPermissions()
 }
 
 /**
- * Returns the groups that a user could see.
- *
- * - Ask and it will give you.
- *
- * @param int $id_member the id of a member
- * @param bool $show_hidden true if hidden groups (that the user can moderate) should be loaded (default false)
- * @param int $min_posts minimum number of posts for the group (-1 for non-post-based groups)
- *
- * @return array
- * @package Membergroups
- */
-function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
-{
-	$db = database();
-
-	$groups = [];
-	$db->fetchQuery('
-		SELECT 
-			mg.id_group, mg.group_name, COALESCE(gm.id_member, 0) AS can_moderate, mg.hidden
-		FROM {db_prefix}membergroups AS mg
-			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
-		WHERE mg.min_posts = {int:min_posts}
-			AND mg.id_group != {int:moderator_group}' . ($show_hidden ? '' : '
-			AND mg.hidden = {int:not_hidden}') . '
-		ORDER BY mg.group_name',
-		[
-			'current_member' => $id_member,
-			'min_posts' => $min_posts,
-			'moderator_group' => 3,
-			'not_hidden' => 0,
-		]
-	)->fetch_callback(
-		function ($row) use (&$groups, $show_hidden) {
-			// Hide hidden groups!
-			if ($show_hidden && $row['hidden'] && !$row['can_moderate'])
-			{
-				return;
-			}
-
-			$groups[$row['id_group']] = $row['group_name'];
-		}
-	);
-
-	return $groups;
-}
-
-/**
  * Returns the groups that the current user can see.
  *
  * - Uses User::$info and allowedTo().

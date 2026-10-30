@@ -137,7 +137,7 @@ function prepareCreditsData()
 	call_integration_hook('integrate_credits', [&$credits]);
 
 	// Copyright information
-	$credits['copyrights']['elkarte'] = '&copy; 2012 - ' . Util::strftime('%Y', time()) . ' ElkArte Forum contributors';
+	$credits['copyrights']['elkarte'] = '&copy; 2012 - ' . date('Y', time()) . ' ElkArte Forum contributors';
 
 	return $credits;
 }
