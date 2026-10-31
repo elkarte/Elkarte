@@ -89,30 +89,27 @@ class Filebased extends AbstractCacheMethod
 	 */
 	public function get($key, $ttl = 120)
 	{
-		$return = null;
-		$fName = $this->getFileName($key);
+		$fName = CACHEDIR . '/' . $this->getFileName($key);
+		$raw = @file_get_contents($fName);
 
-		if ($this->fileFunc->fileExists(CACHEDIR . '/' . $fName))
+		if ($raw === false || strlen($raw) < 9)
 		{
-			// Even though it exists, we may not be able to access the file
-			$value = json_decode(substr(@file_get_contents(CACHEDIR . '/' . $fName), 7, -2), false);
-
-			if ($value === null || $value->expiration < time())
-			{
-				$this->fileFunc->delete(CACHEDIR . '/' . $fName);
-			}
-			else
-			{
-				$return = $value->data;
-			}
-
-			unset($value);
-			$this->is_miss = $return === null;
-
-			return $return;
+			$this->is_miss = true;
+			return null;
 		}
 
-		$this->is_miss = true;
+		$value = json_decode(substr($raw, 7, -2), false);
+		if ($value === null || $value->expiration < time())
+		{
+			$this->fileFunc->delete(CACHEDIR . '/' . $fName);
+		}
+		else
+		{
+			$return = $value->data;
+		}
+
+		unset($value, $raw);
+		$this->is_miss = $return === null;
 
 		return $return;
 	}
