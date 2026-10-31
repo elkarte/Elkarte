@@ -175,7 +175,7 @@ class Templates
 			$sheets = [];
 			foreach ($style_sheets as $sheet)
 			{
-				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
+				$sheets[] = stripos($sheet, '.css') !== false ? $sheet : $sheet . '.css';
 				if ($sheet !== 'admin')
 				{
 					continue;
@@ -210,6 +210,7 @@ class Templates
 				{
 					$this->dirs->fileInclude(
 						$template_dir . '/' . $template_name . '.template.php',
+						true,
 						true
 					);
 				}
