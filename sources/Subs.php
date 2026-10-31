@@ -30,6 +30,7 @@ use ElkArte\Notifications\Notifications;
 use ElkArte\Request;
 use ElkArte\Search\Search;
 use ElkArte\Themes\DefaultTheme\Theme;
+use ElkArte\UrlGenerator\AbstractParseQuery;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 
@@ -2050,14 +2051,7 @@ function obStart($use_compression = false)
  */
 function getUrl($type, $params)
 {
-	static $generator = null;
-
-	if ($generator === null)
-	{
-		$generator = initUrlGenerator();
-	}
-
-	return $generator->get($type, $params);
+	return initUrlGenerator()->get($type, $params);
 }
 
 /**
@@ -2070,14 +2064,21 @@ function getUrl($type, $params)
  */
 function getUrlQuery($type, $params)
 {
-	static $generator = null;
+	return initUrlGenerator()->getQuery($type, $params);
+}
 
-	if ($generator === null)
-	{
-		$generator = initUrlGenerator();
-	}
+/**
+ * Initialize the URL parser
+ *
+ * @return AbstractParseQuery The URL parser object
+ */
+function initUrlParser(): AbstractParseQuery
+{
+	global $url_format;
 
-	return $generator->getQuery($type, $params);
+	$class = '\\ElkArte\\UrlGenerator\\' . ucfirst($url_format ?? 'standard') . '\\ParseQuery';
+
+	return new $class();
 }
 
 /**
@@ -2087,19 +2088,24 @@ function getUrlQuery($type, $params)
  */
 function initUrlGenerator()
 {
-	global $scripturl, $context, $url_format;
+	static $generator = null;
 
-	$generator = new UrlGenerator([
-		'generator' => ucfirst($url_format ?? 'standard'),
-		'scripturl' => $scripturl,
-		'replacements' => [
-			'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''
-		]
-	]);
+	if ($generator === null)
+	{
+		global $scripturl, $context, $url_format;
 
-	$generator->register('Topic');
-	$generator->register('Board');
-	$generator->register('Profile');
+		$generator = new UrlGenerator([
+			'generator' => ucfirst($url_format ?? 'standard'),
+			'scripturl' => $scripturl,
+			'replacements' => [
+				'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''
+			]
+		]);
+
+		$generator->register('Topic');
+		$generator->register('Board');
+		$generator->register('Profile');
+	}
 
 	return $generator;
 }
