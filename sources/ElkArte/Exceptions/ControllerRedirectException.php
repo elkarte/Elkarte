@@ -104,14 +104,14 @@ class ControllerRedirectException extends \Exception
 	protected function _callControllerAction($controller)
 	{
 		$hook = is_callable([$controller, 'getHook']) ? $controller->getHook() : '';
-		if (!empty($hook) && function_exists('call_integration_hook'))
+		if (!empty($hook))
 		{
 			call_integration_hook('integrate_action_' . $hook . '_before', [$this->_method]);
 		}
 
 		$result = $controller->{$this->_method}();
 
-		if (!empty($hook) && function_exists('call_integration_hook'))
+		if (!empty($hook))
 		{
 			call_integration_hook('integrate_action_' . $hook . '_after', [$this->_method]);
 		}

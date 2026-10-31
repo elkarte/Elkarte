@@ -113,7 +113,7 @@ class BBCParser
 	 * @param HtmlParser|null $html_parser
 	 * @param MarkdownParser|null $markdown_parser
 	 */
-	public function __construct(Codes $bbc, Autolink $autolinker = null, HtmlParser $html_parser = null, MarkdownParser $markdown_parser = null)
+	public function __construct(Codes $bbc, ?Autolink $autolinker = null, ?HtmlParser $html_parser = null, ?MarkdownParser $markdown_parser = null)
 	{
 		$this->bbc = $bbc;
 

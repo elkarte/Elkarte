@@ -246,7 +246,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	obExit();
 
 	// We should never get to this point, but if we did, we wouldn't know the user isn't a guest.
-	trigger_error('Hacking attempt...', E_USER_ERROR);
+	throw new \ElkArte\Exceptions\Exception('Hacking attempt...');
 }
 
 /**
@@ -880,7 +880,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	return $error;
 
 	// We really should never fall through here, for very important reasons.  Let's make sure.
-	trigger_error('Hacking attempt...', E_USER_ERROR);
+	throw new \ElkArte\Exceptions\Exception('Hacking attempt...');
 }
 
 /**

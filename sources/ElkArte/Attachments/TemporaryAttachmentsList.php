@@ -50,7 +50,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param int|null $userId
 	 */
-	public function removeAll(int $userId = null): void
+	public function removeAll(?int $userId = null): void
 	{
 		$prefix = $userId === null ? $this->getTplName('')[0] : $this->getTplName($userId);
 
