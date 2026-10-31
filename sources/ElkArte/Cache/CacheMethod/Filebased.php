@@ -90,7 +90,7 @@ class Filebased extends AbstractCacheMethod
 	public function get($key, $ttl = 120)
 	{
 		$fName = CACHEDIR . '/' . $this->getFileName($key);
-		$raw = @file_get_contents($fName);
+		$raw = is_readable($fName) ? file_get_contents($fName) : false;
 		$return = null;
 
 		if ($raw === false || strlen($raw) < 9)
@@ -102,7 +102,7 @@ class Filebased extends AbstractCacheMethod
 		$value = json_decode(substr($raw, 7, -2), false);
 		if ($value === null || $value->expiration < time())
 		{
-			$this->fileFunc->delete(CACHEDIR . '/' . $fName);
+			$this->fileFunc->delete($fName);
 		}
 		else
 		{

@@ -101,7 +101,7 @@ final class Hooks
 		}
 
 		// Loop through each function.
-		$functions = $this->_prepare_hooks($modSettings[$hook]);
+		$functions = $this->parsed[$modSettings[$hook]] ??= $this->_prepare_hooks($modSettings[$hook]);
 		foreach ($functions as $function => $call)
 		{
 			$results[$function] = call_user_func_array($call, $parameters);
