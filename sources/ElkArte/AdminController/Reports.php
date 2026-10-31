@@ -815,7 +815,7 @@ function newTable(string $title = '', string $default_value = '', string $shadin
  *
  * @return bool
  */
-function addData(array $inc_data, int $custom_table = null)
+function addData(array $inc_data, ?int $custom_table = null)
 {
 	global $context;
 
@@ -892,7 +892,7 @@ function addData(array $inc_data, int $custom_table = null)
  *
  * @return null|false false if there are no tables
  */
-function addSeparator(string $title = '', string $custom_table = null)
+function addSeparator(string $title = '', ?string $custom_table = null)
 {
 	global $context;
 

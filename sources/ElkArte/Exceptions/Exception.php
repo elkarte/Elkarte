@@ -41,7 +41,7 @@ class Exception extends \Exception
 	 * @param int $code
 	 * @param Exception|null $previous
 	 */
-	public function __construct($message, protected $log = false, $sprintf = [], $code = 0, Exception $previous = null)
+	public function __construct($message, protected $log = false, $sprintf = [], $code = 0, ?Exception $previous = null)
 	{
 		$this->sprintf = is_array($sprintf) ? $sprintf : (array) $sprintf;
 

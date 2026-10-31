@@ -41,7 +41,7 @@ class MaillistSettings extends SettingsForm\SettingsForm
 	 * @param int $editId -1 add a row, otherwise edit a row with the supplied key value
 	 * @param string $editName used when editing a row, needs to be the name of the col to find $editId
 	 */
-	public static function saveTableSettings(array $configVars, string $tableName, object|array $configValues = null, array $indexes = [], int $editId = -1, string $editName = ''): void
+	public static function saveTableSettings(array $configVars, string $tableName, object|array|null $configValues = null, array $indexes = [], int $editId = -1, string $editName = ''): void
 	{
 		if ($configValues === null)
 		{
