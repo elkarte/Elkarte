@@ -413,18 +413,19 @@ class Menu
 	 */
 	private function checkPermissions($obj)
 	{
-		if (!empty($obj->getPermission()))
-		{
-			// The profile menu has slightly different permissions
-			if (isset($obj->getPermission()['own'], $obj->getPermission()['any']))
-			{
-				return !empty($obj->getPermission()[$this->permissionSet]) && allowedTo($obj->getPermission()[$this->permissionSet]);
-			}
+		$permission = $obj->getPermission();
 
-			return allowedTo($obj->getPermission());
+		if (empty($permission))
+		{
+			return true;
 		}
 
-		return true;
+		if (isset($permission['own'], $permission['any']))
+		{
+			return !empty($permission[$this->permissionSet]) && allowedTo($permission[$this->permissionSet]);
+		}
+
+		return allowedTo($permission);
 	}
 
 	/**
