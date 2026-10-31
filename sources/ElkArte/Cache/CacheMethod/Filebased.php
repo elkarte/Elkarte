@@ -91,6 +91,7 @@ class Filebased extends AbstractCacheMethod
 	{
 		$fName = CACHEDIR . '/' . $this->getFileName($key);
 		$raw = @file_get_contents($fName);
+		$return = null;
 
 		if ($raw === false || strlen($raw) < 9)
 		{
