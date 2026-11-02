@@ -35,6 +35,9 @@ final class Hooks
 	/** @var FileFunctions */
 	protected $fileFunc;
 
+	/** @var array Memoized hook strings => prepared callables, keyed by the raw $modSettings value */
+	private array $parsed = [];
+
 	/**
 	 * The class constructor loads globals in to the class object
 	 *
