@@ -56,6 +56,8 @@ class MarkdownParser
 	 * > lines
 	 *
 	 * This MUST be called on the full message before the BBC parse_loop runs.
+	 * supports [!TIP], [!IMPORTANT], [!WARNING], and [!CAUTION] as well.
+	 *
 	 *
 	 * @param string $data Message with <br /> as line separators
 	 *

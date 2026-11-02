@@ -193,11 +193,13 @@ class Codes
 	    The rest of the attributes depend on the type and other options. */
 	protected $bbc = [];
 
-	protected $itemcodes = [];
+	/** @var array|null Cached item code map */
+	protected $item_codes;
 
 	protected $disabled = [];
 
-	protected $parsing_codes = [];
+	/** @var array|null Cached BBC codes grouped by their first character */
+	protected $parsing_codes;
 
 	/**
 	 * Codes constructor.
@@ -221,6 +223,14 @@ class Codes
 	}
 
 	/**
+	 * Invalidate the cached parsing codes after the code definitions change.
+	 */
+	protected function invalidateParsingCodes(): void
+	{
+		$this->parsing_codes = null;
+	}
+
+	/**
 	 * Add a code
 	 *
 	 * @param array $code
@@ -236,6 +246,8 @@ class Codes
 		// }
 
 		$this->bbc[] = $code;
+
+		$this->invalidateParsingCodes();
 	}
 
 	/**
@@ -252,6 +264,8 @@ class Codes
 				unset($this->bbc[$k]);
 			}
 		}
+
+		$this->invalidateParsingCodes();
 	}
 
 	/**
@@ -924,6 +938,11 @@ class Codes
 	 */
 	public function getItemCodes(): array
 	{
+		if ($this->item_codes !== null)
+		{
+			return $this->item_codes;
+		}
+
 		$item_codes = [
 			'*' => 'disc',
 			'@' => 'disc',
@@ -937,6 +956,8 @@ class Codes
 
 		// Want to add some more?
 		call_integration_hook('integrate_item_codes', [&$item_codes]);
+
+		$this->item_codes = $item_codes;
 
 		return $item_codes;
 	}
@@ -996,6 +1017,11 @@ class Codes
 	 */
 	public function getForParsing(): array
 	{
+		if ($this->parsing_codes !== null)
+		{
+			return $this->parsing_codes;
+		}
+
 		$bbc = $this->bbc;
 		$item_codes = $this->getItemCodes();
 		call_integration_hook('bbc_codes_parsing', [&$bbc, &$item_codes]);
@@ -1022,6 +1048,8 @@ class Codes
 			$return[$code[self::ATTR_TAG][0]][] = $code;
 		}
 
+		$this->parsing_codes = $return;
+
 		return $return;
 	}
 
@@ -1034,7 +1062,7 @@ class Codes
 	 */
 	public function setParsingCodes(): self
 	{
-		$this->parsing_codes = $this->getForParsing();
+		$this->getForParsing();
 
 		return $this;
 	}
@@ -1147,6 +1175,8 @@ class Codes
 	{
 		$this->disabled[$tag] = $tag;
 
+		$this->invalidateParsingCodes();
+
 		return isset($this->disabled[$tag]);
 	}
 
@@ -1163,6 +1193,8 @@ class Codes
 		{
 			unset($this->disabled[$tag]);
 		}
+
+		$this->invalidateParsingCodes();
 
 		return !isset($this->disabled[$tag]);
 	}
@@ -1184,5 +1216,7 @@ class Codes
 				$this->disabled[$code[self::ATTR_TAG]] = $code[self::ATTR_TAG];
 			}
 		}
+
+		$this->invalidateParsingCodes();
 	}
 }

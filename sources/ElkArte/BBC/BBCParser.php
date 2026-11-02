@@ -117,8 +117,8 @@ class BBCParser
 	{
 		$this->bbc = $bbc;
 
-		$this->bbc_codes = $this->bbc->getForParsing();
 		$this->item_codes = $this->bbc->getItemCodes();
+		$this->bbc_codes = $this->bbc->getForParsing();
 
 		$this->autolinker = $autolinker;
 		$this->loadAutolink();
@@ -906,9 +906,8 @@ class BBCParser
 		$num_open_tags = count($this->open_tags);
 		if ($this->pos2 !== false && ($this->pos3 === false || $this->pos2 <= $this->pos3))
 		{
-			// Can't use offset because of the ^
-			preg_match('~^(<br />|&nbsp;|\s|\[)+~', substr($this->message, $this->pos2 + 6), $matches);
-			//preg_match('~(<br />|&nbsp;|\s|\[)+~', $this->message, $matches, 0, $this->pos2 + 6);
+			//preg_match('~^(<br />|&nbsp;|\s|\[)+~', substr($this->message, $this->pos2 + 6), $matches);
+			preg_match('~\G(<br />|&nbsp;|\s|\[)+~', $this->message, $matches, 0, $this->pos2 + 6);
 
 			// Keep the list open if the next character after the break is a [. Otherwise, close it.
 			$replacement = !empty($matches[0]) && substr_compare($matches[0], '[', -1, 1) === 0 ? '[/li]' : '[/li][/list]';
