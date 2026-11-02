@@ -568,8 +568,7 @@
 				 * for browsers that do not support IntersectionObserver.  This is a fallback
 				 * for older browsers.
 				 */
-				function videoLinksListener ()
-				{
+				const videoLinksListener = function() {
 					if (throttleTimeout)
 					{
 						clearTimeout(throttleTimeout);
@@ -606,7 +605,7 @@
 							found = false;
 						}
 					}, 50);
-				}
+				};
 
 				// Scroll, rotate or resize, we check if we can see the video link.
 				document.addEventListener('scroll', videoLinksListener);
