@@ -17,6 +17,7 @@
 namespace BBC;
 
 use ElkArte\Helper\TokenHash;
+use ElkArte\Helper\Util;
 
 /**
  * Class PreparseCode
@@ -91,7 +92,7 @@ class PreparseCode
 		// Remove \r's... they're evil!
 		$this->message = strtr($this->message, ["\r" => '']);
 
-		// You won't believe this - but too many periods upset apache, it seems!
+		// You won't believe this - but too many periods upset Apache, it seems!
 		$this->message = preg_replace('~\.{100,}~', '...', $this->message);
 
 		// Remove Trailing Quotes
@@ -242,6 +243,12 @@ class PreparseCode
 	 */
 	private function _validateICodeBlocks(): void
 	{
+		// No [icode then there should be nothing to do
+		if (stripos($this->message, '[icode') === false)
+		{
+			return;
+		}
+
 		$lines = explode("\n", $this->message);
 		foreach ($lines as $number => $line)
 		{
@@ -282,6 +289,12 @@ class PreparseCode
 	 */
 	public function tokenizeCodeBlocks($message, $html = false): string
 	{
+		// Fast path, see if we can find and '[code' / '[icode' are present
+		if (!$html && stripos($message, '[code') === false && stripos($message, '[icode') === false)
+		{
+			return $message;
+		}
+
 		// Split up the message on the code start/end tags/
 		$patterns = $html
 			? ['~(</code>|<code(?:[^>]+)?>)~', '~(</icode>|<icode(?:[^>]+)?>)~']
@@ -505,7 +518,7 @@ class PreparseCode
 				{
 					$replace = $scripturl . $replace;
 				}
-				elseif (str_starts_with($replace, '#') && $embeddedUrl)
+				elseif ($embeddedUrl && str_starts_with($replace, '#'))
 				{
 					$replace = '#' . preg_replace('~[^A-Za-z0-9_\-#]~', '', substr($replace, 1));
 					$this_tag = 'iurl';
@@ -649,17 +662,19 @@ class PreparseCode
 	{
 		$me_regex = '~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i';
 		$footnote_regex = '~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i';
+		$user_name = Util::htmlspecialchars($this->user_name, ENT_QUOTES);
+		$me_tag = '[me=&quot;' . $user_name . '&quot;]';
 
-		if (preg_match('~[\[\]"]~', $this->user_name) === 1)
-		{
-			$this->message = preg_replace($me_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]', $this->message);
-			$this->message = preg_replace($footnote_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]$3', $this->message);
-		}
-		else
-		{
-			$this->message = preg_replace($me_regex, '$1[me=' . $this->user_name . ']$2[/me]', $this->message);
-			$this->message = preg_replace($footnote_regex, '$1[me=' . $this->user_name . ']$2[/me]$3', $this->message);
-		}
+		$this->message = preg_replace_callback(
+			$me_regex,
+			static fn($matches) => $matches[1] . $me_tag . $matches[2] . '[/me]',
+			$this->message
+		);
+		$this->message = preg_replace_callback(
+			$footnote_regex,
+			static fn($matches) => $matches[1] . $me_tag . $matches[2] . '[/me]' . $matches[3],
+			$this->message
+		);
 	}
 
 	/**
@@ -852,37 +867,40 @@ class PreparseCode
 	private function _validateLinks(): void
 	{
 		$allowed = allowedTo('post_nofollow');
-		$regexFollow = '~\[url[^]]*(follow=([^] \s]+))[^]]*]~';
-		$regexUrl = '~\[url[^]]*(url=([^] \s]+))[^]]*]~';
+		$regexUrl = '~\[url[^]]*?\surl=([^]\s]+)~';
 
-		preg_match_all($regexFollow, $this->message, $matches);
-		if (isset($matches[1]) && is_array($matches[1]))
-		{
-			// Every [URL] code with follow= in them
-			foreach ($matches[1] as $key => $followTerm)
-			{
+		// Process each [url ... follow=...] tag separately so only that tag is changed
+		$this->message = preg_replace_callback(
+			'~\[url[^]]*?\sfollow=([^]\s]+)[^]]*]~',
+			static function ($matches) use ($allowed, $regexUrl) {
+				$tag = $matches[0];
+
 				// Flush out the actual URL and follow value
-				preg_match($regexUrl, $matches[0][$key], $match);
-				$allowedDomain = validateURLAllowList(addProtocol($match[2]));
-				$followChoice = in_array(trim($matches[2][$key]), ['follow', 'true', 'on', 'yes'], true);
+				$allowedDomain = preg_match($regexUrl, $tag, $urlMatch) === 1
+					&& validateURLAllowList(addProtocol($urlMatch[1]));
+				$followChoice = in_array(trim($matches[1]), ['follow', 'true', 'on', 'yes'], true);
 
 				// Allowed domain and purposely turning it off?
 				if ($allowedDomain && $allowed && !$followChoice)
 				{
-					$this->message = str_replace($followTerm, 'follow=false', $this->message);
+					$follow = 'false';
 				}
 				// Allowed domain OR you are allowed and already have it on
 				elseif ($allowedDomain || ($allowed && $followChoice))
 				{
-					$this->message = str_replace($followTerm, 'follow=true', $this->message);
+					$follow = 'true';
 				}
 				// Not allowed to use the function, and the domain is not on the allowList
 				else
 				{
-					$this->message = str_replace($followTerm, 'follow=false', $this->message);
+					$follow = 'false';
 				}
-			}
-		}
+
+				// Replace only this tag's follow attribute
+				return preg_replace('~(\sfollow=)[^]\s]+~', '${1}' . $follow, $tag, 1);
+			},
+			$this->message
+		);
 	}
 
 	/**

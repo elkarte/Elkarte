@@ -33,6 +33,9 @@ class BBCParser
 	/** @var Codes */
 	protected $bbc;
 
+	/** @var Codes[] Restricted Codes objects used for recursive parsing, keyed by the allowed tag list */
+	protected $recursive_codes = [];
+
 	/** @var array */
 	protected $bbc_codes;
 
@@ -1534,22 +1537,32 @@ class BBCParser
 	 */
 	protected function recursiveParser($data, array $tag): string
 	{
-		// @todo if parsed tags allowed is empty, return?
-		$bbc = clone $this->bbc;
+		$allowed = $tag[Codes::ATTR_PARSED_TAGS_ALLOWED] ?? [];
+		$key = implode('|', $allowed);
 
-		if (!empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))
+		// Building the restricted Codes object is expensive: setParsedTags() invalidates
+		// the parsing cache, so getForParsing() rebuilds the code list and re-runs
+		// bbc_codes_parsing. Reuse it for every tag that allows the same set of codes.
+		if (!isset($this->recursive_codes[$key]))
 		{
-			$bbc->setParsedTags($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]);
+			$bbc = clone $this->bbc;
+
+			if ($allowed !== [])
+			{
+				$bbc->setParsedTags($allowed);
+			}
+
+			$this->recursive_codes[$key] = $bbc;
 		}
 
-		// Do not use $this->autolinker. For some reason it causes a recursive loop
+		// Do not use $this->autolinker, it shares its possible link/email state with the parent parse
 		$autolinker = null;
 		$html = null;
 		call_integration_hook('integrate_recursive_bbc_parser', [&$autolinker, &$html]);
 
-		$parser = new BBCParser($bbc, $autolinker, $html);
+		$parser = new BBCParser($this->recursive_codes[$key], $autolinker, $html);
 
-		return $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
+		return $parser->enableSmileys($allowed === [])->parse($data);
 	}
 
 	/**
