@@ -81,7 +81,7 @@ class EmojiIntegrate
 		if (empty($context['mentions_enabled']))
 		{
 			loadCSSFile('jquery.atwho.css');
-			loadJavascriptFile(['editor/jquery.atwho.min.js', 'editor/jquery.caret.min.js', 'editor/emoji.plugin.js'], ['defer' => true]);
+			loadJavascriptFile(['editor/atwho.js', 'editor/emoji.plugin.js'], ['defer' => true]);
 		}
 		else
 		{

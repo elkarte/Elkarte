@@ -323,7 +323,7 @@ class Display extends AbstractController
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
 		{
-			loadJavascriptFile(['editor/mentioning.js', 'quickQuote.js'], ['defer' => true]);
+			loadJavascriptFile(['editor/atwho.js', 'editor/mentioning.js', 'quickQuote.js'], ['defer' => true]);
 			$this->_template_layers->addBefore('quickreply', 'moderation_buttons');
 			theme()->addInlineJavascript("
 				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(), false);", true
