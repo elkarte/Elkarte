@@ -524,9 +524,8 @@ class App
 		let controller = this._controllers[flag];
 		if (!controller)
 		{
-			controller = this._controllers[flag] = this.inputor.hasAttribute('contenteditable')
-				? new EditableController(this, flag)
-				: new TextareaController(this, flag);
+			const ControllerClass = this.inputor.hasAttribute('contenteditable') ? EditableController : TextareaController;
+			controller = this._controllers[flag] = new ControllerClass(this, flag);
 		}
 		if (setting.alias)
 		{
@@ -972,7 +971,10 @@ class Controller
 	_delayLookUp (query, wait)
 	{
 		const now = Date.now();
-		this._previousCallTime || (this._previousCallTime = now);
+		if (!this._previousCallTime)
+		{
+			this._previousCallTime = now;
+		}
 		const remaining = wait - (now - this._previousCallTime);
 		if (0 < remaining && remaining < wait)
 		{
@@ -1221,7 +1223,7 @@ class TextareaController extends Controller
 		let suffix = this.setting.suffix;
 		suffix = suffix === '' ? suffix : suffix || ' ';
 		content += suffix;
-		inputor.value = `${startStr}${content}${source.slice(this.query['endPos'] || 0)}`;
+		inputor.value = `${startStr}${content}${source.slice(this.query.endPos || 0)}`;
 		const caret = startStr.length + content.length;
 		inputor.setSelectionRange(caret, caret);
 		if (inputor.ownerDocument.activeElement !== inputor)
@@ -1314,7 +1316,6 @@ class EditableController extends Controller
 		{
 			return active;
 		}
-		const doc = this.app.document;
 		for (const query of this.inputor.querySelectorAll('.atwho-query'))
 		{
 			if (query.classList.contains('atwho-inserted'))
@@ -1876,9 +1877,11 @@ class View
 		{
 			current.classList.remove('cur');
 		}
-		let selected = current
-			? (dir > 0 ? current.nextElementSibling : current.previousElementSibling)
-			: null;
+		let selected = null;
+		if (current)
+		{
+			selected = dir > 0 ? current.nextElementSibling : current.previousElementSibling;
+		}
 		if (!selected)
 		{
 			selected = dir > 0 ? items[0] : items[items.length - 1];
