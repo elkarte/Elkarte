@@ -487,7 +487,6 @@ class Attachment extends AbstractController
 		$id_folder = $attachment['id_folder'] ?? '';
 		$real_filename = $attachment['filename'] ?? '';
 		$file_hash = $attachment['file_hash'] ?? '';
-		$file_ext = $attachment['fileext'] ?? '';
 		$id_attach = $attachment['id_attach'] ?? -1;
 		$attachment_type = $attachment['attachment_type'] ?? -1;
 		$mime_type = $attachment['mime_type'] ?? '';
@@ -509,8 +508,6 @@ class Attachment extends AbstractController
 		$reqQueryHasImage = $this->_req->hasQuery('image');
 		$imageRequested = $reqQueryHasImage || $forceImage;
 		$validMime = getValidMimeImageType($mime_type);
-		$validExtMime = getValidMimeImageType($file_ext);
-		$do_cache = !(!$imageRequested && $validExtMime !== '');
 
 		// Make sure the mime type warrants an inline display.
 		if ($imageRequested && (empty($mime_type) || empty($validMime)))
@@ -524,7 +521,7 @@ class Attachment extends AbstractController
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || (!$imageRequested && $validExtMime !== ''))
+		elseif (empty($mime_type))
 		{
 			$mime_type = '';
 			if ($reqQueryHasImage)
@@ -537,7 +534,7 @@ class Attachment extends AbstractController
 
 		// Show this content inline or download?
 		$disposition = ($reqQueryHasImage || $forceImage) ? 'inline' : 'attachment';
-		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
+		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename);
 
 		// Update the download counter (unless it's a thumbnail, and only after 304 validation passes).
 		if (!empty($id_attach) && (int) $attachment_type !== 3 && !$forceImage && $this->_req->getQuery('thumb') === null)
@@ -618,7 +615,7 @@ class Attachment extends AbstractController
 	 * @param bool $do_cache Send a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
-	public function prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true): void
+	public function prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache = true, $check_filename = true): void
 	{
 		global $txt;
 
@@ -679,7 +676,7 @@ class Attachment extends AbstractController
 		// Different browsers like different standards...
 		$headers->setAttachmentFileParams($mime_type, $real_filename, $disposition);
 
-		// If this has an "image extension" - but isn't an image - then ensure it isn't cached cause of silly IE.
+		// Cache-Control headers
 		if ($do_cache)
 		{
 			$headers
@@ -841,9 +838,8 @@ class Attachment extends AbstractController
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
-		$this->prepare_headers($filename, $eTag, $mime_type, 'inline', $real_filename, $do_cache);
+		$this->prepare_headers($filename, $eTag, $mime_type, 'inline', $real_filename);
 
 		// do not resize for ;image
 		if ($resize && !isset($this->_req->query->ila, $this->_req->query->image))

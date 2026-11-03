@@ -142,4 +142,75 @@ class AttachmentSecurityTest extends TestCase
 		$this->assertSame('application/octet-stream', $headers->getContentType());
 		$this->assertStringStartsWith('attachment;', $allHeaders['Content-Disposition']);
 	}
+
+	/**
+	 * Verify prepare_headers sends proper caching headers for inline image requests.
+	 */
+	public function testPrepareHeadersCachingInlineImage(): void
+	{
+		$headers = Headers::instance();
+		$headers->removeHeader('all');
+
+		$controller = new Attachment(new EventManager());
+		$controller->prepare_headers('photo.jpg', '"etag123"', 'image/jpeg', 'inline', 'photo.jpg', true, false);
+
+		$allHeaders = $headers->getHeaders();
+		$this->assertSame('max-age=31536000, private', $allHeaders['Cache-Control']);
+		$this->assertArrayNotHasKey('Pragma', $allHeaders);
+		$this->assertSame('inline; filename="photo.jpg"', $allHeaders['Content-Disposition']);
+		$this->assertSame('image/jpeg', $headers->getContentType());
+	}
+
+	/**
+	 * Verify prepare_headers sends proper caching headers for image file downloads.
+	 */
+	public function testPrepareHeadersCachingDownloadedImage(): void
+	{
+		$headers = Headers::instance();
+		$headers->removeHeader('all');
+
+		$controller = new Attachment(new EventManager());
+		// Image requested as download attachment
+		$controller->prepare_headers('photo.png', '"etag456"', 'image/png', 'attachment', 'photo.png', true, false);
+
+		$allHeaders = $headers->getHeaders();
+		$this->assertSame('max-age=31536000, private', $allHeaders['Cache-Control']);
+		$this->assertArrayNotHasKey('Pragma', $allHeaders);
+		$this->assertSame('attachment; filename="photo.png"', $allHeaders['Content-Disposition']);
+		$this->assertSame('image/png', $headers->getContentType());
+	}
+
+	/**
+	 * Verify prepare_headers sends proper caching headers for non-image file downloads.
+	 */
+	public function testPrepareHeadersCachingNonImageAttachment(): void
+	{
+		$headers = Headers::instance();
+		$headers->removeHeader('all');
+
+		$controller = new Attachment(new EventManager());
+		$controller->prepare_headers('archive.zip', '"etag789"', 'application/zip', 'attachment', 'archive.zip', true, false);
+
+		$allHeaders = $headers->getHeaders();
+		$this->assertSame('max-age=31536000, private', $allHeaders['Cache-Control']);
+		$this->assertArrayNotHasKey('Pragma', $allHeaders);
+		$this->assertSame('attachment; filename="archive.zip"', $allHeaders['Content-Disposition']);
+		$this->assertSame('application/octet-stream', $headers->getContentType());
+	}
+
+	/**
+	 * Verify prepare_headers respects $do_cache = false when anti-caching is explicitly requested.
+	 */
+	public function testPrepareHeadersExplicitNoCache(): void
+	{
+		$headers = Headers::instance();
+		$headers->removeHeader('all');
+
+		$controller = new Attachment(new EventManager());
+		$controller->prepare_headers('file.txt', '"etag000"', '', 'attachment', 'file.txt', false, false);
+
+		$allHeaders = $headers->getHeaders();
+		$this->assertSame('no-cache', $allHeaders['Cache-Control']);
+		$this->assertSame('no-cache', $allHeaders['Pragma']);
+	}
 }
