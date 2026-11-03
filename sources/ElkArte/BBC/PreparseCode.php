@@ -72,7 +72,7 @@ class PreparseCode
 	 * @param string $message
 	 * @param bool $previewing
 	 */
-	public function preparsecode(&$message, $previewing = false): ?string
+	public function preparsecode(&$message, $previewing = false): string
 	{
 		if (empty($message))
 		{
@@ -103,6 +103,7 @@ class PreparseCode
 		$this->_validateICodeBlocks();
 
 		// Protect CODE blocks from further processing
+		$this->code_blocks = [];
 		$this->message = $this->tokenizeCodeBlocks($this->message);
 
 		//  Now that we've fixed all the code tags, let's fix the img and url tags...
@@ -158,9 +159,10 @@ class PreparseCode
 		$this->_preparseTable();
 
 		// Quickly clean up things that will slow our parser (which are common in posted code.)
-		$message = strtr($this->message, ['[]' => '&#91;]', '[&#039;' => '&#91;&#039;']);
+		$this->message = strtr($this->message, ['[]' => '&#91;]', '[&#039;' => '&#91;&#039;']);
+		$message = $this->message;
 
-		return null;
+		return $message;
 	}
 
 	/**
@@ -912,6 +914,8 @@ class PreparseCode
 	 */
 	public function un_preparsecode($message)
 	{
+		$this->code_blocks = [];
+
 		// Protect CODE blocks from further processing
 		$message = $this->tokenizeCodeBlocks($message);
 
