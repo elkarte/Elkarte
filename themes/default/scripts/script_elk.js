@@ -25,20 +25,22 @@
  */
 function elk_codefix ()
 {
-	let codeBlock = document.querySelectorAll('.bbc_code');
-	codeBlock.forEach((code) => {
-		let style = window.getComputedStyle(code, null),
-			height = parseInt(style.getPropertyValue('height'));
+	const codeBlocks = Array.from(document.querySelectorAll('.bbc_code'));
+	const mutations = [];
 
+	// Layout reads
+	codeBlocks.forEach((code) => {
+		const height = parseInt(window.getComputedStyle(code).height, 10);
 		if (code.scrollHeight > height)
 		{
-			code.style.maxHeight = 'none';
-			code.style.height = height + 'px';
+			mutations.push({element: code, height});
 		}
-		else
-		{
-			code.style.resize = 'none';
-		}
+	});
+
+	// Style mutations
+	mutations.forEach(({element, height}) => {
+		element.style.maxHeight = 'none';
+		element.style.height = `${height}px`;
 	});
 }
 
