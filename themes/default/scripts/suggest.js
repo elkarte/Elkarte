@@ -119,27 +119,20 @@ elk_AutoSuggest.prototype.init = function() {
  * Handle keypress events for the suggest controller
  */
 elk_AutoSuggest.prototype.handleKey = function(oEvent) {
-	let iKeyPress = this.getKeyPress(oEvent);
+	let iKeyPress = oEvent.key;
 
 	switch (iKeyPress)
 	{
-		case 9: // Tab
+		case 'Tab': // Tab
 			return this.handleTabKey();
-		case 13: // Enter
+		case 'Enter': // Enter
 			return this.handleEnterKey();
-		case 38: // Up arrow
-		case 40: // Down arrow
+		case 'ArrowUp': // Up arrow
+		case 'ArrowDown': // Down arrow
 			return this.handleArrowKey(iKeyPress);
 	}
 
 	return true;
-};
-
-/**
- * Gets the key pressed from the event handler.
- */
-elk_AutoSuggest.prototype.getKeyPress = function(oEvent) {
-	return 'which' in oEvent ? oEvent.which : oEvent.keyCode;
 };
 
 /**
@@ -191,28 +184,28 @@ elk_AutoSuggest.prototype.handleArrowKey = function(iKeyPress) {
 		for (let i = 0; i < this.aDisplayData.length; i++)
 		{
 			// If we're going up and yet the top one was already selected don't go around.
-			if (this.oSelectedDiv !== null && this.oSelectedDiv === this.aDisplayData[i] && i === 0 && iKeyPress === 38)
+			if (this.oSelectedDiv !== null && this.oSelectedDiv === this.aDisplayData[i] && i === 0 && iKeyPress === 'ArrowUp')
 			{
 				oToHighlight = this.oSelectedDiv;
 				break;
 			}
 
 			// If nothing is selected, and we are going down then we select the first one.
-			if (this.oSelectedDiv === null && iKeyPress === 40)
+			if (this.oSelectedDiv === null && iKeyPress === 'ArrowDown')
 			{
 				oToHighlight = this.aDisplayData[i];
 				break;
 			}
 
 			// If the previous handle was the actual previously selected one, and we're hitting down then this is the one we want.
-			if (bPrevHandle !== false && bPrevHandle === this.oSelectedDiv && iKeyPress === 40)
+			if (bPrevHandle !== false && bPrevHandle === this.oSelectedDiv && iKeyPress === 'ArrowDown')
 			{
 				oToHighlight = this.aDisplayData[i];
 				break;
 			}
 
 			// If we're going up and this is the previously selected one then we want the one before, if there was one.
-			if (bPrevHandle !== false && this.aDisplayData[i] === this.oSelectedDiv && iKeyPress === 38)
+			if (bPrevHandle !== false && this.aDisplayData[i] === this.oSelectedDiv && iKeyPress === 'ArrowUp')
 			{
 				oToHighlight = bPrevHandle;
 				break;
