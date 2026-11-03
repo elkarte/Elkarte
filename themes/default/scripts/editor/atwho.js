@@ -485,6 +485,7 @@ class App
 			}
 		}
 		this._iframeAsRoot = asRoot;
+		// Unless the iframe owns the UI, the dropdown is hosted by the top document.
 		return this.createContainer(this._iframeAsRoot ? this._document : document);
 	}
 
@@ -859,6 +860,7 @@ class Controller
 		}
 	}
 
+	// Kept for at.js API compatibility; internal code goes through callbacks().
 	callDefault (funcName, ...args)
 	{
 		try
@@ -904,15 +906,11 @@ class Controller
 	/** @deprecated Use the typed `setting` object (`this.setting.name`) instead. */
 	getOpt (name, defaultValue)
 	{
-		try
+		if (!this.setting || typeof this.setting[name] === 'undefined')
 		{
-			const value = this.setting[name];
-			return typeof value === 'undefined' ? defaultValue : value;
+			return defaultValue;
 		}
-		catch (error)
-		{
-			return null;
-		}
+		return this.setting[name];
 	}
 
 	insertContentFor (li)
@@ -1181,9 +1179,9 @@ class TextareaController extends Controller
 			const end = start + query.length;
 			this.pos = start;
 			query = {
-				'text': query,
-				'headPos': start,
-				'endPos': end
+				text: query,
+				headPos: start,
+				endPos: end
 			};
 			this.trigger('matched', [this.at, query.text]);
 		}
@@ -1280,12 +1278,8 @@ class EditableController extends Controller
 			range = this._getRange();
 		}
 		const sel = this.app.window.getSelection();
-		// note: ctrl_a_pressed was never assigned in the original; the guard is vestigial.
-		if (this.ctrl_a_pressed == null)
-		{
-			sel.removeAllRanges();
-			return sel.addRange(range);
-		}
+		sel.removeAllRanges();
+		return sel.addRange(range);
 	}
 
 	_movingEvent (e)
@@ -1408,7 +1402,7 @@ class EditableController extends Controller
 				this._clearRange();
 				return;
 			}
-			if (keyName(e) === KEY.BACKSPACE && range.startContainer.nodeType === document.ELEMENT_NODE && (range.startOffset - 1) >= 0)
+			if (keyName(e) === KEY.BACKSPACE && range.startContainer.nodeType === 1 && (range.startOffset - 1) >= 0)
 			{
 				const rangeClone = range.cloneRange();
 				rangeClone.setStart(range.startContainer, range.startOffset - 1);
@@ -1419,7 +1413,7 @@ class EditableController extends Controller
 					this._setRange('after', inserted ? inserted.lastChild : null);
 				}
 			}
-			else if (keyName(e) === KEY.LEFT && range.startContainer.nodeType === document.TEXT_NODE)
+			else if (keyName(e) === KEY.LEFT && range.startContainer.nodeType === 3)
 			{
 				const prevInserted = range.startContainer.previousSibling;
 				if (prevInserted && prevInserted.nodeType === 1 && prevInserted.matches('.atwho-inserted') && range.startOffset === 0)
@@ -1608,6 +1602,8 @@ class EditableController extends Controller
 		{
 			el.classList.remove('atwho-query');
 			el.classList.add('atwho-inserted');
+			// Template output (insertTpl + item data). Callers are responsible
+			// for escaping any untrusted values that end up in it.
 			el.innerHTML = content;
 			el.setAttribute('data-atwho-at-query', '' + itemData['atwho-at'] + this.query.text);
 			el.setAttribute('data-atwho-inserted-text', el.textContent);
@@ -1663,7 +1659,7 @@ class Model
 		const searchKey = this.context.setting.searchKey;
 		items = this.context.callbacks('filter').call(this.context, query, items, searchKey) || [];
 		const remoteFilter = this.context.callbacks('remoteFilter');
-		if (items.length > 0 || (!remoteFilter && items.length === 0))
+		if (items.length > 0 || !remoteFilter)
 		{
 			return callback(items);
 		}
@@ -1683,7 +1679,7 @@ class Model
 
 	load (items)
 	{
-		if (!(this.saved() || !items))
+		if (items && !this.saved())
 		{
 			return this._load(items);
 		}
@@ -1699,7 +1695,8 @@ class Model
 		if (typeof items === 'string')
 		{
 			// The URL path stays promise-based; the array path below stays
-			// synchronous, exactly like the input file.
+			// synchronous, exactly like the input file. `fetch` here is the
+			// global HTTP API; this.fetch() is the in-memory item list.
 			return fetch(items, {headers: {Accept: 'application/json'}})
 				.then((res) => {
 					if (!res.ok)
@@ -1708,7 +1705,16 @@ class Model
 					}
 					return res.json();
 				})
-				.then((json) => this.save(json));
+				.then((json) => this.save(json))
+				.catch((error) => {
+					// Keep whatever is already loaded rather than leaving the
+					// caller with an unhandled promise rejection.
+					if (typeof console !== 'undefined' && console.error)
+					{
+						console.error('atwho: could not load "' + items + '"', error);
+					}
+					return this.fetch();
+				});
 		}
 		return this.save(items);
 	}
@@ -1892,7 +1898,7 @@ class View
 
 	_itemBottom (el)
 	{
-		return el.offsetTop + el.offsetHeight + (el.nextSibling ? el.nextSibling.offsetHeight : 0);
+		return el.offsetTop + el.offsetHeight + (el.nextElementSibling ? el.nextElementSibling.offsetHeight : 0);
 	}
 
 	scrollTop (value)
@@ -1982,6 +1988,8 @@ class View
 			const item = {...list[i], 'atwho-at': this.context.at};
 			const liHtml = this.context.callbacks('tplEval').call(this.context, tpl, item, 'onDisplay');
 			const html = this.context.callbacks('highlighter').call(this.context, liHtml, this.context.query.text);
+			// Template output (displayTpl + item data). Callers are responsible
+			// for escaping any untrusted values that end up in it.
 			template.innerHTML = String(html).trim();
 			Array.from(template.content.childNodes).forEach((node) => {
 				if (node.nodeType === 1)
@@ -2032,8 +2040,12 @@ const AtWho = {
 		{
 			return null;
 		}
-		const app = getApp(el);
 		options = options || {};
+		if (typeof options.at !== 'string' || options.at === '')
+		{
+			throw new Error('AtWho.attach requires an "at" option (for example "@" or ":")');
+		}
+		const app = getApp(el);
 		app.reg(options.at, options);
 		return app;
 	},
@@ -2081,4 +2093,3 @@ else
  * evt.alias; with an alias the `name-alias` variant is also fired):
  *   matched, inserted, shown, hidden, reposition, beforeDestroy
  * ------------------------------------------------------------------ */
-
