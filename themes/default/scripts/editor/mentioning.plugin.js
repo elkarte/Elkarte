@@ -9,7 +9,7 @@
 /** global: elk_session_var, elk_session_id, elk_scripturl, sceditor  */
 
 /**
- * This file contains javascript associated with the @mentions function as it
+ * This file contains JavaScript associated with the @mentions function as it
  * relates to a sceditor invocation
  */
 var disableDrafts = false;
@@ -27,10 +27,9 @@ var disableDrafts = false;
 		this.opts = $.extend({}, this.defaults, options);
 	}
 
-	Elk_Mentions.prototype.attachAtWho = function ($element, oIframeWindow)
+	Elk_Mentions.prototype.attachAtWho = function (element, oIframeWindow)
 	{
-		let mentioned = $('#mentioned'),
-			corrected_offset = {};
+		let mentioned = $('#mentioned');
 
 		// Create / use a container to hold the results
 		if (mentioned.length === 0)
@@ -45,9 +44,24 @@ var disableDrafts = false;
 		this.opts.cache.mentions = this.opts._mentioned;
 
 		let self = this;
-		$element.atwho({
+
+		// Copy of a result list with each member id present only once
+		const dedupe = function (list)
+		{
+			const seen = new Set();
+			return (list || []).filter((item) => {
+				if (seen.has(item.id))
+				{
+					return false;
+				}
+				seen.add(item.id);
+				return true;
+			});
+		};
+
+		AtWho.attach(element, {
 			at: "@",
-			limit: 8,
+			limit: 10,
 			maxLen: 25,
 			displayTpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
 			acceptSpaceBar: true,
@@ -57,10 +71,10 @@ var disableDrafts = false;
 					// Already cached this query, then use it
 					if (typeof self.opts.cache.names[query] !== 'undefined')
 					{
-						return self.opts.cache.names[query];
+						return dedupe(self.opts.cache.names[query]);
 					}
 
-					return items;
+					return dedupe(items);
 				},
 				// Well then let's make a find member suggest call
 				remoteFilter: function (query, callback)
@@ -82,7 +96,11 @@ var disableDrafts = false;
 					let current_call = Math.round(new Date().getTime());
 					if (self.opts._last_call !== 0 && self.opts._last_call + 150 > current_call)
 					{
-						callback(self.opts._names);
+						// Throttled, reuse what we already know for this query (if anything)
+						if (typeof self.opts.cache.names[query] !== 'undefined')
+						{
+							callback(dedupe(self.opts.cache.names[query]));
+						}
 						return;
 					}
 
@@ -94,26 +112,23 @@ var disableDrafts = false;
 					};
 
 					// Make the request
-					suggest(self, obj, function ()
+					suggest(self, obj, function (names)
 					{
 						// Update the time gate
 						self.opts._last_call = current_call;
 
 						// Update the cache with the values for reuse in local filter
-						self.opts.cache.names[query] = self.opts._names;
+						self.opts.cache.names[query] = names;
 
 						// Update the query cache for use in revalidateMentions
 						self.opts.cache.queries[self.opts.cache.queries.length] = query;
 
-						callback(self.opts._names);
+						callback(dedupe(names));
 					});
 				},
-				beforeInsert: function (value, $li)
+                beforeInsert: function (value, li)
 				{
-					// Set up for a new pull-down box/location
-					corrected_offset = {};
-
-					self.addUID($li.data('id'), $li.data('value'));
+					self.addUID(li.dataset.id, li.dataset.value);
 
 					return value;
 				},
@@ -134,8 +149,9 @@ var disableDrafts = false;
 					// Allow first last name entry?
 					space = acceptSpaceBar ? "\ " : "";
 
+					// No multiline flag: '$' must match only at the caret, never at an earlier line end
 					// regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-					regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'um');
+					regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'u');
 					match = regex_matcher.exec(subtext);
 
 					if (match)
@@ -167,42 +183,36 @@ var disableDrafts = false;
 				},
 				beforeReposition: function (offset)
 				{
-					// We only need to adjust when in wysiwyg
-					if (editor.inSourceMode())
-					{
-						return offset;
-					}
-
-					if (Object.keys(corrected_offset).length === 0)
-					{
-						// Get the caret position, so we can add the mentions box there
-						corrected_offset = editor.findCursorPosition('@');
-					}
-
-					offset.top = corrected_offset.top;
-					offset.left = corrected_offset.left;
-
 					return offset;
 				},
 				afterMatchFailed: function (at, el)
 				{
-					// Clear the offset
-					corrected_offset = {};
+					// Leave an already inserted mention untouched
+					if (el && (el.classList.contains('atwho-inserted') || el.hasAttribute('data-atwho-inserted-text')))
+					{
+						return false;
+					}
 				}
 			}
 		});
 
 		// Use atwho selection box show/hide events to prevent autosave from firing
-		if (Object.keys(oIframeWindow).length)
+		if (oIframeWindow)
 		{
-			$(oIframeWindow).on("shown.atwho", function (event, offset)
+			oIframeWindow.addEventListener('shown', function (e)
 			{
-				disableDrafts = true;
+				if (e.namespace === 'atwho')
+				{
+					disableDrafts = true;
+				}
 			});
 
-			$(oIframeWindow).on("hidden.atwho", function (event, offset)
+			oIframeWindow.addEventListener('hidden', function (e)
 			{
-				disableDrafts = false;
+				if (e.namespace === 'atwho')
+				{
+					disableDrafts = false;
+				}
 			});
 		}
 
@@ -217,7 +227,9 @@ var disableDrafts = false;
 		{
 			let postString = serialize(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
-			self.opts._names = [];
+			// Per request list, never shared between overlapping requests
+			const names = [];
+			const seen = new Set();
 			fetch(elk_prepareScriptUrl(elk_scripturl) + "action=suggest;api=xml", {
 				method: "POST",
 				body: postString,
@@ -238,19 +250,25 @@ var disableDrafts = false;
 				.then(data => {
 					let items = data.querySelectorAll('item');
 					items.forEach((item, idx) => {
-						self.opts._names[idx] = {
-							"id": item.getAttribute('id'),
+						const id = item.getAttribute('id');
+						if (seen.has(id))
+						{
+							return;
+						}
+						seen.add(id);
+						names.push({
+							"id": id,
 							"name": item.textContent
-						};
+						});
 					});
-					callback();
+					callback(names);
 				})
 				.catch(function (error) {
 					if ('console' in window && console.error)
 					{
 						console.error('Error: ', error.message);
 					}
-					callback();
+					callback(names);
 				});
 		}
 	};
@@ -307,7 +325,7 @@ var disableDrafts = false;
 
 			// Adds the selector to the list of known "mentioner"
 			add_elk_mention(oMentions.opts.editor_id, {isPlugin: true});
-			oMentions.attachAtWho($(sceditor_textarea), {});
+			oMentions.attachAtWho(sceditor_textarea, null);
 
 			// Using wysiwyg, then let's attach atwho to it
 			if (!instance.opts.runWithoutWysiwygSupport)
@@ -317,7 +335,7 @@ var disableDrafts = false;
 					oIframeWindow = oIframe.contentWindow,
 					oIframeBody = oIframe.contentDocument.body;
 
-				oMentions.attachAtWho($(oIframeBody), oIframeWindow);
+				oMentions.attachAtWho(oIframeBody, oIframeWindow);
 			}
 		};
 	};

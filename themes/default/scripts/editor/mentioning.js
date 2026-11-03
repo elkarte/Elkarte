@@ -7,7 +7,7 @@
  */
 
 /**
- * This file contains javascript associated with the mentioning function as it
+ * This file contains JavaScript associated with the mentioning function as it
  * relates to a plain text box as found in quick modify/edit
  */
 
@@ -35,12 +35,18 @@ elk_mentions.prototype.attachAtWho = function () {
 	var _self = this;
 
 	// We need a container to display the names in
-	_self.$atwho = $(this.opt.selector);
-	_self.mentions = $('<div style="display:none" />');
-	_self.$atwho.after(this.mentions);
+	_self.$atwho = document.querySelector(this.opt.selector);
+	if (!_self.$atwho)
+	{
+		return;
+	}
+
+	_self.mentions = document.createElement('div');
+	_self.mentions.style.display = 'none';
+	_self.$atwho.after(_self.mentions);
 
 	// Attach the atwho to our container
-	_self.$atwho.atwho({
+	AtWho.attach(_self.$atwho, {
 		at: "@",
 		limit: 8,
 		maxLen: 25,
@@ -100,8 +106,13 @@ elk_mentions.prototype.attachAtWho = function () {
 					callback(_self.names);
 				});
 			},
-			beforeInsert: function (value, $li) {
-				_self.mentions.append($('<input type="hidden" name="uid[]" />').val($li.data('id')).attr('data-name', $li.data('value')));
+			beforeInsert: function (value, li) {
+				let input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = 'uid[]';
+				input.value = li.dataset.id;
+				input.setAttribute('data-name', li.dataset.value);
+				_self.mentions.appendChild(input);
 
 				return value;
 			},
@@ -119,7 +130,8 @@ elk_mentions.prototype.attachAtWho = function () {
 				// Allow first last name entry?
 				space = acceptSpaceBar ? "\ " : "";
 
-				regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'um');
+				// No multiline flag: '$' must match only at the caret, never at an earlier line end
+				regex_matcher = new RegExp(flag + "([\\p{L}0-9_" + space + "\\[\\]\'\.\+\-]*)$", 'u');
 				match = regex_matcher.exec(subtext);
 				if (match)
 				{
