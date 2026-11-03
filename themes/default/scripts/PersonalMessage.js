@@ -527,7 +527,7 @@ function addCriteriaOption ()
 		group_option += '<option value="' + index + '">' + groups[index] + '</option>';
 	}
 
-	setOuterHTML(document.getElementById('criteriaAddHere'), '<br />' +
+	document.getElementById('criteriaAddHere').outerHTML = '<br />' +
 		'<select class="criteria" name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '">' +
 		'   <option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '' +
 		'</select><span class="breaking_space">' +
@@ -539,7 +539,7 @@ function addCriteriaOption ()
 		'   <option value="">' + txt_pm_rule_sel_group + '</option>' + group_option +
 		'</select>' +
 		'</span>' +
-		'<span id="criteriaAddHere"></span>');
+		'<span id="criteriaAddHere"></span>';
 
 	return false;
 }
@@ -574,7 +574,7 @@ function addActionOption ()
 		label_option += '<option value="' + index + '">' + labels[index] + '</option>';
 	}
 
-	setOuterHTML(document.getElementById('actionAddHere'), '<br />' +
+	document.getElementById('actionAddHere').outerHTML = '<br />' +
 		'<select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '">' +
 		'   <option value="">' + txt_pm_rule_sel_action + ':</option>' +
 		'   <option value="lab">' + txt_pm_rule_label + '</option>' +
@@ -584,5 +584,5 @@ function addActionOption ()
 		'<select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '">' +
 		'   <option value="">' + txt_pm_rule_sel_label + '</option>' + label_option +
 		'</select></span>' +
-		'<span id="actionAddHere"></span>');
+		'<span id="actionAddHere"></span>';
 }

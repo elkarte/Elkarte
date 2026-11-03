@@ -344,7 +344,7 @@ function onDocSent (XMLDoc)
 
 				newPostsHTML += '<div class="messageContent" id="msg_' + newPosts[i].getAttribute('id') + '_body">' + newPosts[i].getElementsByTagName('message')[0].firstChild.nodeValue + '</div></div></div>';
 			}
-			setOuterHTML(document.getElementById('new_replies'), newPostsHTML);
+			document.getElementById('new_replies').outerHTML = newPostsHTML;
 		}
 
 		// Remove the new image from old-new replies!
@@ -439,7 +439,7 @@ function addPollOption ()
 	pollOptionId++;
 	pollTabIndex++;
 
-	setOuterHTML(document.getElementById('pollMoreOptions'), '<li><label for="options-' + pollOptionId + '">' + txt_option + ' ' + pollOptionNum + '</label>: <input type="text" name="options[' + pollOptionId + ']" id="options-' + pollOptionId + '" value="" size="80" maxlength="255" tabindex="' + pollTabIndex + '" class="input_text" /></li><li id="pollMoreOptions"></li>');
+	document.getElementById('pollMoreOptions').outerHTML = '<li><label for="options-' + pollOptionId + '">' + txt_option + ' ' + pollOptionNum + '</label>: <input type="text" name="options[' + pollOptionId + ']" id="options-' + pollOptionId + '" value="" size="80" maxlength="255" tabindex="' + pollTabIndex + '" class="input_text" /></li><li id="pollMoreOptions"></li>';
 }
 
 /**
@@ -457,7 +457,7 @@ function addAttachment ()
 		return alert(txt_more_attachments_error);
 	}
 
-	setOuterHTML(document.getElementById('moreAttachments'), '<dd class="smalltext"><input type="file" size="60" name="attachment[]" id="attachment' + current_attachment + '" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment' + current_attachment + '\');">' + txt_clean_attach + '<\/a>)' + '<\/dd><dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(' + txt_more_attachments + ')</a></dd>');
+	document.getElementById('moreAttachments').outerHTML = '<dd class="smalltext"><input type="file" size="60" name="attachment[]" id="attachment' + current_attachment + '" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment' + current_attachment + '\');">' + txt_clean_attach + '<\/a>)' + '<\/dd><dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(' + txt_more_attachments + ')</a></dd>';
 
 	return true;
 }
