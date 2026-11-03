@@ -114,19 +114,6 @@ function template_verification_control_hcaptcha($id, $values)
 }
 
 /**
- * keyCaptcha, Empty div to be populated by the JS
- */
-function template_verification_control_keycaptcha($id, $values)
-{
-	echo '
-	<div style="display: flex; justify-content: center;">
-		<div id="div_for_keycaptcha">
-			<input name="key-capcode" id="key-capcode" type="hidden" value="">
-		</div>
-	</div>';
-}
-
-/**
  * Turnstile, Empty div to be populated by the JS
  */
 function template_verification_control_turnstile()
