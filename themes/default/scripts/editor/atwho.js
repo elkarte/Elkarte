@@ -1,4 +1,4 @@
-/**
+/*!
  * atwho.js — jQuery-free ES2018 port of at.js 1.5.6
  * Original: Copyright (c) 2022 chord.luo <chord.luo@gmail.com>, MIT
  * This port: 2026-11-01, MIT
