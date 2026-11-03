@@ -1172,7 +1172,6 @@ class Post extends AbstractController
 		$guestname = $req->getPost('guestname', 'trim|Util::htmlspecialchars', '');
 		$email = $req->getPost('email', 'trim|Util::htmlspecialchars', '');
 		$subject = $req->getPost('subject', 'trim');
-		$message = $req->getPost('message', 'trim');
 
 		if ($posterIsGuest)
 		{
@@ -1209,6 +1208,7 @@ class Post extends AbstractController
 
 		// Trigger before_save_post event
 		$this->_events->trigger('before_save_post', ['post_errors' => $this->_post_errors, 'topic_info' => $topic_info]);
+		$message = $req->getPost('message', 'trim');
 
 		// Check the subject and message.
 		if (!isset($subject) || Util::htmltrim(Util::htmlspecialchars($subject)) === '')
