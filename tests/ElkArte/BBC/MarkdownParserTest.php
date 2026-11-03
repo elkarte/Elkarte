@@ -73,6 +73,66 @@ class MarkdownParserTest extends ElkArteCommonSetupTest
 				'before<br />&gt;quoted',
 				'before[quote]quoted[/quote]',
 			),
+			array(
+				'ATX heading level 1',
+				'# Heading 1',
+				'[size=7][b]Heading 1[/b][/size]',
+			),
+			array(
+				'ATX heading level 2',
+				'## Heading 2',
+				'[size=6][b]Heading 2[/b][/size]',
+			),
+			array(
+				'ATX heading level 3',
+				'### Heading 3',
+				'[size=5][b]Heading 3[/b][/size]',
+			),
+			array(
+				'ATX heading level 4',
+				'#### Heading 4',
+				'[size=4][b]Heading 4[/b][/size]',
+			),
+			array(
+				'ATX heading level 5',
+				'##### Heading 5',
+				'[size=3][b]Heading 5[/b][/size]',
+			),
+			array(
+				'ATX heading level 6',
+				'###### Heading 6',
+				'[size=2][b]Heading 6[/b][/size]',
+			),
+			array(
+				'ATX heading level 7',
+				'####### Heading 7',
+				'[size=1][b]Heading 7[/b][/size]',
+			),
+			array(
+				'ATX heading level 8 clamps to size 1',
+				'######## Heading 8',
+				'[size=1][b]Heading 8[/b][/size]',
+			),
+			array(
+				'ATX heading with inline formatting',
+				'## Heading with *italic* and ~~strike~~',
+				'[size=6][b]Heading with [i]italic[/i] and [s]strike[/s][/b][/size]',
+			),
+			array(
+				'ATX heading requires text',
+				'#<br />next',
+				'#<br />next',
+			),
+			array(
+				'ATX heading must be at line start',
+				'prefix # not a heading',
+				'prefix # not a heading',
+			),
+			array(
+				'ATX heading is single line only',
+				'## Heading<br />continuation',
+				'[size=6][b]Heading[/b][/size]<br />continuation',
+			),
 		);
 
 		// Test cases for inlineCodeTags()
@@ -156,4 +216,3 @@ class MarkdownParserTest extends ElkArteCommonSetupTest
 		}
 	}
 }
-
