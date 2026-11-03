@@ -16,7 +16,6 @@
  */
 
 use ElkArte\Request;
-use ElkArte\User;
 
 /**
  * Clean the request variables - add HTML entities to GET.
@@ -36,9 +35,8 @@ function cleanRequest()
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
 	$req = Request::instance();
 
-	$parser = initUrlGenerator()->getParser();
-
 	// Make sure there are no problems with the request
+	$parser = initUrlParser();
 	$req->cleanRequest($parser);
 
 	// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff

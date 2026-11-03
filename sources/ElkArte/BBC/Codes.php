@@ -193,11 +193,13 @@ class Codes
 	    The rest of the attributes depend on the type and other options. */
 	protected $bbc = [];
 
-	protected $itemcodes = [];
+	/** @var array|null Cached item code map */
+	protected $item_codes;
 
 	protected $disabled = [];
 
-	protected $parsing_codes = [];
+	/** @var array|null Cached BBC codes grouped by their first character */
+	protected $parsing_codes;
 
 	/**
 	 * Codes constructor.
@@ -221,6 +223,14 @@ class Codes
 	}
 
 	/**
+	 * Invalidate the cached parsing codes after the code definitions change.
+	 */
+	protected function invalidateParsingCodes(): void
+	{
+		$this->parsing_codes = null;
+	}
+
+	/**
 	 * Add a code
 	 *
 	 * @param array $code
@@ -236,6 +246,8 @@ class Codes
 		// }
 
 		$this->bbc[] = $code;
+
+		$this->invalidateParsingCodes();
 	}
 
 	/**
@@ -252,6 +264,8 @@ class Codes
 				unset($this->bbc[$k]);
 			}
 		}
+
+		$this->invalidateParsingCodes();
 	}
 
 	/**
@@ -714,7 +728,7 @@ class Codes
 				self::ATTR_BEFORE => '<span style="font-size: $1;" class="bbc_size">',
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_VALIDATE => static function (&$data) {
-					$sizes = [1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95];
+					$sizes = [1 => 1, 2 => 1.1, 3 => 1.2, 4 => 1.3, 5 => 1.4, 6 => 1.5, 7 => 1.6];
 					$data = $sizes[(int) $data] . 'em';
 				},
 				self::ATTR_DISALLOW_PARENTS => [
@@ -924,6 +938,11 @@ class Codes
 	 */
 	public function getItemCodes(): array
 	{
+		if ($this->item_codes !== null)
+		{
+			return $this->item_codes;
+		}
+
 		$item_codes = [
 			'*' => 'disc',
 			'@' => 'disc',
@@ -937,6 +956,8 @@ class Codes
 
 		// Want to add some more?
 		call_integration_hook('integrate_item_codes', [&$item_codes]);
+
+		$this->item_codes = $item_codes;
 
 		return $item_codes;
 	}
@@ -996,6 +1017,11 @@ class Codes
 	 */
 	public function getForParsing(): array
 	{
+		if ($this->parsing_codes !== null)
+		{
+			return $this->parsing_codes;
+		}
+
 		$bbc = $this->bbc;
 		$item_codes = $this->getItemCodes();
 		call_integration_hook('bbc_codes_parsing', [&$bbc, &$item_codes]);
@@ -1019,10 +1045,44 @@ class Codes
 		// Find the first letter of the tag faster
 		foreach ($bbc as $code)
 		{
+			self::prepareParameterCache($code);
+
 			$return[$code[self::ATTR_TAG][0]][] = $code;
 		}
 
+		$this->parsing_codes = $return;
+
 		return $return;
+	}
+
+	/**
+	 * Pre-computes the fragments used to match a code's parameters.
+	 *
+	 * These only depend on the code definition, so they can be shared by every
+	 * occurrence of the tag instead of being rebuilt for each one.
+	 *
+	 * @param array $code
+	 */
+	public static function prepareParameterCache(array &$code): void
+	{
+		if (empty($code[self::ATTR_PARAM]) || isset($code['regex_cache']))
+		{
+			return;
+		}
+
+		$code['regex_cache'] = [];
+		$code['param_check'] = [];
+		$code['optionals'] = [];
+
+		foreach ($code[self::ATTR_PARAM] as $param => $info)
+		{
+			$quote = empty($info[self::PARAM_ATTR_QUOTED]) ? '' : '&quot;';
+			$code['optionals'][] = !empty($info[self::PARAM_ATTR_OPTIONAL]);
+			$code['param_check'][] = ' ' . $param . '=' . $quote;
+			$code['regex_cache'][] = '(\s+' . $param . '=' . $quote . ($info[self::PARAM_ATTR_MATCH] ?? '(.+?)') . $quote . ')';
+		}
+
+		$code['regex_size'] = count($code[self::ATTR_PARAM]) - 1;
 	}
 
 	/**
@@ -1034,7 +1094,7 @@ class Codes
 	 */
 	public function setParsingCodes(): self
 	{
-		$this->parsing_codes = $this->getForParsing();
+		$this->getForParsing();
 
 		return $this;
 	}
@@ -1147,6 +1207,8 @@ class Codes
 	{
 		$this->disabled[$tag] = $tag;
 
+		$this->invalidateParsingCodes();
+
 		return isset($this->disabled[$tag]);
 	}
 
@@ -1163,6 +1225,8 @@ class Codes
 		{
 			unset($this->disabled[$tag]);
 		}
+
+		$this->invalidateParsingCodes();
 
 		return !isset($this->disabled[$tag]);
 	}
@@ -1184,5 +1248,7 @@ class Codes
 				$this->disabled[$code[self::ATTR_TAG]] = $code[self::ATTR_TAG];
 			}
 		}
+
+		$this->invalidateParsingCodes();
 	}
 }

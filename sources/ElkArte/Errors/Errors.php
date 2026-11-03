@@ -600,21 +600,17 @@ class Errors extends AbstractModel
 	 */
 	public function log_deprecated($function, $replacement): void
 	{
-		$debug = '<br><br>';
-		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
+		global $modSettings;
+
+		if (empty($modSettings['enableErrorLogging']))
 		{
-			$debug .= $var . ': ' . $val . '<br>';
+			return;
 		}
 
-		$this->log_error(
-			sprintf(
-				'%s is deprecated, use %s instead.%s',
-				$function,
-				$replacement,
-				$debug
-			),
-			'deprecated'
-		);
+		$frame = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] ?? [];
+		$where = ($frame['file'] ?? '?') . ':' . ($frame['line'] ?? '?');
+
+		$this->log_error(sprintf('%s is deprecated, use %s instead. (%s)', $function, $replacement, $where), 'deprecated');
 	}
 
 	/**
@@ -699,6 +695,6 @@ class Errors extends AbstractModel
 			PROGRAM FLOW.  Otherwise, security error messages will not be shown, and
 			your forum will be in a very easily hackable state.
 		*/
-		trigger_error('Hacking attempt...', E_USER_ERROR);
+		throw new \ElkArte\Exceptions\Exception('Hacking attempt...');
 	}
 }

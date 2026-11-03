@@ -39,7 +39,7 @@ class MarkdownParser
 	 */
 	public function parse($data): string
 	{
-		// Start tag search and replace
+		$data = $this->headingTags($data);
 		$data = $this->boldTags($data);
 		$data = $this->italicTags($data);
 		$data = $this->strikeTags($data);
@@ -56,6 +56,8 @@ class MarkdownParser
 	 * > lines
 	 *
 	 * This MUST be called on the full message before the BBC parse_loop runs.
+	 * supports [!TIP], [!IMPORTANT], [!WARNING], and [!CAUTION] as well.
+	 *
 	 *
 	 * @param string $data Message with <br /> as line separators
 	 *
@@ -182,11 +184,54 @@ class MarkdownParser
 	 */
 	protected function ruleTags($data): string
 	{
-		// convert rule
-		$data = preg_replace('~(^|\n|<br \/>)---+?(^|\n|<br \/>)~', '$1[hr]', $data);
-		$data = preg_replace('~(^|\n|<br \/>)___+?(^|\n|<br \/>)~', '$1[hr]', $data);
+		if (str_contains($data, '---'))
+		{
+			return preg_replace('~(^|\n|<br \/>)---+?(^|\n|<br \/>)~', '$1[hr]', $data);
+		}
 
-		return preg_replace('~(^|\n|<br \/>)\*\*\*+?(^|\n|<br \/>)~', '$1[hr]', $data);
+		if (str_contains($data, '___'))
+		{
+			return preg_replace('~(^|\n|<br \/>)___+?(^|\n|<br \/>)~', '$1[hr]', $data);
+		}
+
+		if (str_contains($data, '***'))
+		{
+			return preg_replace('~(^|\n|<br \/>)\*\*\*+?(^|\n|<br \/>)~', '$1[hr]', $data);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Convert ATX headings to [size=x]Text[/size].
+	 *
+	 * @param string $data
+	 *
+	 * @return string
+	 */
+	protected function headingTags($data): string
+	{
+		if (!str_contains($data, '#'))
+		{
+			return $data;
+		}
+
+		return preg_replace_callback('~(^|<br \/>|\n)(#{1,})(.*?)(?=<br \/>|\n|$)~u', function ($match) {
+			$headingText = trim($match[3]);
+
+			if ($headingText === '')
+			{
+				return $match[0];
+			}
+
+			$level = strlen($match[2]);
+			$size = max(1, 8 - $level);
+			$headingText = $this->boldTags($headingText);
+			$headingText = $this->italicTags($headingText);
+			$headingText = $this->strikeTags($headingText);
+
+			return $match[1] . '[size=' . $size . ']' . $headingText . '[/size]';
+		}, $data);
 	}
 
 	/**

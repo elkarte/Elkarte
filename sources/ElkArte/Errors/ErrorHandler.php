@@ -164,7 +164,7 @@ final class ErrorHandler extends Errors
 		{
 			E_USER_ERROR => 'Fatal Error',
 			E_USER_WARNING, E_WARNING => 'Warning',
-			E_USER_NOTICE, E_NOTICE, E_STRICT => 'Notice',
+			E_USER_NOTICE, E_NOTICE => 'Notice',
 			E_RECOVERABLE_ERROR => 'Catchable',
 			default => 'Unknown Error',
 		};

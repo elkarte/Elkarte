@@ -13,6 +13,7 @@
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use BBC\PreparseCode;
 
 class PreparseSubsTest extends TestCase
 {
@@ -98,5 +99,18 @@ class PreparseSubsTest extends TestCase
 
 			$this->assertEquals($expected, $test);
 		}
+	}
+
+	public function testPreparseCodeMeUsernameBackreferencesAreLiteral()
+	{
+		$preparse = PreparseCode::instance('name$1\\1$');
+		$message = "/me waves\n[footnote]/me nods[/footnote]";
+
+		$preparse->preparsecode($message, true);
+
+		$this->assertEquals(
+			'[me=&quot;name$1\1$&quot;]waves[/me]' . "\n" . '[footnote][me=&quot;name$1\1$&quot;]nods[/me][/footnote]',
+			$message
+		);
 	}
 }

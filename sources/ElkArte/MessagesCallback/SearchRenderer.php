@@ -40,7 +40,7 @@ class SearchRenderer extends Renderer
 	/**
 	 * {@inheritDoc}
 	 */
-	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, BodyParserInterface $bodyParser, ?ValuesContainer $opt = null)
 	{
 		parent::__construct($request, $user, $bodyParser, $opt);
 

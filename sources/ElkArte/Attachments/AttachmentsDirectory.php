@@ -441,7 +441,7 @@ class AttachmentsDirectory
 	 * @param int|null $minLevel
 	 * @return bool
 	 */
-	public function autoManageEnabled(int $minLevel = null): bool
+	public function autoManageEnabled(?int $minLevel = null): bool
 	{
 		if ($minLevel === null)
 		{

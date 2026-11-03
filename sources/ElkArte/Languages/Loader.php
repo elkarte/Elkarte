@@ -144,7 +144,9 @@ class Loader
 
 		// A fallback is used to provide core language strings that are missing from another language
 		$found_fallback = false;
-		if ($this->loadFallback)
+
+		// Loading English as the "fallback" for English is the same file twice.
+		if ($this->loadFallback && $this->language !== 'English')
 		{
 			$found_fallback = $this->loadFile($file, 'English');
 		}

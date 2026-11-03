@@ -36,16 +36,16 @@ class Action
 	/** @var string A (unique !!) id that triggers a hook */
 	protected $_name;
 
-	/** @var HttpReq Access to post/get data */
+	/** @var HttpReq|null Access to post/get data */
 	protected $_req;
 
 	/**
 	 * Constructor!
 	 *
 	 * @param string|null $name Hook name
-	 * @param HttpReq $req Access to post/get data
+	 * @param HttpReq|null $req Access to post/get data
 	 */
-	public function __construct(string $name = null, $req = null)
+	public function __construct(?string $name = null, ?HttpReq $req = null)
 	{
 		$this->_name = $name;
 		$this->_req = $req ?: HttpReq::instance();

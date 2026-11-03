@@ -33,7 +33,6 @@ function loadSession()
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', '1');
-	@ini_set('session.use_only_cookies', '1');
 	@ini_set('arg_separator.output', '&amp;');
 	@ini_set('session.cookie_samesite', 'Lax');
 	@ini_set('session.cookie_httponly', '1');

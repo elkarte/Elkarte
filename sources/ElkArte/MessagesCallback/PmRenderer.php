@@ -44,7 +44,7 @@ class PmRenderer extends Renderer
 	/**
 	 * {@inheritDoc}
 	 */
-	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, BodyParserInterface $bodyParser, ?ValuesContainer $opt = null)
 	{
 		parent::__construct($request, $user, $bodyParser, $opt);
 		$this->_idx_mapper = new ValuesContainer([

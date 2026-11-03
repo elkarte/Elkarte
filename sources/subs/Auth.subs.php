@@ -257,7 +257,7 @@ function adminLogin($type = 'admin'): never
 	obExit();
 
 	// We MUST exit at this point, because otherwise we CANNOT KNOW that the user is privileged.
-	trigger_error('Hacking attempt...', E_USER_ERROR);
+	throw new \ElkArte\Exceptions\Exception('Hacking attempt...');
 }
 
 /**

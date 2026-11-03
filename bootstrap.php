@@ -419,10 +419,9 @@ class Bootstrap
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
 
-			// This is here only to avoid session errors in PHP7
 			// microtime effectively forces the replacing of the session in the db each
 			// time the page is loaded
-			$_SESSION['mictrotime'] = microtime();
+			$_SESSION['microtime'] = microtime();
 		}
 
 		// Get rid of $board and $topic... do stuff loadBoard would do.

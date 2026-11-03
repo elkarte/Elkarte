@@ -106,28 +106,28 @@ class Directories
 	 * @param bool $once Optional. If true, the file will only be included once. Default is false.
 	 * @return void
 	 */
-	public function fileInclude($filename, $once = false): void
+	public function fileInclude($filename, $once = false, ?bool $exists = null): void
 	{
-		// Don't include the file more than once if $once is true.
-		if ($once && in_array($filename, $this->templates))
+		if ($once && in_array($filename, $this->templates, true))
 		{
 			return;
 		}
 
-		// Add this file to our include list, whether $once is true or not.
 		$this->templates[] = $filename;
+		$exists ??= is_file($filename);
 
-		// Load it if we find it
-		$file_found = FileFunctions::instance()->fileExists($filename);
 		try
 		{
-			if ($once && $file_found)
+			if ($exists)
 			{
-				require_once($filename);
-			}
-			elseif ($file_found)
-			{
-				require($filename);
+				if ($once)
+				{
+					require_once($filename);
+				}
+				else
+				{
+					require($filename);
+				}
 			}
 			else
 			{

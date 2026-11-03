@@ -993,7 +993,7 @@ function insertEvent(&$eventOptions)
 	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 	{
-		trigger_error('insertEvent(): invalid start date format given', E_USER_ERROR);
+		throw new \ElkArte\Exceptions\Exception('insertEvent(): invalid start date format given');
 	}
 
 	// Set the end date (if not yet given)
@@ -1057,7 +1057,7 @@ function modifyEvent($event_id, &$eventOptions)
 	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 	{
-		trigger_error('modifyEvent(): invalid start date format given', E_USER_ERROR);
+		throw new \ElkArte\Exceptions\Exception('modifyEvent(): invalid start date format given');
 	}
 
 	// Default span to 0 days.

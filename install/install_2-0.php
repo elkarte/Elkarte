@@ -2450,7 +2450,7 @@ class InstallInstructions_install_2_0
 				array('karmaTimeRestrictAdmins', '1'),
 				array('enablePreviousNext', '1'),
 				array('pollMode', '1'),
-				array('modules_display', 'metadata,mentions,poll,verification,random,attachments'),
+				array('modules_display', 'mentions,poll,verification,random,attachments'),
 				array('modules_post', 'mentions,poll,attachments,verification,random'),
 				array('modules_personalmessage', 'verification'),
 				array('modules_register', 'verification'),

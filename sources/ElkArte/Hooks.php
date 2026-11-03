@@ -35,6 +35,9 @@ final class Hooks
 	/** @var FileFunctions */
 	protected $fileFunc;
 
+	/** @var array Memoized hook strings => prepared callables, keyed by the raw $modSettings value */
+	private array $parsed = [];
+
 	/**
 	 * The class constructor loads globals in to the class object
 	 *
@@ -101,7 +104,7 @@ final class Hooks
 		}
 
 		// Loop through each function.
-		$functions = $this->_prepare_hooks($modSettings[$hook]);
+		$functions = $this->parsed[$modSettings[$hook]] ??= $this->_prepare_hooks($modSettings[$hook]);
 		foreach ($functions as $function => $call)
 		{
 			$results[$function] = call_user_func_array($call, $parameters);
@@ -268,7 +271,7 @@ final class Hooks
 
 		foreach ($enabled as $class)
 		{
-			if (class_exists($class) && in_array('register', get_class_methods($class)))
+			if (is_callable([$class, 'register']))
 			{
 				$hooks = $class::register();
 
@@ -300,7 +303,7 @@ final class Hooks
 
 		foreach ($enabled as $class)
 		{
-			if (class_exists($class) && in_array('settingsRegister', get_class_methods($class)))
+			if (is_callable([$class, 'settingsRegister']))
 			{
 				$hooks = $class::settingsRegister();
 

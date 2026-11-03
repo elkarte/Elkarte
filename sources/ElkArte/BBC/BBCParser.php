@@ -33,6 +33,9 @@ class BBCParser
 	/** @var Codes */
 	protected $bbc;
 
+	/** @var Codes[] Restricted Codes objects used for recursive parsing, keyed by the allowed tag list */
+	protected $recursive_codes = [];
+
 	/** @var array */
 	protected $bbc_codes;
 
@@ -113,12 +116,12 @@ class BBCParser
 	 * @param HtmlParser|null $html_parser
 	 * @param MarkdownParser|null $markdown_parser
 	 */
-	public function __construct(Codes $bbc, Autolink $autolinker = null, HtmlParser $html_parser = null, MarkdownParser $markdown_parser = null)
+	public function __construct(Codes $bbc, ?Autolink $autolinker = null, ?HtmlParser $html_parser = null, ?MarkdownParser $markdown_parser = null)
 	{
 		$this->bbc = $bbc;
 
-		$this->bbc_codes = $this->bbc->getForParsing();
 		$this->item_codes = $this->bbc->getItemCodes();
+		$this->bbc_codes = $this->bbc->getForParsing();
 
 		$this->autolinker = $autolinker;
 		$this->loadAutolink();
@@ -549,6 +552,17 @@ class BBCParser
 	 */
 	protected function parseMarkdown($data): string
 	{
+		// If there are no Markdown characters, don't waste time parsing it.
+		if (!str_contains($data, '`')
+			&& !str_contains($data, '*')
+			&& !str_contains($data, '_')
+			&& !str_contains($data, '~')
+			&& !str_contains($data, '>')
+			&& !str_contains($data, '#'))
+		{
+			return $data;
+		}
+
 		return $this->markdown_parser->parse($data);
 	}
 
@@ -906,9 +920,8 @@ class BBCParser
 		$num_open_tags = count($this->open_tags);
 		if ($this->pos2 !== false && ($this->pos3 === false || $this->pos2 <= $this->pos3))
 		{
-			// Can't use offset because of the ^
-			preg_match('~^(<br />|&nbsp;|\s|\[)+~', substr($this->message, $this->pos2 + 6), $matches);
-			//preg_match('~(<br />|&nbsp;|\s|\[)+~', $this->message, $matches, 0, $this->pos2 + 6);
+			//preg_match('~^(<br />|&nbsp;|\s|\[)+~', substr($this->message, $this->pos2 + 6), $matches);
+			preg_match('~\G(<br />|&nbsp;|\s|\[)+~', $this->message, $matches, 0, $this->pos2 + 6);
 
 			// Keep the list open if the next character after the break is a [. Otherwise, close it.
 			$replacement = !empty($matches[0]) && substr_compare($matches[0], '[', -1, 1) === 0 ? '[/li]' : '[/li][/list]';
@@ -1387,19 +1400,7 @@ class BBCParser
 	{
 		if (!isset($possible['regex_cache']))
 		{
-			$possible['regex_cache'] = [];
-			$possible['param_check'] = [];
-			$possible['optionals'] = [];
-
-			foreach ($possible[Codes::ATTR_PARAM] as $param => $info)
-			{
-				$quote = empty($info[Codes::PARAM_ATTR_QUOTED]) ? '' : '&quot;';
-				$possible['optionals'][] = !empty($info[Codes::PARAM_ATTR_OPTIONAL]);
-				$possible['param_check'][] = ' ' . $param . '=' . $quote;
-				$possible['regex_cache'][] = '(\s+' . $param . '=' . $quote . ($info[Codes::PARAM_ATTR_MATCH] ?? '(.+?)') . $quote . ')';
-			}
-
-			$possible['regex_size'] = count($possible[Codes::ATTR_PARAM]) - 1;
+			Codes::prepareParameterCache($possible);
 		}
 
 		// Tag setup for this loop
@@ -1535,22 +1536,32 @@ class BBCParser
 	 */
 	protected function recursiveParser($data, array $tag): string
 	{
-		// @todo if parsed tags allowed is empty, return?
-		$bbc = clone $this->bbc;
+		$allowed = $tag[Codes::ATTR_PARSED_TAGS_ALLOWED] ?? [];
+		$key = implode('|', $allowed);
 
-		if (!empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))
+		// Building the restricted Codes object is expensive: setParsedTags() invalidates
+		// the parsing cache, so getForParsing() rebuilds the code list and re-runs
+		// bbc_codes_parsing. Reuse it for every tag that allows the same set of codes.
+		if (!isset($this->recursive_codes[$key]))
 		{
-			$bbc->setParsedTags($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]);
+			$bbc = clone $this->bbc;
+
+			if ($allowed !== [])
+			{
+				$bbc->setParsedTags($allowed);
+			}
+
+			$this->recursive_codes[$key] = $bbc;
 		}
 
-		// Do not use $this->autolinker. For some reason it causes a recursive loop
+		// Do not use $this->autolinker, it shares its possible link/email state with the parent parse
 		$autolinker = null;
 		$html = null;
 		call_integration_hook('integrate_recursive_bbc_parser', [&$autolinker, &$html]);
 
-		$parser = new BBCParser($bbc, $autolinker, $html);
+		$parser = new BBCParser($this->recursive_codes[$key], $autolinker, $html);
 
-		return $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
+		return $parser->enableSmileys($allowed === [])->parse($data);
 	}
 
 	/**
@@ -1802,7 +1813,7 @@ class BBCParser
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
 
-			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
+			if (isset($this->open_tags[$i][Codes::ATTR_TRIM]) && $this->open_tags[$i][Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
 				$this->trimWhiteSpace($this->pos);
 			}

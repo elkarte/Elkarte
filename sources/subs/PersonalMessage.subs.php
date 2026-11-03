@@ -619,7 +619,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 			return !empty($validationResult['valid_for_inbox']) || !empty($validationResult['valid_for_outbox']);
 
 		default:
-			trigger_error('Undefined validation type given', E_USER_ERROR);
+			throw new \ElkArte\Exceptions\Exception('Undefined validation type given');
 	}
 }
 

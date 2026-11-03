@@ -13,7 +13,8 @@
 /**
  * This JavaScript searches the message for video links and replaces them
  * with a clickable preview thumbnail of the video.  Once the image is clicked
- * the video is embedded in to the page to play.
+ * the video is embedded in to the page to play.  Twitter and TikTok have no usable
+ * preview image, so their players are embedded (TikTok paused) when scrolled into view.
  *
  * Currently, works with YouTube, Vimeo, TikTok, Twitter, Facebook, Instagram and DailyMotion
  *
@@ -110,7 +111,14 @@
 		 */
 		function createFragment (a, data)
 		{
+			// Nothing to embed, leave the default preview in place
+			if (!data || !data.html)
+			{
+				return;
+			}
+
 			// Since data.html may contain a script tag that needs to run, we have to add it like this
+
 			let parent = a.parentNode,
 				frag = document.createRange().createContextualFragment('<div class="elk_video">' + data.html + '</div>');
 
@@ -192,10 +200,16 @@
 
 			function ttResponse (data)
 			{
-				if (!data || typeof data.html === 'undefined')
+				data = data || {};
+
+				// TikTok no longer supplies a thumbnail, and the player must not autoplay
+				if (typeof data.html !== 'string')
 				{
-					data.thumbnail_url = logos.tiktok;
 					data.html = '';
+				}
+				else
+				{
+					data.html = data.html.replace(/autoplay=1/g, 'autoplay=0');
 				}
 
 				callback(data);
@@ -358,6 +372,7 @@
 		};
 
 		// TikTok
+		// https://www.tiktok.com/@the.mcfarlands/video/7003480282145852677?_t=8RvxobUnrVS&_r=1
 		handlers['tiktok.com'] = function(path, a) {
 			let videoID = path.match(/^\/@([0-9A-Za-z_\-.]*)\/video\/([0-9]*)/i);
 
@@ -370,27 +385,14 @@
 				embedURL = elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=videoembed;api=json;site=tiktok;videoid=' + videoURL + ';' + elk_session_var + '=' + elk_session_id,
 				tag;
 
-			imgHandlers.getTikTokEmbed(embedURL, function(data) {
-				if (typeof data.thumbnail_url !== 'undefined')
-				{
-					$(a).parent().next().find('img').attr('src', data.thumbnail_url);
-				}
-				a.embedURL = data.html;
-			});
-
 			tag = embedIMG(a, logos.tiktok, embedURL);
 
-			// Change the default click event to one that replaces the markup
+			// TikTok has its own embed code we need to load (no thumbnail), replace click event as well
 			tag.off('click', '**', false);
-			tag.on('click', function(e) {
-				e.preventDefault();
-				let load = $(a).parent();
-				load.parent().addClass('portrait');
+			a.embedURL = embedURL;
+			a.setAttribute('data-video_embed', 'getTikTokEmbed');
 
-				load.next().replaceWith('<div class="elk_video">' + a.embedURL + '</div>');
-			});
-
-			return [oSettings.tiktok, tag];
+			return [oSettings.tiktok, tag, 'portrait'];
 		};
 
 		// Twitter
@@ -517,7 +519,7 @@
 				// Call the handler and get the tag to insert
 				handler = handlers[m[1]];
 
-				// If there are video tags seperated by only a BR node, remove the BR so the video embed can
+				// If there are video tags separated by only a BR node, remove the BR so the video embed can
 				// be side by side on a wide enough screen.
 				if (tag.previousSibling && tag.previousSibling.nodeName === 'BR')
 				{
@@ -554,56 +556,97 @@
 		 */
 		function scrollEmbed ()
 		{
-			let videoLinks = document.querySelectorAll('a[data-video_embed]'),
-				throttleTimeout,
-				found = false;
+			let videoLinks = document.querySelectorAll('a[data-video_embed]');
 
-			/**
-			 * Function that fires to lazy load video sites embed when in viewport
-			 */
-			function videoLinksListener ()
+			if (!('IntersectionObserver' in window))
 			{
-				if (throttleTimeout)
-				{
-					clearTimeout(throttleTimeout);
-				}
+				let throttleTimeout,
+					found = false;
 
-				// On scroll fires "a lot" so this tames it to be less abusive
-				throttleTimeout = setTimeout(function() {
-					videoLinks.forEach(function(a) {
-						// No links remaining, drop any listeners
-						if (videoLinks.length === 0)
-						{
-							document.removeEventListener('scroll', videoLinksListener);
-							window.removeEventListener('resize', videoLinksListener);
-							window.removeEventListener('orientationChange', videoLinksListener);
-						}
-
-						// Hey I see you ...
-						if (isElementInViewport(a))
-						{
-							let func = a.getAttribute('data-video_embed');
-							found = true;
-							a.removeAttribute('data-video_embed');
-							imgHandlers[func](a.embedURL, (data) => {
-								createFragment(a, data);
-							});
-						}
-					});
-
-					// Once a link is found, let's not try that one again.
-					if (found)
+				/**
+				 * Function that fires to lazy load video sites embed when in viewport
+				 * for browsers that do not support IntersectionObserver.  This is a fallback
+				 * for older browsers.
+				 */
+				const videoLinksListener = function() {
+					if (throttleTimeout)
 					{
-						videoLinks = document.querySelectorAll('a[data-video_embed]');
+						clearTimeout(throttleTimeout);
 					}
-				}, 25);
+
+					// On scroll fires "a lot" so this tames it to be less abusive
+					throttleTimeout = setTimeout(function() {
+						videoLinks.forEach(function(a) {
+							// No links remaining, drop any listeners
+							if (videoLinks.length === 0)
+							{
+								document.removeEventListener('scroll', videoLinksListener);
+								window.removeEventListener('resize', videoLinksListener);
+								window.removeEventListener('orientationChange', videoLinksListener);
+								return;
+							}
+
+							// Hey I see you ...
+							if (isElementInViewport(a))
+							{
+								let func = a.getAttribute('data-video_embed');
+								found = true;
+								a.removeAttribute('data-video_embed');
+								imgHandlers[func](a.embedURL, (data) => {
+									createFragment(a, data);
+								});
+							}
+						});
+
+						// Once a link is found, let's not try that one again.
+						if (found)
+						{
+							videoLinks = document.querySelectorAll('a[data-video_embed]');
+							found = false;
+						}
+					}, 50);
+				};
+
+				// Scroll, rotate or resize, we check if we can see the video link.
+				document.addEventListener('scroll', videoLinksListener);
+				window.addEventListener('DOMContentLoaded', videoLinksListener);
+				window.addEventListener('resize', videoLinksListener);
+				window.addEventListener('orientationChange', videoLinksListener);
+				return;
 			}
 
-			// Scroll, rotate or resize, we check if we can see the video link.
-			document.addEventListener('scroll', videoLinksListener);
-			window.addEventListener('DOMContentLoaded', videoLinksListener);
-			window.addEventListener('resize', videoLinksListener);
-			window.addEventListener('orientationChange', videoLinksListener);
+			// IntersectionObserver is supported, so we can use that instead of the above code.
+			// This is a more efficient way to lazy load the video embeds.
+			const observer = new IntersectionObserver(function(entries, obs) {
+				entries.forEach(function(entry) {
+					if (!entry.isIntersecting)
+					{
+						return;
+					}
+
+					const link = entry.target;
+					const func = link.getAttribute('data-video_embed');
+
+					if (!func || typeof imgHandlers[func] === 'undefined' || imgHandlers[func] === null)
+					{
+						obs.unobserve(link);
+						return;
+					}
+
+					link.removeAttribute('data-video_embed');
+					obs.unobserve(link);
+
+					imgHandlers[func](link.embedURL, (data) => {
+						createFragment(link, data);
+					});
+				});
+			}, {
+				rootMargin: '200px 0px'
+			});
+
+			videoLinks.forEach(function(link) {
+				observer.observe(link);
+			});
 		}
 	};
 })(jQuery);

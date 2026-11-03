@@ -304,12 +304,12 @@ function modifyBoard($board_id, &$boardOptions)
 			$id_cat = $boards[$boardOptions['target_board']]['category'];
 			$child_level = $boards[$boardOptions['target_board']]['level'];
 			$id_parent = $boards[$boardOptions['target_board']]['parent'];
-			$after = $boards[$boardOptions['target_board']]['order'] - ($boardOptions['move_to'] == 'before' ? 1 : 0);
+			$after = $boards[$boardOptions['target_board']]['order'] - ($boardOptions['move_to'] === 'before' ? 1 : 0);
 		}
 		// Oops...?
 		else
 		{
-			trigger_error('modifyBoard(): The move_to value \'' . $boardOptions['move_to'] . '\' is incorrect', E_USER_ERROR);
+			throw new \ElkArte\Exceptions\Exception('modifyBoard(): The move_to value \'' . $boardOptions['move_to'] . '\' is incorrect');
 		}
 
 		// Get a list of children of this board.
@@ -564,12 +564,12 @@ function createBoard($boardOptions)
 	// Trigger an error if one of the required values is not set.
 	if (!isset($boardOptions['board_name'], $boardOptions['move_to'], $boardOptions['target_category']) || trim($boardOptions['board_name']) === '')
 	{
-		trigger_error('createBoard(): One or more of the required options is not set', E_USER_ERROR);
+		throw new \ElkArte\Exceptions\Exception('createBoard(): One or more of the required options is not set');
 	}
 
 	if (in_array($boardOptions['move_to'], ['child', 'before', 'after']) && !isset($boardOptions['target_board']))
 	{
-		trigger_error('createBoard(): Target board is not set', E_USER_ERROR);
+		throw new \ElkArte\Exceptions\Exception('createBoard(): Target board is not set');
 	}
 
 	// Set every optional value to its default value.
@@ -667,7 +667,7 @@ function getBoardList($boardListOptions = [], $simple = false)
 
 	if ((isset($boardListOptions['excluded_boards']) || isset($boardListOptions['allowed_to'])) && isset($boardListOptions['included_boards']))
 	{
-		trigger_error('getBoardList(): Setting both excluded_boards and included_boards is not allowed.', E_USER_ERROR);
+		throw new \ElkArte\Exceptions\Exception('getBoardList(): Setting both excluded_boards and included_boards is not allowed.');
 	}
 
 	$where = [];
