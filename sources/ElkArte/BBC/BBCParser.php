@@ -552,6 +552,17 @@ class BBCParser
 	 */
 	protected function parseMarkdown($data): string
 	{
+		// If there are no Markdown characters, don't waste time parsing it.
+		if (!str_contains($data, '`')
+			&& !str_contains($data, '*')
+			&& !str_contains($data, '_')
+			&& !str_contains($data, '~')
+			&& !str_contains($data, '>')
+			&& !str_contains($data, '#'))
+		{
+			return $data;
+		}
+
 		return $this->markdown_parser->parse($data);
 	}
 
@@ -1389,19 +1400,7 @@ class BBCParser
 	{
 		if (!isset($possible['regex_cache']))
 		{
-			$possible['regex_cache'] = [];
-			$possible['param_check'] = [];
-			$possible['optionals'] = [];
-
-			foreach ($possible[Codes::ATTR_PARAM] as $param => $info)
-			{
-				$quote = empty($info[Codes::PARAM_ATTR_QUOTED]) ? '' : '&quot;';
-				$possible['optionals'][] = !empty($info[Codes::PARAM_ATTR_OPTIONAL]);
-				$possible['param_check'][] = ' ' . $param . '=' . $quote;
-				$possible['regex_cache'][] = '(\s+' . $param . '=' . $quote . ($info[Codes::PARAM_ATTR_MATCH] ?? '(.+?)') . $quote . ')';
-			}
-
-			$possible['regex_size'] = count($possible[Codes::ATTR_PARAM]) - 1;
+			Codes::prepareParameterCache($possible);
 		}
 
 		// Tag setup for this loop
@@ -1814,7 +1813,7 @@ class BBCParser
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
 
-			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
+			if (isset($this->open_tags[$i][Codes::ATTR_TRIM]) && $this->open_tags[$i][Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
 				$this->trimWhiteSpace($this->pos);
 			}
