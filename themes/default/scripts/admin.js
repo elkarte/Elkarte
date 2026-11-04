@@ -365,7 +365,7 @@ Elk_ViewVersions.prototype.compareVersions = function(sCurrent, sTarget) {
  */
 function addNewWord ()
 {
-	setOuterHTML(document.getElementById('moreCensoredWords'), '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="icon i-chevron-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
+	document.getElementById('moreCensoredWords').outerHTML = '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="icon i-chevron-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>';
 }
 
 /**
@@ -462,7 +462,7 @@ function updateInputBoxes ()
  */
 function addOption ()
 {
-	setOuterHTML(document.getElementById('addopt'), '<p><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /></p><span id="addopt"></span>');
+	document.getElementById('addopt').outerHTML = '<p><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /></p><span id="addopt"></span>';
 	startOptID++;
 }
 
@@ -473,10 +473,10 @@ function addAnotherQuestion ()
 {
 	let placeHolder = document.getElementById('add_more_question_placeholder');
 
-	setOuterHTML(placeHolder, add_question_template.easyReplace({
+	placeHolder.outerHTML = add_question_template.easyReplace({
 		question_last_blank: question_last_blank,
 		setup_verification_add_more_answers: txt_add_another_answer
-	}));
+	});
 
 	question_last_blank++;
 }
@@ -489,10 +489,10 @@ function addAnotherQuestion ()
  */
 function addAnotherAnswer (elem, question_name)
 {
-	setOuterHTML(elem, add_answer_template.easyReplace({
+	elem.outerHTML = add_answer_template.easyReplace({
 		question_last_blank: question_name,
 		setup_verification_add_more_answers: txt_add_another_answer
-	}));
+	});
 }
 
 /**

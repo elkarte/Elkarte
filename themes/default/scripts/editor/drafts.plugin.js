@@ -438,7 +438,7 @@
 		base.signalValuechangedEvent = function (oEvent)
 		{
 			// Prevent autosave when using the tab key to navigate to the submit buttons
-			if (oEvent.keyCode === 9)
+			if (oEvent.key === 'Tab')
 			{
 				oDrafts.opts._bInDraftMode = true;
 			}

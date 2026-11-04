@@ -10,7 +10,7 @@
 /** global: elk_smileys_url, elk_emoji_url, emojis, custom, sceditor */
 
 /**
- * This file contains javascript associated with the :emoji: function as it
+ * This file contains JavaScript associated with the :emoji: function as it
  * relates to a sceditor invocation
  */
 var disableDrafts = false;
@@ -69,23 +69,22 @@ var disableDrafts = false;
 	};
 
 	/**
-	 * Attach atwho to the passed $element, so we create a pull down list
+	 * Attach atwho to the passed element, so we create a pull down list
 	 *
-	 * @param {object} $element
-	 * @param {object} oIframeWindow
+	 * @param {HTMLElement} element
+	 * @param {Window|null} oIframeWindow
 	 */
-	Elk_Emoji.prototype.attachAtWho = function ($element, oIframeWindow)
+	Elk_Emoji.prototype.attachAtWho = function (element, oIframeWindow)
 	{
 		/**
 		 * Create the dropdown selection list
 		 * Inserts the site image location when one is selected.
 		 */
 		let tpl = '${url}${key}.${type}',
-			emoji_group = this.opts.emoji_group,
-			corrected_offset = {};
+			emoji_group = this.opts.emoji_group;
 
 		// Create the emoji select list and insert the choice in to the editor
-		$element.atwho({
+		AtWho.attach(element, {
 			at: ":",
 			data: emojis,
 			maxLen: 20,
@@ -106,9 +105,6 @@ var disableDrafts = false;
 				},
 				beforeInsert: function (value)
 				{
-					// Set up for a new pull-down box/location
-					corrected_offset = {};
-
 					// Grab the values
 					tpl = value.split(" | ");
 
@@ -116,8 +112,7 @@ var disableDrafts = false;
 					{
 						return ":" + tpl[0] + ":";
 					}
-
-					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "" + tpl[3] + tpl[1] + "' src='..' />" + tpl[2] + "";
+					return "<img data-sceditor-emoticon=':" + tpl[0] + ":' class='emoji' alt=':" + tpl[0] + ":' title='" + tpl[0] + "' src='" + tpl[3] + tpl[1] + "." + tpl[2] + "' />";
 				},
 				tplEval: function (tpl, map)
 				{
@@ -154,48 +149,42 @@ var disableDrafts = false;
 				},
 				beforeReposition: function (offset)
 				{
-					// We only need to adjust when in wysiwyg and only on first appearance
-					if (editor.inSourceMode())
-					{
-						return offset;
-					}
-
-					if (Object.keys(corrected_offset).length === 0)
-					{
-						// Get the caret position, so we can add the emoji box there
-						corrected_offset = editor.findCursorPosition(':');
-					}
-
-					offset.top = corrected_offset.top;
-					offset.left = corrected_offset.left;
-
 					return offset;
 				},
 				afterMatchFailed: function (at, el)
 				{
-					// Clear the offset
-					corrected_offset = {};
+					// Leave an already inserted mention untouched
+					if (el && (el.classList.contains('atwho-inserted') || el.hasAttribute('data-atwho-inserted-text')))
+					{
+						return false;
+					}
 				}
 			}
 		});
 
 		// Don't save a draft due to an emoji window open/close
-		if (Object.keys(oIframeWindow).length)
+		if (oIframeWindow)
 		{
-			$(oIframeWindow).on("shown.atwho", function (event, offset)
+			oIframeWindow.addEventListener('shown', function (e)
 			{
-				disableDrafts = true;
+				if (e.namespace === 'atwho')
+				{
+					disableDrafts = true;
+				}
 			});
 
-			$(oIframeWindow).on("hidden.atwho", function (event, offset)
+			oIframeWindow.addEventListener('hidden', function (e)
 			{
-				disableDrafts = false;
+				if (e.namespace === 'atwho')
+				{
+					disableDrafts = false;
+				}
 			});
 		}
 
 		// Attach a click event to the toggle button, can't find a good plugin event to use
 		// for this purpose
-		if (Object.keys(oIframeWindow).length)
+		if (oIframeWindow)
 		{
 			let opts = this.opts;
 
@@ -367,7 +356,7 @@ var disableDrafts = false;
 					sceditor_textarea = instance.getContentAreaContainer().nextSibling;
 
 				// Attach atwho to the editors source textarea
-				oEmoji.attachAtWho($(sceditor_textarea), {});
+    oEmoji.attachAtWho(sceditor_textarea, null);
 
 				// Using wysiwyg, then let's attach atwho to the wysiwyg container as well
 				if (!instance.opts.runWithoutWysiwygSupport)
@@ -377,7 +366,7 @@ var disableDrafts = false;
 						oIframeWindow = oIframe.contentWindow,
 						oIframeBody = oIframe.contentDocument.body;
 
-					oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
+     oEmoji.attachAtWho(oIframeBody, oIframeWindow);
 				}
 			},
 			error => {

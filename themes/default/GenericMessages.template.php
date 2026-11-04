@@ -58,7 +58,7 @@ function template_build_poster_div($message, $ignoring = false)
 	if (!empty($modSettings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 	{
 		$poster_div .= '
-						<img class="avatarresize" src="' . $message['member']['avatar']['href'] . '" alt="avatar' . ' &ndash; ' . $message['member']['name'] . '" />';
+						<img class="avatarresize" src="' . $message['member']['avatar']['href'] . '" alt="avatar' . ' &ndash; ' . $message['member']['name'] . '" loading="lazy" />';
 	}
 
 	if (!$message['member']['is_guest'])

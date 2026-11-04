@@ -203,7 +203,7 @@ function loadEditorPlugins($editor_context)
 	if (!empty($modSettings['mentions_enabled']))
 	{
 		$plugins[] = 'mention';
-		$neededJS = array_merge($neededJS, ['editor/jquery.atwho.min.js', 'editor/jquery.caret.min.js', 'editor/mentioning.plugin.js']);
+		$neededJS = array_merge($neededJS, ['editor/atwho.min.js', 'editor/mentioning.plugin.js']);
 	}
 
 	if (!empty($modSettings['enableGiphy']))

@@ -3335,7 +3335,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	padding: .2rem;
 }
 
-/* This div and items are added by javascript for the icon selection in the keyinfo line */
+/* This div and items are added by JavaScript for the icon selection in the keyinfo line */
 #iconList {
 	display: flex;
 	align-items: center;
@@ -3512,10 +3512,9 @@ figure.attachment_block figcaption {
 }
 
 /* Topic icon and title */
-#topic_header .hdicon {
+#topic_header .dropdown, #topic_header .hdicon  {
 	place-items: center center;
 	grid-area: hdicon;
-	height: 2.5rem;
 }
 
 #topic_header #topic_subject, #boarddescription {
@@ -3542,6 +3541,12 @@ figure.attachment_block figcaption {
 .forumposts {
 	margin-top: .13em;
 	border: 1px solid;
+}
+
+/* Instructs the browser to skip painting for offscreen articles until the user scrolls near them */
+#forumposts article.post_wrapper {
+	content-visibility: auto;
+	contain-intrinsic-size: 0 400px;
 }
 
 /* Other Topic information */

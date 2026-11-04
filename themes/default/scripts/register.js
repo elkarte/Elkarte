@@ -304,7 +304,7 @@ elkRegister.prototype.refreshDisplayname = function(e) {
 
 	if (typeof e !== 'undefined')
 	{
-		if (!(e.altKey || e.ctrlKey || e.shiftKey) && e.which > 48)
+		if (!(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) && e.key && e.key.length === 1)
 		{
 			this.displayChanged = true;
 		}

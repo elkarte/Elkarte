@@ -455,6 +455,8 @@ function submitThisOnce (oControl, bReadOnly)
 
 /**
  * Set the "outer" HTML of an element.
+ * Not used by the Core, left for compatibility with older versions of addons
+ * Use element.outerHTML = '...' instead
  *
  * @param {HTMLElement} oElement
  * @param {string} sToValue
@@ -476,6 +478,8 @@ function setOuterHTML (oElement, sToValue)
 
 /**
  * Checks for variable in theArray, returns true or false
+ * Not used by the Core, left for compatibility with older versions of addons
+ * Use arr.includes(val) instead
  *
  * @param {string} variable
  * @param {string[]} theArray
@@ -495,6 +499,8 @@ function in_array (variable, theArray)
 
 /**
  * Checks for variable in theArray and returns the array key
+ * Not used by the Core, left for compatibility with older versions of addons
+ * Use arr.indexOf(val) instead
  *
  * @param {string} variable
  * @param {Array.} theArray
@@ -633,7 +639,7 @@ function smc_preCacheImage (sSrc)
 		window.smc_aCachedImages = [];
 	}
 
-	if (!in_array(sSrc, window.smc_aCachedImages))
+	if (!window.smc_aCachedImages.includes(sSrc))
 	{
 		var oImage = new Image();
 		oImage.src = sSrc;
@@ -1252,7 +1258,7 @@ IconList.prototype.initIcons = function() {
 	for (let i = icons.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 	{
 		let icon = icons[i];
-		setOuterHTML(icon, '<span class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + icon.id.substring(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)">' + icon.outerHTML + '</span>');
+		icon.outerHTML = '<span class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + icon.id.substring(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)">' + icon.outerHTML + '</span>';
 	}
 };
 

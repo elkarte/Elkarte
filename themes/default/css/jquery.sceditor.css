@@ -198,7 +198,8 @@
 .sceditor-fontsize-option, .sceditor-font-option {
 	font-size: var(--font15);
 	display: block;
-	padding: .4rem .6rem;
+	padding: 0 .6rem;
+	line-height: 1.5;
 	cursor: pointer;
 	text-decoration: none;
 	color: var(--emphasize_text);

@@ -194,9 +194,9 @@ QuickModifyTopic.prototype.modify_topic_hide_edit = function(subject) {
 
 // keypress event ... like enter or escape
 QuickModifyTopic.prototype.modify_topic_keypress = function(oEvent) {
-	if (typeof (oEvent.keyCode) !== 'undefined' && this.bInEditMode)
+	if (typeof (oEvent.key) !== 'undefined' && this.bInEditMode)
 	{
-		if (oEvent.keyCode === 27)
+		if (oEvent.key === 'Escape')
 		{
 			this.modify_topic_cancel();
 			if (typeof (oEvent.preventDefault) === 'undefined')
@@ -208,7 +208,7 @@ QuickModifyTopic.prototype.modify_topic_keypress = function(oEvent) {
 				oEvent.preventDefault();
 			}
 		}
-		else if (oEvent.keyCode === 13)
+		else if (oEvent.key === 'Enter')
 		{
 			this.modify_topic_save(elk_session_id, elk_session_var);
 			if (typeof (oEvent.preventDefault) === 'undefined')
@@ -1042,20 +1042,20 @@ function expandThumbLB (thumbID, messageID)
 		event.preventDefault();
 
 		// escape
-		if (event.which === 27)
+		if (event.key === 'Escape')
 		{
 			closeLightbox();
 		}
 
 		// left
-		if (event.which === 37)
+		if (event.key === 'ArrowLeft')
 		{
 			prevNav();
 			navLightbox();
 		}
 
 		// right
-		if (event.which === 39)
+		if (event.key === 'ArrowRight')
 		{
 			nextNav();
 			navLightbox();

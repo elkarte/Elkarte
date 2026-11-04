@@ -133,16 +133,19 @@ class Mentionmem extends AbstractEventBoardAccess
 			$mentioned_members = membersBy('member_ids', $query_params, true);
 			$replacements = 0;
 			$this->_actually_mentioned = [];
+			$message = $this->_request->post->message ?? $_POST['message'];
 
 			foreach ($mentioned_members as $member)
 			{
-				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+				$message = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $message, $replacements);
 
 				if ($replacements > 0)
 				{
 					$this->_actually_mentioned[] = $member['id_member'];
 				}
 			}
+
+			$this->_request->post->message = $_POST['message'] = $message;
 		}
 	}
 

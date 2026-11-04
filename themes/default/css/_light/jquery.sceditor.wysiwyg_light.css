@@ -16,6 +16,7 @@
 
 /* This really should match your site stylesheet */
 html, body {
+	font-size: 1.1rem;
 	font-weight: 400;
 	line-height: 1.5;
 	overflow: auto;
