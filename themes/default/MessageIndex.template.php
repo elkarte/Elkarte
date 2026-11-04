@@ -218,8 +218,21 @@ function template_topic_listing()
 
 			if (!empty($modSettings['messageIcons_enable']))
 			{
-				echo '
+				if ($color_class === 'sticky_row')
+				{
+					$topic['is_posted_in'] = false;
+					echo '<i class="icon i-pin"></i>';
+				}
+				elseif ($color_class === 'locked_row' || $color_class === 'locked_row sticky_row')
+				{
+					$topic['is_posted_in'] = false;
+					echo '<i class="icon i-lock"></i>';
+				}
+				else
+				{
+					echo '
 					<img src="', $topic['first_post']['icon_url'], '" alt="" />';
+				}
 			}
 
 			echo '
@@ -304,8 +317,8 @@ function template_topic_listing()
 			// The stats section
 			echo '
 				<div class="topic_stats">
-					<span class="stat-item">', $topic['replies'], ' ', $txt['replies'], '</span>
-					<span class="stat-item">', $topic['views'], ' ', $txt['views'], '</span>
+					<span class="stat-item"><span class="stat_count">', $topic['replies'], '</span> ', $txt['replies'], '</span>
+					<span class="stat-item"><span class="stat_count">', $topic['views'], '</span> ', $txt['views'], '</span>
 				</div>';
 
 			// Show the quick moderation options?
