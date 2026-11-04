@@ -1267,12 +1267,16 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--notice);
 }
 
-.sticky_row, .locked_row.sticky_row {
-	background: var(--sticky_row);
+.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
+	background: var(--basic_row);
+	border-left-width: 5px;
+	border-left-color: var(--infobox_border);
 }
 
-.locked_row {
+.topic_listing > li.locked_row {
 	background: var(--locked_row);
+	border-left-width: 5px;
+	border-left-color: var(--infobox_border);
 }
 
 #topic_icons {

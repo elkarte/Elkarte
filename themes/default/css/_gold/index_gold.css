@@ -1284,6 +1284,18 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--notice);
 }
 
+.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
+	background: var(--basic_row);
+	border-left-width: 5px;
+	border-left-color: var(--infobox_border);
+}
+
+.topic_listing > li.locked_row {
+	background: var(--locked_row);
+	border-left-width: 5px;
+	border-left-color: var(--infobox_border);
+}
+
 #topic_icons {
 	border-color: var(--primary_border);
 }
