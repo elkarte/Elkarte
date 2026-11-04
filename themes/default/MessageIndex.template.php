@@ -212,28 +212,32 @@ function template_topic_listing()
 			}
 
 			// First up the message icon
+			$topic_icon_class = '';
+			$topic_icon_html = '';
+
+			if ($topic['is_locked'])
+			{
+				$topic['is_posted_in'] = false;
+				$topic_icon_html = '<i class="icon i-lock"></i>';
+			}
+			elseif ($topic['is_sticky'])
+			{
+				$topic['is_posted_in'] = false;
+				$topic_icon_html = '<i class="icon i-pin"></i>';
+			}
+			elseif (empty($modSettings['messageIcons_enable']))
+			{
+				$topic_icon_class = ' topicicon i-' . $topic['first_post']['icon'];
+			}
+			else
+			{
+				$topic_icon_html = '
+					<img src="' . $topic['first_post']['icon_url'] . '" alt="" />';
+			}
+
 			echo '
 			<li class="', $color_class, '">
-				<div class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
-
-			if (!empty($modSettings['messageIcons_enable']))
-			{
-				if ($color_class === 'sticky_row')
-				{
-					$topic['is_posted_in'] = false;
-					echo '<i class="icon i-pin"></i>';
-				}
-				elseif ($color_class === 'locked_row' || $color_class === 'locked_row sticky_row')
-				{
-					$topic['is_posted_in'] = false;
-					echo '<i class="icon i-lock"></i>';
-				}
-				else
-				{
-					echo '
-					<img src="', $topic['first_post']['icon_url'], '" alt="" />';
-				}
-			}
+				<div class="topic_icons', $topic_icon_class, '">', $topic_icon_html;
 
 			echo '
 					', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
