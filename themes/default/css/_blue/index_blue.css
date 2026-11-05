@@ -86,8 +86,8 @@
 	--input_background: #FAFAFA; /* Generic inputs background */
 	--input_disabled_background: #E4E4E4; /* Disabled button background */
 	--input_border: #CCCCCC; /* Generic inputs border */
-	--input_border_hover: #82a2bc; /* Hover for inputs */
-	--input_border_focus: #7fb0d8; /* Focus for inputs */
+	--input_border_hover: #557ea0; /* Hover for inputs */
+	--input_border_focus: #4a6b8c; /* Focus for inputs */
 	--input_background_hover: #FEFEFE; /* Hover background */
 	--input_text: #585858; /* input text */
 	--input_hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -143,8 +143,8 @@
 	--category_border_bottom: #CCCCCC;
 	--category_header_grad_1: #557ea0; /* 1-2 main header */
 	--category_header_grad_2: #557ea0; /* 1-3 category */
-	--category_header_grad_3: #E4E4E4; /* 1-4 secondary */
-	--category_header_grad_4: #EBEBEB; /* end of */
+	--category_header_grad_3: #3f6385; /* 1-4 secondary */
+	--category_header_grad_4: #3d5f7d; /* end of */
 	--secondary_category_border: #AFAFAF; /* Secondary category boarder */
 	--secondary_category_border_top: #CFCFCF;
 	--secondary_category_bottom: #BBBBBB;
@@ -169,6 +169,7 @@
 	--sticky_row: #cfdce8; /* sticky row background */
 	--locked_row: #e8d8cf; /* locked row background */
 	--basic_row: #fefefe; /* basic row background */
+	--basic_row_alternate: #f0f4f7; /* alternating topic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
 	--forum_posts: #FEFEFE; /* Post background */
@@ -411,6 +412,15 @@ strong {
 	border-top-color: var(--category_border_top);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_4));
 	text-shadow: 1px 1px 0 var(--box_shadow);
+}
+
+/* The blue variant uses dark gradient stops for secondary headers, so their
+   text and links need the light category-header color for contrast. */
+.secondary_header,
+.secondary_header a:link,
+.secondary_header a:visited,
+.letter_row > h3 {
+	color: var(--category_header_text);
 }
 
 .category_header a:link {
@@ -1227,7 +1237,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .topic_listing .basic_row:nth-of-type(2n) {
-	background: #f0f4f7;
+	background: var(--basic_row_alternate);
 }
 
 #sort_by {
@@ -1398,7 +1408,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* This div and items are added by javascript for the icon selection */
 #iconList {
-	border-color: #ADADAD;
+	border-color: var(--secondary_border);
 	background: var(--content_background);
 }
 

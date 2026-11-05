@@ -92,9 +92,21 @@
     --hexcode: #FFA500;
 }
 
-.i-modify::before, .i-pencil::before, .i-package::before, .i-menu-login::before, .i-menu-login.enabled::before {
+.i-modify::before, .i-pencil::before, .i-package::before {
     filter: invert(78%) sepia(98%) saturate(658%) hue-rotate(334deg) brightness(104%) contrast(102%);
     --hexcode: #FFD923;
+}
+
+/* Moderator user icon on light content (the topic header uses the pale icon) */
+.moderators .i-user::before {
+    filter: invert(43%) sepia(53%) saturate(2838%) hue-rotate(0deg) brightness(101%) contrast(107%);
+    --hexcode: #FF6600;
+}
+
+/* Sidebar collapse/expand toggle (moved out of structural index.css) */
+#menu_sidebar::before {
+    filter: invert(47%) sepia(8%) saturate(2259%) hue-rotate(165deg) brightness(96%) contrast(86%);
+    --hexcode: #557ea0;
 }
 
 /* Manic Board icons are based on Font Awesome speech balloon */
