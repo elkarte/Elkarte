@@ -49,11 +49,11 @@
 
 :root {
 	/* flip right and left colors for RTL */
-	--primary_border_right: #C7C7C7;
-	--primary_border_left: #CCCCCC;
+	--primary_border_right: #363738;
+	--primary_border_left: #363738;
 
-	--secondary_border_right: #BFBFBF;
-	--secondary_border_left: #AFAFAF;
+	--secondary_border_right: #232323;
+	--secondary_border_left: #232323;
 }
 
 /* -------------------------------------------------------
@@ -62,7 +62,7 @@
  */
 
 body {
-	background-image: linear-gradient(to left, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+	background-image: radial-gradient(50% 50% at top center, rgba(0, 0, 0, .7), var(--body_grad_1)), linear-gradient(180deg, var(--body_grad_2), var(--body_grad_1));
 }
 
 /* Styles for main headers. */

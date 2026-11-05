@@ -214,7 +214,7 @@
 .theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
-	background: #FEFEFE;
+	background: var(--mid_grey_background);
 }
 
 .theme_options .content:nth-child(odd) {
@@ -229,8 +229,8 @@
 ------------------------------------------------- */
 
 .ui-dialog {
-	border-color: #999999;
-	background-color: #F4F4F4;
+	border-color: var(--secondary_border);
+	background-color: var(--content_background);
 	box-shadow: 0 0 16px var(--opacity30);
 }
 

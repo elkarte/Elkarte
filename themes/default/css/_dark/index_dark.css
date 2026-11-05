@@ -62,7 +62,7 @@
 
 	--html_background: #0B0B0B; /* HTML & footer Background */
 	--body_grad_1: #0B0B0B; /* Body Gradient */
-	--body_grad_2: #E0E0E0; /* Body Gradient */
+	--body_grad_2: #1A1A1A; /* Body Gradient */
 
 	/* Top section above the navigation menu */
 	--top_section_border: #232323; /* Header */
@@ -80,43 +80,43 @@
 	/* Footer */
 	--footer_text: #BBBBBB; /* Text used in the footer */
 	--footer_background: #0B0B0B; /* Footer Background */
-	--footer_top_border: #012050; /* Border that separates footer from body */
+	--footer_top_border: #7a6549; /* Border that separates footer from body */
 
 	/* Input controls, input, button, select, textarea */
 	--input_background: #0B0B0B; /* Generic inputs background */
 	--input_disabled_background: rgba(255, 255, 255, 0.12); /* Disabled button background */
-	--input_border: #004299; /* Generic inputs border */
-	--input_border_hover: #2E7EE6; /* Hover for inputs */
-	--input_border_focus: #2E7EE6; /* Focus for inputs */
-	--input_background_hover: #00214C; /* Hover background */
-	--input_text: #3B72F0; /* input text */
-	--input_hover_text: #2E7EE6; /* When you need a darker text color on hover or elsewhere */
+	--input_border: #7a6549; /* Generic inputs border */
+	--input_border_hover: #9D8860; /* Hover for inputs */
+	--input_border_focus: #9D8860; /* Focus for inputs */
+	--input_background_hover: #2A2A2A; /* Hover background */
+	--input_text: #DBDBDB; /* input text */
+	--input_hover_text: #FEFEFE; /* When you need a darker text color on hover or elsewhere */
 
 	/* Submit controls */
-	--input_submit_border: #004299; /* XX[type="submit"] */
-	--input_submit_border_top: #004299; /* complimentary for inset effects */
-	--input_submit_border_left: #004299; /* complimentary for inset effects */
+	--input_submit_border: #7a6549; /* XX[type="submit"] */
+	--input_submit_border_top: #7a6549; /* complimentary for inset effects */
+	--input_submit_border_left: #7a6549; /* complimentary for inset effects */
 	--input_submit_shadow: transparent; /* box shadow */
 	--input_submit_background: #0B0B0B; /* background */
 	--input_submit_background_compliment: #0B0B0B; /* Used as gradient */
 
 	/* Submit hover effects */
-	--input_submit_border_hover: #2E7EE6; /* XX[type="submit"] */
-	--input_submit_border_top_hover: #2E7EE6; /* complimentary for inset effects */
-	--input_submit_border_left_hover: #2E7EE6; /* complimentary for inset effects */
+	--input_submit_border_hover: #9D8860; /* XX[type="submit"] */
+	--input_submit_border_top_hover: #9D8860; /* complimentary for inset effects */
+	--input_submit_border_left_hover: #9D8860; /* complimentary for inset effects */
 	--input_submit_shadow_hover: transparent; /* box shadow */
-	--input_submit_background_hover: #00214C; /* background */
+	--input_submit_background_hover: #2A2A2A; /* background */
 
 	/* Main Menu Active Button */
-	--menu_button_active: #0266E9; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_2: #006FFF; /* Compliment gradient color for above */
-	--menu_button_border_active: #0266E9; /* Active border color */
-	--menu_button_border_active_top: #0266E9; /* Active top border */
-	--menu_button_active_hover: #1A7DFF; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_hover_2: #1A7DFF; /* Compliment gradient color for above */
-	--menu_border_active_hover_top: #1A7DFF; /* Active menu border color top */
-	--menu_border_active_hover_left: #1A7DFF; /* Active menu border color left */
-	--menu_border_active_hover: #1A7DFF; /* Hover / active border */
+	--menu_button_active: #64533F; /* Link, list active/hover colors (gradient and color) */
+	--menu_button_active_2: #6b5943; /* Compliment gradient color for above */
+	--menu_button_border_active: #9D8860; /* Active border color */
+	--menu_button_border_active_top: #9D8860; /* Active top border */
+	--menu_button_active_hover: #6b5943; /* Link, list active/hover colors (gradient and color) */
+	--menu_button_active_hover_2: #6e5c45; /* Compliment gradient color for above */
+	--menu_border_active_hover_top: #9D8860; /* Active menu border color top */
+	--menu_border_active_hover_left: #9D8860; /* Active menu border color left */
+	--menu_border_active_hover: #9D8860; /* Hover / active border */
 
 	/* Main Menu Regular Buttons */
 	--menu_border: #363738; /* linklevel 1 border */
@@ -128,17 +128,17 @@
 	--menu_border_hover_left: #0B0B0B; /* menu border color left */
 	--menu_border_hover: #0B0B0B; /* Hover border */
 	--menu_button_hover_background: #0B0B0B; /* A background used on non active menu hovers */
-	--menu_dropdown_indicator: #566450; /* dropdown menu indicator */
+	--menu_dropdown_indicator: #9D8860; /* dropdown menu indicator */
 	--icon_menu_hover: #0B0B0B; /* Icon menu (small screen) hover background */
-	--icon_menu_hover_border: #232323;
+	--icon_menu_hover_border: #64533F;
 
 	/* Breadcrumbs */
-	--breadcrumb_active: #0266E9; /* Breadcrumb active/hover colors (gradient and color) */
-	--breadcrumb_active_2: #006FFF; /* Compliment gradient color for above */
+	--breadcrumb_active: #64533F; /* Breadcrumb active/hover colors (gradient and color) */
+	--breadcrumb_active_2: #6b5943; /* Compliment gradient color for above */
 	--breadcrumb_background: #0B0B0B; /* Breadcrumb background */
 
 	/* Category Headers */
-	--category_header_text: #9D8860; /* Text in the category bars */
+	--category_header_text: #C4A980; /* Text in the category bars */
 	--category_border: #131417; /* Main border color used around most everything that has a border */
 	--category_border_top: #131417;
 	--category_border_bottom: #131417;
@@ -146,9 +146,9 @@
 	--category_header_grad_2: #2B2A2A; /* 1-3 category */
 	--category_header_grad_3: #292A2A; /* 1-4 secondary */
 	--category_header_grad_4: #27272A; /* end of */
-	--secondary_category_border: #AFAFAF; /* Secondary border */
-	--secondary_category_border_top: #CFCFCF;
-	--secondary_category_bottom: #BBBBBB;
+	--secondary_category_border: #363738; /* Secondary border */
+	--secondary_category_border_top: #363738;
+	--secondary_category_bottom: #232323;
 
 	/* Standard horizontal rule.. ([hr], etc.) */
 	--hr_border_bottom: #64533F;
@@ -156,17 +156,17 @@
 	--hr_background: #9D8860;
 
 	/* Misc */
-	--links: #9D8860; /*#5784FF; /* normal links */
+	--links: #9D8860; /* normal links */
 	--bbclinks: #9D8860; /* bbc links */
 	--bbclinks_hover: #64533F; /* bbc link hover effect */
 	--bbclinks_shadow: #CEDCCB; /* BBC link underline */
-	--valid: #EBFFD8; /* used as valid background color */
-	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
-	--information: #1B644E; /* information box background */
+	--valid: #14351C; /* used as valid background color */
+	--invalid: #3A1515; /* dark red, used as invalid input color */
+	--information: #0E3A2E; /* information box background */
 	--description: #003A47; /* description box background */
 
 	/* Generally used in topic display */
-	--topic_name: #3B72F0; /* Subject line, poster name and keyinfo */
+	--topic_name: #9D8860; /* Subject line, poster name and keyinfo */
 	--me: #30AD55; /* me and footnotes */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #64533F; /* part of icon online gradient */
@@ -178,11 +178,11 @@
 
 	/* Boxes with icons */
 	--successbox: transparent; /* success box background */
-	--successbox_border: #008000;
+	--successbox_border: #30AD55;
 	--infobox: #2C64AB; /* Infobox div background */
 	--infobox_border: #3A87AD; /* Infobox border */
 	--errorbox: transparent;
-	--errorbox_border: #A80000;
+	--errorbox_border: #FF6B6B;
 	--warningbox: transparent;
 	--warningbox_border: #D08D1E;
 
@@ -197,17 +197,18 @@
 	/* Calendar Items */
 	--birthday: #B73DE8; /* Birthday color on calendar */
 	--holiday: #847BAD; /* Holiday color on calendar */
-	--event: #008F00; /* Event color on calendar */
-	--currentday: #1B644E; /* Calendar current day */
+	--event: #30AD55; /* Event color on calendar */
+	--currentday: #0E3A2E; /* Calendar current day */
 
 	/* Backgrounds */
 	--content_background: #0B0B0B; /* Background for many divs, input controls, etc */
 	--forum_category: #0B0B0B; /* Category background, seen as line separators */
 	--primary_content_background: #0B0B0B; /* Used in many backgrounds */
 	--news_background: #0B0B0B; /* Background of news section */
+	--quote_background: #0B0B0B; /* Quote box background; also used by the fade overlay */
 	--action_available: #64533F; /* new button, approval button */
-	--mid_grey_background: #C4C4C4; /* Various uses where a slightly darker background is needed */
-	--dark_background: #64533F; /* A bit darker, useful in some places */
+	--mid_grey_background: #2A2A2A; /* Various uses where a slightly lighter background is needed */
+	--dark_background: #332F2A; /* A bit darker, useful in some places */
 
 	/* Text colors */
 	--emphasize_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -242,12 +243,30 @@
 
 	/* Mostly used for shadows */
 	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
-	--box_shadow: transparent; /* Used on many box shadows */
+	--box_shadow: rgba(0, 0, 0, 0.65); /* Used on many box shadows */
 	--opacity10: rgba(200, 200, 200, 0.1); /* Used as box shadows */
 	--opacity20: rgba(200, 200, 200, 0.2);
 	--opacity30: rgba(200, 200, 200, 0.3);
 	--opacity40: rgba(200, 200, 200, 0.4);
 	--opacity50: rgba(200, 200, 200, 0.5);
+
+	/* Fall away box shadows, tuned for dark surfaces */
+	--shadow-elevation-low:
+		0.3px 0.4px 0.6px rgba(200, 200, 200, 0.14),
+		0.4px 0.7px 1px -1px rgba(200, 200, 200, 0.16),
+		1px 1.6px 2.3px -2px rgba(200, 200, 200, 0.18);
+	--shadow-elevation-medium:
+		0.4px 0.5px 0.6px rgba(200, 200, 200, 0.2),
+		0.9px 1.2px 1.5px -1.2px rgba(200, 200, 200, 0.18),
+		2.4px 3.3px 4px -2.3px rgba(200, 200, 200, 0.16),
+		3.2px 5.5px 7.3px -3.5px rgba(200, 200, 200, 0.12);
+	--shadow-elevation-high:
+		0.4px 0.5px 0.6px rgba(200, 200, 200, 0.2),
+		1.2px 1.6px 2px -0.5px rgba(200, 200, 200, 0.18),
+		2.2px 3px 3.6px -1px rgba(200, 200, 200, 0.16),
+		3.9px 5.3px 6.4px -1.5px rgba(200, 200, 200, 0.14),
+		6.7px 9.2px 11.1px -2px rgba(200, 200, 200, 0.12),
+		11.1px 15.3px 18.4px -2.5px rgba(200, 200, 200, 0.1);
 }
 
 /* ---------------
@@ -443,7 +462,7 @@ strong {
 }
 
 .warn_watch, .success {
-	color: var(--success);
+	color: var(--gradient_bar_bottom);
 }
 
 .moderation_link, .moderation_link:visited {
@@ -499,7 +518,7 @@ strong {
 .codeheader, .bbc_quote > cite {
 	color: var(--body_text);
 	border-color: var(--primary_border);
-	background: var(--primary_content_background);
+	background: var(--quote_background);
 }
 
 .codeheader {
@@ -507,7 +526,11 @@ strong {
 }
 
 /* A quote, perhaps from another post. */
-.bbc_quote,
+.bbc_quote {
+	border-color: var(--primary_border);
+	background: var(--quote_background);
+}
+
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
@@ -515,7 +538,7 @@ strong {
 }
 
 input[type=checkbox].quote-show-more {
-	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_content_background) 100%);
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--quote_background) 100%);
 	border-left-color: var(--primary_border);
 }
 
@@ -628,7 +651,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Maintenance mode warning. */
 #top_section_notice {
-	color: var(--attention);
+	color: var(--alert);
 }
 
 #forumtitle > a {
@@ -809,7 +832,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--menu_border_active_hover);
 	border-top-color: var(--menu_border_active_hover_top);
 	border-left-color: var(--menu_border_active_hover_left);
-	background: var(--input_submit_background_hover);
+	background-image: linear-gradient(to bottom, var(--menu_button_active_hover), var(--menu_button_active_hover_2));
 	box-shadow: 1px 1px 1px var(--box_shadow) inset;
 }
 
@@ -817,7 +840,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	color: var(--menu_button_active_2);
+	color: var(--links);
 	background: none;
 	box-shadow: none;
 }
@@ -874,7 +897,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Level 2: dividers between admin/moderation, and pm/profile links. */
 #button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
 	border-top-color: var(--menu_border_top);
-	box-shadow: 0 -1px 0 #BBBBBB;
+	box-shadow: 0 -1px 0 var(--primary_border_bottom);
 }
 
 /* Styles for sidebar menus.
@@ -916,7 +939,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .breadcrumb .crumb:after {
 	background: var(--breadcrumb_background);
 	/* Arrow using box shadow on our rotated box */
-	box-shadow: 1px -1px 0 1px var(--emphasize_text), 2px -2px 0 1px var(--html_background);
+	box-shadow: 1px -1px 0 1px var(--secondary_border), 2px -2px 0 1px var(--html_background);
 }
 
 /* -------------------------------------------------------
@@ -981,7 +1004,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 #gotop:hover, #gobottom:hover {
 	opacity: 1;
-	color: var(--emphasize_text);
+	color: var(--contrast_text);
 }
 
 /* Skip navigation link. */
@@ -1326,7 +1349,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* This div and items are added by javascript for the icon selection */
 #iconList {
-	border-color: #ADADAD;
+	border-color: var(--secondary_border);
 	background: var(--content_background);
 }
 
@@ -1365,7 +1388,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
-	color: var(--emphasize_text) !important;
+	color: var(--strong_text) !important;
 	border: solid 1px var(--secondary_border);
 	background: var(--mid_grey_background) !important;
 }
@@ -1468,7 +1491,7 @@ nav.pagesection:has(+ #forumposts) {
 }
 
 .drop_area {
-	color: var(--emphasize_text);
+	color: var(--body_text);
 	border-color: var(--primary_border);
 	background: var(--mid_grey_background);
 }
@@ -1765,7 +1788,7 @@ ul.cf_icons {
 }
 
 .modify_event {
-	color: var(--attention);
+	color: var(--alert);
 }
 
 /* Add a background that fits with the calendar. */
@@ -1928,10 +1951,10 @@ ul.cf_icons {
 }
 
 .successbox {
-	border-top-color: var(--success);
-	border-bottom-color: var(--success);
+	border-top-color: var(--gradient_bar_top);
+	border-bottom-color: var(--gradient_bar_top);
 	background-color: var(--transparent);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23008000' viewBox='0 0 32 32'%3E%3Cpath d='M27 4L12 19l-7-7-5 5 12 12L32 9z'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2330AD55' viewBox='0 0 32 32'%3E%3Cpath d='M27 4L12 19l-7-7-5 5 12 12L32 9z'/%3E%3C/svg%3E");
 }
 
 .infobox {
@@ -1948,10 +1971,10 @@ ul.cf_icons {
 }
 
 .errorbox {
-	border-top-color: var(--attention);
-	border-bottom-color: var(--attention);
+	border-top-color: var(--alert);
+	border-bottom-color: var(--alert);
 	background-color: var(--transparent);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23A80000' viewBox='0 0 31 36'%3E%3Cpath d='M15.429 2.571c8.518 0 15.429 6.911 15.429 15.429s-6.911 15.429-15.429 15.429S0 26.518 0 18 6.911 2.571 15.429 2.571zM18 27.623v-3.817c0-.362-.281-.663-.623-.663H13.52a.668.668 0 00-.663.663v3.817c0 .362.301.663.663.663h3.857c.342 0 .623-.301.623-.663zm-.04-6.911l.362-12.475a.403.403 0 00-.201-.362.776.776 0 00-.482-.161h-4.42a.768.768 0 00-.482.161.402.402 0 00-.201.362l.342 12.475c0 .281.301.502.683.502h3.717c.362 0 .663-.221.683-.502z'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23FF6B6B' viewBox='0 0 31 36'%3E%3Cpath d='M15.429 2.571c8.518 0 15.429 6.911 15.429 15.429s-6.911 15.429-15.429 15.429S0 26.518 0 18 6.911 2.571 15.429 2.571zM18 27.623v-3.817c0-.362-.281-.663-.623-.663H13.52a.668.668 0 00-.663.663v3.817c0 .362.301.663.663.663h3.857c.342 0 .623-.301.623-.663zm-.04-6.911l.362-12.475a.403.403 0 00-.201-.362.776.776 0 00-.482-.161h-4.42a.768.768 0 00-.482.161.402.402 0 00-.201.362l.342 12.475c0 .281.301.502.683.502h3.717c.362 0 .663-.221.683-.502z'/%3E%3C/svg%3E");
 }
 
 .bbc_callout_note {
@@ -2127,7 +2150,7 @@ ul.cf_icons {
 
 	/* This provides a bottom border, seen when crumbs wrap */
 	.breadcrumb .crumb:not(:last-child) {
-		box-shadow: 0 -1px 0 1px var(--emphasize_text), 0 0 0 1px var(--emphasize_text);
+		box-shadow: 0 0 0 1px var(--secondary_border);
 	}
 }
 
