@@ -32,9 +32,6 @@ class PreparseCode
 	/** @var string the message to preparse */
 	public $message = '';
 
-	/** @var string the username of the current user */
-	public $user_name = '';
-
 	/** @var bool if this is just a preview */
 	protected $previewing = false;
 
@@ -49,10 +46,9 @@ class PreparseCode
 	 *
 	 * @param string $user_name
 	 */
-	protected function __construct($user_name)
-	{
-		$this->user_name = $user_name;
-	}
+	protected function __construct(public $user_name)
+    {
+    }
 
 	/**
 	 * Takes a message and parses it, returning the prepared message as a reference

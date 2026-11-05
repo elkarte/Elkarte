@@ -35,18 +35,14 @@ class HeadersManager
 		'html' => 'text/html',
 	];
 
-	/** @var HttpReq */
-	private $request;
-
 	/**
 	 * HeadersManager constructor
 	 *
 	 * @param HttpReq $request
 	 */
-	public function __construct(HttpReq $request)
-	{
-		$this->request = $request;
-	}
+	public function __construct(private HttpReq $request)
+    {
+    }
 
 	/**
 	 * Get the value of 'api' from the request

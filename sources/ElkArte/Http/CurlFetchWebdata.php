@@ -67,9 +67,6 @@ class CurlFetchWebdata
 	/** @var int Holds the current redirect count for the request */
 	private $_current_redirect = 0;
 
-	/** @var array Holds the passed user options array */
-	private $_user_options;
-
 	/** @var string Holds any data that will be posted to a form */
 	private $_post_data = '';
 
@@ -83,18 +80,17 @@ class CurlFetchWebdata
 	private $_options = [];
 
 	/**
-	 * Start the cURL object
-	 *
-	 * - Allow for user override values
-	 *
-	 * @param array $options cURL options as an array
-	 * @param int $max_redirect Maximum number of redirects
-	 */
-	public function __construct($options = [], $max_redirect = 3)
+     * Start the cURL object
+     *
+     * - Allow for user override values
+     *
+     * @param array $_user_options cURL options as an array
+     * @param int $max_redirect Maximum number of redirects
+     */
+    public function __construct(private $_user_options = [], $max_redirect = 3)
 	{
 		// Initialize class variables
 		$this->_max_redirect = (int) $max_redirect;
-		$this->_user_options = $options;
 	}
 
 	/**

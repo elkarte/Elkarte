@@ -26,23 +26,15 @@ use ElkArte\Helper\Util;
  */
 class AssetManager
 {
-	/** @var Javascript JavaScript manager instance */
-	private $javascript;
-
-	/** @var Css CSS manager instance */
-	private $css;
-
 	/**
 	 * AssetManager constructor
 	 *
 	 * @param Javascript $javascript
 	 * @param Css $css
 	 */
-	public function __construct(Javascript $javascript, Css $css)
-	{
-		$this->javascript = $javascript;
-		$this->css = $css;
-	}
+	public function __construct(private Javascript $javascript, private Css $css)
+    {
+    }
 
 	/**
 	 * Load custom CSS files and add CSS rules

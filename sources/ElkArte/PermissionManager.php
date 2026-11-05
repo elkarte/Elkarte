@@ -21,7 +21,6 @@ class PermissionManager
 {
 	private array $context;
 	private array $txt;
-	private array $modSettings;
 	private array $hiddenPermissions = [];
 	private array $relabelPermissions = [];
 	private Permissions $permissionsObject;
@@ -41,12 +40,11 @@ class PermissionManager
 	 *
 	 * @return void
 	 */
-	public function __construct(array &$context, array &$txt, array &$modSettings)
+	public function __construct(array &$context, array &$txt, private array &$modSettings)
 	{
 		// Load the permissions object with global settings.
 		$this->context = &$context;
 		$this->txt = &$txt;
-		$this->modSettings = $modSettings;
 		$this->permissionsObject = new Permissions();
 	}
 

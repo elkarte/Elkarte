@@ -24,38 +24,20 @@ class MessageTopicIcons extends ValuesContainer
 
 	public const DEFAULT_URL = 'default_images_url';
 
-	/** @var bool Whether to check if the icon exists in the expected location */
-	protected $_check = false;
-
-	/** @var string Theme directory path */
-	protected $_theme_dir = '';
-
-	/** @var string Default icon code */
-	protected $_default_icon = 'xx';
-
-	/** @var array Icons passed to the class, merged with site defined */
-	protected $_custom_icons = [];
-
 	/** @var array Icons to load in addition to the default */
 	protected $_icons = [];
 
 	/**
-	 * This function returns the message topic icon array.
-	 *
-	 * @param bool|false $icon_check
-	 * @param string $theme_dir
-	 * @param array $custom topic icons to load in addition to default
-	 * @param string $default
-	 */
-	public function __construct($icon_check = false, $theme_dir = '', $custom = [], $default = 'xx')
+     * This function returns the message topic icon array.
+     *
+     * @param bool|false $_check
+     * @param string $_theme_dir
+     * @param array $_custom_icons topic icons to load in addition to default
+     * @param string $_default_icon
+     */
+    public function __construct(protected $_check = false, protected $_theme_dir = '', protected $_custom_icons = [], protected $_default_icon = 'xx')
 	{
 		parent::__construct();
-
-		// Load passed parameters to the class properties
-		$this->_check = $icon_check;
-		$this->_theme_dir = $theme_dir;
-		$this->_default_icon = $default;
-		$this->_custom_icons = $custom;
 
 		// Merge in additional ones
 		$this->_loadSiteIcons();

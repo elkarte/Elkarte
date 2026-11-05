@@ -23,9 +23,6 @@ use Exception;
  */
 class StreamFetchWebdata
 {
-	/** @var bool Use the same connection on redirects */
-	private $_keep_alive;
-
 	/** @var int Holds the passed or default value for redirects */
 	private $_max_redirect;
 
@@ -38,9 +35,6 @@ class StreamFetchWebdata
 	/** @var null|resource the fopen resource */
 	private $_fp;
 
-	/** @var array Holds the passed user options array (only option is max_length) */
-	private $_user_options;
-
 	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
@@ -51,18 +45,16 @@ class StreamFetchWebdata
 	private $_options = [];
 
 	/**
-	 * StreamFetchWebdata constructor.
-	 *
-	 * @param array $options
-	 * @param int $max_redirect
-	 * @param bool $keep_alive
-	 */
-	public function __construct($options = [], $max_redirect = 3, $keep_alive = false)
+     * StreamFetchWebdata constructor.
+     *
+     * @param array $_user_options
+     * @param int $max_redirect
+     * @param bool $_keep_alive
+     */
+    public function __construct(private $_user_options = [], $max_redirect = 3, private $_keep_alive = false)
 	{
 		// Initialize class variables
 		$this->_max_redirect = (int) $max_redirect;
-		$this->_user_options = $options;
-		$this->_keep_alive = $keep_alive;
 	}
 
 	/**

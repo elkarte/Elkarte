@@ -29,9 +29,6 @@ class Cache
 	/** @var object Holds our static instance of the class */
 	protected static $_instance;
 
-	/** @var array Array of options for the methods (if needed) */
-	protected $_options = [];
-
 	/** @var bool If the cache is enabled or not. */
 	protected $enabled = false;
 
@@ -48,16 +45,14 @@ class Cache
 	protected $_cache_obj;
 
 	/**
-	 * Initialize the class, defines the options and the caching method to use
-	 *
-	 * @param int $level The level of caching
-	 * @param string $accelerator The accelerator used
-	 * @param array $options Any setting necessary to the caching engine
-	 */
-	public function __construct($level, $accelerator, $options)
+     * Initialize the class, defines the options and the caching method to use
+     *
+     * @param int $level The level of caching
+     * @param string $accelerator The accelerator used
+     * @param array $_options Any setting necessary to the caching engine
+     */
+    public function __construct($level, $accelerator, protected $_options)
 	{
-		$this->_options = $options;
-
 		// Default to filebased, so we can slow everything down :P
 		if (empty($accelerator))
 		{

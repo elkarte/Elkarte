@@ -62,23 +62,8 @@ class UnTgz
 	/** @var array|string Current file header we are working on */
 	protected $_header = [];
 
-	/** @var null|string[] Array of file names we want to extract from the archive */
-	protected $files_to_extract;
-
 	/** @var FileFunctions The file functions class */
 	protected $fileFunc;
-
-	/** @var string Holds the data string passed to the function */
-	protected $data;
-
-	/** @var string Location to write the files. */
-	protected $destination;
-
-	/** @var bool|string If we are looking for a single specific file */
-	protected $single_file;
-
-	/** @var bool If we can overwrite a file with the same name in the destination */
-	protected $overwrite;
 
 	/**
 	 * Class initialization, passes variables, loads dependencies
@@ -91,15 +76,8 @@ class UnTgz
 	 *
 	 * @throws Exception package_no_zlib
 	 */
-	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
+	public function __construct(protected $data, protected $destination, protected $single_file = false, protected $overwrite = false, protected $files_to_extract = null)
 	{
-		// Load the passed commands in to the class
-		$this->data = $data;
-		$this->destination = $destination;
-		$this->single_file = $single_file;
-		$this->overwrite = $overwrite;
-		$this->files_to_extract = $files_to_extract;
-
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
 		{

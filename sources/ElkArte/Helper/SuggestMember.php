@@ -27,17 +27,13 @@ class SuggestMember
 	/** @var string What we are going to search for */
 	private $_search;
 
-	/** @var array Any special parameters for the search */
-	private $_params;
-
 	/**
-	 * @param string $search
-	 * @param array $params
-	 */
-	public function __construct($search, $params)
+     * @param string $search
+     * @param array $_params
+     */
+    public function __construct($search, private $_params)
 	{
 		$this->_search = trim(Util::strtolower(urldecode($search))) . '*';
-		$this->_params = $params;
 	}
 
 	/**

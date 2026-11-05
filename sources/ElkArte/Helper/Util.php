@@ -680,7 +680,7 @@ class Util
 	}
 
 	/**
-	 * Provide a PHP 8.1 version of strftime
+	 * Provide a PHP 8.1+ version of strftime
 	 *
 	 * @param string $format of the date/time to return
 	 * @param int|null $timestamp to convert
@@ -695,13 +695,18 @@ class Util
 
 		$timestamp ??= time();
 
-		// Build directive => rendered-value map once, then a single strtr pass.
+		// Only the directives this format string actually uses, not all 30+
 		$map = [];
-		foreach (self::DIRECTIVES as $directive => $spec)
+		$offset = 0;
+		while (($p = strpos($format, '%', $offset)) !== false)
 		{
-			$map[$directive] = is_string($spec)
-				? date($spec, $timestamp)
-				: $spec($timestamp);
+			$token = $format[$p + 1] ?? '';
+			if ($token !== '' && !isset($map['%' . $token]) && isset(self::DIRECTIVES['%' . $token]))
+			{
+				$spec = self::DIRECTIVES['%' . $token];
+				$map['%' . $token] = is_string($spec) ? date($spec, $timestamp) : $spec($timestamp);
+			}
+			$offset = $p + 2;
 		}
 
 		return strtr($format, $map);

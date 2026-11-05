@@ -1219,12 +1219,16 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background: var(--notice);
 }
 
-.sticky_row, .locked_row.sticky_row {
-	background: var(--sticky_row);
+.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
+	background: var(--basic_row);
+	border-left-width: 5px;
+	border-left-color: var(--infobox_border);
 }
 
-.locked_row {
+.topic_listing > li.locked_row {
 	background: var(--locked_row);
+	border-left-width: 5px;
+	border-left-color: var(--infobox_border);
 }
 
 #topic_icons {
@@ -1340,7 +1344,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* This div and items are added by javascript for the icon selection */
 #iconList {
-	border-color: #ADADAD;
+	border-color: var(--secondary_border);
 	background: var(--content_background);
 }
 
@@ -2166,6 +2170,12 @@ ul.cf_icons {
 	.forumposts > aside {
 		border-bottom-color: var(--primary_border_bottom);
 	}
+}
+
+/* Sidebar collapse/expand toggle */
+#menu_sidebar::before {
+	filter: invert(57%) sepia(47%) saturate(608%) hue-rotate(73deg) brightness(95%) contrast(80%);
+	--hexcode: #4CAF50;
 }
 
 /* This one does 480px screens at default font size.

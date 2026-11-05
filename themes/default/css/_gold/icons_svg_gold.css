@@ -55,7 +55,7 @@
 
  .i-user::before {
     filter: invert(66%) sepia(32%) saturate(4068%) hue-rotate(2deg) brightness(107%) contrast(102%);
-    --hexcode: #1966B3;
+    --hexcode: #FFA500;
 }
 
 .i-comment::before, .i-profile::before,
@@ -69,6 +69,12 @@
 .i-bell::before {
     filter: invert(66%) sepia(32%) saturate(4068%) hue-rotate(2deg) brightness(107%) contrast(102%);
     --hexcode: #FFA500;
+}
+
+/* Sidebar collapse/expand toggle (moved out of structural index.css) */
+#menu_sidebar::before {
+    filter: invert(71%) sepia(8%) saturate(2834%) hue-rotate(0deg) brightness(87%) contrast(90%);
+    --hexcode: #BAA41F;
 }
 
 /* Gold Board icons */

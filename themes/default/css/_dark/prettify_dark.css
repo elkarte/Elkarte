@@ -6,25 +6,25 @@
 @media screen {
 	.str { color: #30AD55 }  /* string content */
 
-	.kwd { color: #0266E9 }  /* a keyword */
+	.kwd { color: #5784ff }  /* a keyword */
 
-	.com { color: #FF0000 }  /* a comment */
+	.com { color: #FF6B6B }  /* a comment */
 
-	.typ { color: #555080 }  /* a type name */
+	.typ { color: #B780FF }  /* a type name */
 
-	.lit { color: #006666 }  /* a literal value */
+	.lit { color: #43A8DA }  /* a literal value */
 	/* punctuation, lisp open bracket, lisp close bracket */
-	.pun, .opn, .clo { color: #666600 }
+	.pun, .opn, .clo { color: #BAA41F }
 
-	.tag { color: #0266E9 }  /* a markup tag name */
+	.tag { color: #5784ff }  /* a markup tag name */
 
-	.atn { color: #555080 }  /* a markup attribute name */
+	.atn { color: #B780FF }  /* a markup attribute name */
 
 	.atv { color: #30AD55 }  /* a markup attribute value */
 
-	.dec, .var { color: #555080 }  /* a declaration; a variable name */
+	.dec, .var { color: #B780FF }  /* a declaration; a variable name */
 
-	.fun { color: red }  /* a function name */
+	.fun { color: #FF6B6B }  /* a function name */
 }
 
 /* Use higher contrast and text-weight for printable form. */
@@ -68,4 +68,4 @@ li.L1,
 li.L3,
 li.L5,
 li.L7,
-li.L9 { background: #EEEEEE }
+li.L9 { background: #1A1A1A }

@@ -55,7 +55,9 @@
 	"require-dev": {
 		"phpunit/phpunit-selenium": "9.0.1",
 		"phpunit/phpunit": "9.6.*",
-		"myclabs/deep-copy": "1.13.*"
+		"myclabs/deep-copy": "1.13.*",
+		"rector/rector": "2.8.4",
+		"phpstan/phpstan": "2.3.5"
     },
 	"autoload": {
 		"psr-4": {
