@@ -924,7 +924,7 @@ class BBCParser
 			preg_match('~\G(<br />|&nbsp;|\s|\[)+~', $this->message, $matches, 0, $this->pos2 + 6);
 
 			// Keep the list open if the next character after the break is a [. Otherwise, close it.
-			$replacement = !empty($matches[0]) && substr_compare($matches[0], '[', -1, 1) === 0 ? '[/li]' : '[/li][/list]';
+			$replacement = !empty($matches[0]) && str_ends_with($matches[0], '[') ? '[/li]' : '[/li][/list]';
 
 			$this->message = substr_replace($this->message, $replacement, $this->pos2, 0);
 			$this->open_tags[$num_open_tags - 2][Codes::ATTR_AFTER] = '</ul>';

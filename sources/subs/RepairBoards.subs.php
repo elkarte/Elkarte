@@ -1621,7 +1621,7 @@ function findForumErrors($do_fix = false)
 									$variables[$k] = $row[$v];
 								}
 							}
-							$context['repair_errors'][] = call_user_func_array('sprintf', $variables);
+							$context['repair_errors'][] = sprintf(...$variables);
 						}
 					}
 
