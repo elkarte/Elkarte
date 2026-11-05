@@ -30,28 +30,24 @@ class XmlArray
 	/** @var int|null Holds debugging level */
 	public $debug_level;
 
-	/** @var bool Holds trim level textual data */
-	public $trim;
-
 	/**
-	 * Constructor for the XML parser.
-	 *
-	 * Example use:
-	 *   $xml = new \ElkArte\XmlArray(file('data.xml'));
-	 *
-	 * @param string $data the XML data or an array of, unless is_clone is true.
-	 * @param bool $auto_trim default false, used to automatically trim textual data.
-	 * @param int|null $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
-	 * @param bool $is_clone default false. If is_clone is true, the \ElkArte\XmlArray is cloned from another - used internally only.
-	 */
-	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
+     * Constructor for the XML parser.
+     *
+     * Example use:
+     *   $xml = new \ElkArte\XmlArray(file('data.xml'));
+     *
+     * @param string $data the XML data or an array of, unless is_clone is true.
+     * @param bool $trim default false, used to automatically trim textual data.
+     * @param int|null $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
+     * @param bool $is_clone default false. If is_clone is true, the \ElkArte\XmlArray is cloned from another - used internally only.
+     */
+    public function __construct($data, public $trim = false, $level = null, $is_clone = false)
 	{
 		// If we're using this, try to get some more memory.
 		detectServer()->setMemoryLimit('128M');
 
 		// Set the debug level.
 		$this->debug_level = $level ?? error_reporting();
-		$this->trim = $auto_trim;
 
 		// Is the data already parsed?
 		if ($is_clone)

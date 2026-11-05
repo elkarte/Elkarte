@@ -27,9 +27,6 @@ use ElkArte\Helper\HttpReq;
  */
 abstract class AbstractController
 {
-	/** @var EventManager The event manager. */
-	protected $_events;
-
 	/** @var string The current hook. */
 	protected $_hook = '';
 
@@ -40,17 +37,15 @@ abstract class AbstractController
 	protected $user;
 
 	/**
-	 * Constructor for the class.
-	 *
-	 * @param EventManager $eventManager The event manager object.
-	 * @param UserInfo|null $user The user object (optional, defaults to User::$info).
-	 */
-	public function __construct($eventManager, ?UserInfo $user = null)
+     * Constructor for the class.
+     *
+     * @param EventManager $_events The event manager object.
+     * @param UserInfo|null $user The user object (optional, defaults to User::$info).
+     */
+    public function __construct(protected $_events, ?UserInfo $user = null)
 	{
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
-
-		$this->_events = $eventManager;
 		$this->user = $user ?? User::$info ?? null;
 	}
 

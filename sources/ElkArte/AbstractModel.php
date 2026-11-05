@@ -29,9 +29,6 @@ abstract class AbstractModel
 	/** @var QueryInterface The database object */
 	protected $_db;
 
-	/** @var UserInfo The current user data */
-	protected $user;
-
 	/** @var object The modSettings */
 	protected $_modSettings = [];
 
@@ -44,12 +41,11 @@ abstract class AbstractModel
 	 * @param object|null $db
 	 * @param object|null $user
 	 */
-	public function __construct($db = null, $user = null)
+	public function __construct($db = null, protected $user = null)
 	{
 		global $modSettings;
 
 		$this->_db = $db ?: database();
-		$this->user = $user;
 		$this->_modSettings = new ValuesContainer($modSettings ?: []);
 		$this->_req = HttpReq::instance();
 	}

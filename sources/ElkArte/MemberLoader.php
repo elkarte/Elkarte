@@ -33,18 +33,6 @@ class MemberLoader
 	/** @var string What is required to see a profile page */
 	public const SET_PROFILE = 'profile';
 
-	/** @var QueryInterface */
-	protected $db;
-
-	/** @var Cache */
-	protected $cache;
-
-	/** @var ParserWrapper */
-	protected $bbc_parser;
-
-	/** @var MembersList */
-	protected $users_list;
-
 	/** @var array */
 	protected $options = [
 		'titlesEnable' => false,
@@ -72,20 +60,16 @@ class MemberLoader
 	protected $loaded_members = [];
 
 	/**
-	 * Initialize the class
-	 *
-	 * @param QueryInterface $db The object to query the database
-	 * @param Cache $cache Cache object used to... well cache content of each member
-	 * @param ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
-	 * @param MembersList $list the instance of the list of members
-	 * @param array $options Random options useful to the loader to decide what to actually load
-	 */
-	public function __construct($db, $cache, $bbc_parser, $list, $options = [])
+     * Initialize the class
+     *
+     * @param QueryInterface $db The object to query the database
+     * @param Cache $cache Cache object used to... well cache content of each member
+     * @param ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
+     * @param MembersList $users_list the instance of the list of members
+     * @param array $options Random options useful to the loader to decide what to actually load
+     */
+    public function __construct(protected $db, protected $cache, protected $bbc_parser, protected $users_list, $options = [])
 	{
-		$this->db = $db;
-		$this->cache = $cache;
-		$this->bbc_parser = $bbc_parser;
-		$this->users_list = $list;
 		$this->options = array_merge($this->options, $options);
 
 		$this->useCache = $this->cache->isEnabled() && $this->cache->levelHigherThan(2);

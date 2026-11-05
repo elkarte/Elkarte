@@ -21,9 +21,6 @@ use ElkArte\Helper\FileFunctions;
  */
 abstract class AbstractCacheMethod implements CacheMethodInterface
 {
-	/** @var array The settings of the caching engine */
-	public $_options;
-
 	/** @var bool Cache hit or not */
 	protected $is_miss = true;
 
@@ -37,17 +34,16 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	protected $fileFunc;
 
 	/**
-	 * Class constructor.
-	 *
-	 * Initializes the object with the given options.
-	 *
-	 * @param mixed $options The options for the object.
-	 *
-	 * @return void
-	 */
-	public function __construct($options)
+     * Class constructor.
+     *
+     * Initializes the object with the given options.
+     *
+     * @param mixed $_options The options for the object.
+     *
+     * @return void
+     */
+    public function __construct(public $_options)
 	{
-		$this->_options = $options;
 		$this->fileFunc = FileFunctions::instance();
 	}
 

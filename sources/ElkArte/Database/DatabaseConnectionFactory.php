@@ -38,23 +38,15 @@ class DatabaseConnectionFactory
 	/** @var AbstractDump|null Holds the current instance of the dump class */
 	private ?AbstractDump $dumpInstance = null;
 
-	/** @var array Holds the database connection options */
-	private array $dbOptions;
-
-	/** @var string Holds the database type */
-	private string $dbType;
-
 	/**
 	 * DatabaseConnectionFactory constructor.
 	 *
 	 * @param array $dbOptions The database connection options
 	 * @param string $dbType The database type (e.g., 'mysqli', 'postgresql', etc.)
 	 */
-	public function __construct(array $dbOptions = [], string $dbType = 'mysqli')
-	{
-		$this->dbOptions = $dbOptions;
-		$this->dbType = $dbType;
-	}
+	public function __construct(private array $dbOptions = [], private string $dbType = 'mysqli')
+    {
+    }
 
 	/**
 	 * Resolve the database type to the appropriate adapter name.

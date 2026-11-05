@@ -23,22 +23,13 @@ class AttachmentsDisplay
 	/** @var array The good old attachments array */
 	public array $attachments = [];
 
-	/** @var array The message array */
-	protected array $messages = [];
-
-	/** @var bool If unapproved posts/attachments should be shown */
-	protected bool $includeUnapproved = false;
-
 	/**
 	 * @param int[] $messages
 	 * @param int[] $posters
 	 * @param bool $includeUnapproved
 	 */
-	public function __construct(array $messages, array $posters, bool $includeUnapproved)
+	public function __construct(protected array $messages, array $posters, protected bool $includeUnapproved)
 	{
-		$this->messages = $messages;
-		$this->includeUnapproved = $includeUnapproved;
-
 		// Fetch attachments.
 		if (allowedTo('view_attachments'))
 		{

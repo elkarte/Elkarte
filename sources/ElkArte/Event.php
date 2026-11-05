@@ -28,18 +28,14 @@ class Event
 	/** @var string[] List of classes. */
 	protected $_events = [];
 
-	/** @var object The priority object. */
-	protected $_priority = [];
-
 	/**
-	 * Initialize the class.
-	 *
-	 * @param Priority $priority the object that handles priorities
-	 */
-	public function __construct($priority)
-	{
-		$this->_priority = $priority;
-	}
+     * Initialize the class.
+     *
+     * @param Priority $_priority the object that handles priorities
+     */
+    public function __construct(protected $_priority)
+    {
+    }
 
 	/**
 	 * Add a new event with a certain priority.
