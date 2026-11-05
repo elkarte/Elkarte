@@ -297,9 +297,9 @@ button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="submit"]::-m
 /* These values are to suppress the browsers `focus ring` which don't match the
    theme (instead we use border colors).  However we still want to allow keyboard
    users to see which button / submit is active.
-   Focusing with a keyboard will show an assistive dashed black line on button type elements. */
+   Focusing with a keyboard will show an assistive dashed line on button type elements. */
 input[type="submit"]:focus-visible, button:focus-visible, .linkbutton:focus-visible {
-	outline: 2px dashed #222222;
+	outline: 2px dashed var(--links);
 }
 
 /* Focusing with a mouse or touch will not change it's indication. */
@@ -6600,7 +6600,6 @@ div.labels {
 		width: 1.6rem;
 		height: 16rem;
 		content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='1' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
-		filter: invert(57%) sepia(47%) saturate(608%) hue-rotate(73deg) brightness(95%) contrast(80%);
 	}
 
 	#menu_sidebar ul, #menu_sidebar .category_header {
