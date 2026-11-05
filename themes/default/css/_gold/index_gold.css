@@ -86,8 +86,8 @@
 	--input_background: #FAFAFA; /* Generic inputs background */
 	--input_disabled_background: #E4E4E4; /* Disabled button background */
 	--input_border: #CCCCCC; /* Generic inputs border */
-	--input_border_hover: #EDEDED; /* Hover for inputs */
-	--input_border_focus: #EDEDED; /* Focus for inputs */
+	--input_border_hover: #9e7935; /* Hover for inputs */
+	--input_border_focus: #9e7935; /* Focus for inputs */
 	--input_background_hover: #FEFEFE; /* Hover background */
 	--input_text: #585858; /* input text */
 	--input_hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -203,6 +203,7 @@
 	--forum_category: #DEEDDA; /* Category background, seen as line separators */
 	--primary_content_background: #FEFEFE; /* Used in many backgrounds */
 	--news_background: #F7F3E7; /* Background of news section */
+	--quote_background: #FEFEFE; /* Quote box background; also used by the fade overlay */
 	--action_available: #f97b00; /* new button, approval links */
 	--mid_grey_background: #E9E9E9; /* Various uses where a slightly darker background is needed */
 	--dark_background: #989898; /* A bit darker, useful in some places */
@@ -211,7 +212,7 @@
 	--emphasize_text: #5f4724; /* When you need a darker text color on hover or elsewhere */
 	--body_text: #232020; /* Body text, text areas, editor, inputs, more */
 	--menu_text: #585858; /* used for text in menus, breadcrumbs, buttons */
-	--menu_active_text: #5f4724;
+	--menu_active_text: #3a2a14;
 	--strong_text: #686868; /* like a demi bold */
 	--disabled_text: #888888; /* used in ACP */
 	--debug_text: #359D27; /* Debug text, generally on footer background */
@@ -511,7 +512,7 @@ strong {
 .codeheader, .bbc_quote > cite {
 	color: var(--body_text);
 	border-color: var(--primary_border);
-	background: var(--primary_content_background);
+	background: var(--quote_background);
 }
 
 .codeheader {
@@ -519,7 +520,11 @@ strong {
 }
 
 /* A quote, perhaps from another post. */
-.bbc_quote,
+.bbc_quote {
+	border-color: var(--primary_border);
+	background: var(--quote_background);
+}
+
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
@@ -528,7 +533,7 @@ strong {
 
 /* Special box-shadow */
 input[type=checkbox].quote-show-more {
-	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_content_background) 90%);
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--quote_background) 90%);
 	box-shadow: 1px 1px 0 0 var(--box_shadow);
 	border-left-color: var(--primary_border);
 }
@@ -829,7 +834,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator, .button_indicator,
 #search_form_button .linklevel1 {
-	color: var(--contrast_text);
+	color: var(--menu_active_text);
 	border-color: var(--menu_button_border_active);
 	border-top-color: var(--menu_button_border_active_top);
 	background: var(--menu_button_active);
@@ -847,7 +852,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-left-color: var(--menu_border_active_hover_left);
 	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
 	box-shadow: none;
-	color: var(--emphasize_text);
+	color: var(--menu_active_text);
 }
 
 .linklevel1:hover .pm_indicator {
@@ -867,7 +872,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	color: var(--menu_button_active_2);
+	color: var(--poster_name);
 	background: none;
 	box-shadow: none;
 }
@@ -899,6 +904,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* PM and Notification bubble indicator */
 .pm_indicator {
+	color: var(--contrast_text);
 	box-shadow: none;
 	background: var(--attention);
 }
@@ -995,7 +1001,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .buttonlist li a.active, .quickbuttons li a.active {
 	box-shadow: var(--shadow-elevation-low), 0 -1px 0 var(--menu_button_active) inset;
 	background: var(--menu_button_active);
-	color: var(--contrast_text);
+	color: var(--menu_active_text);
 }
 
 .quickbuttons .listlevel1.subsections::after {
@@ -1415,7 +1421,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* This div and items are added by javascript for the icon selection */
 #iconList {
-	border-color: #ADADAD;
+	border-color: var(--secondary_border);
 	background: var(--content_background);
 }
 
