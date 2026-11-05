@@ -90,9 +90,9 @@ final class Hooks
 	 */
 	public function hook($hook, $parameters = []): array
 	{
-		global $modSettings;
+		global $modSettings, $db_show_debug;
 
-		if ($this->_debug !== null)
+		if (!empty($db_show_debug) && $this->_debug !== null)
 		{
 			$this->_debug->add('hooks', $hook);
 		}
