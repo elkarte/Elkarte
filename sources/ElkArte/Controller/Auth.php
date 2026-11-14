@@ -167,8 +167,8 @@ class Auth extends AbstractController
 		if (!empty($_COOKIE))
 		{
 			// Login/logout tolerate UA changes from device/browser changes while retaining token verification.
-			$session_error = checkSession('post', '', false, false);
-			if ($session_error === 'session_timeout')
+			$session_error = checkSessionRequest('post', '', false);
+			if ($session_error['error'] === 'session_timeout')
 			{
 				// Expired login forms, preserve the username and request the password again.
 				$this->action_login();
@@ -177,10 +177,10 @@ class Auth extends AbstractController
 
 				return false;
 			}
-			elseif ($session_error !== '')
+			elseif ($session_error['error'] !== '')
 			{
 				// Preserve the normal error handling for an invalid referrer.
-				checkSession('post', '', true, false);
+				handleSessionError($session_error);
 			}
 
 			validateToken('login');
@@ -580,8 +580,8 @@ class Auth extends AbstractController
 		}
 
 		// A stale logout link needs confirmation with the current session token.
-		$session_error = $internal ? '' : checkSession('get', '', false, false);
-		if (!$internal && $session_error === 'session_verify_fail')
+		$session_error = $internal ? null : checkSessionRequest('get', '', false);
+		if (!$internal && $session_error['error'] === 'session_verify_fail')
 		{
 			Txt::load('Login');
 			theme()->getTemplates()->load('Login');
@@ -601,9 +601,9 @@ class Auth extends AbstractController
 			obExit();
 		}
 
-		if (!$internal && $session_error !== '')
+		if (!$internal && $session_error['error'] !== '')
 		{
-			checkSession('get', '', true, false);
+			handleSessionError($session_error);
 		}
 
 		require_once(SUBSDIR . '/Auth.subs.php');

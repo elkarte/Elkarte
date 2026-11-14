@@ -765,6 +765,25 @@ function isBannedEmail($email, $restriction, $error)
  */
 function checkSession($type = 'post', $from_action = '', $is_fatal = true, $check_user_agent = true)
 {
+	$session_error = checkSessionRequest($type, $from_action, $check_user_agent);
+	if ($is_fatal)
+	{
+		handleSessionError($session_error);
+	}
+
+	return $session_error['error'];
+}
+
+/**
+ * Validate a session request and retain the details needed to report a failure.
+ *
+ * @param string $type post, get, or request
+ * @param string $from_action Optional referring action to require.
+ * @param bool $check_user_agent Whether to require the saved user agent to match.
+ * @return array{error: string, log: string|false, sprintf: string[]} An empty error means success.
+ */
+function checkSessionRequest($type = 'post', $from_action = '', $check_user_agent = true): array
+{
 	global $modSettings, $boardurl;
 
 	// We'll work out user agent checks
@@ -854,34 +873,38 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true, $chec
 		$sprintf = [Util::htmlspecialchars($referrer_url ?? '')];
 	}
 
-	// Everything is ok, return an empty string.
-	if (!isset($error))
+	return [
+		'error' => $error ?? '',
+		'log' => isset($log_error) ? 'user' : false,
+		'sprintf' => $sprintf ?? [],
+	];
+}
+
+/**
+ * Report a previously validated session failure without checking the request again.
+ *
+ * @param array{error: string, log: string|false, sprintf: string[]} $session_error
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function handleSessionError(array $session_error): void
+{
+	if ($session_error['error'] === '')
 	{
-		return '';
+		return;
 	}
 
-	// A session error occurred, show the error.
-	if ($is_fatal)
+	if (isset($_REQUEST['api']))
 	{
-		if (isset($_REQUEST['api']))
-		{
-			@ob_end_clean();
-			Headers::instance()
-				->removeHeader('all')
-				->httpCode(403)
-				->header('X-Error-Message', 'Session timeout')
-				->sendHeaders();
-			die;
-		}
-
-		throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, $sprintf ?? []);
+		@ob_end_clean();
+		Headers::instance()
+			->removeHeader('all')
+			->httpCode(403)
+			->header('X-Error-Message', 'Session timeout')
+			->sendHeaders();
+		die;
 	}
 
-	// A session error occurred, return the error to the calling function.
-	return $error;
-
-	// We really should never fall through here, for very important reasons.  Let's make sure.
-	throw new \ElkArte\Exceptions\Exception('Hacking attempt...');
+	throw new \ElkArte\Exceptions\Exception($session_error['error'], $session_error['log'], $session_error['sprintf']);
 }
 
 /**
