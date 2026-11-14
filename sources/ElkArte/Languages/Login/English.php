@@ -37,6 +37,8 @@ $txt['checkbox_privacypol'] = 'I accept the privacy policy';
 $txt['confirm_request_accept_agreement'] = 'Are you sure you want to force all members to accept the agreement?';
 $txt['confirm_request_accept_privacy_policy'] = 'Are you sure you want to force all members to accept the privacy policy?';
 
+$txt['login_session_expired'] = 'Your login form expired. Please enter your password and try again.';
+
 $txt['login_hash_error'] = 'Password security has recently been upgraded.<br />Please enter your password again.';
 
 $txt['logout_confirm'] = 'Are you sure you want to logout?';

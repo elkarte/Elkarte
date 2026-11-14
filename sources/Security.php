@@ -759,10 +759,11 @@ function isBannedEmail($email, $restriction, $error)
  * @param string $type = 'post' (post, get, request)
  * @param string $from_action = ''
  * @param bool $is_fatal = true
+ * @param bool $check_user_agent Whether to require the saved user agent to match.
  *
  * @return string the error message if is_fatal is false.
  */
-function checkSession($type = 'post', $from_action = '', $is_fatal = true)
+function checkSession($type = 'post', $from_action = '', $is_fatal = true, $check_user_agent = true)
 {
 	global $modSettings, $boardurl;
 
@@ -799,7 +800,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	}
 
 	// Verify that they aren't changing user agents on us - that could be bad.
-	if ((!isset($_SESSION['USER_AGENT']) || $_SESSION['USER_AGENT'] !== $req->user_agent()) && empty($modSettings['disableCheckUA']))
+	if ($check_user_agent && (!isset($_SESSION['USER_AGENT']) || $_SESSION['USER_AGENT'] !== $req->user_agent()) && empty($modSettings['disableCheckUA']))
 	{
 		$error = 'session_verify_fail';
 	}
