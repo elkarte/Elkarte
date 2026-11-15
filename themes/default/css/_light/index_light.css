@@ -1120,7 +1120,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--strong_text);
 }
 
-
 .childboards {
 	border-top-color: var(--primary_border_top);
 }
@@ -2157,7 +2156,7 @@ ul.cf_icons {
 	}
 }
 
-/* This one does up to 540 screens.
+/* This one does up to 544 px screens.
    -------------------------------------------------------------------------------------------*/
 
 @media screen and (max-width: 34em) {

@@ -14,7 +14,7 @@
 
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor, .ui-tabs .ui-tabs-nav .ui-state-active {
 	font-weight: bold;
-	border-radius: 6px 6px 0 0;
+	border-radius: .4rem .4rem 0 0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active > a, .ui-tabs .ui-tabs-nav .ui-state-active {
@@ -38,7 +38,7 @@
 
 .ui-tabs .ui-tabs-nav li {
 	font-size: var(--font15);
-	line-height: 2.077em;
+	line-height: 2;
 	position: relative;
 	top: 0;
 	margin: 1px .2em 0 0;
@@ -48,14 +48,14 @@
 	white-space: normal;
 	overflow-wrap: anywhere;
 	border: 1px solid;
-	border-radius: 6px 6px 0 0;
+	border-radius: .4rem .4rem 0 0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
 	float: left;
 	padding: 0 .5em;
 	text-decoration: none;
-	border-radius: 6px 6px 0 0;
+	border-radius: .4rem .4rem 0 0;
 	outline-offset: -2px;
 }
 
@@ -90,6 +90,6 @@
 	.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
 		display: flex;
 		align-items: center;
-		min-height: 4rem;
+		min-height: 3.5rem;
 	}
 }

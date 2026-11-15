@@ -33,7 +33,7 @@
 }
 
 .sceditor-klipy {
-    background: #EFEFEF;
+    background: var(--primary_content_background);
 }
 
 .sceditor-button-klipy div {

@@ -44,7 +44,7 @@
  *
  *		$PROFILE.............The profile areas.
  *		$PERSONAL............The personal messages (PM) areas.
- *		$CALENDAR............Antz (and the calendar).
+ *		$CALENDAR............The calendar.
  *		$STATISTICS..........The statistics centre.
  *		$LIKE STATS..........The like stats area
  *
@@ -2124,21 +2124,14 @@ button[type="submit"].quick_quote_button.hide {
 }
 
 /* Keep the topic's top page navigation visible while scrolling long topics.
-   Background color comes from the theme variant files. */
+   Background color comes from the theme variant files.
+   --topic_navigation_offset is measured from the pinned header/menu by theme.js. */
 nav.pagesection:has(+ #forumposts) {
 	position: sticky;
 	z-index: 10;
-	top: 0;
+	top: var(--topic_navigation_offset, 0);
 	margin-top: 0;
 	padding-block: .4rem;
-}
-
-/* When the top header is collapsed (#top_section.th_collapse) it is itself sticky,
-   so the page navigation must stick just below it.  The exact height is measured
-   by JS (index.template.php) into --collapsed_header_height; the fallback is a
-   close approximation of the collapsed header height. */
-body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
-	top: var(--collapsed_header_height, 7rem);
 }
 
 /* Button list in a page section (flexbox), "float" right */
@@ -2168,8 +2161,8 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 /* Used on message index, applied to ul */
 .small_pagelinks {
 	display: flex;
-	float: right;
 	align-items: center;
+	margin-left: auto;
 }
 
 /* our buddies &laquo; &raquo; */
@@ -2519,16 +2512,15 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	font-size: var(--font17);
 }
 
-
 .moderators {
 	font-size: var(--font14);
 }
 
-.board_avatar {
+.board_avatar, .topic_avatar {
 	padding-top: .4rem;
 }
 
-.board_avatar .avatar {
+.board_avatar .avatar, .topic_avatar .avatar {
 	width: 5rem;
 	max-height: 5rem;
 	object-fit: scale-down;
@@ -2766,15 +2758,15 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	display: grid;
 	border: 1px solid;
 	border-bottom: 0;
-	grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_latest] 35rem [topic_stats] 15rem [topic_moderation] 7.5rem;
+	grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_avatar] 5rem [topic_latest] 25rem [topic_stats] 15rem [topic_moderation] 7.5rem [col-end];
 	grid-template-rows: auto;
 }
 
-/* The quick topic area is like the topic listing, it's sits at the top */
+/* The quick topic area is styled to look like the topic listing, it's sits at the top */
 #quicktopic > li {
 	display: grid;
 	align-content: center;
-	grid-template-columns: [topic_icon] 5rem [topic_title] minmax(15rem, auto) [topic_subject] minmax(0, 1fr);
+	grid-template-columns: [topic_icon] 5rem [topic_title] minmax(15rem, auto) [topic_subject] minmax(0, 1fr) [col-end];
 	grid-template-rows: auto auto;
 	grid-template-areas:
 		"topic_icon topic_title topic_subject"
@@ -2791,7 +2783,7 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 
 #quicktopic_title {
 	font-weight: 600;
-	padding: .6rem 1.2rem .6rem 1.2rem;
+	align-content: center;
 	grid-area: topic_title;
 }
 
@@ -2801,16 +2793,16 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	grid-area: topic_subject;
 }
 
-/* Container, holds the topic icon and fred */
-.topic_icons {
-	position: relative;
-	padding: 0 .5rem;
-	grid-column-start: topic_icon;
-	place-self: center start;
+/* Message index icon */
+.topicicon::before {
+	display: inline-block;
+	width: 1.8rem;
+	height: 1.8rem;
+	content: "";
 }
 
-.topic_icons > img {
-	max-width: 1.8rem;
+.topicicon {
+	vertical-align: middle;
 }
 
 /* Indicator if you posted in this topic — absolutely positioned as a small badge */
@@ -2840,7 +2832,14 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 .topic_starter {
 	font-size: var(--font13);
 	line-height: 1.4;
+	display: flex;
+	align-items: center;
 	opacity: .85;
+}
+
+.topic_listing > li > .topic_avatar {
+	flex-shrink: 0;
+	grid-column-start: topic_avatar;
 }
 
 /* Container, Holds last poster and time, link to end */
@@ -2853,10 +2852,6 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	padding: .4rem .8rem;
 	gap: .5rem;
 	grid-column-start: topic_latest;
-}
-
-.topic_latest .board_avatar {
-	flex-shrink: 0;
 }
 
 /* Text block holding timestamp and poster name */
@@ -2921,18 +2916,6 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	margin-bottom: 0;
 }
 
-/* Message index icons, topic status & quick moderation */
-.topicicon::before {
-	display: inline-block;
-	width: 1.8rem;
-	height: 1.8rem;
-	content: "";
-}
-
-.topicicon {
-	vertical-align: middle;
-}
-
 /* sticky / locked icons for the upper right of the div */
 .sticky_row .topic_details::before,
 .locked_row .topic_details::before,
@@ -2944,6 +2927,18 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
 	width: 1.6rem;
 	height: 1.6rem;
 	padding: 0 .1rem;
+}
+
+/* Below topic listing Container, holds the topic icon legend and quick moderation */
+.topic_icons {
+	position: relative;
+	padding: 0 .5rem;
+	grid-column-start: topic_icon;
+	place-self: center start;
+}
+
+.topic_icons > img {
+	max-width: 1.8rem;
 }
 
 /* Actions and icons below the message listing */
@@ -3085,7 +3080,7 @@ body:has(#top_section.th_collapse) nav.pagesection:has(+ #forumposts) {
    and all the postarea data (which is another grid, see .postarea) */
 .post_wrapper {
 	display: grid;
-	grid-template-columns: [poster] minmax(0, 22.5rem) [postarea] minmax(0, 1fr);
+	grid-template-columns: [poster] minmax(0, 22.5rem) [postarea] minmax(0, 1fr) [col-end];
 	grid-template-rows: auto auto;
 	grid-template-areas:
 	"keyinfo_header keyinfo_header"
@@ -3175,7 +3170,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 /* Dropdown `business card` grid, left is avatar, right is information */
 .poster_div_container {
 	display: grid;
-	grid-template-columns: [poster] 13.5rem [details] 27.5rem;
+	grid-template-columns: [poster] 13.5rem [details] 27.5rem [col-end];
 	grid-template-rows: auto;
 	grid-template-areas:
     "poster details";
@@ -3324,13 +3319,12 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	font-size: var(--font13);
 	display: flex;
 	align-items: center;
-	margin-top: .6rem;
+	margin-top: 0;
 	padding: 1px 0 .5rem 0;
 	grid-area: keyinfo;
 }
 
 .keyinfo.above {
-	margin-top: 0;
 	grid-area: keyinfo_header;
 }
 
@@ -3409,7 +3403,7 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	/* Don't let an ILA align cascade past the end */
 	clear: both;
 	grid-template-columns: 1fr;
-	grid-template-rows: [attachments] auto [quickbuttons] auto [signature] auto;
+	grid-template-rows: [attachments] auto [quickbuttons] auto [signature] auto [col-end];
 	grid-template-areas:
 	"attachments"
 	"quickbuttons"
@@ -4214,8 +4208,8 @@ ul.post_options li {
 	opacity: 0.0001;
 }
 
-/* The transparent file input needs a visible focus indicator on its drop zone. */
-.drop_area:focus-within {
+/* Show keyboard focus without highlighting the drop zone after a pointer selection. */
+.drop_area:has(:focus-visible) {
 	outline: 2px solid currentColor;
 	outline-offset: 2px;
 	opacity: 1;
@@ -4822,7 +4816,7 @@ ul.cf_icons li:not(:first-child)::before {
 #recentposts article {
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: [header] 6rem [article] auto [nav] auto;
+	grid-template-rows: [header] 6rem [article] auto [nav] auto [col-end];
 	grid-template-areas:
 		"header"
 		"article"
@@ -5403,6 +5397,9 @@ div.labels {
 	margin: .12em 0 0 0;
 	padding: .8rem 0;
 	text-align: center;
+	min-width: 0;
+	box-sizing: border-box;
+	max-width: 100%;
 }
 
 #search_error {
@@ -5857,8 +5854,7 @@ div.labels {
 	font-weight: bold;
 }
 
-/* Styles for (fatal) errors.
-   @todo find and validate these odd cases */
+/* Styles for (fatal) errors. */
 #fatal_error {
 	width: 80%;
 	margin: auto;
@@ -6215,29 +6211,8 @@ div.labels {
 		display: none;
 	}
 
-	.topic_info {
+	.quicktopic .topic_icons {
 		grid-row: 1;
-	}
-
-	.topic_stats {
-		display: flex;
-		flex-wrap: wrap;
-		max-width: 100%;
-		padding: .2rem 1.2rem .6rem;
-		gap: .4rem 1rem;
-		grid-column: topic_info;
-		grid-row: 2;
-		place-self: start;
-	}
-
-	.topic_stats .stat-item {
-		display: inline-flex;
-		align-items: baseline;
-		gap: .3rem;
-	}
-
-	.topic_latest, .topic_icons, .topic_moderation {
-		grid-row: 1 / span 2;
 	}
 
 	#menu_nav {
@@ -6245,12 +6220,17 @@ div.labels {
 		padding: .4rem 0;
 	}
 
+	/* Topic listing grid layout for smaller screens, drop stats */
 	.topic_listing > li {
-		grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_latest] 30rem [topic_moderation] minmax(2.5rem, 7.5rem);
+		grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_avatar] 5rem [topic_latest] 25rem [topic_moderation] minmax(2.5rem, 7.5rem);
 	}
 
 	#unread.topic_listing > li {
 		grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_latest] 40% [topic_moderation] minmax(2.5rem, 3.5rem);
+	}
+
+	.topic_stats {
+		display: none;
 	}
 
 	.topic_name h4 .new_posts, .new_posts, .require_approval {
@@ -6272,7 +6252,7 @@ div.labels {
 		flex: 0 0 100%;
 	}
 
-	.avatar, .avatar.avatarresize {
+	#quicktopicbox .avatar, #quicktopicbox .avatar.avatarresize {
 		max-width: 7.5rem;
 	}
 }
@@ -6289,9 +6269,9 @@ div.labels {
 		justify-content: center;
 		line-height: 1;
 		transform: none;
-		width: 4.5rem;
-		height: 4.5rem;
-		min-height: 4.5rem;
+		width: 4rem;
+		height: 4rem;
+		min-height: 4rem;
 		margin: .2rem;
 		padding: .6rem;
 		border: 2px solid;
@@ -6317,12 +6297,11 @@ div.labels {
 
 	#collapse_button .linklevel1, #search_form_button .linklevel1 {
 		width: 4rem;
-		height: 4.5rem;
+		height: 4rem;
 		margin: .2rem !important;
-		padding: 0 !important;
 	}
 
-	#search_form_button .main-menu-icon {
+	#collapse_button .main-menu-icon, #search_form_button .main-menu-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -6330,19 +6309,18 @@ div.labels {
 		line-height: 1;
 	}
 
-	#search_form_button .main-menu-icon::before {
+	#collapse_button .main-menu-icon::before, #search_form_button .main-menu-icon::before {
 		display: block;
 		width: 100%;
 		height: 100%;
 	}
 
-	#collapse_button {
-		display: none;
+	#search_form_menu input, #search_form_menu select, #search_form_menu button {
+		height: 4rem;
 	}
 
-	#search_form_menu input, #search_form_menu select, #search_form_menu button {
-		line-height: 2.4;
-		height: 4.5rem;
+	#search_form_menu {
+		top: .5rem;
 	}
 
 	.button_title {
@@ -6368,6 +6346,10 @@ div.labels {
 
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
 		border: 1px solid;
+	}
+
+	#forumposts .forumposts {
+		margin-bottom: .8rem;
 	}
 }
 
@@ -6432,13 +6414,12 @@ div.labels {
 		margin: 0 0 0 .4rem;
 	}
 
-	/* Allow two subject lines without a fixed-height inline box. */
 	.board_row .lastpost_link {
-		display: -webkit-box;
+		display: flex;
 		overflow: hidden;
 		white-space: normal;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
+		align-items: center;
+		min-height: 4rem;
 	}
 
 	.board_row .board_latest {
@@ -6456,6 +6437,10 @@ div.labels {
 		content: none;
 	}
 
+	.childboard_row {
+		grid-column-start: bicon;
+	}
+
 	/* Message Index: preserve room for last-post information and moderation. */
 	.topic_listing > li {
 		grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_latest] 22.5rem [topic_moderation] 4rem;
@@ -6468,6 +6453,53 @@ div.labels {
 
 	#quickreplybox .post_wrapper, #quicktopicbox .post_wrapper {
 		grid-template-columns: [poster] 0 [postarea] minmax(0, 1fr);
+	}
+
+	.topic_avatar {
+		display: none;
+	}
+
+	.topic_moderation label {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 4rem;
+		min-height: 4rem;
+	}
+
+	.topic_name {
+		display: flex;
+		align-items: center;
+	}
+
+	.topic_name h4 a:not(.new_posts) {
+		display: inline-flex;
+		align-items: center;
+		min-height: 4rem;
+	}
+
+	.topic_latest .i-last_post {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 4rem;
+		max-width: 100%;
+		min-height: 4rem;
+	}
+
+	/* Keep secondary listing text readable on compact screens. */
+	.topic_starter {
+		font-size: var(--font14);
+		flex-wrap: wrap;
+		min-height: 4rem;
+	}
+
+	.topic_starter > a {
+		margin: 0 .4rem;
+	}
+
+	.topic_moderation {
+		height: initial;
 	}
 
 	.post_wrapper {
@@ -6504,20 +6536,19 @@ div.labels {
 		flex-wrap: wrap;
 	}
 
+	.post_footer .generic_menu {
+		justify-content: flex-end;
+	}
+
 	.smalltext.modified {
 		max-width: 45%;
 	}
 
-	.board_name a, .childboards a, .poster .name, .topic_latest .i-last_post {
+	.board_name a, .childboards a, .poster .name {
 		display: inline-flex;
 		align-items: center;
 		max-width: 100%;
-		min-height: 4rem;
-	}
-
-	.topic_latest .i-last_post {
-		justify-content: center;
-		min-width: 4rem;
+		min-height: 3.5rem;
 	}
 
 	#menu_sidebar .linklevel1 {
@@ -6555,6 +6586,7 @@ div.labels {
 		display: none;
 	}
 
+	/* un-sticky the topic bar reply / notify / etc. */
 	nav.pagesection:has(+ #forumposts) {
 		position: unset;
 	}
@@ -6584,19 +6616,8 @@ div.labels {
 		max-width: 100%;
 	}
 
-	#creator dt, #creator dd, .settings dt, .settings dd {
-		float: none;
-		width: 100%;
-		text-align: start;
-		padding-inline: 0;
-	}
-
-	#creator dd, .settings dd {
-		margin-bottom: 1rem;
-	}
-
 	/* Keep secondary listing and attachment text readable on compact screens. */
-	.topic_starter, .topic_stats, .attachments, .attachment_name, .attachment_details {
+	.attachments, .attachment_name, .attachment_details {
 		font-size: var(--font14);
 	}
 
@@ -6604,8 +6625,8 @@ div.labels {
 	.admin_menu .linklevel1, #adm_submenus .linklevel1 {
 		display: flex;
 		align-items: center;
-		min-width: 4rem;
-		min-height: 4rem;
+		min-width: 3.5rem;
+		min-height: 3.5rem;
 		white-space: normal;
 	}
 
@@ -6613,8 +6634,8 @@ div.labels {
 	input[type="search"], input[type="submit"], input[type="button"], button, select,
 	.linkbutton:link, .linkbutton:visited {
 		font-size: var(--font16);
-		min-height: 4rem;
-		line-height: 2.5;
+		min-height: 3.5rem;
+		line-height: 2;
 	}
 
 	.buttonlist li a.linklevel1, .quickbuttons .linklevel1,
@@ -6623,10 +6644,15 @@ div.labels {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		min-width: 4rem;
-		min-height: 4rem;
+		min-width: 3.5rem;
+		min-height: 3.5rem;
 		white-space: normal;
 		padding: 0 0.4rem;
+	}
+
+	 .small_pagelinks .navPages {
+		min-width: 3rem;
+		min-height: 3rem;
 	}
 
 	.quickbuttons .linklevel1 {
@@ -6745,22 +6771,22 @@ div.labels {
 	}
 
 	.quickbuttons .inline_mod_check {
-		height: 4rem;
+		height: 3.5rem;
 		padding: 0;
 		margin-block: 0;
 	}
 
 	.quickbuttons .inline_mod_check input[type="checkbox"] {
-		width: 2rem;
-		height: 2rem;
+		width: 1.5rem;
+		height: 1.5rem;
 	}
 
 	.quickbuttons .inline_mod_check label {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		min-width: 4rem;
-		min-height: 4rem;
+		min-width: 3.5rem;
+		min-height: 3.5rem;
 		cursor: pointer;
 	}
 
@@ -6779,19 +6805,6 @@ div.labels {
 		align-items: center;
 		justify-content: center;
 		min-width: 4rem;
-		min-height: 4rem;
-	}
-
-	.topic_moderation label {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 4rem;
-		min-height: 4rem;
-	}
-
-	.topic_name h4 a:not(.new_posts) {
-		display: inline-block;
 		min-height: 4rem;
 	}
 
@@ -6959,10 +6972,10 @@ div.labels {
 	}
 }
 
-/* 544px at the default font size: stack listings and poster information.
+/* 576px at the default font size: stack listings and poster information.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 34em) {
+@media screen and (max-width: 36em) {
 	/* Hide top clutter on smaller screens */
 	#news, #logobox, .rightheader #logobox, #top_section_notice {
 		display: none;
@@ -7011,7 +7024,7 @@ div.labels {
 	}
 
 	select, .input_text, .input_password {
-		max-width: 27rem;
+		max-width: 95%;
 	}
 
 	.grid20 {
@@ -7121,8 +7134,8 @@ div.labels {
 		margin: 0 .4rem;
 	}
 
-	.childboards li:nth-child(n+2)::before {
-		content: " - ";
+	.childboards li:first-child {
+		display: none;
 	}
 
 	.board_info, .board_latest {
@@ -7134,13 +7147,13 @@ div.labels {
 		border-left: 0;
 	}
 
-	.topic_lastpost {
-		min-width: 27rem;
-	}
-
 	.board_info h3 a {
 		font-size: var(--font16);
 		overflow-wrap: anywhere;
+	}
+
+	.topic_lastpost {
+		min-width: 27rem;
 	}
 
 	.topic_name, .topic_starter {
@@ -7155,7 +7168,6 @@ div.labels {
 		font-size: var(--font17);
 	}
 
-
 	.topic_name h4 a {
 		text-overflow: ellipsis;
 	}
@@ -7166,6 +7178,10 @@ div.labels {
 
 	.lastpost_link, .board_lastposter, .board_lasttime {
 		white-space: normal;
+	}
+
+	.topic_latest .i-last_post {
+		display: none;
 	}
 
 	/* Message Index: retain board information and sorting on phones. */
@@ -7192,13 +7208,13 @@ div.labels {
 		grid-template-rows: auto auto auto;
 		grid-template-areas:
 			"topic_info topic_moderation"
-			"topic_latest topic_latest"
-			"topic_stats topic_stats";
+			"topic_latest topic_latest";
 	}
 
 	.topic_info {
 		overflow: hidden;
 		padding: .8rem 0 .8rem .4rem;
+		grid-row: 1;
 		grid-area: topic_info;
 	}
 
@@ -7214,15 +7230,16 @@ div.labels {
 		overflow-wrap: anywhere;
 	}
 
+	.topic_latest_info > span:first-child::after {
+		content: " • ";
+	}
+
+	.topic_latest_info > span:first-child::before {
+		content: "📅";
+	}
 
 	.topic_icons {
 		display: none;
-	}
-
-	.topic_status {
-		font-size: var(--font14);
-		display: inline-block;
-		margin-inline-end: .6rem;
 	}
 
 	.topic_moderation {
@@ -7230,11 +7247,8 @@ div.labels {
 		grid-area: topic_moderation;
 	}
 
-	.topic_stats {
-		font-size: var(--font14);
-		margin: 0 .4rem;
-		padding: .4rem;
-		grid-area: topic_stats;
+	#topic_header .stats_text, #whoisviewing {
+		display: none;
 	}
 
 	/* Quick topic has its own ID-specific grid, independent of topic rows. */
@@ -7330,11 +7344,6 @@ div.labels {
 		overflow-wrap: anywhere;
 	}
 
-	.poster > .subsections {
-		order: 2;
-		margin-left: auto;
-	}
-
 	.poster li.membergroup, .poster .title, .poster .poster_online, .icons img {
 		display: none;
 	}
@@ -7357,6 +7366,8 @@ div.labels {
 	}
 
 	ul.poster > .subsections {
+		order: 2;
+		margin-left: auto;
 		position: static;
 		flex: 1;
 		width: auto;
@@ -7587,7 +7598,7 @@ div.labels {
     }
 
 	/* Stack form fields without overriding unrelated definition lists. */
-	form dt, form dd, .settings dt, .settings dd, .login dt, .login dd {
+	.settings dt, .settings dd, .login dt, .login dd {
 		display: block;
 		width: 100% !important;
 		margin: 0 !important;
@@ -7596,16 +7607,6 @@ div.labels {
 
 	#popularposts div.content dl, #popularactivity div.content dl {
 		row-gap: 0;
-	}
-
-	/* Stack profile details only on phones, independently of forms and board counts. */
-	#detailedinfo dt, #detailedinfo dd, #tracking dt, #tracking dd,
-	.profileblock dt, .profileblock dd,
-	#generalstats .content dt, #generalstats .content dd {
-		float: none;
-		width: 100%;
-		margin: 0;
-		text-align: start;
 	}
 
 	.content {
@@ -7620,11 +7621,6 @@ div.labels {
 
 	.listlevel1#button_profile {
 		margin-left: initial;
-	}
-
-	#search_form_button .linklevel1 {
-		width: 4.5rem;
-		height: 4.5rem;
 	}
 
 	/* Other navigation controls */
@@ -7694,8 +7690,12 @@ div.labels {
 		max-width: 85%;
 	}
 
-	.childboards li:first-child {
-		display: none;
+	.category_boards .board_lastposter > span:first-child::before {
+		content: "✏️ ";
+	}
+
+	.category_boards .board_lastposter > span:nth-child(2)::before {
+		content: "📅";
 	}
 
 	.childboard_row {
@@ -7842,5 +7842,31 @@ div.labels {
 
 	figure.attachment_block {
 		max-width: 10em;
+	}
+}
+
+/* This one does 352px screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+@media screen and (max-width: 22em) {
+	/* Stack profile details */
+	#detailedinfo dt, #detailedinfo dd, #tracking dt, #tracking dd,
+	.profileblock dt, .profileblock dd,
+	#generalstats .content dt, #generalstats .content dd {
+		float: none;
+		width: 100%;
+		margin: 0;
+		text-align: start;
+	}
+
+	/* Stack settings and creator details */
+	#creator dt, #creator dd, .settings dt, .settings dd {
+		float: none;
+		width: 100%;
+		text-align: start;
+		padding-inline: 0;
+	}
+
+	#creator dd, .settings dd {
+		margin-bottom: 1rem;
 	}
 }

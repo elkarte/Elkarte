@@ -32,7 +32,7 @@
 }
 
 .sceditor-giphy {
-    background: #EFEFEF;
+    background: var(--primary_content_background);
 }
 
 .sceditor-button-giphy div {

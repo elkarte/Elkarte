@@ -102,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	// This adds / removes a .sticky class on scroll, see index_gold.css for an example.
 	stickyMenu();
 
+	// Keep sticky content (topic page navigation, etc.) clear of pinned header chrome.
+	initializeTopicNavigationOffset();
+
 	// Smooth scroll to top.
 	document.getElementById('gotop').addEventListener('click', function(e) {
 		e.preventDefault();
@@ -320,18 +323,56 @@ function useClickMenu ()
 // Adds/Removes sticky class to id='menu_nav'
 function stickyMenu ()
 {
-	let menu = document.getElementById('menu_nav');
+	let menu = document.getElementById('menu_nav'),
+		header = document.getElementById('top_section');
 
 	if (menu)
 	{
-		let offset = menu.getBoundingClientRect().top + window.scrollY;
 		let rafId = null;
 
-		let checkSticky = function() {
-			if (!menu.classList.contains('sticky'))
+		// Top of an element in the page's scroll coordinates, ignoring any
+		// visual shift caused by sticky/fixed positioning.  offsetTop is
+		// based on the layout box, so it stays put while an element is pinned.
+		let documentTop = function(element) {
+			let top = 0;
+
+			while (element)
 			{
-				offset = menu.getBoundingClientRect().top + window.scrollY;
+				top += element.offsetTop;
+				element = element.offsetParent;
 			}
+
+			return top;
+		};
+
+		// Top of the header in the page's scroll coordinates.  A static header
+		// can be measured directly (this also keeps its margins); a pinned
+		// header has to be measured from its layout offset instead.
+		let headerTop = function() {
+			let position = getComputedStyle(header).position;
+
+			if (position === 'static' || position === 'relative')
+			{
+				return header.getBoundingClientRect().top + window.scrollY;
+			}
+
+			return documentTop(header);
+		};
+
+		// Where the menu would sit if it was not fixed.  While `.sticky` is
+		// active the menu is out of flow, so the header's height is exactly
+		// the space above the menu's natural position.
+		let measureOffset = function() {
+			if (menu.classList.contains('sticky') && header)
+			{
+				return headerTop() + header.offsetHeight;
+			}
+
+			return menu.getBoundingClientRect().top + window.scrollY;
+		};
+
+		let checkSticky = function() {
+			let offset = measureOffset();
 
 			if (window.scrollY > offset - 5)
 			{
@@ -358,7 +399,134 @@ function stickyMenu ()
 		window.addEventListener('scroll', scheduleStickyCheck, {passive: true});
 		window.addEventListener('resize', scheduleStickyCheck);
 
+		// Collapsing or expanding the header moves the menu's natural position,
+		// and the header slide animation changes its height over several frames.
+		// Re-check on every layout change so the menu cannot stay pinned in front
+		// of an expanded header.  Only a pinned menu needs this: an unpinned one
+		// is still following the header in normal flow.
+		let scheduleHeaderCheck = function() {
+			if (menu.classList.contains('sticky'))
+			{
+				scheduleStickyCheck();
+			}
+		};
+
+		if (header)
+		{
+			if (typeof MutationObserver !== 'undefined')
+			{
+				new MutationObserver(scheduleHeaderCheck).observe(header, {attributes: true, attributeFilter: ['class']});
+			}
+
+			if (typeof ResizeObserver !== 'undefined')
+			{
+				new ResizeObserver(scheduleHeaderCheck).observe(header, {box: 'border-box'});
+			}
+		}
+
 		// Run once on load to handle pre-scrolled page refreshes
 		scheduleStickyCheck();
 	}
 }
+
+// Coalesce offset measurements into a single animation frame.
+// `var` (not `let`) so a duplicate theme.js load can't throw a redeclaration error.
+var topicNavigationFrame = null;
+
+// Measures whatever chrome is currently pinned to the top of the viewport (a
+// sticky/fixed header or a fixed menu bar) and exposes its lower edge as
+// --topic_navigation_offset.  Sticky elements can then use
+// `top: var(--topic_navigation_offset, 0)` instead of hard-coding an offset.
+function setTopicNavigationOffset ()
+{
+	if (topicNavigationFrame !== null)
+	{
+		return;
+	}
+
+	topicNavigationFrame = window.requestAnimationFrame(function() {
+		topicNavigationFrame = null;
+
+		let header = document.getElementById('top_section'),
+			menu = document.getElementById('menu_nav'),
+			headerPosition = header ? getComputedStyle(header).position : '',
+			menuPosition = menu ? getComputedStyle(menu).position : '',
+			offset = 0;
+
+		// A sticky or fixed header is pinned to the top; measure its lower edge.
+		if (header && (headerPosition === 'sticky' || headerPosition === 'fixed'))
+		{
+			offset = header.getBoundingClientRect().bottom;
+		}
+
+		// A fixed menu bar can extend further down than the header.
+		if (menu && menuPosition === 'fixed')
+		{
+			offset = Math.max(offset, menu.getBoundingClientRect().bottom);
+		}
+
+		offset = Math.max(0, Math.ceil(offset));
+
+		let root = document.documentElement;
+		root.style.setProperty('--topic_navigation_offset', offset + 'px');
+
+		// Compatibility for themes that still read the old variable.
+		if (offset > 0)
+		{
+			root.style.setProperty('--collapsed_header_height', offset + 'px');
+		}
+		else
+		{
+			root.style.removeProperty('--collapsed_header_height');
+		}
+	});
+}
+
+// Watch for the events that change the pinned chrome: class changes catch
+// scroll-triggered .sticky and header toggling, while size changes catch
+// wrapped menus, font loading and responsive layouts.
+function initializeTopicNavigationOffset ()
+{
+	if (window.elkTopicNavigationOffsetInitialized)
+	{
+		return;
+	}
+
+	window.elkTopicNavigationOffsetInitialized = true;
+
+	window.addEventListener('load', setTopicNavigationOffset);
+	window.addEventListener('resize', setTopicNavigationOffset);
+
+	if (typeof MutationObserver !== 'undefined')
+	{
+		let topicNavigationClasses = new MutationObserver(setTopicNavigationOffset);
+
+		['top_section', 'menu_nav'].forEach(function (id) {
+			let element = document.getElementById(id);
+
+			if (element)
+			{
+				topicNavigationClasses.observe(element, {attributes: true, attributeFilter: ['class']});
+			}
+		});
+	}
+
+	if (typeof ResizeObserver !== 'undefined')
+	{
+		let topicNavigationSizes = new ResizeObserver(setTopicNavigationOffset);
+
+		['top_section', 'menu_nav'].forEach(function (id) {
+			let element = document.getElementById(id);
+
+			if (element)
+			{
+				topicNavigationSizes.observe(element, {box: 'border-box'});
+			}
+		});
+	}
+
+	setTopicNavigationOffset();
+}
+
+// Exposed so inline toggle callbacks can refresh the measurement immediately.
+window.setTopicNavigationOffset = setTopicNavigationOffset;

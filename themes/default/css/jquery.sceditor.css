@@ -464,8 +464,8 @@ a.sceditor-button-space, .sceditor-button-space div {
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 51.5em) {
 	.sceditor-button div, .sceditor-button {
-		width: 4rem;
-		height: 4rem;
+		width: 3.5rem;
+		height: 3.5rem;
 	}
 
 	.sceditor-group {

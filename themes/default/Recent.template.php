@@ -79,42 +79,49 @@ function template_unread()
 		echo '
 						<h2 class="category_header">
 							', $context['unread_header_title'], '
-						</h2>
+						</h2>';
+
+		if ($context['showSort'])
+		{
+			echo '	
 						<div id="unread_sort" class="flow_flex">
 							<ul id="sort_by" class="topic_sorting topic_sorting_recent no_js">';
 
-		$current_header = $context['topics_headers'][$context['sort_by']];
-		echo '
+			$current_header = $context['topics_headers'][$context['sort_by']];
+			echo '
 								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 									<ul class="menulevel2" id="sortby">';
 
-		foreach ($context['topics_headers'] as $key => $value)
-		{
-			echo '
+			foreach ($context['topics_headers'] as $key => $value)
+			{
+				echo '
 										<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '">
 											<a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a>
 										</li>';
-		}
+			}
 
-		echo '
+			echo '
 									</ul>
 								</li>
 								<li class="listlevel1 topic_sorting_row">
 									<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 								</li>';
 
-		// Show a "select all" box for quick moderation?
-		if ($context['showCheckboxes'])
-		{
-			echo '
+			// Show a "select all" box for quick moderation?
+			if ($context['showCheckboxes'])
+			{
+				echo '
 								<li class="listlevel1 quickmod_select_all">
 									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 								</li>';
-		}
+			}
 
 		echo '
 							</ul>
-						</div>
+						</div>';
+		}
+
+		echo '
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -140,19 +147,38 @@ function template_unread()
 				$color_class = 'basic_row';
 			}
 
-			echo '
-							<li class="', $color_class, '">
-								<div class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
+			// First up the message icon
+			$topic_icon_class = '';
+			$topic_icon_html = '';
 
-			if (!empty($modSettings['messageIcons_enable']))
+			if ($topic['is_locked'])
 			{
-				echo '
-									<img src="', $topic['first_post']['icon_url'], '" alt="" />';
+				$topic['is_posted_in'] = false;
+				$topic_icon_html = '<i class="icon i-lock"></i>';
+			}
+			elseif ($topic['is_sticky'])
+			{
+				$topic['is_posted_in'] = false;
+				$topic_icon_html = '<i class="icon i-pin"></i>';
+			}
+			elseif (empty($modSettings['messageIcons_enable']))
+			{
+				$topic_icon_class = ' topicicon i-' . $topic['first_post']['icon'];
+			}
+			else
+			{
+				$topic_icon_html = '
+					<img src="' . $topic['first_post']['icon_url'] . '" alt="" />';
 			}
 
 			echo '
-									', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
+							<li class="', $color_class, '">
+								<div class="topic_icons', $topic_icon_class, '">', $topic_icon_html;
+
+			echo '
+					', ($topic['is_posted_in'] && !$topic['new']) ? '<span class="fred topicicon i-profile"></span>' : '', '
 								</div>
+								
 								<div class="topic_info">
 									<div class="topic_name">';
 
@@ -160,7 +186,11 @@ function template_unread()
 			echo '
 										<h4>
 											<a class="new_posts" href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '">' . $txt['new'] . '</a>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic['default_preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+											', $topic['is_sticky'] ? '<strong>' : '', '
+											<span class="preview" title="', $topic['default_preview'], '">
+												<span id="msg_' . $topic['first_post']['id'] . '"><a href="' . $topic['new_href'] . '">' . $topic['first_post']['subject'] . '</a>', '
+												</span>
+											</span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
 									<div class="topic_starter">
@@ -168,16 +198,20 @@ function template_unread()
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="navigation">' . $topic['pages'] . '</ul>', '
 									</div>
 								</div>
-								<div class="topic_latest">
-									<p class="topic_lastpost">
-										<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
+								
+								<div class="topic_latest">';
+
+			echo '
+									<span class="topic_latest_info">
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
-									</p>
+									</span>
+									<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 								</div>
+								
 								<div class="topic_stats">
-									', $topic['replies'], ' ', $txt['replies'], '<br />
-									', $topic['views'], ' ', $txt['views'], '
+									<span class="stat-item"><span class="stat_count">', $topic['replies'], '</span> ', $txt['replies'], '</span>
+									<span class="stat-item"><span class="stat_count">', $topic['views'], '</span> ', $txt['views'], '</span>
 								</div>';
 
 			if ($context['showCheckboxes'])
