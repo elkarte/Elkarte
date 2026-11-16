@@ -12,20 +12,9 @@
  * -------------------------------------------------------
  */
 
-#admin_form_wrapper {
+.action_admin .generic_list_wrapper .information {
 	border-color: var(--primary_border);
-}
-
-#support_resources, #credits_sections {
-	margin: 0;
-}
-
-.admincenter > #admin_form_wrapper {
-	margin-top: 0;
-}
-
-#admin_content .content {
-	background: var(--content_background);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
 #admin_main_section, .quick_tasks, #mod_main_section,
@@ -33,47 +22,227 @@
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
-	border: 1px solid var(--transparent);
+	border-color: var(--primary_border);
+	background: var(--content_background);
+	box-shadow: var(--shadow-elevation-medium);
 }
 
-#manage_boards, .admincenter, h3 + .infobox {
-	margin-top: .7em;
+#admin_content .content {
+	background: var(--content_background);
+	box-shadow: none;
+}
+
+.disabled {
+	color: var(--disabled_text);
+}
+
+/* News and newsletters screen.
+---------------------------------------------*/
+
+#admin_newsletters .information {
+	border-color: var(--primary_border);
+	box-shadow: var(--shadow-elevation-medium);
+}
+
+#news_lists .newspreview div {
+	border-color: var(--primary_border);
+}
+
+#welcome {
+	border-color: var(--secondary_border);
+}
+
+.search_results li {
+	border-bottom-color: var(--primary_border_bottom);
+}
+
+.search_results li a strong {
+	color: var(--strong_text);
+}
+
+#admin_main_section .content {
+	border-color: var(--primary_border);
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content_background);
+	box-shadow: var(--shadow-elevation-low);
+}
+
+#live_news div.content dl {
+	color: var(--emphasize_text);
+}
+
+#ourAnnouncements dt {
+	border-top-color: var(--top_section_top_border);
+}
+
+#ourAnnouncements dt a {
+	color: var(--title);
+}
+
+#ourAnnouncements dd {
+	border-top-color: var(--primary_border_top);
+}
+
+.quick_tasks {
+	background: var(--content_background);
+	box-shadow: none;
+}
+
+#quick_tasks li {
+	border-top-color: var(--transparent);
+	border-bottom-color: var(--primary_border_bottom);
+}
+
+/* Styles for the package manager.
+------------------------------------------------- */
+
+#package_list li {
+	border-color: var(--secondary_border);
+}
+
+#package_list .package_area_section li {
+	border-color: var(--transparent);
+}
+
+ul.package_section {
+	border-color: var(--secondary_border);
+}
+
+#find_code, #replace_code {
+	border-top-color: var(--secondary_border_top);
+	border-bottom-color: var(--secondary_border_bottom);
+	background: var(--content_background);
+}
+
+/* Styles for the D&D indicators
+------------------------------------------------- */
+
+#sort_email_fp td:nth-child(2):before,
+#custom_profile_fields td:nth-child(2):before,
+#message_icon_list td:nth-child(1):before,
+#manage_boards li .floatleft:before {
+	color: var(--footer_text);
 }
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards h2 {
-	margin-bottom: .5em;
+
+#manage_boards .content > ul {
+	border-color: var(--primary_border);
+	box-shadow: var(--shadow-elevation-medium);
+}
+
+#manage_boards ul li {
+	border-top-color: var(--secondary_border);
 }
 
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom-color: var(--emphasize_text);
+	border-bottom-color: var(--secondary_border_bottom);
 }
 
-/* This is the drag/drop placeholder, normally not visible */
-.ui-state-highlight {
-	border-color: var(--infobox_border) !important;
-	background-color: var(--content_background) !important;
+/* Indeed ugly, but will allow 4 level deep board nesting stripping to work */
+#manage_boards li:nth-child(even),
+#manage_boards li:nth-child(even) > li:nth-child(odd),
+#manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even),
+#manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) {
+	background: var(--contrast_text_compliment);
+}
+
+#manage_boards li:nth-child(odd),
+#manage_boards li:nth-child(odd) > li:nth-child(even),
+#manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd),
+#manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) {
+	background: var(--contrast_text);
+}
+
+/* Styles for the manage maintenance section.
+------------------------------------------------- */
+
+#manage_maintenance div.content {
+	border-bottom-color: var(--primary_border_bottom);
+	background: none;
+	box-shadow: var(--shadow-elevation-low);
 }
 
 /* Styles for the manage membergroups.
 ------------------------------------------------- */
+
 .select_category, .select_all_box {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
+}
+
+/* Styles for the manage permissions section.
+------------------------------------------------- */
+
+.perm_boards li {
+	border-color: var(--secondary_border);
+}
+
+.perm_groups {
+	background-color: var(--content_background);
+}
+
+/* Styles for the moderation center.
+------------------------------------------------- */
+#modcenter {
+	background: none repeat scroll 0 0 var(--content_background);
+	box-shadow: var(--shadow-elevation-medium);
+}
+
+#modcenter .content, #modcenter .generic_list_wrapper {
+	border-color: var(--primary_border);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content_background);
+}
+
+#mod_main_section .content {
+	border-color: var(--primary_border);
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content_background);
+	box-shadow: var(--shadow-elevation-medium);
+}
+
+.moderation_notes li {
+	border-bottom-color: var(--primary_border_bottom);
+}
+
+/* Styles for the Report generation
+------------------------------------------------- */
+
+.report_results th {
+	border-right-color: var(--primary_border);
+	border-left-color: var(--primary_border_left);
+}
+
+/* alternate row colors on Modify Themes,Copy a template */
+.theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: #FEFEFE;
+}
+
+.theme_options .content:nth-child(odd) {
+	background: var(--content_background)
+}
+
+#css_preview_box {
+	border-color: var(--secondary_border);
 }
 
 /* jQuery Dialog
 ------------------------------------------------- */
 
 .ui-dialog {
-	border-color: var(--secondary_border);
-	background-color: var(--content_background);
+	border-color: #999999;
+	background-color: #F4F4F4;
 	box-shadow: 0 0 16px var(--opacity30);
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	background-color: var(--category_header_grad_4)
+	background-color: var(--content_background);
 }
 
 .ui-widget-overlay {
@@ -81,22 +250,12 @@
 	background-color: var(--dark_background);
 }
 
-/* alternate row colors on Modify Themes,Copy a template */
-.theme_options .content {
-	border-top-color: var(--primary_border_top);
-	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content_background);
-}
-
-#quick_tasks li {
-	border-top-color: var(--transparent);
-	border-bottom-color: var(--transparent);
+/* This is the drag/drop placeholder, normally not visible */
+.ui-state-highlight {
+	border-color: var(--event) !important;
+	background-color: var(--dark_background) !important;
 }
 
 .sortable_smiley {
-	border-bottom-color: var(--primary_border)
-}
-
-#manage_maintenance div.content {
-	border-color: var(--transparent);
+	border-bottom-color: var(--primary_border_bottom)
 }

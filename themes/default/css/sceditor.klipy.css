@@ -13,78 +13,78 @@
  */
 
 #klipy_results {
-    width: 475px;
-    margin: 6px auto;
-    min-height: 30px;
-    max-height: 230px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-width: calc(100% - 10px)
+	width: 475px;
+	margin: 6px auto;
+	min-height: 30px;
+	max-height: 230px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-width: calc(100% - 10px)
 }
 
 #klipy_search {
-    width: 100%;
+	width: 100%;
 }
 
 #klipy_attribution_mark {
-    background: url(../images/klipy.svg) no-repeat 50% 50% transparent;
-    height: 24px;
-    margin-bottom: 0.2rem;
+	background: url(../images/klipy.svg) no-repeat 50% 50% transparent;
+	height: 24px;
+	margin-bottom: 0.2rem;
 }
 
 .sceditor-klipy {
-    background: #EFEFEF;
+	background: var(--primary_content_background);
 }
 
 .sceditor-button-klipy div {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-grid-3x3-gap-fill' viewBox='0 0 16 16'%3E%3Cpath d='M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V2zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2z'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-grid-3x3-gap-fill' viewBox='0 0 16 16'%3E%3Cpath d='M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V2zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2z'/%3E%3C/svg%3E");
 }
 
 .klipy-imagelist {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    grid-gap: 5px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+	grid-gap: 5px;
 }
 
 .klipy-item {
-    position: relative;
-    cursor: pointer;
+	position: relative;
+	cursor: pointer;
 }
 
 .klipy-item::before {
-    content: "";
-    padding-bottom: 100%;
-    display: inline-block;
-    vertical-align: top;
+	content: "";
+	padding-bottom: 100%;
+	display: inline-block;
+	vertical-align: top;
 }
 
 .klipy-cover {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+	position: absolute;
+	width: 100%;
+	height: 100%;
 }
 
 .klipy-cover img {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
 }
 
 #klipy-overlay {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 2;
-    background-color: rgba(0, 0, 0, 0.65);
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2;
+	background-color: rgba(0, 0, 0, 0.65);
 }
 
 .overlay-spinner {
-    position: absolute;
-    transform: translateY(-50%);
-    top: 50%;
-    left: 0;
-    right: 0;
-    text-align: center;
+	position: absolute;
+	transform: translateY(-50%);
+	top: 50%;
+	left: 0;
+	right: 0;
+	text-align: center;
 }

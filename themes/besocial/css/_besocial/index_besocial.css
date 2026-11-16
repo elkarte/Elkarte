@@ -56,6 +56,12 @@
  * ---------------
  */
 :root {
+	/* Let the browser render form controls and scrollbars to match the variant */
+	color-scheme: light;
+
+	/* Native checkboxes, radios, progress etc pick up the link color */
+	accent-color: #008299; /* matches --links */
+
 	--html_background: #4D4F54; /* HTML & footer Background */
 	--body_grad_1: #EEEEEE; /* Body Gradient */
 	--body_grad_2: #EEEEEE; /* Body Gradient */
@@ -68,7 +74,7 @@
 	--title: #43A8DA; /* forum title, board names */
 
 	/* Footer */
-	--footer_text: #CCCCCC; /* Text used in the footer */
+	--footer_text: #F2F2F2; /* Text used in the footer */
 	--footer_top_border: #444444; /* Border that separates footer from body */
 	--footer_background: #4D4F54; /* Footer Background */
 
@@ -99,7 +105,7 @@
 	--breadcrumb_background: #FEFEFE; /* Breadcrumb background */
 
 	/* Category Headers */
-	--category_header_text: #777777; /* Text in the category bars */
+	--category_header_text: #555555; /* Text in the category bars */
 	--category_header_grad_1: #FAFAFA; /* 1-2 main header */
 	--category_header_grad_4: #EBEBEB; /* end of */
 
@@ -114,6 +120,7 @@
 	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
 	--information: #F0F6F0; /* very light green, information background */
 	--description: #FEFEFE; /* description div background */
+	--quote_background: #FAFAFA; /* Quote box background; also used by the fade overlay */
 
 	/* Generally used in topic display */
 	--me: #50AA3A; /* me and footnotes */
@@ -161,8 +168,9 @@
 	/* Text colors */
 	--emphasize_text: #333333; /* When you need a darker text color on hover or elsewhere */
 	--body_text: #4D4F53; /* Body text, text areas, editor, inputs, more */
+	--disabled_text: #999999; /* Disabled control text */
 	--menu_text: #585858; /* used for text in menus, breadcrumbs, buttons */
-	--strong_text: #686868; /* like a demi bold */
+	--strong_text: #555555; /* like a demi bold */
 	--reverse_text: #111111; /* Text when high contrast is needed on light background */
 	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
 	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
@@ -191,6 +199,9 @@
 	/* Mostly used for shadows */
 	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
 	--box_shadow: #DDDDDD; /* Used on many box shadows */
+	--shadow-elevation-low: 0 1px 2px rgba(0, 0, 0, 0.12);
+	--shadow-elevation-medium: 0 2px 6px rgba(0, 0, 0, 0.18);
+	--shadow-elevation-high: 0 4px 12px rgba(0, 0, 0, 0.22);
 	--opacity10: rgba(0, 0, 0, 0.1); /* Used as box shadows */
 	--opacity20: rgba(0, 0, 0, 0.2);
 	--opacity30: rgba(0, 0, 0, 0.3);
@@ -205,7 +216,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
@@ -273,8 +284,8 @@ input[disabled].input_text, input[disabled].input_password, textarea[disabled], 
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-/* Anchors styled to look like buttons.
-   These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--menu_text);
 	border-color: var(--secondary_border);
@@ -456,7 +467,7 @@ hr {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-/* A code block - maybe PHP ;) - shared styles. */
+	/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
@@ -729,14 +740,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* For primary admin/profile/etc drop menus. */
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-/* For secondary admin/profile/etc menus. */
+	/* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
 	color: var(--emphasize_text);
 }
 
 /* Level 1 active buttons for primary admin/profile/etc drop menus... */
 .admin_menu .active,
-/* ......and for secondary admin/profile/etc menu strip. */
+	/* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
 	color: var(--contrast_text);
 	border-color: var(--secondary_border);
@@ -817,7 +828,7 @@ a.active {
 .listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
 .linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
 .linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
-	color: var(--contrast_text);
+	color: var(--emphasize_text);
 	background: var(--menu_button_hover_background);
 }
 
@@ -1158,6 +1169,7 @@ nav.breadcrumb {
 }
 
 .messageContent {
+	border-top-color: var(--transparent);
 }
 
 .messageContent .bbc_img.ila_pending {

@@ -131,7 +131,7 @@ function template_trackIP()
 	else
 	{
 		echo '
-		<table class="table_grid">
+		<table class="table_grid table_scroll">
 			<thead>
 				<tr class="table_head">
 					<th scope="col">', $txt['ip_address'], '</th>

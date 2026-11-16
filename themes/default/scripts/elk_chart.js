@@ -9,11 +9,11 @@
 /** global: titles, year, monthdata, yeardata, request, colors, yearDataset, yearStats */
 
 /**
- * Returns the config object for chart.js, used in profile stats
+ * Returns the config object for chart.js, used in forum/profile statistics
  *
  * @param {object} bar_data
  * @param {array} tooltips
- * @returns {{data, options: {indexAxis: string, plugins: {legend: {display: boolean}, tooltip: {callbacks: {label: (function(*): *)}}, title: {display: boolean}}, elements: {bar: {borderWidth: number}}, responsive: boolean, scales: {yAxis: {ticks: {font: {size: number}}, grid: {display: boolean}, afterFit: {options.scales.yAxis.afterFit}, xAxis: {ticks: {display: boolean, stepSize: number}}}, categoryPercentage: string}, type: string}}
+ * @returns {object}
  */
 function barConfig (bar_data, tooltips)
 {
@@ -22,23 +22,44 @@ function barConfig (bar_data, tooltips)
 		data: bar_data,
 		options: {
 			indexAxis: 'y',
-			categoryPercentage: '.9',
+			categoryPercentage: 0.9,
 			elements: {
 				bar: {
 					borderWidth: 0,
 				}
 			},
 			responsive: true,
+			maintainAspectRatio: false,
 			scales: {
 				y: {
 					grid: {display: false},
-					// Sets the yAxis to an initial 200px wide
+					// Keep most of the canvas available for bars on narrow screens.
 					afterFit: function(scaleInstance) {
-						scaleInstance.width = 200;
+						scaleInstance.width = Math.min(200, scaleInstance.chart.width * 0.4);
 					},
 					ticks: {
 						font: {
 							size: 15,
+						},
+						callback: function(value) {
+							const label = this.getLabelForValue(value),
+								maxWidth = Math.min(200, this.chart.width * 0.4) - 20,
+								ctx = this.chart.ctx;
+							let text = label;
+
+							ctx.save();
+							ctx.font = Chart.helpers.toFont(this.options.ticks.font).string;
+							if (ctx.measureText(text).width > maxWidth)
+							{
+								while (text.length > 0 && ctx.measureText(text + '…').width > maxWidth)
+								{
+									text = text.slice(0, -1);
+								}
+								text += '…';
+							}
+							ctx.restore();
+
+							return text;
 						}
 					},
 				},
@@ -92,7 +113,7 @@ function setYearClickEvents ()
 				borderWidth: 1,
 				pointStyle: 'circle',
 				pointRadius: 4,
-				lineTension: 0.2,
+				tension: 0.2,
 				fill: 'origin'
 			};
 

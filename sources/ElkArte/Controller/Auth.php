@@ -166,8 +166,23 @@ class Auth extends AbstractController
 		// Are you guessing with a script?
 		if (!empty($_COOKIE))
 		{
-			// Without a cookie, these checks will fail
-			checkSession();
+			// Login/logout tolerate UA changes from device/browser changes while retaining token verification.
+			$session_error = checkSessionRequest('post', '', false);
+			if ($session_error['error'] === 'session_timeout')
+			{
+				// Expired login forms, preserve the username and request the password again.
+				$this->action_login();
+				$context['default_username'] = Util::htmlspecialchars($this->_req->getPost('user', 'strval', ''));
+				$context['login_errors'] = [$txt['login_session_expired']];
+
+				return false;
+			}
+			elseif ($session_error['error'] !== '')
+			{
+				// Preserve the normal error handling for an invalid referrer.
+				handleSessionError($session_error);
+			}
+
 			validateToken('login');
 		}
 
@@ -552,14 +567,21 @@ class Auth extends AbstractController
 	{
 		global $context, $txt;
 
+		// An external request to log out an existing guest has nothing left to do.
+		if (!$internal && User::$info->is_guest)
+		{
+			redirectexit();
+		}
+
 		// Changed their mind?  Go back.
-		if (!$internal && isset($_POST['cancel'], $_GET[$context['session_var']]))
+		if (!$internal && isset($this->_req->post->cancel, $this->_req->query->{$context['session_var']}))
 		{
 			redirectexit($_SESSION['logout_return'] ?? '');
 		}
 
-		// No session? Give them a nice logout form instead of a jolting session validation failed
-		if (!$internal && !isset($_GET[$context['session_var']]))
+		// A stale logout link needs confirmation with the current session token.
+		$session_error = $internal ? null : checkSessionRequest('get', '', false);
+		if (!$internal && $session_error['error'] === 'session_verify_fail')
 		{
 			Txt::load('Login');
 			theme()->getTemplates()->load('Login');
@@ -579,9 +601,9 @@ class Auth extends AbstractController
 			obExit();
 		}
 
-		if (!$internal)
+		if (!$internal && $session_error['error'] !== '')
 		{
-			checkSession('get');
+			handleSessionError($session_error);
 		}
 
 		require_once(SUBSDIR . '/Auth.subs.php');

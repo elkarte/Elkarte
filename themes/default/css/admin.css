@@ -314,7 +314,7 @@ h3.category_header form {
 }
 
 #core_features hr {
-	margin: .4rem  0 1.2rem 0;
+	margin: .4rem 0 1.2rem 0;
 	padding: 0;
 }
 
@@ -432,7 +432,7 @@ ul.package_section {
 	overflow: auto;
 	height: 14rem;
 	margin: .1rem 0 .4rem 0;
-	padding: .4rem  1.2rem;
+	padding: .4rem 1.2rem;
 	/* Show a scrollbar after about 6 lines. */
 	/* This is much better than the old max-height css. */
 	resize: vertical;
@@ -887,7 +887,7 @@ dl.themes_list dd {
 
 #agreement, #reserved {
 	width: 99%;
-	padding: 0 .4rem ;
+	padding: 0 .4rem;
 }
 
 #admin_register_form dt span {
@@ -1136,7 +1136,7 @@ dl.themes_list dd {
 	height: 100%;
 }
 
-/* This one does 825 screens at default font size.
+/* 824px at the default font size: compact admin layouts.
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 51.5em) {
 	#quick_tasks li {
@@ -1144,7 +1144,7 @@ dl.themes_list dd {
 	}
 }
 
-/* This one does 540 and smaller screens at default font size.
+/* 544px at the default font size: stack admin layouts.
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 34em) {
 	body {
@@ -1162,11 +1162,6 @@ dl.themes_list dd {
 
 	#quick_search .input_text {
 		max-width: 17rem;
-	}
-
-	#adm_submenus {
-		flex-wrap: wrap;
-		row-gap: .4rem;
 	}
 
 	#quick_tasks li {
@@ -1189,19 +1184,6 @@ dl.themes_list dd {
 
 	#main_content_section {
 		padding: 0 1rem;
-	}
-
-	/* Level 1 button background. */
-	.dropmenu li {
-		line-height: 3;
-	}
-
-	.dropmenu li ul {
-		top: 5.5rem;
-	}
-
-	.dropmenu li li a {
-		line-height: 4;
 	}
 
 	#live_news, #supportVersionsTable {

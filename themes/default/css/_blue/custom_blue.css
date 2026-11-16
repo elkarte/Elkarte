@@ -28,7 +28,7 @@
 
 /* Next controls the overall forum font */
 .wrapper {
-    font-size: var(--font14);
+	font-size: var(--font14);
 }
 
 /* Forum title typography */
@@ -44,18 +44,18 @@
 
 /* Category headers */
 .category_header, .forum_category .category_header {
-    line-height: 1.8;
-    font-size: var(--font15);
-    padding: .2rem .8rem .2rem .8rem;
+	line-height: 1.8;
+	font-size: var(--font15);
+	padding: .2rem .8rem .2rem .8rem;
 }
 
 #collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-    padding: .5rem;
-    height: 2.7rem;
+	padding: .5rem;
+	height: 2.7rem;
 }
 
 .quickbuttons .inline_mod_check {
-    padding: .2rem .4rem;
+	padding: .2rem .4rem;
 }
 
 /* Menu list level 1 line height */
@@ -97,23 +97,23 @@
    ======================================== */
 
 .previous_month, .next_month {
-    margin-top: 0;
+	margin-top: 0;
 }
 
 #month_grid .category_header {
-    padding-bottom: .4rem;
+	padding-bottom: .4rem;
 }
 
 /* ========================================
    POPUPS - STRUCTURAL
    ======================================== */
 .popup_window {
-    background-clip: padding-box;
+	background-clip: padding-box;
 }
 
 /* More boxes, although SVG they have embedded color so they are here */
 .warningbox, .successbox, .infobox, .errorbox {
-    background-repeat: no-repeat;
+	background-repeat: no-repeat;
 }
 
 /* ========================================
@@ -130,14 +130,14 @@
    ======================================== */
 
 @media screen and (max-width: 60em) {
-    #collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-        width: 4.4rem;
-        height: 4.5rem;
-        padding: 1.4rem 0 0 0 !important;
-    }
+	#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+		width: 4.4rem;
+		height: 4.5rem;
+		padding: 0 !important;
+	}
 }
 
-@media screen and (max-width: 33.750em) {
+@media screen and (max-width: 34em) {
 	.poster:after, .posterarea:before {
 		border-bottom: 1px solid;
 	}

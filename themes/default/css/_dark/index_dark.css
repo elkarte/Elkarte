@@ -80,12 +80,12 @@
 	/* Footer */
 	--footer_text: #BBBBBB; /* Text used in the footer */
 	--footer_background: #0B0B0B; /* Footer Background */
-	--footer_top_border: #7a6549; /* Border that separates footer from body */
+	--footer_top_border: #7A6549; /* Border that separates footer from body */
 
 	/* Input controls, input, button, select, textarea */
 	--input_background: #0B0B0B; /* Generic inputs background */
 	--input_disabled_background: rgba(255, 255, 255, 0.12); /* Disabled button background */
-	--input_border: #7a6549; /* Generic inputs border */
+	--input_border: #7A6549; /* Generic inputs border */
 	--input_border_hover: #9D8860; /* Hover for inputs */
 	--input_border_focus: #9D8860; /* Focus for inputs */
 	--input_background_hover: #2A2A2A; /* Hover background */
@@ -93,9 +93,9 @@
 	--input_hover_text: #FEFEFE; /* When you need a darker text color on hover or elsewhere */
 
 	/* Submit controls */
-	--input_submit_border: #7a6549; /* XX[type="submit"] */
-	--input_submit_border_top: #7a6549; /* complimentary for inset effects */
-	--input_submit_border_left: #7a6549; /* complimentary for inset effects */
+	--input_submit_border: #7A6549; /* XX[type="submit"] */
+	--input_submit_border_top: #7A6549; /* complimentary for inset effects */
+	--input_submit_border_left: #7A6549; /* complimentary for inset effects */
 	--input_submit_shadow: transparent; /* box shadow */
 	--input_submit_background: #0B0B0B; /* background */
 	--input_submit_background_compliment: #0B0B0B; /* Used as gradient */
@@ -109,11 +109,11 @@
 
 	/* Main Menu Active Button */
 	--menu_button_active: #64533F; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_2: #6b5943; /* Compliment gradient color for above */
+	--menu_button_active_2: #6B5943; /* Compliment gradient color for above */
 	--menu_button_border_active: #9D8860; /* Active border color */
 	--menu_button_border_active_top: #9D8860; /* Active top border */
-	--menu_button_active_hover: #6b5943; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_hover_2: #6e5c45; /* Compliment gradient color for above */
+	--menu_button_active_hover: #6B5943; /* Link, list active/hover colors (gradient and color) */
+	--menu_button_active_hover_2: #6E5C45; /* Compliment gradient color for above */
 	--menu_border_active_hover_top: #9D8860; /* Active menu border color top */
 	--menu_border_active_hover_left: #9D8860; /* Active menu border color left */
 	--menu_border_active_hover: #9D8860; /* Hover / active border */
@@ -134,7 +134,7 @@
 
 	/* Breadcrumbs */
 	--breadcrumb_active: #64533F; /* Breadcrumb active/hover colors (gradient and color) */
-	--breadcrumb_active_2: #6b5943; /* Compliment gradient color for above */
+	--breadcrumb_active_2: #6B5943; /* Compliment gradient color for above */
 	--breadcrumb_background: #0B0B0B; /* Breadcrumb background */
 
 	/* Category Headers */
@@ -251,22 +251,19 @@
 	--opacity50: rgba(200, 200, 200, 0.5);
 
 	/* Fall away box shadows, tuned for dark surfaces */
-	--shadow-elevation-low:
-		0.3px 0.4px 0.6px rgba(200, 200, 200, 0.14),
-		0.4px 0.7px 1px -1px rgba(200, 200, 200, 0.16),
-		1px 1.6px 2.3px -2px rgba(200, 200, 200, 0.18);
-	--shadow-elevation-medium:
-		0.4px 0.5px 0.6px rgba(200, 200, 200, 0.2),
-		0.9px 1.2px 1.5px -1.2px rgba(200, 200, 200, 0.18),
-		2.4px 3.3px 4px -2.3px rgba(200, 200, 200, 0.16),
-		3.2px 5.5px 7.3px -3.5px rgba(200, 200, 200, 0.12);
-	--shadow-elevation-high:
-		0.4px 0.5px 0.6px rgba(200, 200, 200, 0.2),
-		1.2px 1.6px 2px -0.5px rgba(200, 200, 200, 0.18),
-		2.2px 3px 3.6px -1px rgba(200, 200, 200, 0.16),
-		3.9px 5.3px 6.4px -1.5px rgba(200, 200, 200, 0.14),
-		6.7px 9.2px 11.1px -2px rgba(200, 200, 200, 0.12),
-		11.1px 15.3px 18.4px -2.5px rgba(200, 200, 200, 0.1);
+	--shadow-elevation-low: 0.3px 0.4px 0.6px rgba(200, 200, 200, 0.14),
+	0.4px 0.7px 1px -1px rgba(200, 200, 200, 0.16),
+	1px 1.6px 2.3px -2px rgba(200, 200, 200, 0.18);
+	--shadow-elevation-medium: 0.4px 0.5px 0.6px rgba(200, 200, 200, 0.2),
+	0.9px 1.2px 1.5px -1.2px rgba(200, 200, 200, 0.18),
+	2.4px 3.3px 4px -2.3px rgba(200, 200, 200, 0.16),
+	3.2px 5.5px 7.3px -3.5px rgba(200, 200, 200, 0.12);
+	--shadow-elevation-high: 0.4px 0.5px 0.6px rgba(200, 200, 200, 0.2),
+	1.2px 1.6px 2px -0.5px rgba(200, 200, 200, 0.18),
+	2.2px 3px 3.6px -1px rgba(200, 200, 200, 0.16),
+	3.9px 5.3px 6.4px -1.5px rgba(200, 200, 200, 0.14),
+	6.7px 9.2px 11.1px -2px rgba(200, 200, 200, 0.12),
+	11.1px 15.3px 18.4px -2.5px rgba(200, 200, 200, 0.1);
 }
 
 /* ---------------
@@ -276,12 +273,12 @@
 
 /* use a light calendar for chrome's data picker */
 ::-webkit-calendar-picker-indicator {
-	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="%23bbbbbb" d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>');
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\"><path fill=\"%23bbbbbb\" d=\"M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z\"/></svg>");
 }
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
@@ -336,8 +333,8 @@ input[disabled].input_text, input[disabled].input_password, textarea[disabled] {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-/* Anchors styled to look like buttons.
-   These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--input_text);
 	border-color: var(--input_submit_border);
@@ -1386,6 +1383,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .likes_above_signature {
 	border-bottom-color: var(--secondary_border);
 }
+
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
 	color: var(--strong_text) !important;
@@ -1461,7 +1459,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* Background for the sticky top page navigation in topics */
-nav.pagesection:has(+ #forumposts) {
+.pagesection.topic_pagesection {
 	background: var(--content_background);
 }
 
@@ -2050,10 +2048,6 @@ ul.cf_icons {
 	background: var(--primary_content_background);
 }
 
-.stats.floatleft {
-	border-right-color: var(--primary_border);
-}
-
 #top_row .stats dd, .statsbar {
 	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
@@ -2182,10 +2176,6 @@ ul.cf_icons {
    -------------------------------------------------------------------------------------------*/
 
 @media screen and (max-width: 34em) {
-	.board_lastpost {
-		border-top-color: var(--primary_border);
-	}
-
 	.topic_listing > li {
 		border-color: var(--secondary_border);
 		box-shadow: 3px 3px 6px var(--box_shadow);

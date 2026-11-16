@@ -14,43 +14,49 @@
 
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor, .ui-tabs .ui-tabs-nav .ui-state-active {
 	font-weight: bold;
-	border-radius: 6px 6px 0 0;
+	border-radius: .4rem .4rem 0 0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active > a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	font-family: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+	font-family: var(--font-body);
 	font-weight: 600;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
 .ui-tabs {
-	position: relative; /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+	position: relative;
 	padding: .2em;
 }
 
 .ui-tabs .ui-tabs-nav {
+	display: flex;
+	flex-wrap: wrap;
 	margin: 0;
 	padding: .2em .2em 0;
 }
 
 .ui-tabs .ui-tabs-nav li {
-	font-size: 0.929em;
-	line-height: 2.077em;
+	font-size: var(--font15);
+	line-height: 2;
 	position: relative;
 	top: 0;
-	float: left;
 	margin: 1px .2em 0 0;
 	padding: 0;
 	list-style: none;
-	white-space: nowrap;
-	border-bottom-width: 0;
+	max-width: 100%;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	border: 1px solid;
+	border-radius: .4rem .4rem 0 0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
 	float: left;
 	padding: 0 .5em;
 	text-decoration: none;
+	border-radius: .4rem .4rem 0 0;
+	outline-offset: -2px;
 }
 
 .ui-tabs .ui-tabs-nav li.ui-tabs-active {
@@ -75,12 +81,15 @@
 	background: none;
 }
 
-.ui-tabs .ui-tabs-nav li {
-	border: 1px solid;
-	border-radius: 6px 6px 0 0;
-}
+/* Match the shared mobile control sizing in index.css. */
+@media screen and (max-width: 51.5em) {
+	.ui-tabs .ui-tabs-nav li {
+		font-size: var(--font14);
+	}
 
-.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	border-radius: 6px 6px 0 0;
-	outline: none;
+	.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+		display: flex;
+		align-items: center;
+		min-height: 3.5rem;
+	}
 }

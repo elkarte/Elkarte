@@ -17,12 +17,14 @@
  */
 function template_generic_menu_sidebar_above()
 {
-	global $context;
+	global $context, $txt;
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '
 	<div id="main_container">
-		<div id="menu_sidebar">';
+		<div id="menu_sidebar">
+			<button type="button" class="sidebar_menu_toggle" aria-controls="menu_sidebar_sections" aria-expanded="true">', $txt['main_menu'], '</button>
+			<div id="menu_sidebar_sections" class="sidebar_menu_sections">';
 
 	// What one are we rendering?
 	$context['cur_menu_id'] = isset($context['cur_menu_id']) ? $context['cur_menu_id'] + 1 : 1;
@@ -82,6 +84,7 @@ function template_generic_menu_sidebar_above()
 
 	// This is where the actual "main content" area for the admin section starts.
 	echo '
+			</div>
 		</div>
 		<div id="main_admsection">';
 

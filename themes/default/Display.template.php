@@ -603,7 +603,7 @@ function template_display_poll_above()
 	if ($context['poll']['show_results'] || !$context['allow_vote'])
 	{
 		echo '
-					<dl class="stats floatleft">';
+					<dl class="poll_stats">';
 
 		// Show each option with its corresponding percentage bar.
 		foreach ($context['poll']['options'] as $option)
@@ -725,7 +725,7 @@ function template_pages_and_buttons_above()
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a id="new"></a>' : '';
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons');
+	template_pagesection('normal_buttons', '', ['class' => 'topic_pagesection']);
 }
 
 /**
@@ -733,8 +733,8 @@ function template_pages_and_buttons_above()
  */
 function template_pages_and_buttons_below()
 {
-	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons');
+	// Show the page index... "Pages: [1]". theme.js hides the sticky copy above once this one is on screen.
+	template_pagesection('normal_buttons', '', ['class' => 'topic_pagesection_end']);
 
 	// Show the lower breadcrumbs.
 	theme_breadcrumbs();
@@ -754,7 +754,7 @@ function template_moderation_buttons_below()
 	if (can_see_button_strip($context['mod_buttons']))
 	{
 		echo '
-				<i class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons"></i>';
+				<button type="button" class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons" aria-controls="moderationbuttons_strip" aria-expanded="false" aria-label="', $txt['moderate'], '"></button>';
 	}
 
 	template_button_strip($context['mod_buttons'], '', ['id' => 'moderationbuttons_strip']);

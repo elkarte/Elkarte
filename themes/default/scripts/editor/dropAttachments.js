@@ -669,11 +669,11 @@
 		/**
 		 * Initialize the drag and drop function!
 		 */
-		window.onload = function() {
+		window.addEventListener('load', function() {
 			const obj = document.querySelector('.drop_area');
 
 			// Make sure the browser supports this
-			if (!(window.FormData && window.fetch))
+			if (!obj || !(window.FormData && window.fetch))
 			{
 				return;
 			}
@@ -732,7 +732,7 @@
 
 			// Hide the original input from view (programmatic click will still work)
 			input.style.display = 'none';
-		};
+		}, {once: true});
 
 		init(params);
 		return {

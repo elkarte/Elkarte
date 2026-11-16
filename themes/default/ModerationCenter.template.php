@@ -493,7 +493,7 @@ function template_user_watch_post_callback($post)
 								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
 							</li>
 							<li class="listlevel1 inline_mod_check">
-								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" />
+								<label><input type="checkbox" name="delete[]" value="' . $post['id'] . '" /></label>
 							</li>
 						</ul>';
 	}

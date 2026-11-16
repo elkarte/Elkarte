@@ -97,7 +97,7 @@ function template_topic_listing_above()
 		echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
 	}
 
-	// Sort topics mumbo-jumbo
+	// Sort topics
 	echo '
 					</div>
 					<ul id="sort_by" class="no_js">';
@@ -126,8 +126,8 @@ function template_topic_listing_above()
 	{
 		echo '
 						<li class="listlevel1 quickmod_select_all">
-							<label for="select_all" class="hide">', $txt['all'], '</label>
-							<input type="checkbox" id="select_all" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
+							<label for="select_all">', $txt['all'], '
+							<input type="checkbox" id="select_all" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" /></label>
 						</li>';
 	}
 
@@ -240,12 +240,14 @@ function template_topic_listing()
 				<div class="topic_icons', $topic_icon_class, '">', $topic_icon_html;
 
 			echo '
-					', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
+					', ($topic['is_posted_in'] && !$topic['new']) ? '<span class="fred topicicon i-profile"></span>' : '', '
 				</div>';
 
-			// The subject/poster section
+			// The topic_info area / subject/poster section
 			echo '
-				<div class="topic_info">
+				<div class="topic_info">',
+					$topic['is_sticky'] ? '<span class="topic_status"><i class="icon i-pin" aria-hidden="true"></i> ' . $txt['sticky_topic'] . '</span>' : '',
+					$topic['is_locked'] ? '<span class="topic_status"><i class="icon i-lock" aria-hidden="true"></i> ' . $txt['locked_topic'] . '</span>' : '', '
 					<div class="topic_name" ', (empty($topic['quick_mod']['modify']) ? '' : 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . "', '" . $topic['first_post']['id'] . '\');"'), '>
 						<h4>';
 
@@ -289,48 +291,51 @@ function template_topic_listing()
 					</div>
 				</div>';
 
-			// The last poster info, avatar, when
+			// The board_avatar area / last poster avatar
 			echo '
-				<div class="topic_latest">';
+				<div class="topic_avatar">';
 
 			if (!empty($topic['last_post']['member']['avatar']))
 			{
 				echo '
-					<span class="board_avatar">
-						<a href="', $topic['last_post']['member']['href'], '">
-							<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" loading="lazy" />
-						</a>
-					</span>';
+					<a href="', $topic['last_post']['member']['href'], '">
+						<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" loading="lazy" />
+					</a>';
 			}
 			else
 			{
 				echo '
-					<span class="board_avatar">
-						<a href="#"></a>
-					</span>';
+					<a href="#"></a>';
 			}
 
 			echo '
+				</div>';
+
+			// The topic_latest area / last poster info, when
+			echo '
+				<div class="topic_latest">
 					<span class="topic_latest_info">
 						<span>', $topic['last_post']['html_time'], '</span>
-						<span>', $txt['by'], ' ', empty($topic['last_post']['member']['avatar']) ? $topic['last_post']['member']['link'] : $topic['last_post']['member']['name'], '</span>
+						<span>', $txt['by'], ' ', $topic['last_post']['member']['link'], '</span>
 					</span>
 					<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 				</div>';
 
-			// The stats section
+			// The topic_stats section
 			echo '
 				<div class="topic_stats">
 					<span class="stat-item"><span class="stat_count">', $topic['replies'], '</span> ', $txt['replies'], '</span>
 					<span class="stat-item"><span class="stat_count">', $topic['views'], '</span> ', $txt['views'], '</span>
 				</div>';
 
-			// Show the quick moderation options?
+			// The topic_moderation area / Show the quick moderation options?
 			if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']))
 			{
 				echo '
 				<div class="topic_moderation">
-					<input type="checkbox" name="topics[]" aria-label="check ', $topic['id'], '" value="', $topic['id'], '" />
+					<label>
+						<input type="checkbox" name="topics[]" aria-label="check ', $topic['id'], '" value="', $topic['id'], '" />
+					</label>
 				</div>';
 			}
 
@@ -342,7 +347,7 @@ function template_topic_listing()
 		</ul>
 		</main>';
 
-		// Show the moderation buttons
+		// Show the moderation buttons below the topic listing, if Quick Moderation is enabled.
 		if (!empty($context['can_quick_mod']) && !empty($options['display_quick_mod']) && !empty($context['topics']))
 		{
 			echo '

@@ -731,7 +731,7 @@ legend::before, .i-caret-down::before {
 
 .i-help::before, .i-question::before {
 	filter: invert(70%) sepia(70%) saturate(5471%) hue-rotate(204deg) brightness(96%) contrast(114%);
-	--hexcode: #5784ff;
+	--hexcode: #5784FF;
 }
 
 .i-warning::before, .i-warning-watch::before,
@@ -770,7 +770,7 @@ legend::before, .i-caret-down::before {
 
 .i-website::before, .i-search::before {
 	filter: invert(70%) sepia(70%) saturate(5471%) hue-rotate(204deg) brightness(96%) contrast(114%);
-	--hexcode: #5784ff;
+	--hexcode: #5784FF;
 }
 
 .i-modify::before, .i-pencil::before, .i-package::before {

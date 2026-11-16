@@ -109,7 +109,7 @@ function template_list_boards(array $boards, $id)
 	foreach ($boards as $board)
 	{
 		echo '
-				<li class="board_row', (empty($board['children'])) ? '' : ' parent_board', $board['is_redirect'] ? ' board_row_redirect' : '', '" id="board_', $board['id'], '">
+				<li class="board_row', (empty($board['children'])) ? '' : ' parent_board', $board['is_redirect'] ? ' board_row_redirect' : '', (empty($board['new']) && empty($board['children_new'])) ? '' : ' board_row_new', '" id="board_', $board['id'], '">
 					<div class="board_icon">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
@@ -120,7 +120,6 @@ function template_list_boards(array $boards, $id)
 							<s>', $txt['new_posts'], '</s>
 							<span class="', $board['new'] ? 'i-board-new' : 'i-board-sub', '" title="', $txt['new_posts'], '"></span>';
 		}
-
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 		{
@@ -128,7 +127,6 @@ function template_list_boards(array $boards, $id)
 							<s>', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '</s>
 							<span class="i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 		}
-
 		// No new posts at all! The agony!!
 		else
 		{
@@ -196,10 +194,10 @@ function template_list_boards(array $boards, $id)
 		echo '
 					</div>
 					<div class="board_stats">
-						', $board['is_redirect'] ? comma_format($board['posts']) . ' ' . $txt['redirects'] : comma_format($board['topics']) . ' ' . $txt['board_topics'] . '<br /> ' . comma_format($board['posts']) . ' ' . $txt['posts'], '
+						<span class="stat_count">', $board['is_redirect'] ? comma_format($board['posts']) . '</span><span class="stat-item">' . $txt['redirects'] . '</span>' : comma_format($board['topics']) . '</span><span class="stat-item">' . $txt['board_topics'] . '</span><span class="stat_count">' . comma_format($board['posts']) . '</span><span class="stat-item">' . $txt['posts'], '</span>
 					</div>';
 
-		// Show the "Sub-boards: ". (there's a link_children, but we're going to bold the new ones...)
+		// Show the "Sub-boards: "
 		if (!empty($board['children']))
 		{
 			// Sort the links into an array with new boards bold so it can be imploded.

@@ -39,16 +39,6 @@ function elkMenu (menuRef)
  * Set up the menu to work with click / keyboard events instead of :hover
  */
 elkMenu.prototype.initMenu = function() {
-	// Setup enter/spacebar keys to trigger a click on the "Skip to main content" link
-	if (this.menu.id === 'main_menu')
-	{
-		const skip = document.getElementById('skipnav');
-		if (skip)
-		{
-			this.keysAsClick(skip);
-		}
-	}
-
 	// Removing this class prevents the standard hover effect, assuming the CSS is set up correctly
 	this.menu.classList.remove('no_js');
 	if (this.menu.parentElement)
@@ -73,8 +63,42 @@ elkMenu.prototype.initMenu = function() {
 		this.docClick();
 	}
 
+	// Keyboard handler avoids handling a nested item's key twice.
+	this.keysAsClick(this.menu);
+	this.menu.addEventListener('focusout', function(event) {
+		if (!this.menu.contains(event.relatedTarget))
+		{
+			this.resetMenu(this.menu);
+		}
+	}.bind(this));
+
 	// Set up the subMenus (menulevel2, menulevel3) to open when clicked
 	this.submenuReveal(subMenu);
+};
+
+/**
+ * Keep the main menu dropdowns on screen when their triggers become icons.
+ */
+elkMenu.fitMainMenu = function(mainMenu) {
+	if (!mainMenu || mainMenu.id !== 'main_menu')
+	{
+		return;
+	}
+
+	let narrow = window.matchMedia('(max-width: 51.5em)').matches,
+		viewport = document.documentElement,
+		left = getComputedStyle(viewport).direction === 'rtl' ? window.innerWidth - viewport.clientWidth : 0;
+
+	mainMenu.querySelectorAll(':scope > li > .menulevel2').forEach(function(menu) {
+		menu.style.translate = '';
+		if (narrow)
+		{
+			let bounds = menu.getBoundingClientRect(),
+				offset = Math.max(left + 8 - bounds.left, Math.min(0, left + viewport.clientWidth - 8 - bounds.right));
+
+			menu.style.translate = offset + 'px 0';
+		}
+	});
 };
 
 /**
@@ -141,12 +165,9 @@ elkMenu.prototype.submenuReveal = function(subMenu) {
 		this.SetItemAttribute(subLink, '', {
 			'role': 'button',
 			'aria-pressed': 'false',
-			'aria-expanded': 'false'
+			'aria-expanded': 'false',
+			'aria-haspopup': 'true'
 		});
-
-		// Setup keyboard navigation
-		this.keysAsClick(menu);
-		this.keysAsClick(parentLi);
 
 		// The click event listener for opening sub menus
 		subLink.addEventListener('click', function(e) {
@@ -179,6 +200,7 @@ elkMenu.prototype.submenuReveal = function(subMenu) {
 				currentMenu.classList.remove('un_selected');
 				currentMenu.classList.add('selected');
 				currentMenu.setAttribute('aria-hidden', 'false');
+				elkMenu.fitMainMenu(this.menu);
 			}
 		}.bind(this));
 	}.bind(this));
@@ -252,7 +274,7 @@ elkMenu.prototype.resetSubLinks = function(subLink) {
  */
 elkMenu.prototype.resetMenu = function(menu) {
 	this.SetItemAttribute(menu, '[aria-hidden="false"]', {'aria-hidden': 'true'});
-	this.SetItemAttribute(menu, '[aria-expanded="true"]', {'aria-expanded': 'false'});
+	this.SetItemAttribute(menu, '[aria-haspopup][aria-expanded="true"]', {'aria-expanded': 'false'});
 	this.SetItemAttribute(menu, '[aria-pressed="true"]', {'aria-pressed': 'false'});
 
 	menu.querySelectorAll('.selected').forEach(function(item) {
@@ -308,69 +330,95 @@ elkMenu.prototype.keysAsClick = function(el) {
 /**
  * Callback for keyAsClick
  *
- * @param {KeyboardEvent} keyboardEvent
+ * @param {KeyboardEvent} event
  * @param {HTMLElement} el
  */
-elkMenu.prototype.keysCallback = function(keyboardEvent, el) {
-	// THe keys we know how to respond to
-	let keys = [' ', 'Enter', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Home', 'End', 'Escape', 'Spacebar'];
+elkMenu.prototype.keysCallback = function(event, el) {
+	let keys = [' ', 'Enter', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Home', 'End', 'Escape', 'Spacebar'],
+		item = event.target.closest('a, button');
 
-	if (keys.includes(keyboardEvent.key))
+	if (!keys.includes(event.key) || !item || !el.contains(item))
 	{
-		// What menu and links are we "in"
-		let menu = keyboardEvent.target.closest ? keyboardEvent.target.closest('ul') : null;
-		if (!menu)
-		{
-			return;
-		}
+		return;
+	}
 
-		let menuLinks = Array.prototype.slice.call(menu.querySelectorAll('a')),
-			currentIndex = menuLinks.indexOf(document.activeElement);
+	let menu = item.closest('ul');
+	if (!menu)
+	{
+		return;
+	}
 
-		// Don't follow the links, don't bubble the event
-		keyboardEvent.stopPropagation();
-		keyboardEvent.preventDefault();
-		switch (keyboardEvent.key)
+	let links = Array.from(menu.querySelectorAll(':scope > li > a, :scope > li > button')).filter(function(link) {
+			return link.getClientRects().length && getComputedStyle(link).visibility !== 'hidden';
+		}),
+		index = links.indexOf(item),
+		submenu = item.nextElementSibling;
+	if (!submenu || !submenu.matches('.menulevel2, .menulevel3'))
+	{
+		submenu = null;
+	}
+
+	event.stopPropagation();
+	event.preventDefault();
+	if (event.key === 'Escape' || (event.key === 'ArrowLeft' && menu !== this.menu))
+	{
+		if (menu !== this.menu)
 		{
-			case 'Escape':
-				this.resetSubMenus(menu);
-				break;
-			case ' ':
-			case 'Spacebar':
-			case 'Enter':
-				if (currentIndex > -1 && menuLinks[currentIndex])
-				{
-					menuLinks[currentIndex].click();
-				}
-				break;
-			case 'ArrowUp':
-			case 'ArrowLeft':
-				if (currentIndex > -1)
-				{
-					let prevIndex = Math.max(0, currentIndex - 1);
-					menuLinks[prevIndex].focus();
-				}
-				break;
-			case 'ArrowDown':
-			case 'ArrowRight':
-				if (currentIndex > -1)
-				{
-					let nextIndex = Math.min(menuLinks.length - 1, currentIndex + 1);
-					menuLinks[nextIndex].focus();
-				}
-				break;
-			case 'Home':
-				if (menuLinks.length)
-				{
-					menuLinks[0].focus();
-				}
-				break;
-			case 'End':
-				if (menuLinks.length)
-				{
-					menuLinks[menuLinks.length - 1].focus();
-				}
-				break;
+			let parent = menu.parentElement,
+				trigger = parent.querySelector(':scope > a');
+			this.resetMenu(parent);
+			parent.classList.remove('open');
+			if (trigger)
+			{
+				trigger.focus();
+			}
 		}
+		else
+		{
+			this.resetMenu(this.menu);
+		}
+		return;
+	}
+
+	if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar')
+	{
+		item.click();
+		return;
+	}
+
+	if (submenu && (event.key === 'ArrowRight' || event.key === 'ArrowDown' || (event.key === 'ArrowUp' && menu === this.menu)))
+	{
+		if (!item.classList.contains('open'))
+		{
+			item.click();
+		}
+		let children = submenu.querySelectorAll(':scope > li > a');
+		if (children.length)
+		{
+			children[event.key === 'ArrowUp' ? children.length - 1 : 0].focus();
+		}
+		return;
+	}
+
+	if (links.length && index !== -1)
+	{
+		let next = event.key === 'Home' ? 0 : event.key === 'End' ? links.length - 1
+			: Math.max(0, Math.min(links.length - 1, index + (event.key === 'ArrowUp' || event.key === 'ArrowLeft' ? -1 : 1)));
+		links[next].focus();
 	}
 };
+
+// Position both hover and click menus without changing their interaction mode.
+document.addEventListener('DOMContentLoaded', function() {
+	let mainMenu = document.getElementById('main_menu');
+
+	if (mainMenu)
+	{
+		let fit = function() { elkMenu.fitMainMenu(mainMenu); };
+
+		fit();
+		window.addEventListener('resize', fit);
+		mainMenu.addEventListener('mouseover', fit);
+		mainMenu.addEventListener('focusin', fit);
+	}
+});

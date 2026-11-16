@@ -44,6 +44,7 @@ function template_editBuddies()
 		<h2 class="category_header hdicon i-users">
 			', $txt['editBuddies'], '
 		</h2>
+		<div class="table_scroll" tabindex="0" role="region" aria-label="', $txt['editBuddies'], '">
 		<table class="table_grid">
 			<tr class="table_head">
 				<th scope="col" class="grid20">', $txt['name'], '</th>
@@ -113,6 +114,7 @@ function template_editBuddies()
 
 	echo '
 		</table>
+		</div>
 	</div>';
 
 	// Add a new buddy?
@@ -170,6 +172,7 @@ function template_editIgnoreList()
 		<h2 class="category_header hdicon i-user">
 			', $txt['editIgnoreList'], '
 		</h2>
+		<div class="table_scroll" tabindex="0" role="region" aria-label="', $txt['editIgnoreList'], '">
 		<table class="table_grid">
 			<tr class="table_head">
 				<th scope="col" style="width: 20%;">', $txt['name'], '</th>
@@ -222,6 +225,7 @@ function template_editIgnoreList()
 
 	echo '
 		</table>
+		</div>
 	</div>';
 
 	// Add to the ignore list?
@@ -500,21 +504,21 @@ function template_profile_options()
 			// Always fun - select boxes!
 			elseif ($field['type'] === 'select')
 			{
+				$options = $field['options'] ?? [];
+				if (is_callable($options))
+				{
+					$options = $options();
+				}
+
 				echo '
 						<select name="', $key, '" id="', $key, '">';
 
-				if (is_callable($field['options']))
+				if (is_array($options))
 				{
-					$field['options'] = $field['options']();
-
-					// Assuming we now have some!
-					if (is_array($field['options']))
+					foreach ($options as $value => $name)
 					{
-						foreach ($field['options'] as $value => $name)
-						{
-							echo '
+						echo '
 							<option value="', $value, '" ', $value == $field['value'] ? 'selected="selected"' : '', '>', $name, '</option>';
-						}
 					}
 				}
 
@@ -1024,7 +1028,8 @@ function template_groupMembership()
 	else
 	{
 		echo '
-			<table class="table_grid">
+		<div class="table_scroll" tabindex="0" role="region" aria-label="', $txt['current_membergroups'], '">
+		<table class="table_grid">
 				<thead>
 					<tr class="table_head">
 						<th scope="col" ', $context['can_edit_primary'] ? ' colspan="2"' : '', '>', $txt['current_membergroups'], '</th>
@@ -1068,7 +1073,8 @@ function template_groupMembership()
 
 		echo '
 				</tbody>
-			</table>';
+			</table>
+		</div>';
 
 		if ($context['can_edit_primary'])
 		{
@@ -1083,7 +1089,8 @@ function template_groupMembership()
 		{
 			echo '
 			<br />
-			<table class="table_grid">
+		<div class="table_scroll" tabindex="0" role="region" aria-label="', $txt['available_groups'], '">
+		<table class="table_grid">
 				<thead>
 					<tr class="table_head">
 						<th scope="col">
@@ -1129,7 +1136,8 @@ function template_groupMembership()
 
 			echo '
 				</tbody>
-			</table>';
+			</table>
+		</div>';
 		}
 
 		// Javascript for the selector stuff.

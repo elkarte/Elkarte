@@ -42,7 +42,7 @@ class Theme extends BaseTheme
 			 * This doesn't apply when custom templates are being
 			 * used; nor does it apply to the default theme.
 			 */
-			'use_default_images' => 'never',
+			'use_default_images' => 'defaults',
 
 			/*
 			 * The version this template/theme is for. This should

@@ -83,8 +83,10 @@ function template_action_summary()
 			// Each template in the tab gets placed in a container
 			foreach ($context['summarytabs'][$tab]['templates'] as $templates)
 			{
+				$profile_content_class = 'profile_content' . (is_array($templates) ? ' profile_columns' : '');
+
 				echo '
-						<div class="profile_content">';
+						<div class="', $profile_content_class, '">';
 
 				// This container has multiple templates in it (like side x side)
 				if (is_array($templates))
@@ -191,7 +193,7 @@ function template_action_showPermissions()
 	{
 		echo '
 		<p class="description">', $txt['showPermissions_help'], '</p>
-		<div id="permissions" class="flow_hidden">';
+		<div id="permissions" class="table_scroll" tabindex="0" role="region" aria-label="', $txt['showPermissions'], '">';
 
 		if (!empty($context['no_access_boards']))
 		{
@@ -399,14 +401,14 @@ function template_action_statPanel()
 	else
 	{
 		echo '
-				<ul class="activity_stats flow_hidden">
-					<canvas id="hourStats" height="200" style="width:80%"></canvas>';
+				<div class="activity_stats">
+					<canvas id="hourStats" role="img" aria-label="', $txt['statPanel_activityTime'], '"></canvas>';
 
 		setHourData($context['posts_by_time']);
 		showHourChart('posts');
 
 		echo '
-				</ul>';
+				</div>';
 	}
 
 	echo '
@@ -1129,7 +1131,7 @@ function template_profile_block_buddies()
 
 					foreach ($data['custom_fields'] as $cpf)
 					{
-						if ($cpf['placement'] == 1)
+						if (isset($cpf['placement']) && $cpf['placement'] == 1)
 						{
 							$im[] = $cpf['value'];
 						}
@@ -1413,19 +1415,21 @@ function showHourChart($type)
 					borderWidth: 1,
 					pointStyle: "circle",
 					pointRadius: 4,
-					lineTension: 0.35,
+					tension: 0.35,
 					fill: "origin"
 				}]
 			},
 			hourConfig = {
 				type: "line",
-				responsive: true,
 				data: hourDataset,
 				options: {
+					responsive: true,
+					maintainAspectRatio: false,
 					scales: {
 						y: {
 							stacked: true,
-							ticks: {beginAtZero: true}
+							beginAtZero: true,
+							ticks: {precision: 0}
 						}
 					},
 					plugins: {

@@ -745,6 +745,7 @@ InTopicModeration.prototype.init = function() {
 	this.opt.aMessageIds.forEach((messageID) => {
 		// Create the checkbox.
 		let oCheckbox = document.createElement('input'),
+			oCheckboxLabel = document.createElement('label'),
 			oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + messageID);
 
 		oCheckbox.type = 'checkbox';
@@ -754,8 +755,9 @@ InTopicModeration.prototype.init = function() {
 		oCheckbox.setAttribute('aria-label', 'checkbox ' + messageID);
 		oCheckbox.onclick = this.handleClick.bind(this, oCheckbox);
 
-		// Append it to the container
-		oCheckboxContainer.appendChild(oCheckbox);
+		// The label provides a full touch target around the checkbox.
+		oCheckboxLabel.appendChild(oCheckbox);
+		oCheckboxContainer.appendChild(oCheckboxLabel);
 		oCheckboxContainer.classList.remove('hide');
 	});
 };

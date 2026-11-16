@@ -115,7 +115,7 @@ legend {
 
 h2 a.collapse {
 	float: left;
-	margin:  .2rem 0 -.2rem .4rem;
+	margin: .2rem 0 -.2rem .4rem;
 }
 
 .hdicon::before {
@@ -208,7 +208,7 @@ h2 a.collapse {
 }
 
 #search_form input[type="submit"] {
-	border-radius:  .2rem 0 0  .2rem;
+	border-radius: .2rem 0 0 .2rem;
 }
 
 .rightheader #forumtitle .forumlink {
@@ -437,18 +437,28 @@ h2 a.collapse {
 	font-size: var(--font14);
 	position: absolute;
 	right: -1.2rem;
-	content: '\2B9E';
+	content: "\2B9E";
 }
 
 .small_pagelinks li:last-child::after {
 	font-size: var(--font14);
 	position: absolute;
 	left: -1.4rem;
-	content: '\2B9C';
+	content: "\2B9C";
 }
 
 .small_pagelinks {
 	float: left;
+}
+
+.small_pagelinks li:first-child::before {
+	-webkit-mask: url("data:…M20 2l-16 10L20 22l-4-10z…") no-repeat center / 100%;
+	mask: url("data:…M20 2l-16 10L20 22l-4-10z…") no-repeat center / 100%;
+}
+
+.small_pagelinks li:last-child::after {
+	-webkit-mask: url("data:…M4 2l16 10L4 22l4-10z…") no-repeat center / 100%;
+	mask: url("data:…M4 2l16 10L4 22l4-10z…") no-repeat center / 100%;
 }
 
 /* Globally accessible top/bottom links. */
@@ -886,26 +896,8 @@ ul.post_options li {
 	clear: right;
 }
 
-/* Profile statistics */
-#generalstats .content dt {
-	float: right;
-}
-
-#generalstats .content dd {
-	float: right;
-}
-
 #show_attachments th {
 	text-align: right;
-}
-
-.activity_stats li {
-	float: right;
-}
-
-.activity_stats li .bar span {
-	right: -1555em;
-	left: auto;
 }
 
 /* Most popular boards by posts and activity */
@@ -927,7 +919,7 @@ ul.post_options li {
 
 .profile_pie {
 	float: right;
-	margin: 0 0 0  1.2rem;
+	margin: 0 0 0 1.2rem;
 }
 
 /* View posts */
@@ -941,7 +933,7 @@ ul.post_options li {
 
 .topic .mod_icons {
 	margin-right: 0;
-	margin-left:  1.2rem;
+	margin-left: 1.2rem;
 	text-align: left;
 }
 
@@ -973,7 +965,7 @@ ul.post_options li {
  * -------------------------------------------------------
  */
 #personal_messages .capacity_bar {
-	margin: .6rem  1.2rem 0 0;
+	margin: .6rem 1.2rem 0 0;
 }
 
 .pm_date {
@@ -1047,26 +1039,22 @@ div.labels {
  *	$STATISTICS
  * -------------------------------------------------------
  */
-.statistics .category_header {
-	margin: 0 50.5% 0 0.5%;
-}
 
-.stats {
-	margin:  1.2rem 50%  1.2rem 0;
-}
-
-.stats.floatleft {
-	clear: right;
-}
-
-.stats dt {
-	float: right;
+/* Statistics blocks are grids, which mirror automatically.
+   Only their inline spacing needs flipping. */
+.statistics .stats dt {
 	margin: 0 0 .4rem 2%;
 }
 
-#top_row .stats dd, .statsbar {
+/* Poll results still float, so mirror their float direction. */
+#poll_options .poll_stats dt {
+	float: right;
+	clear: right;
+	margin: 0 0 .4rem 2%;
+}
+
+.statsbar {
 	float: left;
-	padding: 0 0 0 .4rem;
 }
 
 .statsbar .bar {
@@ -1082,14 +1070,6 @@ div.labels {
 
 #stats .lefttext {
 	text-align: right;
-}
-
-#stats .stats_month {
-	padding: .4rem 3rem .4rem .8rem;
-}
-
-#stats .stats_day {
-	padding: .4rem 6rem .4rem .8rem;
 }
 
 /* -------------------------------------------------------
@@ -1151,7 +1131,7 @@ div.labels {
 
 /* The search results page. */
 .search_results_posts .buttons {
-	padding: .4rem 0 0  1.2rem;
+	padding: .4rem 0 0 1.2rem;
 }
 
 .search_results_posts .quick_mod {
@@ -1252,10 +1232,21 @@ div.labels {
  * -------------------------------------------------------
  */
 
-/* This one does 825 screens at default font size.
+/* 824px at the default font size: mirror compact layouts.
    -------------------------------------------------------------------------------------------*/
 
 @media screen and (max-width: 51.5em) {
+	/* Preserve stacked profile and settings rows after the desktop RTL floats. */
+	#basicinfo, #detailedinfo, .profileblock_left, .profileblock_right,
+	#popularposts, #popularactivity,
+	#creator dt, #creator dd, .settings dt, .settings dd,
+	#tracking dt, #tracking dd,
+	#popularposts div.content dt, #popularposts div.content dd,
+	#popularactivity div.content dt, #popularactivity div.content dd {
+		float: none;
+		width: 100%;
+	}
+
 	#main_menu .linklevel1 {
 		margin-right: 0;
 		margin-left: .4rem;
@@ -1265,18 +1256,12 @@ div.labels {
 		margin: 0 .8rem 0 0;
 	}
 
-	/* Playing silly buggers with a sidebar menu option for narrow screens. */
-	#main_container {
-		padding: 0  1.2rem 0 0;
+	#main_container, #menu_sidebar {
+		padding: 0;
 	}
 
 	#menu_sidebar {
-		right: -1rem;
-		left: auto;
-	}
-
-	#menu_sidebar:hover {
-		padding: 1rem 0.8rem 1.6rem 1.6rem;
+		float: none;
 	}
 
 	.quickbuttons .modified {
@@ -1290,29 +1275,14 @@ div.labels {
 	.ignoreboards.floatright {
 		float: none;
 	}
-
-	/* our stats page */
-	.statistics .category_header {
-		margin: 0;
-	}
-
-	.stats {
-		float: none;
-		margin: 0;
-	}
 }
 
-/* This one does 540 and smaller screens at default font size.
+/* 544px at the default font size: mirror stacked layouts.
    -------------------------------------------------------------------------------------------*/
 
-@media screen and (max-width: 33.750em) {
+@media screen and (max-width: 34em) {
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		text-align: right;
-	}
-
-	dd {
-		padding-right: 8% !important;
-		padding-left: 0;
 	}
 
 	#main_content_section {
@@ -1341,12 +1311,7 @@ div.labels {
 		float: none;
 	}
 
-	.postarea {
-		display: block;
-		margin: 0;
-	}
-
-	h2 .views_text, h2 .nextlinks {
+	h2 .nextlinks {
 		display: block;
 		float: none;
 	}
@@ -1364,47 +1329,27 @@ div.labels {
 		float: none;
 	}
 
-	.admin_menu li {
-		float: right;
-	}
-
 	#main_menu {
 		clear: right;
 	}
 
-	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
-		right: -.4rem;
+	.admin_menu li ul li {
+		float: right;
+	}
+
+	/* Preserve the structural flex/grid layouts and mirror only alignment. */
+	.poster > .subsections {
+		margin-left: 0;
+		margin-right: auto;
+	}
+
+	.poster .menulevel2 {
+		right: 0;
 		left: auto;
 	}
 
-	#main_menu li ul li, .admin_menu li ul li {
-		float: right;
-	}
-
-	ul.poster {
-		display: block;
-		clear: both;
-	}
-
-	.poster {
-		float: none;
-	}
-
-	.poster .listlevel1 {
-		display: inline-block;
-	}
-
-	.poster li.avatar {
-		float: right;
-	}
-
-	.poster .subsections {
-		float: left;
-		text-align: left;
-	}
-
-	.poster .membergroup {
-		float: left;
+	.menulevel3 {
+		margin: 0;
 	}
 
 	.postarea, .forumtitle {
@@ -1425,6 +1370,13 @@ div.labels {
 	}
 
 	.pagesection div.floatright {
+		float: none;
+	}
+}
+
+/* Match the shared phone-only stacking after the RTL detail-column floats. */
+@media screen and (max-width: 30em) {
+	#detailedinfo dt, #detailedinfo dd, .profileblock dt, .profileblock dd {
 		float: none;
 	}
 }

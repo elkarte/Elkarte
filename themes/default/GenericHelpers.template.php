@@ -172,7 +172,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
 			// if not always, just reserve a checkbox location (e.g. for quick moderation)
 			$checkbox[] = '
 						<li ' . (isset($buttonParameters['id']) ? 'id="' . $buttonParameters['id'] . '"' : '') . ' ' . $liClass . ' role="none">' .
-							($buttonParameters['checkbox'] === 'always' ? '<input role="menuitemcheckbox" class="input_check ' . $buttonName . '_check" type="checkbox" name="' . $buttonParameters['name'] . '[]" value="' . $buttonParameters['value'] . '" />' : '') . '
+							($buttonParameters['checkbox'] === 'always' ? '<label><input role="menuitemcheckbox" class="input_check ' . $buttonName . '_check" type="checkbox" name="' . $buttonParameters['name'] . '[]" value="' . $buttonParameters['value'] . '" /></label>' : '') . '
 						</li>';
 
 			continue;
@@ -239,6 +239,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
  *     - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if
  *        the page index code is not in the first level of $context
  *     - 'extra' (string) used to add html markup at the end of the template
+ *     - 'class' (string) extra class(es) to add to the nav element
  *
  * @return void an echoed content
  */
@@ -271,7 +272,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 	}
 
 	echo '
-			<nav class="pagesection">
+			<nav class="pagesection', empty($options['class']) ? '' : ' ' . $options['class'], '">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 				$options['extra'], '
@@ -318,7 +319,7 @@ function template_quickbutton_strip($strip, $tests = [])
 		{
 			$buttons[] = '
 					<li class="listlevel1 ' . $key . '">
-						<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
+						<label><input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" /></label>
 					</li>';
 
 			continue;

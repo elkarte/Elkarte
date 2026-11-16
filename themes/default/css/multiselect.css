@@ -1,9 +1,9 @@
 .multiselect-wrapper {
-	width: 180px;
+	font-family: var(--font-body);
+	font-size: var(--font14);
 	display: inline-block;
+	width: 180px;
 	white-space: nowrap;
-	font-size: 12px;
-	font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
 }
 
 .multiselect-wrapper .multiselect-input {
@@ -13,91 +13,92 @@
 }
 
 .multiselect-wrapper label {
+	font-size: var(--font14);
+	font-weight: 600;
 	display: block;
-	font-size: 12px;
-	font-weight : 600;
 }
 
 .multiselect-wrapper .multiselect-list {
-	z-index: 1;
 	position: absolute;
+	z-index: 1;
 	display: none;
-	background-color: white;
-	border: 1px solid grey;
-	border-bottom-left-radius: 2px;
-	border-bottom-right-radius: 2px;
 	margin-top: -2px;
+	border: 1px solid grey;
+	border-bottom-right-radius: 2px;
+	border-bottom-left-radius: 2px;
+	background-color: white;
 }
 
-	.multiselect-wrapper .multiselect-list.active {
-		display: block;
-	}
+.multiselect-wrapper .multiselect-list.active {
+	display: block;
+}
 
-	.multiselect-wrapper .multiselect-list > span {
-		font-weight: bold;
-	}
+.multiselect-wrapper .multiselect-list > span {
+	font-weight: bold;
+}
 
-	.multiselect-wrapper .multiselect-list .multiselect-checkbox {
-		margin-right: 2px;
-	}
+.multiselect-wrapper .multiselect-list .multiselect-checkbox {
+	margin-right: 2px;
+}
 
-	.multiselect-wrapper .multiselect-list > span,
-	.multiselect-wrapper .multiselect-list li {
-		cursor: default;
-	}
+.multiselect-wrapper .multiselect-list > span,
+.multiselect-wrapper .multiselect-list li {
+	cursor: default;
+}
 
 .multiselect-wrapper .multiselect-list {
-	padding: 5px;
 	min-width: 200px;
+	padding: 5px;
 }
 
 .multiselect-wrapper ul {
-	list-style: none;
-	display: block;
 	position: relative;
-	padding: 0px;
-	margin: 0px;
-	max-height: 200px;
-	overflow-y: auto;
+	display: block;
 	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: 200px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
 }
 
-	.multiselect-wrapper ul li {
-		padding-right: 20px;
-		display: block;
-	}
+.multiselect-wrapper ul li {
+	display: block;
+	margin-bottom: 5px;
+	padding-right: 20px;
+}
 
-		.multiselect-wrapper ul li.active {
-			background-color: rgb(0, 102, 255);
-			color: white;
-		}
+.multiselect-wrapper ul li.active {
+	color: white;
+	background-color: rgb(0, 102, 255);
+}
 
-		.multiselect-wrapper ul li:hover {
-			background-color: rgb(0, 102, 255);
-			color: white;
-		}
+.multiselect-wrapper ul li:hover {
+	color: white;
+	background-color: rgb(0, 102, 255);
+}
 
 .multiselect-input-div {
 	height: 34px;
 }
 
-	.multiselect-input-div input{
-		border: 1px solid #ababab;
-		background : #fff;
-		margin: 5px 0 6px 0;
-		padding: 5px;
-		vertical-align:middle;
-	}
+.multiselect-input-div input {
+	margin: 5px 0 6px 0;
+	padding: 5px;
+	vertical-align: middle;
+	border: 1px solid #ABABAB;
+	background: #FFFFFF;
+}
 
 .multiselect-count {
 	position: relative !important;
+	left: -45px !important;
+	display: inline-block !important;
+	width: auto !important;
+	padding: 2px 7px !important;
 	text-align: center !important;
 	border-radius: 2px !important;
 	background-color: lightblue !important;
-	display: inline-block !important;
-	padding: 2px 7px !important;
-	left: -45px !important;
-	width: auto !important;
 }
 
 .multiselect-wrapper.disabled .multiselect-dropdown-arrow {
@@ -109,16 +110,52 @@
 }
 
 .multiselect-dropdown-arrow {
+	line-height: 20px !important;
+	position: absolute !important;
+	display: inline-block !important;
 	width: 0 !important;
 	height: 0 !important;
-	border-left: 5px solid transparent !important;
-	border-right: 5px solid transparent !important;
-	border-top: 5px solid black !important;
-	position: absolute !important;
-	line-height: 20px !important;
-	text-align: center !important;
-	display: inline-block !important;
 	margin-top: 17px !important;
 	margin-left: -42px !important;
+	text-align: center !important;
+	border-top: 5px solid black !important;
+	border-right: 5px solid transparent !important;
+	border-left: 5px solid transparent !important;
 }
 
+
+/* Keep profile multiselects aligned with the other mobile form controls. */
+@media screen and (max-width: 51.5em) {
+	.multiselect-wrapper {
+		font-size: var(--font14);
+		position: relative;
+		width: 24rem;
+		max-width: 100%;
+	}
+
+	.multiselect-wrapper label {
+		font-size: var(--font14);
+		display: flex;
+		align-items: center;
+		min-height: 3.5rem;
+		white-space: normal;
+		overflow-wrap: anywhere;
+	}
+
+	.multiselect-wrapper .multiselect-list {
+		left: 0;
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+	}
+
+	.multiselect-input-div {
+		height: auto;
+		min-height: 3.5rem;
+	}
+
+	.multiselect-input-div input {
+		min-height: 3.5rem;
+		margin-block: 0;
+	}
+}
