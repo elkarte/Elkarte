@@ -248,22 +248,19 @@
 	--opacity50: rgba(0, 0, 0, 0.5);
 
 	/* Fall away box shadows. #B3B3B3 or HSL 0 0 70 */
-	--shadow-elevation-low:
-		0.3px 0.4px 0.6px rgba(179, 179, 179, 0.25),
-		0.4px 0.7px 1px -1px rgba(179, 179, 179,  0.29),
-		1px 1.6px 2.3px -2px rgba(179, 179, 179, 0.33);
-	--shadow-elevation-medium:
-		0.4px 0.5px 0.6px rgba(179, 179, 179, 0.38),
-		0.9px 1.2px 1.5px -1.2px rgba(179, 179, 179, 0.32),
-		2.4px 3.3px 4px -2.3px rgba(179, 179, 179, 0.27),
-		3.2px 5.5px 7.3px -3.5px rgba(179, 179, 179, 0.15);
-	--shadow-elevation-high:
-		0.4px 0.5px 0.6px rgba(179, 179, 179, 0.35),
-		1.2px 1.6px 2px -0.5px rgba(179, 179, 179, 0.32),
-		2.2px 3px 3.6px -1px rgba(179, 179, 179, 0.3),
-		3.9px 5.3px 6.4px -1.5px rgba(179, 179, 179, 0.27),
-		6.7px 9.2px 11.1px -2px rgba(179, 179, 179, 0.25),
-		11.1px 15.3px 18.4px -2.5px rgba(179, 179, 179, 0.22);
+	--shadow-elevation-low: 0.3px 0.4px 0.6px rgba(179, 179, 179, 0.25),
+	0.4px 0.7px 1px -1px rgba(179, 179, 179, 0.29),
+	1px 1.6px 2.3px -2px rgba(179, 179, 179, 0.33);
+	--shadow-elevation-medium: 0.4px 0.5px 0.6px rgba(179, 179, 179, 0.38),
+	0.9px 1.2px 1.5px -1.2px rgba(179, 179, 179, 0.32),
+	2.4px 3.3px 4px -2.3px rgba(179, 179, 179, 0.27),
+	3.2px 5.5px 7.3px -3.5px rgba(179, 179, 179, 0.15);
+	--shadow-elevation-high: 0.4px 0.5px 0.6px rgba(179, 179, 179, 0.35),
+	1.2px 1.6px 2px -0.5px rgba(179, 179, 179, 0.32),
+	2.2px 3px 3.6px -1px rgba(179, 179, 179, 0.3),
+	3.9px 5.3px 6.4px -1.5px rgba(179, 179, 179, 0.27),
+	6.7px 9.2px 11.1px -2px rgba(179, 179, 179, 0.25),
+	11.1px 15.3px 18.4px -2.5px rgba(179, 179, 179, 0.22);
 }
 
 /* ---------------
@@ -273,7 +270,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
@@ -326,8 +323,8 @@ input[disabled].input_text, input[disabled].input_password, textarea[disabled] {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-/* Anchors styled to look like buttons.
-   These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--input_text);
 	border-color: var(--input_submit_border);
@@ -1464,7 +1461,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* Background for the sticky top page navigation in topics */
-nav.pagesection:has(+ #forumposts) {
+.pagesection.topic_pagesection {
 	background: var(--content_background);
 }
 

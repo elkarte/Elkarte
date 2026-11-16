@@ -60,18 +60,18 @@
 	/* Native checkboxes, radios, progress etc pick up the link color */
 	accent-color: #334466; /* matches --links */
 
-	--html_background: #3e5a78; /* HTML & footer Background */
-	--body_grad_1: #e9eef2; /* Body Gradient */
-	--body_grad_2: #e9eef2; /* Body Gradient */
+	--html_background: #3E5A78; /* HTML & footer Background */
+	--body_grad_1: #E9EEF2; /* Body Gradient */
+	--body_grad_2: #E9EEF2; /* Body Gradient */
 
 	/* Top section above the navigation menu */
-	--top_section_border: #b8b8b8; /* Header */
-	--top_section_top_border: #b8b8b8; /* Top border */
-	--top_section_bottom_border: #b8b8b8; /* Top section lower border */
+	--top_section_border: #B8B8B8; /* Header */
+	--top_section_top_border: #B8B8B8; /* Top border */
+	--top_section_bottom_border: #B8B8B8; /* Top section lower border */
 	--top_section: #FEFEFE; /* Background */
 	--top_section_compliment: #E4E4E4; /* Used with above for gradient */
-	--title: #a85400; /* forum title, news, board names */
-	--title-compliment: #a85400; /* if you want a fade effect */
+	--title: #A85400; /* forum title, news, board names */
+	--title-compliment: #A85400; /* if you want a fade effect */
 
 	/* Menu nav background if a different background from top_section is wanted */
 	--menu_nav_grad_1: transparent; /* Top Menu nav bar background */
@@ -79,15 +79,15 @@
 
 	/* Footer */
 	--footer_text: #DDDDDD; /* Text used in the footer */
-	--footer_background: #3e5a78; /* Footer Background */
-	--footer_top_border: #b2b6bd; /* Border that separates footer from body */
+	--footer_background: #3E5A78; /* Footer Background */
+	--footer_top_border: #B2B6BD; /* Border that separates footer from body */
 
 	/* Input controls, input, button, select, textarea */
 	--input_background: #FAFAFA; /* Generic inputs background */
 	--input_disabled_background: #E4E4E4; /* Disabled button background */
 	--input_border: #CCCCCC; /* Generic inputs border */
-	--input_border_hover: #557ea0; /* Hover for inputs */
-	--input_border_focus: #4a6b8c; /* Focus for inputs */
+	--input_border_hover: #557EA0; /* Hover for inputs */
+	--input_border_focus: #4A6B8C; /* Focus for inputs */
 	--input_background_hover: #FEFEFE; /* Hover background */
 	--input_text: #585858; /* input text */
 	--input_hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
@@ -107,33 +107,33 @@
 	--input_submit_background_hover: #F0F0F0; /* background */
 
 	/* Main Menu Active Button */
-	--menu_button_active: #557ea0; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_2: #557ea0; /* Compliment gradient color for above */
-	--menu_button_border_active: #f49a3a; /* Active border color */
-	--menu_button_border_active_top: #f49a3a; /* Active top border */
-	--menu_button_active_hover: #ffae14; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_hover_2: #f5a100; /* Compliment gradient color for above */
-	--menu_border_active_hover_top: #f49a3a; /* Active menu border color top/left */
-	--menu_border_active_hover_left: #f49a3a; /* Active menu border color top/left */
-	--menu_border_active_hover: #f49a3a; /* Hover / active border */
+	--menu_button_active: #557EA0; /* Link, list active/hover colors (gradient and color) */
+	--menu_button_active_2: #557EA0; /* Compliment gradient color for above */
+	--menu_button_border_active: #F49A3A; /* Active border color */
+	--menu_button_border_active_top: #F49A3A; /* Active top border */
+	--menu_button_active_hover: #FFAE14; /* Link, list active/hover colors (gradient and color) */
+	--menu_button_active_hover_2: #F5A100; /* Compliment gradient color for above */
+	--menu_border_active_hover_top: #F49A3A; /* Active menu border color top/left */
+	--menu_border_active_hover_left: #F49A3A; /* Active menu border color top/left */
+	--menu_border_active_hover: #F49A3A; /* Hover / active border */
 
 	/* Main Menu Regular Buttons*/
-	--menu_border: #bbbbbb; /* linklevel 1 border */
-	--menu_border_top: #dddddd;
-	--menu_border_left: #aaaaaa;
-	--menu_background: #e2e9f3; /* linklevel 1  background */
-	--menu_background_compliment: #e2e9f3;
-	--menu_border_hover_top: #4a6b8c; /*  menu border color top */
-	--menu_border_hover_left: #4a6b8c; /* menu border color left */
-	--menu_border_hover: #4a6b8c; /* Hover border */
-	--menu_button_hover_background: #597b9f; /* A hoverbackground used on non active menu hovers */
+	--menu_border: #BBBBBB; /* linklevel 1 border */
+	--menu_border_top: #DDDDDD;
+	--menu_border_left: #AAAAAA;
+	--menu_background: #E2E9F3; /* linklevel 1  background */
+	--menu_background_compliment: #E2E9F3;
+	--menu_border_hover_top: #4A6B8C; /*  menu border color top */
+	--menu_border_hover_left: #4A6B8C; /* menu border color left */
+	--menu_border_hover: #4A6B8C; /* Hover border */
+	--menu_button_hover_background: #597B9F; /* A hoverbackground used on non active menu hovers */
 	--menu_dropdown_indicator: #989898; /* dropdown menu indicator */
 	--icon_menu_hover: #F4F4F4; /* Icon menu (small screen) hover background */
-	--icon_menu_hover_border: #4a6b8c;
+	--icon_menu_hover_border: #4A6B8C;
 
 	/* Breadcrumbs */
-	--breadcrumb_active: #557ea0; /* Breadcrumb active/hover colors (gradient and color) */
-	--breadcrumb_active_2: #557ea0; /* Compliment gradient color for above */
+	--breadcrumb_active: #557EA0; /* Breadcrumb active/hover colors (gradient and color) */
+	--breadcrumb_active_2: #557EA0; /* Compliment gradient color for above */
 	--breadcrumb_background: #FEFEFE; /* Breadcrumb background */
 
 	/* Category Headers */
@@ -141,10 +141,10 @@
 	--category_border: #CCCCCC; /* Main border color used around most everything that has a border */
 	--category_border_top: #DDDDDD;
 	--category_border_bottom: #CCCCCC;
-	--category_header_grad_1: #557ea0; /* 1-2 main header */
-	--category_header_grad_2: #557ea0; /* 1-3 category */
-	--category_header_grad_3: #3f6385; /* 1-4 secondary */
-	--category_header_grad_4: #3d5f7d; /* end of */
+	--category_header_grad_1: #557EA0; /* 1-2 main header */
+	--category_header_grad_2: #557EA0; /* 1-3 category */
+	--category_header_grad_3: #3F6385; /* 1-4 secondary */
+	--category_header_grad_4: #3D5F7D; /* end of */
 	--secondary_category_border: #AFAFAF; /* Secondary category boarder */
 	--secondary_category_border_top: #CFCFCF;
 	--secondary_category_bottom: #BBBBBB;
@@ -155,8 +155,8 @@
 	--hr_background: #E4E4E4;
 
 	/* Misc */
-	--links: #346; /* normal links */
-	--bbclinks: #346; /* bbc links */
+	--links: #334466; /* normal links */
+	--bbclinks: #334466; /* bbc links */
 	--valid: #EBFFD8; /*  used as valid input background color */
 	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
 	--information: #F0F6F0; /* information box background */
@@ -164,12 +164,12 @@
 
 	/* Generally used in topic display */
 	--me: #A80000; /* me and footnotes */
-	--topic_name: #346; /* Subject line, poster name and keyinfo */
-	--poster_name: #c06002;
-	--sticky_row: #cfdce8; /* sticky row background */
-	--locked_row: #e8d8cf; /* locked row background */
-	--basic_row: #fefefe; /* basic row background */
-	--basic_row_alternate: #f0f4f7; /* alternating topic row background */
+	--topic_name: #334466; /* Subject line, poster name and keyinfo */
+	--poster_name: #C06002;
+	--sticky_row: #CFDCE8; /* sticky row background */
+	--locked_row: #E8D8CF; /* locked row background */
+	--basic_row: #FEFEFE; /* basic row background */
+	--basic_row_alternate: #F0F4F7; /* alternating topic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
 	--forum_posts: #FEFEFE; /* Post background */
@@ -204,7 +204,7 @@
 	--forum_category: #DEEDDA; /* Category background, seen as line separators */
 	--primary_content_background: #FEFEFE; /* Used in many backgrounds */
 	--news_background: #FAFAFA; /* Background of news section */
-	--action_available: #f97b00; /* new button, approval links */
+	--action_available: #F97B00; /* new button, approval links */
 	--mid_grey_background: #E9E9E9; /* Various uses where a slightly darker background is needed */
 	--quote_background: #FAFAFA; /* Quote box background; also used by the fade overlay */
 	--dark_background: #989898; /* A bit darker, useful in some places */
@@ -249,22 +249,19 @@
 	--opacity50: rgba(0, 0, 0, 0.5);
 
 	/* Fall away box shadows. #B3B3B3 or HSL 0 0 70 */
-	--shadow-elevation-low:
-		0.3px 0.4px 0.6px rgba(179, 179, 179, 0.25),
-		0.4px 0.7px 1px -1px rgba(179, 179, 179,  0.29),
-		1px 1.6px 2.3px -2px rgba(179, 179, 179, 0.33);
-	--shadow-elevation-medium:
-		0.4px 0.5px 0.6px rgba(179, 179, 179, 0.38),
-		0.9px 1.2px 1.5px -1.2px rgba(179, 179, 179, 0.32),
-		2.4px 3.3px 4px -2.3px rgba(179, 179, 179, 0.27),
-		3.2px 5.5px 7.3px -3.5px rgba(179, 179, 179, 0.15);
-	--shadow-elevation-high:
-		0.4px 0.5px 0.6px rgba(179, 179, 179, 0.35),
-		1.2px 1.6px 2px -0.5px rgba(179, 179, 179, 0.32),
-		2.2px 3px 3.6px -1px rgba(179, 179, 179, 0.3),
-		3.9px 5.3px 6.4px -1.5px rgba(179, 179, 179, 0.27),
-		6.7px 9.2px 11.1px -2px rgba(179, 179, 179, 0.25),
-		11.1px 15.3px 18.4px -2.5px rgba(179, 179, 179, 0.22);
+	--shadow-elevation-low: 0.3px 0.4px 0.6px rgba(179, 179, 179, 0.25),
+	0.4px 0.7px 1px -1px rgba(179, 179, 179, 0.29),
+	1px 1.6px 2.3px -2px rgba(179, 179, 179, 0.33);
+	--shadow-elevation-medium: 0.4px 0.5px 0.6px rgba(179, 179, 179, 0.38),
+	0.9px 1.2px 1.5px -1.2px rgba(179, 179, 179, 0.32),
+	2.4px 3.3px 4px -2.3px rgba(179, 179, 179, 0.27),
+	3.2px 5.5px 7.3px -3.5px rgba(179, 179, 179, 0.15);
+	--shadow-elevation-high: 0.4px 0.5px 0.6px rgba(179, 179, 179, 0.35),
+	1.2px 1.6px 2px -0.5px rgba(179, 179, 179, 0.32),
+	2.2px 3px 3.6px -1px rgba(179, 179, 179, 0.3),
+	3.9px 5.3px 6.4px -1.5px rgba(179, 179, 179, 0.27),
+	6.7px 9.2px 11.1px -2px rgba(179, 179, 179, 0.25),
+	11.1px 15.3px 18.4px -2.5px rgba(179, 179, 179, 0.22);
 }
 
 /* ---------------
@@ -330,8 +327,8 @@ input[disabled].input_text, input[disabled].input_password, textarea[disabled] {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-/* Anchors styled to look like buttons.
-   These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--input_text);
 	border-color: var(--input_submit_border);
@@ -1517,7 +1514,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* Background for the sticky top page navigation in topics */
-nav.pagesection:has(+ #forumposts) {
+.pagesection.topic_pagesection {
 	background: var(--content_background);
 }
 

@@ -79,7 +79,7 @@ code::before {
 	position: absolute;
 	top: -1.7em;
 	left: 0;
-	content: 'Code:';
+	content: "Code:";
 }
 
 code {

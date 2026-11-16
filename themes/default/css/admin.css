@@ -314,7 +314,7 @@ h3.category_header form {
 }
 
 #core_features hr {
-	margin: .4rem  0 1.2rem 0;
+	margin: .4rem 0 1.2rem 0;
 	padding: 0;
 }
 
@@ -432,7 +432,7 @@ ul.package_section {
 	overflow: auto;
 	height: 14rem;
 	margin: .1rem 0 .4rem 0;
-	padding: .4rem  1.2rem;
+	padding: .4rem 1.2rem;
 	/* Show a scrollbar after about 6 lines. */
 	/* This is much better than the old max-height css. */
 	resize: vertical;
@@ -887,7 +887,7 @@ dl.themes_list dd {
 
 #agreement, #reserved {
 	width: 99%;
-	padding: 0 .4rem ;
+	padding: 0 .4rem;
 }
 
 #admin_register_form dt span {

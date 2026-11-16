@@ -216,7 +216,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
@@ -284,8 +284,8 @@ input[disabled].input_text, input[disabled].input_password, textarea[disabled], 
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
-/* Anchors styled to look like buttons.
-   These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--menu_text);
 	border-color: var(--secondary_border);
@@ -467,7 +467,7 @@ hr {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-/* A code block - maybe PHP ;) - shared styles. */
+	/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
@@ -740,14 +740,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* For primary admin/profile/etc drop menus. */
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-/* For secondary admin/profile/etc menus. */
+	/* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
 	color: var(--emphasize_text);
 }
 
 /* Level 1 active buttons for primary admin/profile/etc drop menus... */
 .admin_menu .active,
-/* ......and for secondary admin/profile/etc menu strip. */
+	/* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
 	color: var(--contrast_text);
 	border-color: var(--secondary_border);

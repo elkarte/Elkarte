@@ -100,6 +100,12 @@
 	--font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 	--font-heading: "Segoe UI Semibold", "Helvetica Neue Medium", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 	--font-mono: SFMono-Regular, ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, Consolas, "DejaVu Sans Mono", monospace;
+
+	/* Last-post icons, shared by the board index (below 30em) and the message index
+       (below 36em). Masked, so they take the surrounding text colour and need no
+       per-variant filter overrides: one declaration covers all four variants. */
+	--icon_lastpost_member: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='-2 -2 28 32'%3E%3Cpath d='M22.857 24.982c0 2.607-1.714 4.732-3.804 4.732H3.803c-2.089 0-3.804-2.125-3.804-4.732 0-4.696 1.161-10.125 5.839-10.125a7.972 7.972 0 0 0 11.178 0c4.679 0 5.839 5.429 5.839 10.125zM18.286 9.143c0 3.786-3.071 6.857-6.857 6.857s-6.857-3.071-6.857-6.857 3.071-6.857 6.857-6.857 6.857 3.071 6.857 6.857z'/%3E%3C/svg%3E");
+	--icon_lastpost_time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath fill='black' d='M2.25 12A9.75 9.75 0 1 1 12 21.75 9.76 9.76 0 0 1 2.25 12m1.5 0A8.25 8.25 0 1 0 12 3.75 8.26 8.26 0 0 0 3.75 12m10.375 4.186-2.655-2.655a.75.75 0 0 1-.22-.531V7.8a.75.75 0 0 1 1.5 0v4.889l2.435 2.436a.75.75 0 1 1-1.06 1.06Z'/%3E%3C/svg%3E");
 }
 
 /* -------------------------------------------------------
@@ -154,7 +160,7 @@ html, body {
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	text-decoration: none;
 }
@@ -281,25 +287,14 @@ textarea, .editor {
 	border-radius: .4rem;
 }
 
-/* Style the different types of inputs to be uniform for all browsers.
-   NOTE:
-   This does require some browser-specific code to get good results.
-   Padding on all types of inputs are set here.
-   If specific styling is wanted for some inputs, be aware of browser
-   differences when adding custom padding, or it will drive you mental. */
-
-/* Remove the inner border and padding in Firefox. */
-button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
-	padding: 0;
-	border-style: none;
-}
+/* Style the different types of inputs to be uniform for all browsers. */
 
 /* These values are to suppress the browsers `focus ring` which don't match the
    theme (instead we use border colors).  However we still want to allow keyboard
    users to see which button / submit is active.
    Focusing with a keyboard will show an assistive dashed line on button type elements. */
-input[type="submit"]:focus-visible, button:focus-visible, .linkbutton:focus-visible {
-	outline: 2px dashed var(--links);
+input[type="submit"]:focus-visible, input[type="button"]:focus-visible, button:focus-visible, .linkbutton:focus-visible {
+	outline: 1px dashed var(--links);
 }
 
 /* Focusing with a mouse or touch will not change it's indication. */
@@ -401,7 +396,7 @@ input[type="checkbox"], input[type="radio"] {
 
 /* Common submit button styling. */
 input[type="submit"], button[type="submit"], input[type="button"], button[type="button"],
-/* Anchors styled to look like buttons. */
+	/* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
 	display: inline-block;
 	margin-right: 0.2rem;
@@ -589,8 +584,6 @@ em, .em {
 }
 
 .nosel {
-	-moz-user-select: none;
-	-webkit-user-select: none;
 	user-select: none;
 }
 
@@ -781,7 +774,7 @@ h2.hdicon {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-/* A code block - maybe PHP ;) - shared styles. */
+	/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	font-size: var(--font14);
 	overflow: auto;
@@ -1150,12 +1143,6 @@ a.bbc_link {
 	display: none;
 }
 
-#search_form_button button {
-	align-items: center;
-	margin-block: 0;
-	font: inherit;
-}
-
 /* Quick Search Form, hidden until search icon is clicked */
 #search_form_menu {
 	position: absolute;
@@ -1169,28 +1156,22 @@ a.bbc_link {
 	opacity: 0;
 }
 
+/* Shared sizing for the three search controls */
 #search_form_menu input, #search_form_menu select, #search_form_menu button {
-	line-height: 2;
 	height: 3rem;
+	line-height: 2;
 }
 
-/* This to simply collapse the search form into a single element */
 #search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
 	margin-right: -1px;
 	border-right: none;
+	border-radius: 0;
 }
 
+/* Round the outer ends */
 #search_form_menu select {
 	min-width: 11.5rem;
 	border-radius: .4rem 0 0 .4rem;
-}
-
-#search_form_menu input {
-	border-radius: 0;
-}
-
-#search_form_menu button[type="submit"] {
-	border-radius: 0;
 }
 
 #search_form_menu button[type="button"] {
@@ -1217,6 +1198,10 @@ a.bbc_link {
 	visibility: visible;
 	transition: opacity .5s;
 	opacity: 1;
+}
+
+#quicksearch:focus {
+	outline: none !important;
 }
 
 /* The logo and slogan. @todo - Simplify. and use flex */
@@ -1289,8 +1274,14 @@ a.bbc_link {
 #news {
 	font-size: var(--font14);
 	line-height: 1.3;
-	padding: 0 0 1.6rem 0;
+	overflow: auto;
+	overflow-y: hidden;
+	height: 8.0rem;
+	min-height: 8.0rem;
+	padding: .4rem 1.2rem;
+	resize: vertical;
 	vertical-align: top;
+	border: 1px solid;
 }
 
 #news .bbc_link {
@@ -1308,16 +1299,6 @@ a.bbc_link {
 
 #news > h2::after {
 	content: "\2026";
-}
-
-#news_line, #news {
-	overflow: auto;
-	overflow-y: hidden;
-	height: 8.0rem;
-	min-height: 8.0rem;
-	padding: .4rem 1.2rem;
-	resize: vertical;
-	border: 1px solid;
 }
 
 /* The content section, below the news and bread crumbs */
@@ -2123,15 +2104,22 @@ button[type="submit"].quick_quote_button.hide {
 	margin: 0 .4rem 0 0;
 }
 
-/* Keep the topic's top page navigation visible while scrolling long topics.
-   Background color comes from the theme variant files.
+/* Keep the topic's top page navigation (pages / 1/2/3 .... reply/notif/etc.) visible while scrolling
+   long topics. The .topic_pagesection class is added by template_pages_and_buttons_above().
    --topic_navigation_offset is measured from the pinned header/menu by theme.js. */
-nav.pagesection:has(+ #forumposts) {
+.pagesection.topic_pagesection {
 	position: sticky;
 	z-index: 10;
 	top: var(--topic_navigation_offset, 0);
 	margin-top: 0;
 	padding-block: .4rem;
+}
+
+/* The bar at the end of the topic carries the same controls; once it is on
+   screen the sticky copy is pure duplication. It keeps its layout box (which is
+   scrolled out of view at that point) so hiding it shifts nothing below it. */
+.pagesection.topic_pagesection.is_hidden {
+	visibility: hidden;
 }
 
 /* Button list in a page section (flexbox), "float" right */
@@ -2167,21 +2155,21 @@ nav.pagesection:has(+ #forumposts) {
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks li:first-child::before, .small_pagelinks li:last-child::after {
-    display: inline-block;
-    width: var(--font12);
-    height: var(--font12);
-    content: ""; /* Was \2B9E; and \2B9C; */
-    background-color: currentColor;
+	display: inline-block;
+	width: var(--font12);
+	height: var(--font12);
+	content: ""; /* Was \2B9E; and \2B9C; */
+	background-color: currentColor;
 }
 
 .small_pagelinks li:last-child::after {
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 2l16 10L4 22l4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M4 2l16 10L4 22l4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 2l16 10L4 22l4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M4 2l16 10L4 22l4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 .small_pagelinks li:first-child::before {
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 2l-16 10L20 22l-4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M20 2l-16 10L20 22l-4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 2l-16 10L20 22l-4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M20 2l-16 10L20 22l-4-10z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 .small_pagelinks li {
@@ -2204,11 +2192,9 @@ nav.pagesection:has(+ #forumposts) {
 	left: 0;
 	height: 2.5em;
 	padding: 0.6em 0.1em 0 0.1em;
-	transform: translateZ(0);
 	border: 1px solid;
 	border-bottom: none;
 	border-radius: 0 2rem 0 0;
-	backface-visibility: hidden;
 }
 
 #gobottom {
@@ -2465,6 +2451,8 @@ nav.pagesection:has(+ #forumposts) {
 	margin-top: .25rem;
 }
 
+/* Above 51.5em the timestamp sits on the same line as the poster, separated by
+   a plain bullet. Between 51.5em and 30em the bullet is dropped (see below). */
 .category_boards .board_lasttime::before {
 	margin-right: 0.5rem;
 	content: "•";
@@ -2556,8 +2544,7 @@ nav.pagesection:has(+ #forumposts) {
 }
 
 /* Strengthen the unread/new-post board title */
-.board_row:has(.i-board-sub) .board_name a,
-.board_row:has(.i-board-new) .board_name a {
+.board_row_new .board_name a {
 	font-weight: 600;
 }
 
@@ -3121,7 +3108,6 @@ aside.poster, #quickreplybox .poster, #quicktopicbox .poster {
 	width: 100%;
 	padding: 0 .6rem;
 	text-align: center;
-
 }
 
 /* to overcome the PM indicator when it's on */
@@ -3536,7 +3522,7 @@ figure.attachment_block figcaption {
 }
 
 /* Topic icon and title */
-#topic_header .dropdown, #topic_header .hdicon  {
+#topic_header .dropdown, #topic_header .hdicon {
 	place-items: center center;
 	grid-area: hdicon;
 }
@@ -3573,10 +3559,20 @@ figure.attachment_block figcaption {
 	contain-intrinsic-size: 0 400px;
 }
 
-/* Open post menus must escape the article's paint containment and cover adjacent posts. */
+/* Fallback for browsers that understand content-visibility but not :has(),
+   i.e. Chrome / Edge 85-104. Everything newer supports both. */
+@supports not selector(:has(*)) {
+	#forumposts article.post_wrapper {
+		content-visibility: visible;
+	}
+}
+
+/* Open post menus must escape the article's paint containment and cover adjacent posts.
+   :focus-within and :hover stand in for "a submenu inside this article is open",
+   which cannot be expressed without :has() because styling cannot walk up the tree. */
 #forumposts article.forumposts:has(.menulevel2.selected),
-#forumposts article.forumposts:has(.listlevel1:focus-within > .menulevel2),
-#forumposts article.forumposts:has(.no_js .listlevel1:hover > .menulevel2) {
+#forumposts article.forumposts:focus-within,
+#forumposts article.forumposts:hover {
 	position: relative;
 	z-index: 1;
 	content-visibility: visible;
@@ -3716,7 +3712,7 @@ figure.attachment_block figcaption {
 
 #elk_lb_expand::before {
 	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='transparent' d='M0 0h100v100H0z'/%3E%3Cpath fill='%23000' d='M81.113 18.887v62.226L62.728 62.728 31.615 93.84 6.16 68.385l31.113-31.113-18.385-18.385Z'/%3E%3C/svg%3E") no-repeat center / 100%;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='transparent' d='M0 0h100v100H0z'/%3E%3Cpath fill='%23000' d='M81.113 18.887v62.226L62.728 62.728 31.615 93.84 6.16 68.385l31.113-31.113-18.385-18.385Z'/%3E%3C/svg%3E") no-repeat center / 100%;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='transparent' d='M0 0h100v100H0z'/%3E%3Cpath fill='%23000' d='M81.113 18.887v62.226L62.728 62.728 31.615 93.84 6.16 68.385l31.113-31.113-18.385-18.385Z'/%3E%3C/svg%3E") no-repeat center / 100%;
 }
 
 #elk_lb_next::before {
@@ -4208,11 +4204,10 @@ ul.post_options li {
 	opacity: 0.0001;
 }
 
-/* Show keyboard focus without highlighting the drop zone after a pointer selection. */
-.drop_area:has(:focus-visible) {
-	outline: 2px solid currentColor;
+/* Highlight the drop zone while its file input has focus. */
+.drop_area:focus-within {
+	outline: 1px solid currentColor;
 	outline-offset: 2px;
-	opacity: 1;
 }
 
 .drop_area_fileselect_text {
@@ -5254,21 +5249,9 @@ div.labels {
 	text-align: center;
 }
 
-#stats .history_head {
-	border-top: none;
-}
-
 #stats .lefttext {
 	width: 25%;
 	text-align: left;
-}
-
-#stats .stats_month {
-	padding: .4rem .8rem .4rem 3rem;
-}
-
-#stats .stats_day {
-	padding: .4rem .8rem .4rem .6rem;
 }
 
 /* -------------------------------------------------------
@@ -5533,7 +5516,7 @@ div.labels {
 	border-bottom: 1px solid;
 }
 
-.mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
+.whos_online dd:nth-child(even) div {
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 }
@@ -5622,10 +5605,6 @@ div.labels {
 	padding: 0.8rem;
 	border: 1px solid;
 	border-radius: .4rem;
-}
-
-#mlsearch_options.nojs {
-	display: none;
 }
 
 #mlsearch_options.nojs li:nth-child(odd) {
@@ -6057,7 +6036,7 @@ div.labels {
 .warnicon > s, .infoicon > s, .main-menu-icon > s {
 	position: absolute;
 	overflow: hidden;
-	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
 	width: 1px;
 	height: 1px;
 	margin: -1px;
@@ -6134,7 +6113,7 @@ div.labels {
    -------------------------------------------------------------------------------------------*/
 
 @media print {
-	#headerarea {
+	#top_section {
 		display: none;
 	}
 }
@@ -6149,19 +6128,6 @@ div.labels {
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 		scroll-behavior: auto !important;
-	}
-}
-
-/* 1600+ wide screens, Allow for 640/360 video to stack side X side
-   -------------------------------------------------------------------------------------------*/
-
-@media screen and (min-width: 100em) {
-	.elk_video_container {
-		max-width: 64rem;
-	}
-
-	.elk_video iframe {
-		max-height: 36rem;
 	}
 }
 
@@ -6261,6 +6227,7 @@ div.labels {
    this can be delayed for a smaller screen.  it's separated out to allow easy modification, be sure to
    check your color variant as well.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 60em) {
 	/* menu to icons */
 	#main_menu .icon-menu {
@@ -6433,6 +6400,7 @@ div.labels {
 		overflow-wrap: anywhere;
 	}
 
+	/* Timestamp wraps onto its own line here */
 	.category_boards .board_lasttime::before {
 		content: none;
 	}
@@ -6563,13 +6531,13 @@ div.labels {
 		min-height: 4rem;
 	}
 
-    #topic_header #topic_subject, #boarddescription {
-        font-size: var(--font18);
-        overflow: hidden;
-        min-width: 0;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
+	#topic_header #topic_subject, #boarddescription {
+		font-size: var(--font18);
+		overflow: hidden;
+		min-width: 0;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 
 	#topic_header.category_header {
 		padding: .5rem .2rem;
@@ -6582,12 +6550,12 @@ div.labels {
 			"navigation";
 	}
 
-	#topic_header .views_text, #topic_header .hdicon {
+	#topic_header .hdicon {
 		display: none;
 	}
 
 	/* un-sticky the topic bar reply / notify / etc. */
-	nav.pagesection:has(+ #forumposts) {
+	.pagesection.topic_pagesection {
 		position: unset;
 	}
 
@@ -6650,7 +6618,7 @@ div.labels {
 		padding: 0 0.4rem;
 	}
 
-	 .small_pagelinks .navPages {
+	.small_pagelinks .navPages {
 		min-width: 3rem;
 		min-height: 3rem;
 	}
@@ -6904,9 +6872,9 @@ div.labels {
 		margin: .8rem auto;
 	}
 
-    .shortcuts {
-        display: none;
-    }
+	.shortcuts {
+		display: none;
+	}
 
 	/* Profile page */
 	.profile_content {
@@ -7003,7 +6971,7 @@ div.labels {
 
 	#main_content_section {
 		margin: 0 1%;
-        padding: .4rem 0 0 0;
+		padding: .4rem 0 0 0;
 	}
 
 	#gobottom, #gotop {
@@ -7082,7 +7050,7 @@ div.labels {
 
 	.buttonlist {
 		flex-wrap: wrap;
-        gap: .4rem 0;
+		gap: .4rem 0;
 	}
 
 	.buttonlist > li {
@@ -7093,9 +7061,9 @@ div.labels {
 		padding: 0 .6rem;
 	}
 
-    .buttonlist .menulevel2 {
-        margin: 0 -2em 0 -2em;
-    }
+	.buttonlist .menulevel2 {
+		margin: 0 -2em 0 -2em;
+	}
 
 	.pagesection .buttonlist li {
 		margin-bottom: .4rem;
@@ -7107,9 +7075,9 @@ div.labels {
 		white-space: nowrap;
 	}
 
-    .quickbuttons .linklevel1 {
-        padding: 0 1rem 0 .4rem;
-    }
+	.quickbuttons .linklevel1 {
+		padding: 0 1rem 0 .4rem;
+	}
 
 	.pagesection .pagelinks {
 		flex-wrap: wrap;
@@ -7150,10 +7118,6 @@ div.labels {
 	.board_info h3 a {
 		font-size: var(--font16);
 		overflow-wrap: anywhere;
-	}
-
-	.topic_lastpost {
-		min-width: 27rem;
 	}
 
 	.topic_name, .topic_starter {
@@ -7201,7 +7165,7 @@ div.labels {
 		transform: none;
 	}
 
-	#unread.topic_listing > li,	.topic_listing > li {
+	#unread.topic_listing > li, .topic_listing > li {
 		margin-bottom: .8rem;
 		border: 1px solid;
 		grid-template-columns: [topic_info] minmax(0, 1fr) [topic_moderation] auto;
@@ -7230,12 +7194,27 @@ div.labels {
 		overflow-wrap: anywhere;
 	}
 
+	/* Last-post icons: masked so they follow the surrounding text colour */
+	.topic_latest_info > span:first-child::before,
 	.topic_latest_info > span:first-child::after {
-		content: " • ";
+		display: inline-block;
+		width: 1.4rem;
+		height: 1.4rem;
+		vertical-align: center;
+		content: "";
+		background-color: currentColor;
 	}
 
 	.topic_latest_info > span:first-child::before {
-		content: "📅";
+		margin-inline-end: .4rem;
+		-webkit-mask: var(--icon_lastpost_time) no-repeat center / contain;
+		mask: var(--icon_lastpost_time) no-repeat center / contain;
+	}
+
+	.topic_latest_info > span:first-child::after {
+		margin-inline-start: .4rem;
+		-webkit-mask: var(--icon_lastpost_member) no-repeat center / contain;
+		mask: var(--icon_lastpost_member) no-repeat center / contain;
 	}
 
 	.topic_icons {
@@ -7592,10 +7571,10 @@ div.labels {
 		min-width: 100%;
 	}
 
-    .editor_wrapper {
-        min-width: 98%;
-        margin: 0 1%;
-    }
+	.editor_wrapper {
+		min-width: 98%;
+		margin: 0 1%;
+	}
 
 	/* Stack form fields without overriding unrelated definition lists. */
 	.settings dt, .settings dd, .login dt, .login dd {
@@ -7626,12 +7605,12 @@ div.labels {
 	/* Other navigation controls */
 	.pagesection .buttonlist {
 		width: 100%;
-        padding: 0 .2rem;
+		padding: 0 .2rem;
 	}
 
-    .pagesection {
-        padding: .6rem 0 .4rem 0;
-    }
+	.pagesection {
+		padding: .6rem 0 .4rem 0;
+	}
 
 	.quickbuttons {
 		margin: .6rem 0 .6rem auto;
@@ -7690,12 +7669,28 @@ div.labels {
 		max-width: 85%;
 	}
 
-	.category_boards .board_lastposter > span:first-child::before {
-		content: "✏️ ";
+	/* Board rows: the same masked icons, coloured by the text around them. */
+	.category_boards .board_lastposter > span:first-child::before,
+	.category_boards .board_lasttime::before {
+		display: inline-block;
+		width: 1.4rem;
+		height: 1.4rem;
+		vertical-align: center;
+		content: "";
+		background-color: currentColor;
 	}
 
-	.category_boards .board_lastposter > span:nth-child(2)::before {
-		content: "📅";
+	.category_boards .board_lastposter > span:first-child::before {
+		margin-inline-end: .4rem;
+		-webkit-mask: var(--icon_lastpost_member) no-repeat center / contain;
+		mask: var(--icon_lastpost_member) no-repeat center / contain;
+	}
+
+	/* Timestamp wraps to its own line here */
+	.category_boards .board_lasttime::before {
+		margin-inline-end: .4rem;
+		-webkit-mask: var(--icon_lastpost_time) no-repeat center / contain;
+		mask: var(--icon_lastpost_time) no-repeat center / contain;
 	}
 
 	.childboard_row {
@@ -7811,10 +7806,6 @@ div.labels {
 		float: none;
 		width: 100%;
 		vertical-align: middle;
-	}
-
-	.views_text {
-		display: none !important;
 	}
 
 	/* Who is online listing, drop table view */

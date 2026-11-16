@@ -135,7 +135,7 @@ fieldset {
    RESPONSIVE - Small Screens
    ======================================== */
 @media screen and (max-width: 34em) {
-    .poster:after, .posterarea:before {
-        border-bottom: 1px solid;
-    }
+	.poster:after, .posterarea:before {
+		border-bottom: 1px solid;
+	}
 }

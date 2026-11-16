@@ -98,7 +98,7 @@
 }
 
 #wrapper {
-    border-radius: 0;
+	border-radius: 0;
 }
 
 /* ========================================
@@ -169,18 +169,18 @@
    ======================================== */
 
 .board_info {
-    border-left: 1px solid;
-    padding-left: .8rem !important;
-    padding-right: .8rem !important;
+	border-left: 1px solid;
+	padding-left: .8rem !important;
+	padding-right: .8rem !important;
 }
 
 .childboards {
-    border-left: 1px solid;
+	border-left: 1px solid;
 }
 
 /* Board stats left border */
 .board_stats {
-    border-left: 1px solid;
+	border-left: 1px solid;
 }
 
 /* =====================================
@@ -189,13 +189,13 @@
  */
 
 .topic_info {
-    border-left: 1px solid;
+	border-left: 1px solid;
 }
 
 /* Topic stats side borders */
 .topic_stats {
-    border-left: 1px solid;
-    border-right: 1px solid;
+	border-left: 1px solid;
+	border-right: 1px solid;
 }
 
 /* Attachment borders */
@@ -222,17 +222,17 @@
 
 /* Large screens - menu button sizing */
 @media screen and (max-width: 60em) {
-    #collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
-        width: 4.4rem;
-        height: 4.5rem;
-        padding: 0 !important;
-    }
+	#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+		width: 4.4rem;
+		height: 4.5rem;
+		padding: 0 !important;
+	}
 }
 
 /* Small screens - poster separator */
 @media screen and (max-width: 34em) {
-    .poster:after, .posterarea:before {
-        border-bottom: 1px solid;
-    }
+	.poster:after, .posterarea:before {
+		border-bottom: 1px solid;
+	}
 }
 

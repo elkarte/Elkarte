@@ -113,7 +113,7 @@
 	display: block;
 	width: var(--pointersize);
 	height: var(--pointersize);
-	content: '';
+	content: "";
 	transform: rotate(-45deg);
 	border: 1px solid var(--transparent);
 	border-top-color: var(--secondary_border);
@@ -244,8 +244,8 @@
 }
 
 .sceditor-group.sceditor-toolbar-toggle {
-	 display: none;
- }
+	display: none;
+}
 
 .sceditor-button {
 	float: left;
@@ -283,7 +283,7 @@
 .sceditor-button:hover, .sceditor-button-source.active:hover {
 	border-radius: .4rem;
 	background: var(--input_background_hover);
-	box-shadow: 1px 1px 1px var(--opacity30)  inset;
+	box-shadow: 1px 1px 1px var(--opacity30) inset;
 }
 
 a.sceditor-button-space:hover, .sceditor-button-space div:hover {

@@ -1,59 +1,127 @@
 /* Pretty printing styles. Used with prettify.js. */
 
 /* SPAN elements with the classes below are added by prettyprint. */
-.pln { color: #000000 }  /* plain text */
+.pln {
+	color: #000000
+}
+
+/* plain text */
 
 @media screen {
-	.str { color: #007700 }  /* string content */
+	.str {
+		color: #007700
+	}
 
-	.kwd { color: #000077 }  /* a keyword */
+	/* string content */
+	.kwd {
+		color: #000077
+	}
 
-	.com { color: #770000 }  /* a comment */
+	/* a keyword */
+	.com {
+		color: #770000
+	}
 
-	.typ { color: #660066 }  /* a type name */
+	/* a comment */
+	.typ {
+		color: #660066
+	}
 
-	.lit { color: #006666 }  /* a literal value */
+	/* a type name */
+	.lit {
+		color: #006666
+	}
+
+	/* a literal value */
 	/* punctuation, lisp open bracket, lisp close bracket */
-	.pun, .opn, .clo { color: #666600 }
+	.pun, .opn, .clo {
+		color: #666600
+	}
 
-	.tag { color: #000077 }  /* a markup tag name */
+	.tag {
+		color: #000077
+	}
 
-	.atn { color: #660066 }  /* a markup attribute name */
+	/* a markup tag name */
+	.atn {
+		color: #660066
+	}
 
-	.atv { color: #007700 }  /* a markup attribute value */
+	/* a markup attribute name */
+	.atv {
+		color: #007700
+	}
 
-	.dec, .var { color: #660066 }  /* a declaration; a variable name */
+	/* a markup attribute value */
+	.dec, .var {
+		color: #660066
+	}
 
-	.fun { color: red }  /* a function name */
+	/* a declaration; a variable name */
+	.fun {
+		color: red
+	}
+
+	/* a function name */
 }
 
 /* Use higher contrast and text-weight for printable form. */
 
 @media print, projection {
-	.str { color: #006600 }
+	.str {
+		color: #006600
+	}
 
-	.kwd { font-weight: bold; color: #000066 }
+	.kwd {
+		font-weight: bold;
+		color: #000066
+	}
 
-	.com { font-style: italic; color: #660000 }
+	.com {
+		font-style: italic;
+		color: #660000
+	}
 
-	.typ { font-weight: bold; color: #440044 }
+	.typ {
+		font-weight: bold;
+		color: #440044
+	}
 
-	.lit { color: #004444 }
+	.lit {
+		color: #004444
+	}
 
-	.pun, .opn, .clo { color: #444400 }
+	.pun, .opn, .clo {
+		color: #444400
+	}
 
-	.tag { font-weight: bold; color: #000066 }
+	.tag {
+		font-weight: bold;
+		color: #000066
+	}
 
-	.atn { color: #440044 }
+	.atn {
+		color: #440044
+	}
 
-	.atv { color: #006600 }
+	.atv {
+		color: #006600
+	}
 }
 
 /* Put a border around prettyprinted code snippets. */
-pre.prettyprint { padding: 2px; border: 1px solid #888888 }
+pre.prettyprint {
+	padding: 2px;
+	border: 1px solid #888888
+}
 
 /* Specify class=linenums on a pre to get line numbering */
-ol.linenums { margin-top: 0; margin-bottom: 0 } /* IE indents via margin-left */
+ol.linenums {
+	margin-top: 0;
+	margin-bottom: 0
+}
+
+/* IE indents via margin-left */
 
 li.L0,
 li.L1,
@@ -62,10 +130,15 @@ li.L3,
 li.L5,
 li.L6,
 li.L7,
-li.L8 { list-style-type: none }
+li.L8 {
+	list-style-type: none
+}
+
 /* Alternate shading for lines */
 li.L1,
 li.L3,
 li.L5,
 li.L7,
-li.L9 { background: #EEEEEE }
+li.L9 {
+	background: #EEEEEE
+}

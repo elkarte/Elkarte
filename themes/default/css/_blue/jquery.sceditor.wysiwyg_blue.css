@@ -11,7 +11,7 @@
 	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
 	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
 	--box_shadow: rgba(0, 0, 0, 0.2); /* Used on many box shadows */
-	--me: #a80000; /* me and footnotes */
+	--me: #A80000; /* me and footnotes */
 }
 
 /* This really should match your site stylesheet */
@@ -77,7 +77,7 @@ code::before {
 	position: absolute;
 	top: -1.7em;
 	left: 0;
-	content: 'Code:';
+	content: "Code:";
 }
 
 code {
