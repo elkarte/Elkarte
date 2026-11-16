@@ -254,10 +254,6 @@ body {
  * $STATISTICS
  * -------------------------------------------------------
  */
-.stats.floatleft {
-	border-right-color: var(--transparent);
-	border-left: 1px solid var(--secondary_border_left);
-}
 
 /* -------------------------------------------------------
  * $MEDIA

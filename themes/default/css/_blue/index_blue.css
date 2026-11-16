@@ -2082,10 +2082,6 @@ ul.cf_icons {
 	background: var(--primary_content_background);
 }
 
-.stats.floatleft {
-	border-right-color: var(--primary_border);
-}
-
 #top_row .stats dd, .statsbar {
 	border-color: var(--secondary_border);
 	background: var(--primary_content_background);

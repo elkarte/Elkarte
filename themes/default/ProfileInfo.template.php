@@ -83,8 +83,10 @@ function template_action_summary()
 			// Each template in the tab gets placed in a container
 			foreach ($context['summarytabs'][$tab]['templates'] as $templates)
 			{
+				$profile_content_class = 'profile_content' . (is_array($templates) ? ' profile_columns' : '');
+
 				echo '
-						<div class="profile_content">';
+						<div class="', $profile_content_class, '">';
 
 				// This container has multiple templates in it (like side x side)
 				if (is_array($templates))
@@ -1413,7 +1415,7 @@ function showHourChart($type)
 					borderWidth: 1,
 					pointStyle: "circle",
 					pointRadius: 4,
-					lineTension: 0.35,
+					tension: 0.35,
 					fill: "origin"
 				}]
 			},
@@ -1426,7 +1428,8 @@ function showHourChart($type)
 					scales: {
 						y: {
 							stacked: true,
-							ticks: {beginAtZero: true}
+							beginAtZero: true,
+							ticks: {precision: 0}
 						}
 					},
 					plugins: {

@@ -603,7 +603,7 @@ function template_display_poll_above()
 	if ($context['poll']['show_results'] || !$context['allow_vote'])
 	{
 		echo '
-					<dl class="stats floatleft">';
+					<dl class="poll_stats">';
 
 		// Show each option with its corresponding percentage bar.
 		foreach ($context['poll']['options'] as $option)

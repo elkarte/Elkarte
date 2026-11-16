@@ -67,7 +67,7 @@ function template_general_statistics()
 				<h2 class="category_header hdicon i-pie-chart">
 					', $txt['general_stats'], '
 				</h2>
-				<dl class="stats floatleft">';
+				<dl class="stats">';
 
 	foreach ($context['general_statistics']['left'] as $key => $value)
 	{
@@ -129,10 +129,10 @@ function template_top_statistics()
 	[$data, $labels, $tooltips] = getChartData($context['top']['posters']);
 	echo '
 			<li class="flow_hidden">
-				<h2 class="category_header floatleft hdicon i-user-plus">
+				<h2 class="category_header hdicon i-user-plus">
 					', $txt['top_posters'], '
 				</h2>
-				<div class="stats floatleft">
+				<div class="stats">
 					<canvas id="topPoster"></canvas>
 				</div>';
 
@@ -155,10 +155,10 @@ function template_top_statistics()
 	[$data, $labels, $tooltips] = getChartData($context['top']['topics_replies'], 'num_replies');
 	echo '
 			<li class="flow_hidden">
-				<h2 class="category_header floatleft hdicon i-comments">
+				<h2 class="category_header hdicon i-comments">
 					', $txt['top_topics_replies'], '
 				</h2>
-				<div class="stats floatleft">
+				<div class="stats">
 					<canvas id="topReplies"></canvas>
 				</div>';
 
@@ -182,10 +182,10 @@ function template_top_statistics()
 
 	echo '
 			<li class="flow_hidden">
-				<h2 class="category_header floatleft hdicon i-pencil">
+				<h2 class="category_header hdicon i-pencil">
 					', $txt['top_starters'], '
 				</h2>
-				<div class="stats floatleft">
+				<div class="stats">
 					<canvas id="topStarters"></canvas>
 				</div>';
 
@@ -228,7 +228,9 @@ function template_forum_chart()
 				(empty($modSettings['hitStats']) ? '' : '
 				<button class="stats_button linklevel1" data-title="hits">' . $txt['page_views'] . '</button>'), '
 			</div>	
-			<canvas id="yearStats" height="200" style="width:80%"></canvas>';
+			<div class="history_stats">
+				<canvas id="yearStats"></canvas>
+			</div>';
 
 	// Generate all the data and place it in JS constants
 	setYearData();
@@ -455,19 +457,21 @@ function showLineChart($type)
 					borderWidth: 1,
 					pointStyle: "circle",
 					pointRadius: 4,
-					lineTension: 0.2,
+					tension: 0.2,
 					fill: "origin"
 				}]
 			},
 			yearConfig = {
 				type: "line",
-				responsive: true,
 				data: yearDataset,
 				options: {
+					responsive: true,
+					maintainAspectRatio: false,
 					scales: {
 						y: {
 							stacked: true,
-							ticks: {beginAtZero: true}
+							beginAtZero: true,
+							ticks: {precision: 0}
 						}
 					},
 					plugins: {

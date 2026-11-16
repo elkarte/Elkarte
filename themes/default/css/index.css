@@ -236,7 +236,7 @@ legend::before, .collapsed legend::before {
 
 /* Collection of pseudo element clearfixes. */
 .category_header::after, .wrapper::after, .editor_wrapper::after,
-#main_content_section::after, #main_container::after, .quickbuttons::after,
+#main_content_section::after, #main_container::after,
 .attachment_name::after, .attachment_name::before,
 #poll_options .options li::after {
 	display: block;
@@ -1158,8 +1158,8 @@ a.bbc_link {
 
 /* Shared sizing for the three search controls */
 #search_form_menu input, #search_form_menu select, #search_form_menu button {
-	height: 3rem;
 	line-height: 2;
+	height: 3rem;
 }
 
 #search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
@@ -1392,8 +1392,8 @@ a.bbc_link {
 	align-items: center;
 	flex-wrap: wrap;
 	justify-content: flex-start;
-	row-gap: .4rem;
 	padding: 0 0.4rem;
+	row-gap: .4rem;
 }
 
 .admin_menu .listlevel1 {
@@ -1418,9 +1418,9 @@ a.bbc_link {
 	align-items: center;
 	flex-wrap: wrap;
 	justify-content: flex-start;
-	row-gap: .4rem;
 	margin-bottom: .4rem;
 	padding: 0 .4rem;
+	row-gap: .4rem;
 }
 
 /* ditto */
@@ -1436,7 +1436,6 @@ a.bbc_link {
 /* When using the above adm_submenus / generic_menu tabs, this is the content div
    added by GenericMenu.template */
 #admin_content {
-	clear: both;
 	padding-top: .8rem;
 }
 
@@ -2328,26 +2327,26 @@ button[type="submit"].quick_quote_button.hide {
 
 /* Lists - settings use these a lot. */
 .settings {
-	clear: right;
-	overflow: auto;
+	display: grid;
+	align-items: start;
 	margin: 0 0 1rem 0;
+	grid-template-columns: minmax(0, 45%) minmax(0, 55%);
 }
 
 .settings dt {
-	float: left;
-	clear: both;
-	width: 45%;
+	width: auto;
 	min-height: 2.5rem;
 	margin: 0 0 1rem 0;
+	grid-column: 1;
 }
 
 .settings dd {
-	float: right;
 	overflow: auto;
-	width: 55%;
+	width: auto;
 	min-height: 2.5rem;
 	margin: 0 0 .3rem 0;
 	padding: .2rem .5rem .2rem .5rem;
+	grid-column: 2;
 }
 
 .settings dd input[type="checkbox"] {
@@ -2894,8 +2893,8 @@ button[type="submit"].quick_quote_button.hide {
 /* Container, holds the moderation checkbox. */
 .topic_moderation {
 	height: 100%;
-	grid-column-start: topic_moderation;
 	padding: .8rem 1rem;
+	grid-column-start: topic_moderation;
 	place-self: center center;
 }
 
@@ -3036,9 +3035,20 @@ button[type="submit"].quick_quote_button.hide {
 	padding: 0 0 0 1.2rem;
 }
 
-#poll_options > dl.stats {
-	width: 100%;
-	border: none;
+#poll_options > .poll_stats {
+	overflow: hidden;
+	margin: 1.3rem 0;
+	padding: 0 1.6rem;
+}
+
+#poll_options .poll_stats dt {
+	font-size: var(--font15);
+	line-height: 1.5;
+	float: left;
+	clear: both;
+	width: 48%;
+	margin: 0 2% .4rem 0;
+	padding: 0;
 }
 
 #pollmoderation {
@@ -3987,23 +3997,26 @@ dl.send_mail dd {
 
 /* Area just above the editor, subject, message icon */
 #post_header {
-	overflow: hidden;
+	display: grid;
+	align-items: start;
 	padding: .6rem;
+	grid-template-columns: minmax(0, 15%) minmax(0, 1fr);
+	column-gap: 2%;
 }
 
 #post_header dt {
 	font-weight: bold;
-	float: left;
-	width: 15%;
+	width: auto;
 	margin: .6rem 0 0 0;
 	padding: 0;
+	grid-column: 1;
 }
 
 #post_header dd {
-	float: left;
-	width: 83%;
+	width: auto;
 	margin: .4rem 0;
 	padding: 0;
+	grid-column: 2;
 }
 
 #post_header img {
@@ -4575,15 +4588,33 @@ dl.merge_topic dd {
 	overflow-wrap: break-word;
 }
 
+.profile_content.profile_columns {
+	display: flex;
+	align-items: flex-start;
+	flex-wrap: wrap;
+	gap: 0;
+}
+
+.profile_content.profile_columns > .profileblock_left,
+.profile_content.profile_columns > .profileblock_right {
+	flex: 1 1 50%;
+	width: auto;
+	min-width: 0;
+}
+
 .profileblock_left {
-	float: left;
-	width: 50%;
+	display: flex;
+	align-items: flex-start;
+	flex-wrap: wrap;
 	padding: 0 .4rem 1.6rem .4rem;
 }
 
+.profileblock_left > * {
+	flex: 1 1 100%;
+	min-width: 0;
+}
+
 .profileblock_right {
-	float: right;
-	width: 50%;
 	padding: 0 .4rem 1.6rem .4rem;
 }
 
@@ -4630,8 +4661,9 @@ ul.cf_icons li:not(:first-child)::before {
 
 /* Main block of user summary */
 #detailedinfo {
-	float: right;
-	width: 70%;
+	flex: 1 1 70%;
+	width: auto;
+	min-width: 0;
 	margin-top: 0;
 	hyphens: auto;
 	overflow-wrap: break-word;
@@ -4639,8 +4671,9 @@ ul.cf_icons li:not(:first-child)::before {
 
 /* The basic user info on the left of the block (avatar title etc) */
 #basicinfo {
-	float: left;
-	width: 30%;
+	flex: 0 0 30%;
+	width: auto;
+	min-width: 0;
 }
 
 #basicinfo h4 {
@@ -4667,25 +4700,25 @@ ul.cf_icons li:not(:first-child)::before {
 }
 
 #detailedinfo dl, #tracking dl, .profileblock dl {
-	clear: right;
-	overflow: auto;
+	display: grid;
+	align-items: start;
 	margin: 0 0 1.6rem 0;
+	grid-template-columns: minmax(0, 35%) minmax(0, 65%);
 }
 
 #detailedinfo dt, #tracking dt, .profileblock dt {
 	font-weight: bold;
-	float: left;
-	clear: both;
-	width: 35%;
+	width: auto;
 	margin: 0 0 .2rem 0;
 	padding: .6rem 0 0 0;
+	grid-column: 1;
 }
 
 #detailedinfo dd, #tracking dd, .profileblock dd {
-	float: left;
-	width: 65%;
+	width: auto;
 	margin: .6rem 0 .2rem 0;
 	padding: 0;
+	grid-column: 2;
 }
 
 .profileblock_signature dd {
@@ -4737,20 +4770,27 @@ ul.cf_icons li:not(:first-child)::before {
 }
 
 /* Profile statistics */
+#generalstats .content dl {
+	display: grid;
+	align-items: start;
+	margin: 0;
+	padding: 0;
+	grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+}
+
 #generalstats .content dt {
 	font-weight: bold;
-	float: left;
-	clear: both;
-	width: 50%;
+	width: auto;
 	margin: 0 0 .4rem 0;
 	padding: 0;
+	grid-column: 1;
 }
 
 #generalstats .content dd {
-	float: left;
-	width: 50%;
+	width: auto;
 	margin: 0 0 .4rem 0;
 	padding: 0;
+	grid-column: 2;
 }
 
 #show_attachments th {
@@ -4766,30 +4806,39 @@ ul.cf_icons li:not(:first-child)::before {
 }
 
 /* Most popular boards by posts and activity */
+#popularposts, #popularactivity {
+	display: inline-block;
+	width: 49%;
+	vertical-align: top;
+}
+
 #popularposts {
-	float: left;
-	width: 50%;
 	padding: .6rem .6rem 0 0;
 }
 
 #popularactivity {
-	float: right;
-	width: 50%;
 	padding: .6rem 0 0 .6rem;
+}
+
+#popularposts div.content dl, #popularactivity div.content dl {
+	display: grid;
+	align-items: start;
+	margin: 0;
+	padding: 0;
+	grid-template-columns: minmax(0, 65%) minmax(0, 35%);
 }
 
 #popularposts div.content dt, #popularactivity div.content dt {
 	font-weight: bold;
-	float: left;
-	clear: both;
-	width: 65%;
+	width: auto;
 	margin: 0 0 .6rem 0;
+	grid-column: 1;
 }
 
 #popularposts div.content dd, #popularactivity div.content dd {
-	float: left;
-	width: 35%;
+	width: auto;
 	margin: 0 0 .6rem 0;
+	grid-column: 2;
 }
 
 /* Holds the "pie-hole" SVG and text in profile stats */
@@ -4850,7 +4899,11 @@ ul.cf_icons li:not(:first-child)::before {
 
 /* Definition lists, mostly used in profile */
 #creator dl {
+	display: grid;
+	align-items: start;
 	margin: .4rem 0 0;
+	grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+	column-gap: 2%;
 }
 
 #creator dl:first-child {
@@ -4858,9 +4911,8 @@ ul.cf_icons li:not(:first-child)::before {
 }
 
 #creator dt {
-	float: left;
-	clear: both;
-	width: 40%;
+	width: auto;
+	grid-column: 1;
 }
 
 #creator dt label {
@@ -4868,11 +4920,11 @@ ul.cf_icons li:not(:first-child)::before {
 }
 
 #creator dd {
-	float: right;
 	overflow: visible;
-	width: 55%;
+	width: auto;
 	margin: 0 0 .67em .13em;
 	padding-bottom: 1px;
+	grid-column: 2;
 }
 
 .ignoreboards {
@@ -5154,26 +5206,36 @@ div.labels {
 	margin: .3rem 0;
 }
 
+/* Each statistics row is a two column grid of header/value block pairs. */
+.statistics > li {
+	display: grid;
+	align-items: start;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	grid-template-rows: auto auto;
+	grid-auto-flow: column;
+}
+
+/* The general statistics row uses one full width header over two blocks. */
+.statistics > #top_row {
+	grid-auto-flow: row;
+}
+
+.statistics > #top_row > .category_header {
+	width: 100%;
+	margin: 0 0.5%;
+	grid-column: 1 / -1;
+}
+
 .statistics .category_header::after {
 	display: none;
 }
 
 .statistics .category_header {
 	font-size: var(--font18);
-	width: 50%;
+	width: auto;
 	padding: 1px 1rem 0 1rem;
 	border: none;
 	border-bottom: .2rem solid;
-}
-
-#top_row .category_header {
-	width: 99%;
-	margin: 0 0.5%;
-}
-
-.statistics .category_header.floatleft {
-	max-width: 49%;
-	margin: 0 0.5%;
 }
 
 .statistics .flow_hidden, #forum_history .flow_hidden {
@@ -5181,31 +5243,60 @@ div.labels {
 	border: 1px solid;
 }
 
-.stats {
+/* Statistics blocks: definition lists and chart containers. */
+.statistics .stats {
 	overflow: hidden;
-	width: 50%;
-	margin: 1.3rem 0 1.3rem 50%;
+	width: auto;
+	margin: 1.3rem 0;
 	padding: 0 1.6rem;
 }
 
-.stats.floatleft {
-	clear: left;
-	margin: 1.3rem 0;
-	border-right: 5px solid;
-	border-right-style: double;
-}
-
-.stats dt {
+.statistics .stats dt {
 	font-size: var(--font15);
-	line-height: 1.467;
-	float: left;
-	clear: both;
-	width: 48%;
+	line-height: 1.5;
 	margin: 0 2% .4rem 0;
 	padding: 0;
 }
 
-#top_row .stats dd, .statsbar {
+/* Dedicated canvas containers keep charts readable at phone widths. */
+.statistics div.stats, .history_stats {
+	position: relative;
+	min-width: 0;
+	height: 28rem;
+}
+
+.history_stats {
+	width: 100%;
+}
+
+/* Definition lists inside the statistics blocks are label/value grids. */
+.statistics dl.stats {
+	display: grid;
+	align-items: start;
+	grid-template-columns: minmax(0, 60%) minmax(0, 1fr);
+}
+
+.statistics dl.stats dt {
+	width: auto;
+	grid-column: 1;
+}
+
+.statistics dl.stats dd {
+	width: auto;
+	grid-column: 2;
+}
+
+#top_row .stats dd {
+	position: relative;
+	float: none;
+	width: auto;
+	min-height: 2.4rem;
+	margin: .2rem 0 .4rem 0;
+	padding: 0;
+	border: 1px solid;
+}
+
+.statsbar {
 	position: relative;
 	float: right;
 	width: 50%;
@@ -5377,12 +5468,11 @@ div.labels {
 
 /* The basic search section. */
 #simple_search, #advanced_search {
+	min-width: 0;
+	max-width: 100%;
 	margin: .12em 0 0 0;
 	padding: .8rem 0;
 	text-align: center;
-	min-width: 0;
-	box-sizing: border-box;
-	max-width: 100%;
 }
 
 #search_error {
@@ -5392,25 +5482,27 @@ div.labels {
 
 /* The advanced search section. */
 #search_options {
-	overflow: hidden;
+	display: grid;
+	align-items: start;
 	width: 60rem;
+	max-width: 100%;
 	margin: 0 auto;
 	padding-top: 1.3rem;
+	grid-template-columns: minmax(0, 35%) minmax(0, 65%);
 }
 
 #advanced_search dt {
-	float: left;
-	clear: both;
-	width: 35%;
+	width: auto;
 	padding: .4rem .4rem 0 .4rem;
 	text-align: right;
+	grid-column: 1;
 }
 
 #advanced_search dd {
-	float: left;
-	width: 65%;
+	width: auto;
 	padding: .4rem .12em;
 	text-align: left;
+	grid-column: 2;
 }
 
 #pick_boards .submitbutton {
@@ -6036,12 +6128,12 @@ div.labels {
 .warnicon > s, .infoicon > s, .main-menu-icon > s {
 	position: absolute;
 	overflow: hidden;
-	clip-path: inset(50%);
 	width: 1px;
 	height: 1px;
 	margin: -1px;
 	padding: 0;
 	border: 0;
+	clip-path: inset(50%);
 }
 
 .icon-small {
@@ -6231,16 +6323,16 @@ div.labels {
 @media screen and (max-width: 60em) {
 	/* menu to icons */
 	#main_menu .icon-menu {
+		line-height: 1;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		line-height: 1;
-		transform: none;
 		width: 4rem;
 		height: 4rem;
 		min-height: 4rem;
 		margin: .2rem;
 		padding: .6rem;
+		transform: none;
 		border: 2px solid;
 		border-radius: .4rem;
 	}
@@ -6269,11 +6361,11 @@ div.labels {
 	}
 
 	#collapse_button .main-menu-icon, #search_form_button .main-menu-icon {
+		line-height: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		height: 1.8rem;
-		line-height: 1;
 	}
 
 	#collapse_button .main-menu-icon::before, #search_form_button .main-menu-icon::before {
@@ -6384,9 +6476,9 @@ div.labels {
 	.board_row .lastpost_link {
 		display: flex;
 		overflow: hidden;
-		white-space: normal;
 		align-items: center;
 		min-height: 4rem;
+		white-space: normal;
 	}
 
 	.board_row .board_latest {
@@ -6560,14 +6652,23 @@ div.labels {
 	}
 
 	/* Stack both summary column levels alongside compact settings forms. */
-	#basicinfo, #detailedinfo {
-		float: none;
+	.profile_content.profile_columns {
+		flex-direction: column;
+	}
+
+	.profile_content.profile_columns > .profileblock_left,
+	.profile_content.profile_columns > .profileblock_right {
+		flex-basis: 100%;
 		width: 100%;
 	}
 
-	.profileblock_left, .profileblock_right {
-		float: none;
-		overflow: auto;
+	.profileblock_left {
+		overflow: visible;
+		flex-direction: column;
+	}
+
+	#basicinfo, #detailedinfo {
+		flex: 1 1 100%;
 		width: 100%;
 	}
 
@@ -6575,8 +6676,8 @@ div.labels {
 	.profileblock .linkbutton {
 		max-width: 100%;
 		height: auto;
-		margin-inline: 0;
 		white-space: normal;
+		margin-inline: 0;
 	}
 
 	/* Shared forms: stack settings rows without stretching short controls. */
@@ -6602,8 +6703,8 @@ div.labels {
 	input[type="search"], input[type="submit"], input[type="button"], button, select,
 	.linkbutton:link, .linkbutton:visited {
 		font-size: var(--font16);
-		min-height: 3.5rem;
 		line-height: 2;
+		min-height: 3.5rem;
 	}
 
 	.buttonlist li a.linklevel1, .quickbuttons .linklevel1,
@@ -6614,8 +6715,8 @@ div.labels {
 		justify-content: center;
 		min-width: 3.5rem;
 		min-height: 3.5rem;
-		white-space: normal;
 		padding: 0 0.4rem;
+		white-space: normal;
 	}
 
 	.small_pagelinks .navPages {
@@ -6723,8 +6824,8 @@ div.labels {
 
 	#main_menu .linklevel2 > span, #main_menu .linklevel3 > span {
 		flex-shrink: 0;
-		margin-inline-start: .4rem;
 		white-space: nowrap;
+		margin-inline-start: .4rem;
 	}
 
 	/* Wrapping labels must not shrink dropdowns to the More button width. */
@@ -6803,17 +6904,27 @@ div.labels {
 	}
 
 	/* our stats page */
-	.stats {
-		float: none;
-		min-width: 100%;
+	.statistics .stats {
 		margin: 0;
 	}
 
-	.stats dt {
+	.statistics .stats dt {
 		font-weight: bold;
 	}
 
+	#poll_options .poll_stats dt {
+		font-weight: bold;
+	}
+
+	/* Stack the paired statistics blocks into a single column. */
+	.statistics > li {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto;
+		grid-auto-flow: row;
+	}
+
 	.statistics .category_header {
+		width: auto;
 		min-width: 100%;
 		margin: 0;
 	}
@@ -7200,8 +7311,8 @@ div.labels {
 		display: inline-block;
 		width: 1.4rem;
 		height: 1.4rem;
-		vertical-align: center;
 		content: "";
+		vertical-align: center;
 		background-color: currentColor;
 	}
 
@@ -7345,12 +7456,12 @@ div.labels {
 	}
 
 	ul.poster > .subsections {
-		order: 2;
-		margin-left: auto;
 		position: static;
 		flex: 1;
+		order: 2;
 		width: auto;
 		min-width: 0;
+		margin-left: auto;
 	}
 
 	ul.poster > .poster_avatar {
@@ -7400,7 +7511,7 @@ div.labels {
 
 	/* Profile statistics: stack popular-board summaries. */
 	#popularposts, #popularactivity {
-		float: none;
+		display: block;
 		width: 100%;
 		padding: .6rem .2rem 0 .2rem;
 	}
@@ -7675,8 +7786,8 @@ div.labels {
 		display: inline-block;
 		width: 1.4rem;
 		height: 1.4rem;
-		vertical-align: center;
 		content: "";
+		vertical-align: center;
 		background-color: currentColor;
 	}
 
@@ -7840,24 +7951,34 @@ div.labels {
    -------------------------------------------------------------------------------------------*/
 @media screen and (max-width: 22em) {
 	/* Stack profile details */
+	#detailedinfo dl, #tracking dl, .profileblock dl,
+	#generalstats .content dl {
+		grid-template-columns: 1fr;
+	}
+
 	#detailedinfo dt, #detailedinfo dd, #tracking dt, #tracking dd,
 	.profileblock dt, .profileblock dd,
 	#generalstats .content dt, #generalstats .content dd {
-		float: none;
 		width: 100%;
 		margin: 0;
 		text-align: start;
+		grid-column: 1;
 	}
 
 	/* Stack settings and creator details */
-	#creator dt, #creator dd, .settings dt, .settings dd {
-		float: none;
+	.settings, #creator dl, #search_options {
+		grid-template-columns: 1fr;
+	}
+
+	#creator dt, #creator dd, .settings dt, .settings dd,
+	#advanced_search dt, #advanced_search dd {
 		width: 100%;
 		text-align: start;
+		grid-column: 1;
 		padding-inline: 0;
 	}
 
-	#creator dd, .settings dd {
+	#creator dd, .settings dd, #advanced_search dd {
 		margin-bottom: 1rem;
 	}
 }

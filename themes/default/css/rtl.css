@@ -896,15 +896,6 @@ ul.post_options li {
 	clear: right;
 }
 
-/* Profile statistics */
-#generalstats .content dt {
-	float: right;
-}
-
-#generalstats .content dd {
-	float: right;
-}
-
 #show_attachments th {
 	text-align: right;
 }
@@ -1048,26 +1039,22 @@ div.labels {
  *	$STATISTICS
  * -------------------------------------------------------
  */
-.statistics .category_header {
-	margin: 0 50.5% 0 0.5%;
-}
 
-.stats {
-	margin: 1.2rem 50% 1.2rem 0;
-}
-
-.stats.floatleft {
-	clear: right;
-}
-
-.stats dt {
-	float: right;
+/* Statistics blocks are grids, which mirror automatically.
+   Only their inline spacing needs flipping. */
+.statistics .stats dt {
 	margin: 0 0 .4rem 2%;
 }
 
-#top_row .stats dd, .statsbar {
+/* Poll results still float, so mirror their float direction. */
+#poll_options .poll_stats dt {
+	float: right;
+	clear: right;
+	margin: 0 0 .4rem 2%;
+}
+
+.statsbar {
 	float: left;
-	padding: 0 0 0 .4rem;
 }
 
 .statsbar .bar {
@@ -1254,7 +1241,6 @@ div.labels {
 	#popularposts, #popularactivity,
 	#creator dt, #creator dd, .settings dt, .settings dd,
 	#tracking dt, #tracking dd,
-	#generalstats .content dt, #generalstats .content dd,
 	#popularposts div.content dt, #popularposts div.content dd,
 	#popularactivity div.content dt, #popularactivity div.content dd {
 		float: none;
@@ -1288,16 +1274,6 @@ div.labels {
 
 	.ignoreboards.floatright {
 		float: none;
-	}
-
-	/* our stats page */
-	.statistics .category_header {
-		margin: 0;
-	}
-
-	.stats {
-		float: none;
-		margin: 0;
 	}
 }
 
