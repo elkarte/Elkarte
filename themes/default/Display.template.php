@@ -725,7 +725,7 @@ function template_pages_and_buttons_above()
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a id="new"></a>' : '';
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons');
+	template_pagesection('normal_buttons', '', ['class' => 'topic_pagesection']);
 }
 
 /**
@@ -733,8 +733,8 @@ function template_pages_and_buttons_above()
  */
 function template_pages_and_buttons_below()
 {
-	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons');
+	// Show the page index... "Pages: [1]". theme.js hides the sticky copy above once this one is on screen.
+	template_pagesection('normal_buttons', '', ['class' => 'topic_pagesection_end']);
 
 	// Show the lower breadcrumbs.
 	theme_breadcrumbs();

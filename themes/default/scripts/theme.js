@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-
 	// Keep hover menus for mouse users; enable explicit controls for touch/keyboard.
 	window.addEventListener('touchstart', onFirstTouch, false);
 	document.addEventListener('keydown', onFirstMenuKey, true);
@@ -52,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		searchForm = document.getElementById('search_form_menu'),
 		searchClose = document.getElementById('search_form_close'),
 		mainMenu = document.getElementById('main_menu');
+
 	if (searchButton && searchCheck && searchForm && searchClose && mainMenu)
 	{
 		let setSearchOpen = function(open, restoreFocus) {
@@ -104,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Keep sticky content (topic page navigation, etc.) clear of pinned header chrome.
 	initializeTopicNavigationOffset();
+
+	// Hide the sticky topic page navigation once the duplicate one at the end of the topic is on screen.
+	initializeTopicPagesectionEnd();
 
 	// Smooth scroll to top.
 	document.getElementById('gotop').addEventListener('click', function(e) {
@@ -429,11 +432,10 @@ function stickyMenu ()
 	}
 }
 
-// Coalesce offset measurements into a single animation frame.
 // `var` (not `let`) so a duplicate theme.js load can't throw a redeclaration error.
 var topicNavigationFrame = null;
 
-// Measures whatever chrome is currently pinned to the top of the viewport (a
+// Measures whatever is currently pinned to the top of the viewport (a
 // sticky/fixed header or a fixed menu bar) and exposes its lower edge as
 // --topic_navigation_offset.  Sticky elements can then use
 // `top: var(--topic_navigation_offset, 0)` instead of hard-coding an offset.
@@ -530,3 +532,58 @@ function initializeTopicNavigationOffset ()
 
 // Exposed so inline toggle callbacks can refresh the measurement immediately.
 window.setTopicNavigationOffset = setTopicNavigationOffset;
+
+// `var` (not `let`) so a duplicate theme.js load can't throw a redeclaration error.
+var topicPagesectionFrame = null;
+
+// Hides the sticky topic page navigation once the bar at the end of the topic,
+// which carries the same page links and buttons, is on screen. Only applies
+// while the bar is actually pinned, so short topics and the un-stuck mobile
+// layout (where it is not sticky) are left alone.
+function setTopicPagesectionEnd ()
+{
+	if (topicPagesectionFrame !== null)
+	{
+		return;
+	}
+
+	topicPagesectionFrame = window.requestAnimationFrame(function() {
+		topicPagesectionFrame = null;
+
+		let top = document.querySelector('.pagesection.topic_pagesection'),
+			bottom = document.querySelector('.pagesection.topic_pagesection_end');
+
+		if (!top || !bottom)
+		{
+			return;
+		}
+
+		let style = getComputedStyle(top),
+			offset = parseFloat(style.top) || 0,
+			// Sticky positioning pins the bar when its box reaches the offset.
+			stuck = style.position === 'sticky' && top.getBoundingClientRect().top <= offset + 1,
+			// 8px dead band, so the bar cannot flicker while the end bar sits on the fold.
+			hidden = top.classList.contains('is_hidden'),
+			limit = window.innerHeight + (hidden ? 8 : -8),
+			bottomVisible = bottom.getBoundingClientRect().top <= limit;
+
+		// Never hide it out from under the keyboard.
+		top.classList.toggle('is_hidden', stuck && bottomVisible && !top.contains(document.activeElement));
+	});
+}
+
+function initializeTopicPagesectionEnd ()
+{
+	if (window.elkTopicPagesectionInitialized)
+	{
+		return;
+	}
+
+	window.elkTopicPagesectionInitialized = true;
+
+	window.addEventListener('scroll', setTopicPagesectionEnd, {passive: true});
+	window.addEventListener('resize', setTopicPagesectionEnd);
+	window.addEventListener('load', setTopicPagesectionEnd);
+
+	setTopicPagesectionEnd();
+}

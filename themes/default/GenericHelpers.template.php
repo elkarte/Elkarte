@@ -239,6 +239,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = [])
  *     - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if
  *        the page index code is not in the first level of $context
  *     - 'extra' (string) used to add html markup at the end of the template
+ *     - 'class' (string) extra class(es) to add to the nav element
  *
  * @return void an echoed content
  */
@@ -271,7 +272,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 	}
 
 	echo '
-			<nav class="pagesection">
+			<nav class="pagesection', empty($options['class']) ? '' : ' ' . $options['class'], '">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 				$options['extra'], '
