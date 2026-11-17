@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains those functions specific to keyCaptcha
+ * This file contains those functions specific to Turnstile verification control.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
