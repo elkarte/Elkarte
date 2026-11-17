@@ -58,8 +58,18 @@
 	color-scheme: light;
 
 	/* Native checkboxes, radios, progress etc pick up the link color */
-	accent-color: #334466; /* matches --links */
+	accent-color: var(--links); /* matches --links */
 
+	/* Core palette primitives: change these to re-tint the whole variant. */
+	--palette-accent: #557EA0;
+	--palette-accent-light: #557EA0;
+	--palette-surface: #FEFEFE;
+	--palette-surface-alt: #FAFAFA;
+	--palette-border: #CCCCCC;
+	--palette-border-dark: #AFAFAF;
+	--palette-text: #585858;
+
+	/* Backgrounds behind the content */
 	--html_background: #3E5A78; /* HTML & footer Background */
 	--body_grad_1: #E9EEF2; /* Body Gradient */
 	--body_grad_2: #E9EEF2; /* Body Gradient */
@@ -68,7 +78,7 @@
 	--top_section_border: #B8B8B8; /* Header */
 	--top_section_top_border: #B8B8B8; /* Top border */
 	--top_section_bottom_border: #B8B8B8; /* Top section lower border */
-	--top_section: #FEFEFE; /* Background */
+	--top_section: var(--palette-surface); /* Background */
 	--top_section_compliment: #E4E4E4; /* Used with above for gradient */
 	--title: #A85400; /* forum title, news, board names */
 	--title-compliment: #A85400; /* if you want a fade effect */
@@ -83,32 +93,31 @@
 	--footer_top_border: #B2B6BD; /* Border that separates footer from body */
 
 	/* Input controls, input, button, select, textarea */
-	--input_background: #FAFAFA; /* Generic inputs background */
+	--input_background: var(--palette-surface-alt); /* Generic inputs background */
 	--input_disabled_background: #E4E4E4; /* Disabled button background */
-	--input_border: #CCCCCC; /* Generic inputs border */
-	--input_border_hover: #557EA0; /* Hover for inputs */
+	--input_border: var(--palette-border); /* Generic inputs border */
+	--input_border_hover: var(--palette-accent); /* Hover for inputs */
 	--input_border_focus: #4A6B8C; /* Focus for inputs */
-	--input_background_hover: #FEFEFE; /* Hover background */
-	--input_text: #585858; /* input text */
+	--input_background_hover: var(--palette-surface); /* Hover background */
+	--input_text: var(--palette-text); /* input text */
 	--input_hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
 
 	/* Submit controls */
-	--input_submit_border: #AFAFAF; /* XX[type="submit"] */
+	--input_submit_border: var(--palette-border-dark); /* XX[type="submit"] */
 	--input_submit_border_top: #CFCFCF; /* complimentary for inset effects */
 	--input_submit_border_left: #BFBFBF; /* complimentary for inset effects */
-	--input_submit_shadow: #E4E4E4; /* box shadow */
-	--input_submit_background: #FEFEFE; /* background */
+	--input_submit_background: var(--palette-surface); /* background */
 	--input_submit_background_compliment: #E4E4E4; /* Used as gradient */
 
 	/* Submit hover effects */
-	--input_submit_border_hover: #CCCCCC; /* XX[type="submit"] */
+	--input_submit_border_hover: var(--palette-border); /* XX[type="submit"] */
 	--input_submit_border_top_hover: #DDDDDD; /* complimentary for inset effects */
 	--input_submit_border_left_hover: #C7C7C7; /* complimentary for inset effects */
 	--input_submit_background_hover: #F0F0F0; /* background */
 
 	/* Main Menu Active Button */
-	--menu_button_active: #557EA0; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_2: #557EA0; /* Compliment gradient color for above */
+	--menu_button_active: var(--palette-accent); /* Link, list active/hover colors (gradient and color) */
+	--menu_button_active_2: var(--palette-accent-light); /* Compliment gradient color for above */
 	--menu_button_border_active: #F49A3A; /* Active border color */
 	--menu_button_border_active_top: #F49A3A; /* Active top border */
 	--menu_button_active_hover: #FFAE14; /* Link, list active/hover colors (gradient and color) */
@@ -132,20 +141,20 @@
 	--icon_menu_hover_border: #4A6B8C;
 
 	/* Breadcrumbs */
-	--breadcrumb_active: #557EA0; /* Breadcrumb active/hover colors (gradient and color) */
-	--breadcrumb_active_2: #557EA0; /* Compliment gradient color for above */
-	--breadcrumb_background: #FEFEFE; /* Breadcrumb background */
+	--breadcrumb_active: var(--palette-accent); /* Breadcrumb active/hover colors (gradient and color) */
+	--breadcrumb_active_2: var(--palette-accent-light); /* Compliment gradient color for above */
+	--breadcrumb_background: var(--palette-surface); /* Breadcrumb background */
 
 	/* Category Headers */
 	--category_header_text: #FAFAFA; /* Text in the category bars */
-	--category_border: #CCCCCC; /* Main border color used around most everything that has a border */
+	--category_border: var(--palette-border); /* Main border color used around most everything that has a border */
 	--category_border_top: #DDDDDD;
-	--category_border_bottom: #CCCCCC;
+	--category_border_bottom: var(--palette-border);
 	--category_header_grad_1: #557EA0; /* 1-2 main header */
 	--category_header_grad_2: #557EA0; /* 1-3 category */
 	--category_header_grad_3: #3F6385; /* 1-4 secondary */
 	--category_header_grad_4: #3D5F7D; /* end of */
-	--secondary_category_border: #AFAFAF; /* Secondary category boarder */
+	--secondary_category_border: var(--palette-border-dark); /* Secondary category boarder */
 	--secondary_category_border_top: #CFCFCF;
 	--secondary_category_bottom: #BBBBBB;
 
@@ -156,7 +165,7 @@
 
 	/* Misc */
 	--links: #334466; /* normal links */
-	--bbclinks: #334466; /* bbc links */
+	--bbclinks: var(--links); /* bbc links */
 	--valid: #EBFFD8; /*  used as valid input background color */
 	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
 	--information: #F0F6F0; /* information box background */
@@ -168,12 +177,12 @@
 	--poster_name: #C06002;
 	--sticky_row: #CFDCE8; /* sticky row background */
 	--locked_row: #E8D8CF; /* locked row background */
-	--basic_row: #FEFEFE; /* basic row background */
+	--basic_row: var(--palette-surface); /* basic row background */
 	--basic_row_alternate: #F0F4F7; /* alternating topic row background */
 	--icon_online: #B4E391; /* part of icon online gradient */
 	--icon_online_grad: #21873C; /* part of icon online gradient */
-	--forum_posts: #FEFEFE; /* Post background */
-	--forum_posts_alternative: #FEFEFE; /* If stripping is wanted */
+	--forum_posts: var(--palette-surface); /* Post background */
+	--forum_posts_alternative: var(--palette-surface); /* If stripping is wanted */
 
 	/* Boxes with icons */
 	--successbox: #EEFFEE; /* success box background */
@@ -200,19 +209,19 @@
 	--currentday: #EBFFD8; /* Calendar current day */
 
 	/* Backgrounds */
-	--content_background: #FAFAFA; /* Background for many divs, input controls, etc */
+	--content_background: var(--palette-surface-alt); /* Background for many divs, input controls, etc */
 	--forum_category: #DEEDDA; /* Category background, seen as line separators */
-	--primary_content_background: #FEFEFE; /* Used in many backgrounds */
-	--news_background: #FAFAFA; /* Background of news section */
+	--primary_content_background: var(--palette-surface); /* Used in many backgrounds */
+	--news_background: var(--palette-surface-alt); /* Background of news section */
 	--action_available: #F97B00; /* new button, approval links */
 	--mid_grey_background: #E9E9E9; /* Various uses where a slightly darker background is needed */
-	--quote_background: #FAFAFA; /* Quote box background; also used by the fade overlay */
+	--quote_background: var(--palette-surface-alt); /* Quote box background; also used by the fade overlay */
 	--dark_background: #989898; /* A bit darker, useful in some places */
 
 	/* Text colors */
 	--emphasize_text: #444444; /* When you need a darker text color on hover or elsewhere */
-	--body_text: #585858; /* Body text, text areas, editor, inputs, more */
-	--menu_text: #585858; /* used for text in menus, breadcrumbs, buttons */
+	--body_text: var(--palette-text); /* Body text, text areas, editor, inputs, more */
+	--menu_text: var(--palette-text); /* used for text in menus, breadcrumbs, buttons */
 	--strong_text: #686868; /* like a demi bold */
 	--disabled_text: #888888; /* used in ACP */
 	--debug_text: #359D27; /* Debug text, generally on footer background */
@@ -229,11 +238,12 @@
 	--notice: #FFF5CD; /* This is a background color used on approve, warn etc */
 
 	/* Most other borders */
-	--primary_border: #CCCCCC; /* Main border color used around most everything that has a border */
+	--primary_border: var(--palette-border); /* Main border color used around most everything that has a border */
 	--primary_border_top: #DDDDDD;
 	--primary_border_left: #C7C7C7;
-	--primary_border_bottom: #CCCCCC;
-	--secondary_border: #AFAFAF; /* darker border */
+	--primary_border_right: var(--primary_border_left);
+	--primary_border_bottom: var(--palette-border);
+	--secondary_border: var(--palette-border-dark); /* darker border */
 	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
 	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
 	--secondary_border_bottom: #BBBBBB;
@@ -262,6 +272,29 @@
 	3.9px 5.3px 6.4px -1.5px rgba(179, 179, 179, 0.27),
 	6.7px 9.2px 11.1px -2px rgba(179, 179, 179, 0.25),
 	11.1px 15.3px 18.4px -2.5px rgba(179, 179, 179, 0.22);
+
+	/* UI Dialogs */
+	--dialog_border: #999999;
+	--dialog_background: #F4F4F4;
+	--title_fill: var(--transparent);
+
+	/* Reusable gradients. Override any of these with `none` in a custom/override stylesheet. */
+	--gradient_body: linear-gradient(to right, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+	--gradient_button: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	--gradient_header: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+	--gradient_header_secondary: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+	--gradient_header_tertiary: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_4));
+	--gradient_menu: linear-gradient(to bottom, var(--menu_background), var(--menu_background_compliment));
+	--gradient_menu_active: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
+	--gradient_menu_active_hover: linear-gradient(to bottom, var(--menu_button_active_hover), var(--menu_button_active_hover_2));
+	--gradient_breadcrumb: linear-gradient(0deg, var(--breadcrumb_active_2), var(--breadcrumb_active));
+	--gradient_breadcrumb_arrow: linear-gradient(135deg, var(--breadcrumb_active), var(--breadcrumb_active_2));
+	--gradient_bar: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+	--gradient_title: linear-gradient(95deg, var(--title-compliment), var(--title));
+	--gradient_top_section: linear-gradient(to bottom, var(--top_section), var(--top_section_compliment));
+	--gradient_nav: linear-gradient(to bottom, var(--menu_nav_grad_1) 0%, var(--menu_nav_grad_2) 100%);
+	--gradient_online: linear-gradient(to bottom, var(--icon_online) 0%, var(--icon_online_grad) 50%, var(--icon_online) 100%);
+	--gradient_offline: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_background) 50%, var(--mid_grey_background) 100%);
 }
 
 /* ---------------
@@ -287,7 +320,8 @@ html {
 
 body {
 	color: var(--body_text);
-	background-image: linear-gradient(to right, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+	background-color: var(--body_grad_1);
+	background-image: var(--gradient_body);
 }
 
 fieldset {
@@ -334,7 +368,8 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	border-color: var(--input_submit_border);
 	border-top-color: var(--input_submit_border_top);
 	border-left-color: var(--input_submit_border_left);
-	background-image: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	background-color: var(--input_submit_background);
+	background-image: var(--gradient_button);
 	box-shadow: var(--shadow-elevation-low);
 }
 
@@ -391,7 +426,8 @@ strong {
 	border-color: var(--category_border);
 	border-top-color: var(--category_border_top);
 	border-bottom-color: var(--category_border_bottom);
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header);
 	text-shadow: -1px -1px 1px var(--box_shadow);
 }
 
@@ -400,14 +436,16 @@ strong {
 	border-color: var(--category_border);
 	border-top-color: var(--secondary_category_border_top);
 	border-bottom-color: var(--secondary_category_bottom);
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header_secondary);
 }
 
 /* Styles for subsection headers. */
 .secondary_header {
 	border-color: var(--category_border);
 	border-top-color: var(--category_border_top);
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_4));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header_tertiary);
 	text-shadow: 1px 1px 0 var(--box_shadow);
 }
 
@@ -536,7 +574,7 @@ strong {
 /* A quote, perhaps from another post. */
 .bbc_quote {
 	border-color: var(--primary_border);
-	background: var(--quote_background, var(--news_background));
+	background: var(--quote_background);
 	box-shadow: var(--shadow-elevation-low);
 }
 
@@ -553,7 +591,7 @@ strong {
 
 /* Special box-shadow - gradient end-stop must match the quote background */
 input[type=checkbox].quote-show-more {
-	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--quote_background, var(--news_background)) 90%);
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--quote_background) 90%);
 	box-shadow: 1px 1px 0 0 var(--box_shadow);
 	border-left-color: var(--primary_border);
 }
@@ -653,13 +691,15 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-bottom: 2px solid;
 	border-top-color: var(--top_section_top_border);
 	border-bottom-color: var(--top_section_bottom_border);
-	background-image: linear-gradient(to bottom, var(--top_section), var(--top_section_compliment));
+	background-color: var(--top_section);
+	background-image: var(--gradient_top_section);
 	box-shadow: 0 1px 4px var(--opacity30), 0 1px 0 var(--top_section_bottom_border) inset;
 }
 
 #menu_nav {
 	border-bottom-color: var(--top_section_bottom_border);
-	background-image: linear-gradient(to bottom, var(--menu_nav_grad_1) 0%, var(--menu_nav_grad_2) 100%);
+	background-color: var(--menu_nav_grad_1);
+	background-image: var(--gradient_nav);
 }
 
 /* Maintenance mode warning. */
@@ -668,8 +708,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #forumtitle > a {
-	color: var(--transparent);
-	background: linear-gradient(95deg, var(--title-compliment), var(--title));
+	color: var(--title);
+	-webkit-text-fill-color: var(--title_fill);
+	background-image: var(--gradient_title);
 	-webkit-background-clip: text;
 }
 
@@ -842,7 +883,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--menu_button_border_active);
 	border-top-color: var(--menu_button_border_active_top);
 	background: var(--menu_button_active);
-	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
+	background-image: var(--gradient_menu_active);
 	background-origin: border-box;
 	box-shadow: var(--shadow-elevation-low);
 }
@@ -857,7 +898,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--menu_border_active_hover);
 	border-top-color: var(--menu_border_active_hover_top);
 	border-left-color: var(--menu_border_active_hover_left);
-	background-image: linear-gradient(to bottom, var(--menu_button_active_hover), var(--menu_button_active_hover_2));
+	background-color: var(--menu_button_active_hover);
+	background-image: var(--gradient_menu_active_hover);
 	box-shadow: none;
 	color: var(--emphasize_text);
 }
@@ -965,7 +1007,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active, .breadcrumb .crumb:hover, .breadcrumb .crumb:last-child:hover {
-	background-image: linear-gradient(0deg, var(--breadcrumb_active_2), var(--breadcrumb_active));
+	background-color: var(--breadcrumb_active);
+	background-image: var(--gradient_breadcrumb);
 }
 
 .breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
@@ -974,7 +1017,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .breadcrumb .crumb.active:after, .breadcrumb .crumb:hover:after, .breadcrumb .crumb:last-child {
-	background-image: linear-gradient(135deg, var(--breadcrumb_active), var(--breadcrumb_active_2));
+	background-color: var(--breadcrumb_active);
+	background-image: var(--gradient_breadcrumb_arrow);
 }
 
 .breadcrumb .crumb:after {
@@ -1043,7 +1087,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--menu_text);
 	border-color: var(--secondary_border);
 	border-top-color: var(--secondary_border_top);
-	background-image: linear-gradient(to bottom, var(--input_submit_background) 0%, var(--input_submit_background_compliment) 100%);
+	background-color: var(--input_submit_background);
+	background-image: var(--gradient_button);
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
@@ -1292,7 +1337,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .jump_to_header {
 	color: var(--category_header_text);
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header_secondary);
 	box-shadow: 2px 1px var(--opacity10) inset;
 }
 
@@ -1318,7 +1364,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .poll_gradient {
 	border-color: var(--contrast_border);
-	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+	background-color: var(--gradient_bar_bottom);
+	background-image: var(--gradient_bar);
 }
 
 /* On to the posts */
@@ -1369,7 +1416,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--secondary_border);
 	border-top-color: var(--secondary_border_top);
 	border-left-color: var(--secondary_border_left);
-	background-image: linear-gradient(to bottom, var(--input_submit_background) 0%, var(--input_submit_background_compliment) 100%);
+	background-color: var(--input_submit_background);
+	background-image: var(--gradient_button);
 	box-shadow: var(--shadow-elevation-low);
 }
 
@@ -1489,7 +1537,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Used by video embed JS when auto linking video links */
 .elk_video_header {
 	border-color: var(--secondary_border);
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header_secondary);
 }
 
 .elk_video_container {
@@ -1530,7 +1579,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #postAdditionalOptionsHeader, #postDraftOptionsHeader {
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header);
 }
 
 #postAdditionalOptions, #postDraftOptions {
@@ -1591,7 +1641,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-color: var(--secondary_border);
 	border-top-color: var(--secondary_border_top);
 	border-left-color: var(--secondary_border_left);
-	background-image: linear-gradient(to bottom, var(--input_submit_background) 0%, var(--input_submit_background_compliment) 100%);
+	background-color: var(--input_submit_background);
+	background-image: var(--gradient_button);
 	box-shadow: var(--shadow-elevation-low);
 }
 
@@ -1644,7 +1695,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
 	color: var(--contrast_text);
-	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active)) !important;
+	background-color: var(--menu_button_active);
+	background-image: var(--gradient_menu_active) !important;
 }
 
 /* Hover effect */
@@ -1704,7 +1756,8 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .activity_stats li .bar div {
-	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+	background-color: var(--gradient_bar_bottom);
+	background-image: var(--gradient_bar);
 }
 
 .profile_pie_ring {
@@ -1935,7 +1988,8 @@ ul.cf_icons {
 
 .letter_row > h3 {
 	border-color: var(--primary_border);
-	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+	background-color: var(--category_header_grad_1);
+	background-image: var(--gradient_header_secondary);
 }
 
 /* -------------------------------------------------------
@@ -2095,7 +2149,8 @@ ul.cf_icons {
 
 /* Status Bar */
 .statsbar .bar {
-	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+	background-color: var(--gradient_bar_bottom);
+	background-image: var(--gradient_bar);
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -2104,7 +2159,8 @@ ul.cf_icons {
 }
 
 .statsbar .righttext.voted {
-	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+	background-color: var(--gradient_bar_bottom);
+	background-image: var(--gradient_bar);
 	color: var(--contrast_text);
 }
 
@@ -2128,12 +2184,14 @@ ul.cf_icons {
 
 .iconline {
 	border-color: var(--icon_online_grad);
-	background-image: linear-gradient(to bottom, var(--icon_online) 0%, var(--icon_online_grad) 50%, var(--icon_online) 100%);
+	background-color: var(--icon_online);
+	background-image: var(--gradient_online);
 }
 
 .icoffline {
 	border-color: var(--primary_border);
-	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_background) 50%, var(--mid_grey_background) 100%);
+	background-color: var(--mid_grey_background);
+	background-image: var(--gradient_offline);
 }
 
 /* -------------------------------------------------------

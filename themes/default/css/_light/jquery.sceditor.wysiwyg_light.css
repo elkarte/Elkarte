@@ -1,6 +1,7 @@
 /* INTRODUCTION
-/* This is the ElkArte css used when the editor is in wysiwyg mode.
-/* ------------------------------------------------------- */
+ *
+ * This is the ElkArte css used when the editor is in wysiwyg mode.
+ * ----------------------------------------------------------------- */
 :root {
 	--body_text: #585858; /* Body text, text areas, editor, inputs, more */
 	--content_background: #FAFAFA; /* background for many divs, input controls, etc */
@@ -11,7 +12,7 @@
 	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
 	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
 	--box_shadow: #E4E4E4; /* Used on many box shadows */
-	--me: #5BA048; /* me and footnotes */
+	--me: #4A823A; /* me and footnotes */
 }
 
 /* This really should match your site stylesheet */

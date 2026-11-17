@@ -271,8 +271,4 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 	.topic_listing > li {
 		box-shadow: -3px 3px 6px var(--contrast_text_compliment);
 	}
-
-	.forumposts .windowbg, .forumposts .windowbg2 {
-		box-shadow: -3px 3px 6px var(--box_shadow);
-	}
 }
