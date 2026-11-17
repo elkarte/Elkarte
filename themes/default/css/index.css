@@ -1262,6 +1262,11 @@ a.bbc_link {
 	margin: 0 0 0 .8rem;
 }
 
+#logo {
+	max-width: 100%;
+	max-height: 250px;
+}
+
 /* Main forum area. */
 #wrapper {
 	margin-top: 1.6rem;
@@ -2450,8 +2455,6 @@ button[type="submit"].quick_quote_button.hide {
 	margin-top: .25rem;
 }
 
-/* Above 51.5em the timestamp sits on the same line as the poster, separated by
-   a plain bullet. Between 51.5em and 30em the bullet is dropped (see below). */
 .category_boards .board_lasttime::before {
 	margin-right: 0.5rem;
 	content: "•";
@@ -6663,8 +6666,8 @@ div.labels {
 	}
 
 	.profileblock_left {
+		display: block;
 		overflow: visible;
-		flex-direction: column;
 	}
 
 	#basicinfo, #detailedinfo {
