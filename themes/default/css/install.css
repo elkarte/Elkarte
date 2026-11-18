@@ -32,7 +32,7 @@ a:link, a:hover, a:visited {
 	border-top-color: var(--top_section_top_border);
 	border-bottom: 4px solid;
 	border-bottom-color: var(--top_section_bottom_border);
-	background-image: linear-gradient(to bottom, var(--contrast_text), var(--contrast_text_compliment));
+	background-image: linear-gradient(to bottom, var(--contrast_text), var(--contrast_text_complement));
 }
 
 #content_section {
@@ -215,7 +215,7 @@ h1.forumtitle {
 	padding: .4em .5em .5em .5em;
 	border: 1px solid var(--primary_border);
 	border-radius: 5px;
-	background: var(--contrast_text_compliment);
+	background: var(--contrast_text_complement);
 	box-shadow: 0 -2px 2px var(--opacity10);
 }
 

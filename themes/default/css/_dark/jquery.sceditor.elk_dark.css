@@ -161,7 +161,7 @@
 	border-top-color: var(--secondary_border_top);
 	border-left-color: var(--secondary_border_left);
 	border-radius: 0.125em;
-	background: var(--menu_background) linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	background: var(--menu_background) linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_complement));
 	box-shadow: 1px 1px 2px var(--opacity10), 0 -1px 0 var(--opacity10) inset;
 }
 

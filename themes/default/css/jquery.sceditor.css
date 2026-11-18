@@ -191,7 +191,7 @@
 	border-top-color: var(--input_submit_border_top);
 	border-left-color: var(--input_submit_border_left);
 	border-radius: .4rem;
-	background-image: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	background-image: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_complement));
 	box-shadow: var(--shadow-elevation-low);
 }
 

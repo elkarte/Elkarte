@@ -139,7 +139,7 @@
 #manage_boards li:nth-child(even) > li:nth-child(odd),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) {
-	background: var(--contrast_text_compliment);
+	background: var(--contrast_text_complement);
 }
 
 #manage_boards li:nth-child(odd),

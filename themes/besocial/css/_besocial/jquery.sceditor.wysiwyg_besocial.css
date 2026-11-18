@@ -5,11 +5,11 @@
 	--body_text: #4D4F53; /* Body text, text areas, editor, inputs, more */
 	--content_background: #FEFEFE; /* background for many divs, input controls, etc */
 	--secondary_border: #AFAFAF; /* darker border */
-	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
-	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
+	--secondary_border_top: #CFCFCF; /* complementary for hover effects */
+	--secondary_border_left: #BFBFBF; /* complementary for hover effects */
 	--secondary_border_bottom: #BBBBBB;
 	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
-	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
+	--contrast_text_complement: #E4E4E4; /* Used with --contrast_text for gradients */
 	--box_shadow: #E4E4E4; /* Used on many box shadows */
 	--me: #50AA3A; /* me and footnotes */
 }

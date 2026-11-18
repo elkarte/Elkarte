@@ -9,58 +9,52 @@
  * © ElkArte Forum contributors
  *
  * INTRODUCTION
- * This variant is the standard, gold, Elkarte theme.
- * This is eye candy / colors, specific layout override code is in custom_gold.css
+ * Colors and effects for the gold variant.
+ * Shared layout is in index.css; optional layout overrides go in custom_gold.css.
  *
- *      $CONSTANTS...........CSS Vars for easy updates
- *		$GENERAL.............Global resets, clearfixes, etc.
- *		$BBC.................Quotes, code blocks, BBC styles.
- *		$AJAX................The "loading" bar (quick edit, etc).
- *
- *		$MAIN................Forum header, wrapper, and footer.
- *		$MENUS...............Main and secondary menus.
- *		$BREADCRUMBS.........The navigation path breadcrumbs.
- *		$BUTTONS.............Most button strips.
- *		$PAGELINKS...........Page navigation links.
- *
- *		$TABLES..............Generic tables (memberlist, error log, etc).
- *		$SETTINGS............Generic lists for settings pages.
- *		$BOARDS..............Board index, sub-boards, and message index.
- *      $MESSAGE.............Message (topic) Index
- *		$DRAG-N-DROP.........Post attachment area, including Drag and Drop
- *
- *		$TOPICS..............The display template (topic view), including send.
- *		$EDITOR..............Main editor (posts, events, polls) and topic summary.
- *		$MODERATE............Move topic, split topic, merge topic.
- *
- *		$PROFILE.............The profile areas.
- *		$PERSONAL............The personal messages (PM) areas.
- *		$CALENDAR............The calendar
- *		$STATISTICS..........The statistics centre.
- *
- *		$HELP................Help pages, help icons and pop-ups, tooltips.
- *		$SEARCH..............Search pages, including memberlist search.
- *		$MEMBERLIST..........The memberlist table.
- *		$LOGIN...............Login and registration, maintenance mode.
- *
- *		$BOXES...............Message boxes (error, warning, info, etc).
- *		$PROGRESS............Nifty progress bars.
- *      $SVG.................Filter colors for the SVG icons
- *		$MEDIA...............Experimental media queries.
+ *	$CONSTANTS............Palette, named colors, and reusable effects.
+ *	$GENERAL..............Links, form controls, headers, and shared panels.
+ *	$BBC..................Quotes, code, links, and tables inside posts.
+ *	$AJAX.................Loading indicators.
+ *	$MAIN.................Forum header, wrapper, and footer.
+ *	$MENUS................Main, dropdown, and sidebar menus.
+ *	$BREADCRUMBS..........Navigation path and active crumbs.
+ *	$BUTTONS..............Action strips and quick buttons.
+ *	$PAGELINKS............Page navigation and floating top/bottom links.
+ *	$TABLES...............Generic tables and row states.
+ *	$SETTINGS.............Settings lists.
+ *	$BOARDS...............Board index and information center.
+ *	$MESSAGE..............Topic index and topic states.
+ *	$TOPICS...............Polls, posts, attachments, and lightbox.
+ *	$EDITOR...............Post editor, uploads, drafts, and topic summary.
+ *	$MODERATE.............Split-topic view.
+ *	$TABS.................Tabbed panels and active states.
+ *	$PROFILE..............Profile panels and activity charts.
+ *	$PERSONAL.............Private messages and capacity indicators.
+ *	$CALENDAR.............Calendar cells, events, and navigation.
+ *	$HELP.................Help panels, tooltips, and popups.
+ *	$SEARCH...............Search options and results.
+ *	$MEMBERLIST...........Member rows and letter navigation.
+ *	$LOGIN................Registration and input validation.
+ *	$BOXES................Status boxes and BBC callouts.
+ *	$PROGRESS.............Maintenance progress bars.
+ *	$STATISTICS...........Statistics panels and bars.
+ *	$ICONS................Warning and presence indicators.
+ *	$MEDIA................Responsive color and effect overrides.
  */
 
 /* ---------------
  *	$CONSTANTS
+ * Palette values supply shared defaults; named roles allow independent overrides.
+ * Put site customizations in override_gold.css, loaded after this file.
  * ---------------
  */
 :root {
-	/* Let the browser render form controls and scrollbars to match the variant */
+	/* Browser-native controls, scrollbars, and accent color */
 	color-scheme: light;
+	accent-color: var(--links);
 
-	/* Native checkboxes, radios, progress etc pick up the link color */
-	accent-color: var(--links); /* matches --links */
-
-	/* Core palette primitives: change these to re-tint the whole variant. */
+	/* Core palette: shared defaults for the role-specific colors below. */
 	--palette-accent: #C69843;
 	--palette-accent-light: #C69843;
 	--palette-surface: #FEFEFE;
@@ -69,196 +63,204 @@
 	--palette-border-dark: #AFAFAF;
 	--palette-text: #232020;
 
-	/* Backgrounds behind the content */
-	--html_background: #ECECEC; /* HTML & footer Background */
-	--body_grad_1: #F3F3F3; /* Body Gradient */
-	--body_grad_2: #F3F3F3; /* Body Gradient */
+	/* Page canvas and body gradient colors */
+	--html_background: #ECECEC; /* Page canvas below and around the body */
+	--body_grad_1: #F3F3F3; /* Body fallback and primary gradient stop */
+	--body_grad_2: #F3F3F3; /* Secondary body gradient stop */
 
-	/* Top section above the navigation menu */
-	--top_section_border: #B8B8B8; /* Header */
-	--top_section_top_border: #B8B8B8; /* Top border */
-	--top_section_bottom_border: #B8B8B8; /* Top section lower border */
-	--top_section: #9E7935; /* Background */
-	--top_section_compliment: #C69843; /* Used with above for gradient */
-	--title: #FAFAFA; /* forum title, news, board names */
-	--title-compliment: #DEDEDE; /* if you want a fade effect */
+	/* Header, wrapper edges, and title accents */
+	--top_section_border: #B8B8B8; /* Wrapper border */
+	--top_section_top_border: #B8B8B8; /* Header and wrapper top border; loading indicator */
+	--top_section_bottom_border: #B8B8B8; /* Header, navigation, and wrapper bottom borders */
+	--top_section: #9E7935; /* Header background and gradient start */
+	--top_section_complement: #C69843; /* Header gradient end color */
+	--title: #FAFAFA; /* Forum title */
+	--title_complement: #DEDEDE; /* Alternate title gradient color */
 
-	/* Menu nav background if a different background from top_section is wanted */
-	--menu_nav_grad_1: #232020; /* Top Menu nav bar background */
-	--menu_nav_grad_2: #232020; /* Top Menu nav bar background */
+	/* Navigation background, independent of the header */
+	--menu_nav_grad_1: #232020; /* Navigation fallback and first gradient stop */
+	--menu_nav_grad_2: #232020; /* Alternate navigation gradient stop */
 
-	/* Footer */
-	--footer_text: #5F4724; /* Text used in the footer */
-	--footer_background: #F3F3F3; /* Footer Background */
-	--footer_top_border: #F3F3F3; /* Border that separates footer from body */
+	/* Footer text, links, and background */
+	--footer_text: #5F4724;
+	--footer_background: #F3F3F3;
+	--footer_top_border: #F3F3F3;
 
-	/* Input controls, input, button, select, textarea */
-	--input_background: var(--palette-surface-alt); /* Generic inputs background */
-	--input_disabled_background: #E4E4E4; /* Disabled button background */
-	--input_border: var(--palette-border); /* Generic inputs border */
-	--input_border_hover: #9E7935; /* Hover for inputs */
-	--input_border_focus: #9E7935; /* Focus for inputs */
-	--input_background_hover: var(--palette-surface); /* Hover background */
-	--input_text: #585858; /* input text */
-	--input_hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
+	/* Form controls: text, backgrounds, and interaction borders */
+	--input_background: var(--palette-surface-alt);
+	--input_disabled_background: #E4E4E4; /* Disabled text fields and textareas */
+	--input_border: var(--palette-border);
+	--input_border_hover: #9E7935;
+	--input_border_focus: #9E7935;
+	--input_background_hover: var(--palette-surface);
+	--input_text: #585858;
+	--input_hover_text: #444444; /* Hovered textarea and editor text */
 
-	/* Submit controls */
-	--input_submit_border: var(--palette-border-dark); /* XX[type="submit"] */
-	--input_submit_border_top: #CFCFCF; /* complimentary for inset effects */
-	--input_submit_border_left: #BFBFBF; /* complimentary for inset effects */
-	--input_submit_background: var(--palette-surface); /* background */
-	--input_submit_background_compliment: #E4E4E4; /* Used as gradient */
+	/* Buttons: submit, button, file-select, and .linkbutton controls */
+	--input_submit_border: var(--palette-border-dark);
+	--input_submit_border_top: #CFCFCF;
+	--input_submit_border_left: #BFBFBF;
+	--input_submit_background: var(--palette-surface);
+	--input_submit_background_complement: #E4E4E4; /* Button gradient end color */
 
-	/* Submit hover effects */
-	--input_submit_border_hover: var(--palette-border); /* XX[type="submit"] */
-	--input_submit_border_top_hover: #DDDDDD; /* complimentary for inset effects */
-	--input_submit_border_left_hover: #C7C7C7; /* complimentary for inset effects */
-	--input_submit_background_hover: #F0F0F0; /* background */
+	/* Button hover colors; directional borders provide bevels */
+	--input_submit_border_hover: var(--palette-border);
+	--input_submit_border_top_hover: #DDDDDD;
+	--input_submit_border_left_hover: #C7C7C7;
+	--input_submit_background_hover: #F0F0F0;
 
-	/* Main Menu Active Button */
-	--menu_button_active: var(--palette-accent); /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_2: var(--palette-accent-light); /* Compliment gradient color for above */
-	--menu_button_border_active: #F49A3A; /* Active border color */
-	--menu_button_border_active_top: #F49A3A; /* Active top border */
-	--menu_button_active_hover: #FFAE14; /* Link, list active/hover colors (gradient and color) */
-	--menu_button_active_hover_2: #F5A100; /* Compliment gradient color for above */
-	--menu_border_active_hover_top: #F49A3A; /* Active menu border color top/left */
-	--menu_border_active_hover_left: #F49A3A; /* Active menu border color top/left */
-	--menu_border_active_hover: #F49A3A; /* Hover / active border */
+	/* Active menus and button strips; backgrounds are also shared by tabs and badges */
+	--menu_button_active: var(--palette-accent); /* Active background and gradient end color */
+	--menu_button_active_2: var(--palette-accent-light); /* Active gradient start color */
+	--menu_button_border_active: #F49A3A;
+	--menu_button_border_active_top: #F49A3A;
+	--menu_button_active_hover: #FFAE14; /* Active hover background and gradient start */
+	--menu_button_active_hover_2: #F5A100; /* Active hover gradient end color */
+	--menu_border_active_hover_top: #F49A3A;
+	--menu_border_active_hover_left: #F49A3A;
+	--menu_border_active_hover: #F49A3A;
 
-	/* Main Menu Regular Buttons #3A3732*/
-	--menu_border: #BBBBBB; /* linklevel 1 border */
+	/* Regular menus: buttons, dropdowns, and hover states */
+	--menu_border: #BBBBBB;
 	--menu_border_top: #DDDDDD;
 	--menu_border_left: #AAAAAA;
-	--menu_background: #DFCE9B; /* linklevel 1  background */
-	--menu_background_compliment: #DFCE9B;
-	--menu_border_hover_top: #DFCE9B; /*  menu border color top */
-	--menu_border_hover_left: #DFCE9B; /* menu border color left */
-	--menu_border_hover: #DFCE9B; /* Hover border */
-	--menu_button_hover_background: #5F4724; /* A hover background used on non active menu hovers */
-	--menu_dropdown_indicator: #F4F4F4; /* dropdown menu indicator */
-	--icon_menu_hover: #F4F4F4; /* Icon menu (small screen) hover background */
-	--icon_menu_hover_border: #DFCE9B;
+	--menu_background: #DFCE9B;
+	--menu_background_complement: #DFCE9B; /* Menu gradient end color */
+	--menu_border_hover_top: #DFCE9B;
+	--menu_border_hover_left: #DFCE9B;
+	--menu_border_hover: #DFCE9B;
+	--menu_button_hover_background: #5F4724;
+	--menu_dropdown_indicator: #F4F4F4; /* Dropdown arrow */
+	--icon_menu_hover: #F4F4F4; /* Mobile menu icon hover background */
+	--icon_menu_hover_border: #DFCE9B; /* Mobile menu icon hover border */
 
-	/* Breadcrumbs */
-	--breadcrumb_active: var(--palette-accent); /* Breadcrumb active/hover colors (gradient and color) */
-	--breadcrumb_active_2: var(--palette-accent-light); /* Compliment gradient color for above */
-	--breadcrumb_background: var(--palette-surface); /* Breadcrumb background */
+	/* Breadcrumb backgrounds and active/hover gradient colors */
+	--breadcrumb_active: var(--palette-accent); /* Active/hover background and gradient color */
+	--breadcrumb_active_2: var(--palette-accent-light); /* Alternate active/hover gradient color */
+	--breadcrumb_background: var(--palette-surface);
 
-	/* Category Headers */
-	--category_header_text: #FAFAFA; /* Text in the category bars */
-	--category_border: var(--palette-border); /* Main border color used around most everything that has a border */
+	/* Header bars: shared start color, separate gradient ends and borders */
+	--category_header_text: #FAFAFA;
+	--category_border: var(--palette-border);
 	--category_border_top: #DDDDDD;
 	--category_border_bottom: var(--palette-border);
-	--category_header_grad_1: #3A3732; /* 1-2 main header */
-	--category_header_grad_2: #3A3732; /* 1-3 category */
-	--category_header_grad_3: #3A3732; /* 1-4 secondary */
-	--category_header_grad_4: #3A3732; /* end of */
-	--secondary_category_border: var(--palette-border-dark); /* Secondary category boarder */
-	--secondary_category_border_top: #CFCFCF;
-	--secondary_category_bottom: #BBBBBB;
+	--category_header_grad_1: #3A3732; /* Shared gradient start and solid fallback */
+	--category_header_grad_2: #3A3732; /* Category header gradient end */
+	--category_header_grad_3: #3A3732; /* Content category gradient end */
+	--category_header_grad_4: #3A3732; /* Secondary header gradient end */
+	--secondary_category_border: var(--palette-border-dark); /* Table header bottom border */
+	--secondary_category_border_top: #CFCFCF; /* Content category top border */
+	--secondary_category_bottom: #BBBBBB; /* Content category bottom border */
 
-	/* Standard horizontal rule.. ([hr], etc.) */
+	/* Horizontal rules, including [hr] */
 	--hr_border_bottom: #BBBBBB;
 	--hr_border_top: #BBBBBB;
 	--hr_background: #E4E4E4;
 
-	/* Misc */
-	--links: #5F4724; /* normal links */
-	--bbclinks: var(--links); /* bbc links */
-	--valid: #EBFFD8; /*  used as valid input background color */
-	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
-	--information: #F0F6F0; /* information box background */
-	--description: #F7F3E7; /* description div background */
+	/* Links, input validation, and plain information panels */
+	--links: #5F4724; /* Standard links and native control accent */
+	--bbclinks: var(--links); /* Links inside posts */
+	--valid: #EBFFD8; /* Valid input background */
+	--invalid: #FFEEEE; /* Invalid input background */
+	--information: #F0F6F0; /* Plain information panel background */
+	--description: #F7F3E7; /* Description panel background */
 
-	/* Generally used in topic display */
-	--me: #A80000; /* me and footnotes */
-	--topic_name: #5F4724; /* Subject line, poster name and keyinfo */
-	--poster_name: #5F4724;
-	--sticky_row: #CFDCE8; /* sticky row background */
-	--locked_row: #E8D8CF; /* locked row background */
-	--basic_row: var(--palette-surface); /* basic row background */
-	--icon_online: #B4E391; /* part of icon online gradient */
-	--icon_online_grad: #21873C; /* part of icon online gradient */
-	--forum_posts: var(--palette-surface); /* Post background */
-	--forum_posts_alternative: var(--palette-surface); /* If stripping is wanted */
+	/* Topic and poster text */
+	--me: #A80000; /* /me actions and footnote links */
+	--topic_name: #5F4724; /* Topic links and post subject links */
+	--poster_name: #5F4724; /* Poster name links */
 
-	/* Boxes with icons */
-	--successbox: #EEFFEE; /* success box background */
+	/* Topic rows: sticky styling takes precedence when a topic is also locked. */
+	--sticky_row: var(--basic_row);
+	--sticky_row_border: var(--infobox_border);
+	--locked_row: #E8D8CF;
+	--locked_row_border: var(--infobox_border);
+	--basic_row: var(--palette-surface);
+
+	/* Presence indicator gradient colors */
+	--icon_online: #B4E391; /* Online indicator fallback and outer gradient stops */
+	--icon_online_grad: #21873C; /* Online indicator border and middle gradient stop */
+
+	/* Post backgrounds: odd and even rows, respectively */
+	--forum_posts: var(--palette-surface);
+	--forum_posts_alternative: var(--palette-surface);
+
+	/* Status boxes and BBC callouts; embedded icon colors are set in the component rules. */
+	--successbox: #EEFFEE;
 	--successbox_border: #008000;
-	--infobox: #D9EDF7; /* Infobox div background */
-	--infobox_border: #3A87AD; /* Infobox border */
+	--infobox: #D9EDF7;
+	--infobox_border: #3A87AD;
 	--errorbox: #FFEEEE;
 	--errorbox_border: #A80000;
 	--warningbox: #FFF5CD;
 	--warningbox_border: #FFA500;
 
-	/* Various bars, progress, totals, etc */
-	--status_bar_border: #A9CCD1; /* Status bar in attachment upload progress */
-	--status_bar_background: #F0F0F0; /* Status bar background */
-	--progress_bar_primary: #0000FF; /* Primary progress bar, as in maintenance */
-	--gradient_bar_top: #9E7935; /* Various bars, poll, stats, capacity */
-	--gradient_bar_bottom: #C69843; /* Various bars, poll, stats, capacity */
-	--gradient_bar_background: #CDDDBD; /* Lighter compliment color when needed */
+	/* Attachment upload progress, poll/statistics bars, and profile charts */
+	--status_bar_border: #A9CCD1;
+	--status_bar_background: #F0F0F0;
+	--progress_bar_primary: #0000FF; /* Maintenance progress fill */
+	--gradient_bar_top: #9E7935; /* Poll/statistics gradient end; profile chart segments */
+	--gradient_bar_bottom: #C69843; /* Poll/statistics gradient start and solid fallback */
+	--gradient_bar_background: #CDDDBD; /* Profile chart ring */
 
-	/* Calendar Items */
-	--birthday: #920AC4; /* Birthday color on calendar */
-	--holiday: #555080; /* Holiday color on calendar */
-	--event: #008000; /* Event color on calendar */
-	--currentday: #EBFFD8; /* Calendar current day */
+	/* Calendar text colors and today's highlight */
+	--birthday: #920AC4;
+	--holiday: #555080;
+	--event: #008000;
+	--currentday: #EBFFD8; /* Today's calendar cell background */
 
-	/* Backgrounds */
-	--content_background: var(--palette-surface-alt); /* Background for many divs, input controls, etc */
-	--forum_category: #DEEDDA; /* Category background, seen as line separators */
-	--primary_content_background: var(--palette-surface); /* Used in many backgrounds */
-	--news_background: #F7F3E7; /* Background of news section */
-	--quote_background: #FEFEFE; /* Quote box background; also used by the fade overlay */
-	--action_available: #F97B00; /* new button, approval links */
-	--mid_grey_background: #E9E9E9; /* Various uses where a slightly darker background is needed */
-	--dark_background: #989898; /* A bit darker, useful in some places */
+	/* Shared content backgrounds and action badges */
+	--content_background: var(--palette-surface-alt); /* General panels and inset surfaces */
+	--forum_category: #DEEDDA; /* Board category container and row separators */
+	--primary_content_background: var(--palette-surface); /* Main content surfaces */
+	--news_background: #F7F3E7;
+	--quote_background: #FEFEFE; /* Quote body, quote header, and fade endpoint */
+	--action_available: #F97B00; /* New-post, approval, and required-field badges */
+	--mid_grey_background: #E9E9E9; /* Muted panels, row containers, and attachments */
+	--dark_background: #989898; /* Offline indicator shading, editor and dialog surfaces */
 
-	/* Text colors */
-	--emphasize_text: #5F4724; /* When you need a darker text color on hover or elsewhere */
-	--body_text: var(--palette-text); /* Body text, text areas, editor, inputs, more */
-	--menu_text: #585858; /* used for text in menus, breadcrumbs, buttons */
-	--menu_active_text: #3A2A14;
-	--strong_text: #686868; /* like a demi bold */
-	--disabled_text: #888888; /* used in ACP */
-	--debug_text: #359D27; /* Debug text, generally on footer background */
-	--contrast_text: #FEFEFE; /* Used in shadows, backgrounds or text, where contrast is needed to background */
-	--contrast_text_compliment: #E4E4E4; /* Used with --contrast_text for gradients */
-	--user_highlight: #DFCD9B; /* User highlighted text */
+	/* Shared text roles for emphasis, controls, and contrast */
+	--emphasize_text: #5F4724; /* Emphasized/hover text and selection foreground */
+	--body_text: var(--palette-text); /* Default body text */
+	--menu_text: #585858; /* Menu, breadcrumb, and button text */
+	--menu_active_text: #3A2A14; /* Active menu and button-strip text */
+	--strong_text: #686868; /* Bold text and secondary headings */
+	--disabled_text: #888888; /* Disabled controls and admin text */
+	--debug_text: #359D27; /* Debug links and emphasized debug text */
+	--contrast_text: #FEFEFE; /* Text on accent fills; also editor and admin surfaces */
+	--contrast_text_complement: #E4E4E4; /* Lightbox/navigation icons and secondary admin surfaces */
+	--user_highlight: #DFCD9B; /* Text selection, copied code, and targeted footnotes */
 
-	/* Other special text / background colors */
-	--success: #008000; /* Success, progress mainly background | border */
-	--attention: #580023; /* Various red notice and error sections */
-	--alert: #E00000; /* error, alert, ... text | border */
-	--search_highlight: #FF7200; /* Search Results Highlight */
-	--warn: #FFA500; /* moderation, warning, ... text | border | background */
-	--notice: #FFF5CD; /* This is a background color used on approve, warn etc */
+	/* Status colors shared by text, indicators, and fills */
+	--success: #008000; /* Success text, progress fills, and low-usage indicators */
+	--attention: #580023; /* Attention text and high-usage indicators */
+	--alert: #E00000; /* Error/alert text and borders */
+	--search_highlight: #FF7200; /* Search-match text */
+	--warn: #FFA500; /* Warning text, borders, and medium-usage indicators */
+	--notice: #FFF5CD; /* Approval rows and moderation notices */
 
-	/* Most other borders */
-	--primary_border: var(--palette-border); /* Main border color used around most everything that has a border */
+	/* Shared borders: general dividers and secondary edges; directional values provide bevels */
+	--primary_border: var(--palette-border);
 	--primary_border_top: #DDDDDD;
 	--primary_border_left: #C7C7C7;
 	--primary_border_right: var(--primary_border_left);
 	--primary_border_bottom: var(--palette-border);
-	--secondary_border: var(--palette-border-dark); /* darker border */
-	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
-	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
+	--secondary_border: var(--palette-border-dark);
+	--secondary_border_top: #CFCFCF;
+	--secondary_border_left: #BFBFBF;
 	--secondary_border_bottom: #BBBBBB;
-	--contrast_border: #222222;
+	--contrast_border: #222222; /* Progress bars and floating navigation borders */
 
-	/* Mostly used for shadows */
-	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
-	--box_shadow: rgba(0, 0, 0, 0.2); /* Used on many box shadows */
-	--opacity10: rgba(0, 0, 0, 0.1); /* Used as box shadows */
+	/* Shadow and overlay colors; --opacityNN values are translucent colors. */
+	--transparent: transparent; /* Transparent fills and borders that retain their dimensions */
+	--box_shadow: rgba(0, 0, 0, 0.2); /* Shadow color; used by box-shadow and text-shadow */
+	--opacity10: rgba(0, 0, 0, 0.1);
 	--opacity20: rgba(0, 0, 0, 0.2);
 	--opacity30: rgba(0, 0, 0, 0.3);
 	--opacity40: rgba(0, 0, 0, 0.4);
 	--opacity50: rgba(0, 0, 0, 0.5);
 
-	/* Fall away box shadows. #B3B3B3 or HSL 0 0 70 */
+	/* Elevation shadows: complete box-shadow values; use none to disable. */
 	--shadow-elevation-low: 0.3px 0.4px 0.6px rgba(179, 179, 179, 0.25),
 	0.4px 0.7px 1px -1px rgba(179, 179, 179, 0.29),
 	1px 1.6px 2.3px -2px rgba(179, 179, 179, 0.33);
@@ -273,25 +275,29 @@
 	6.7px 9.2px 11.1px -2px rgba(179, 179, 179, 0.25),
 	11.1px 15.3px 18.4px -2.5px rgba(179, 179, 179, 0.22);
 
-	/* UI Dialogs */
+	/* Admin dialog border and background */
 	--dialog_border: #999999;
 	--dialog_background: #F4F4F4;
-	--title_fill: var(--transparent);
 
-	/* Reusable gradients. Override any of these with `none` in a custom/override stylesheet. */
+	/* Forum title text fill */
+	--title_fill: var(--transparent); /* Transparent reveals the title gradient or solid fallback */
+
+	/* Gradients: complete background-image values; use none for the solid fallback.
+	 * Quote and tooltip fades are defined with their component rules.
+	 */
 	--gradient_body: linear-gradient(to right, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
-	--gradient_button: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	--gradient_button: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_complement));
 	--gradient_header: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
 	--gradient_header_secondary: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
 	--gradient_header_tertiary: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_4));
-	--gradient_menu: linear-gradient(var(--menu_background) 0%, var(--menu_background_compliment) 70%);
+	--gradient_menu: linear-gradient(var(--menu_background) 0%, var(--menu_background_complement) 70%);
 	--gradient_menu_active: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
 	--gradient_menu_active_hover: linear-gradient(to bottom, var(--menu_button_active_hover), var(--menu_button_active_hover_2));
 	--gradient_breadcrumb: linear-gradient(0deg, var(--breadcrumb_active_2), var(--breadcrumb_active));
 	--gradient_breadcrumb_arrow: linear-gradient(135deg, var(--breadcrumb_active), var(--breadcrumb_active_2));
 	--gradient_bar: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
-	--gradient_title: linear-gradient(95deg, var(--title-compliment), var(--title));
-	--gradient_top_section: linear-gradient(to left, var(--top_section) 0%, var(--top_section_compliment) 50%, var(--top_section) 100%);
+	--gradient_title: linear-gradient(95deg, var(--title_complement), var(--title));
+	--gradient_top_section: linear-gradient(to left, var(--top_section) 0%, var(--top_section_complement) 50%, var(--top_section) 100%);
 	--gradient_nav: linear-gradient(to bottom, var(--menu_nav_grad_1) 0%, var(--menu_nav_grad_2) 100%);
 	--gradient_online: linear-gradient(to bottom, var(--icon_online) 0%, var(--icon_online_grad) 50%, var(--icon_online) 100%);
 	--gradient_offline: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_background) 50%, var(--mid_grey_background) 100%);
@@ -309,8 +315,7 @@ a.new_win:link, a.new_win:visited {
 	color: var(--links);
 }
 
-/* Stop white band under footer on short pages.
-   This color should match $FOOTER background. */
+/* Page canvas below the footer on short pages. */
 html {
 	background: var(--html_background);
 }
@@ -388,7 +393,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	box-shadow: var(--shadow-elevation-low);
 }
 
-/* the new "button" */
+/* New-post badge. */
 .new_posts, .new_posts:visited, .new_posts:link {
 	color: var(--contrast_text);
 	background: var(--action_available);
@@ -428,7 +433,7 @@ strong {
 	text-shadow: -1px -1px 1px var(--box_shadow);
 }
 
-/* Single ones a bit darker than board index ones. */
+/* Content category headers. */
 .content_category {
 	border-color: var(--category_border);
 	border-top-color: var(--secondary_category_border_top);
@@ -504,7 +509,7 @@ strong {
 	background: var(--content_background);
 }
 
-/* The generic wrapper thingy. */
+/* Generic list wrapper. */
 .generic_list_wrapper {
 	border-color: var(--primary_border);
 	box-shadow: var(--shadow-elevation-medium);
@@ -560,7 +565,7 @@ strong {
 	background: var(--quote_background);
 }
 
-/* A code block - maybe PHP ;) - shared styles. */
+/* Shared block and inline code colors. */
 .bbc_code, .bbc_code_inline {
 	border-color: var(--primary_border);
 	background: var(--primary_content_background);
@@ -695,6 +700,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #forumtitle > a {
 	color: var(--title);
 	-webkit-text-fill-color: var(--title_fill);
+	background-color: var(--title);
 	background-image: var(--gradient_title);
 	-webkit-background-clip: text;
 }
@@ -985,7 +991,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* ------------------------
- *	$BREADCRUMB
+ *	$BREADCRUMBS
  * ------------------------
  */
 
@@ -1098,7 +1104,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
 	opacity: 0.2;
-	color: var(--contrast_text_compliment);
+	color: var(--contrast_text_complement);
 	border-color: var(--contrast_border);
 	background: var(--mid_grey_background);
 }
@@ -1263,7 +1269,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* -------------------------------------------------------
- *	$MESSAGE ... Styles for the message (topic) index.
+ *	$MESSAGE - Topic index and topic states.
  * -------------------------------------------------------
  */
 
@@ -1278,14 +1284,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_listing > li.basic_row {
 	background: var(--basic_row);
-}
-
-.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
-	background: var(--sticky_row);
-}
-
-.topic_listing > li.locked_row {
-	background: var(--locked_row);
 }
 
 .topic_sorting_row {
@@ -1334,15 +1332,15 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
-	background: var(--basic_row);
+	background: var(--sticky_row);
 	border-left-width: 5px;
-	border-left-color: var(--infobox_border);
+	border-left-color: var(--sticky_row_border);
 }
 
 .topic_listing > li.locked_row {
 	background: var(--locked_row);
 	border-left-width: 5px;
-	border-left-color: var(--infobox_border);
+	border-left-color: var(--locked_row_border);
 }
 
 #topic_icons {
@@ -1537,7 +1535,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #elk_lb_expand:before,
 #elk_lb_next:before,
 #elk_lb_prev:before {
-	color: var(--contrast_text_compliment);
+	color: var(--contrast_text_complement);
 }
 
 .new_post_separator:after {
@@ -1689,7 +1687,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* -------------------------------------------------------
- * $TABS Yes they are this ugly
+ *	$TABS
  * -------------------------------------------------------
  */
 
@@ -1925,7 +1923,7 @@ ul.cf_icons {
 	box-shadow: var(--shadow-elevation-high);
 }
 
-/* Overlay needs to account for the max-height: 22.5rem; of #site-tooltip */
+/* Fade clipped tooltip content; align stops with #site_tooltip height. */
 .tooltip {
 	background: linear-gradient(to bottom, var(--transparent) 19rem, var(--primary_content_background) 22.5rem);
 }
@@ -2038,7 +2036,7 @@ ul.cf_icons {
 	background: var(--information);
 }
 
-/* More boxes, although SVG they have embedded color so they are here */
+/* Status box icons contain embedded SVG colors. */
 .warningbox, .successbox, .infobox, .errorbox {
 	border-color: var(--primary_border);
 }
@@ -2149,7 +2147,7 @@ ul.cf_icons {
 	background: var(--primary_content_background);
 }
 
-/* Methinks topic links, etc need a little more oomph next to the orange bars. */
+/* Keep top-row statistics labels on the surrounding surface. */
 #top_row .stats dd {
 	border-color: var(--transparent);
 	background: none;
@@ -2178,12 +2176,8 @@ ul.cf_icons {
 
 /* -------------------------------------------------------
  *	$ICONS
+ * Warning and online/offline indicator colors.
  * -------------------------------------------------------
- *
- * Icons. The color file is the place for this since we
- * can't style embedded material.
- *
- * ---------------
  */
 
 .warnicon {
@@ -2204,29 +2198,11 @@ ul.cf_icons {
 
 /* -------------------------------------------------------
  *	$MEDIA
+ * Responsive color and effect overrides; align em breakpoints with index.css.
  * -------------------------------------------------------
- *
- * NOTE:
- * When setting break points for media queries, don't set them in pixels.
- * Use em instead.
- * Why? Because the point of re-stacking/dropping content is to fit it all
- * in the available space. This is dependent not just on width in pixels,
- * but also on the user-selected text size that is set in the browser.
- *
- * If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
- * a user requires text 50% larger than theme default, then their screen is
- * effectively a lot smaller than it's nominal resolution would indicate.
- * If the break points are set in em, suddenly the media queries become equally
- * responsive for all users, without any extra code being required.
- *
- * Testing em break points is just as easy as testing pixels,
- * and it will make more people happier. This is cool. :)
- *
- * Of course, having comments to map em to px for each query is a good idea too.
  */
 
-/* This one does 1024 screens at default font size.
-   -------------------------------------------------------------------------------------------*/
+/* Up to 1024px at the default font size. */
 
 @media screen and (max-width: 64em) {
 	#menu_sidebar {
@@ -2257,8 +2233,7 @@ ul.cf_icons {
 
 }
 
-/* This one does 960 screens at default font size.
-   -------------------------------------------------------------------------------------------*/
+/* Up to 960px at the default font size. */
 
 @media screen and (max-width: 60em) {
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover,
@@ -2303,8 +2278,7 @@ ul.cf_icons {
 	}
 }
 
-/* This one does 480px screens at default font size.
-   -------------------------------------------------------------------------------------------*/
+/* Up to 480px at the default font size. */
 
 @media screen and (max-width: 30em) {
 	.mlist li .group {

@@ -2457,7 +2457,7 @@ button[type="submit"].quick_quote_button.hide {
 
 .category_boards .board_lasttime::before {
 	margin-right: 0.5rem;
-	content: "•";
+	content: "\0020\2022";
 }
 
 .category_boards .board_stats {
