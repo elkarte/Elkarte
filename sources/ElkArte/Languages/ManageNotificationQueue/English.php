@@ -34,5 +34,5 @@ $txt['notificationqueue_no_items'] = 'The notification queue is currently empty'
 
 $txt['deferred_post_notifications'] = 'Send post notifications in the background';
 $txt['deferred_post_notifications_delay'] = 'Notification delay (seconds)';
-$txt['deferred_post_notifications_delay_desc'] = 'Wait time in seconds after posting before sending notifications, allowing for quick post edits.';
+$txt['deferred_post_notifications_delay_desc'] = 'Wait time in seconds after posting before sending notifications, allowing for quick post edits. Set to 0 to follow the Courtesy edit wait time.';
 $txt['deferred_post_notifications_desc'] = 'When enabled, post notifications are queued and processed asynchronously in the background instead of during post creation, improving posting responsiveness.';

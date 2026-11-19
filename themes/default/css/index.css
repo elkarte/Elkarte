@@ -1262,6 +1262,11 @@ a.bbc_link {
 	margin: 0 0 0 .8rem;
 }
 
+#logo {
+	max-width: 100%;
+	max-height: 250px;
+}
+
 /* Main forum area. */
 #wrapper {
 	margin-top: 1.6rem;
@@ -2450,11 +2455,9 @@ button[type="submit"].quick_quote_button.hide {
 	margin-top: .25rem;
 }
 
-/* Above 51.5em the timestamp sits on the same line as the poster, separated by
-   a plain bullet. Between 51.5em and 30em the bullet is dropped (see below). */
 .category_boards .board_lasttime::before {
 	margin-right: 0.5rem;
-	content: "•";
+	content: "\0020\2022";
 }
 
 .category_boards .board_stats {
@@ -2925,6 +2928,12 @@ button[type="submit"].quick_quote_button.hide {
 
 .topic_icons > img {
 	max-width: 1.8rem;
+}
+
+/* The SVG margins need adjustment so it lines up with normal message img */
+.topic_icons .i-lock, .topic_icons .i-pin {
+	margin-left: -.4rem;
+	margin-right: 0;
 }
 
 /* Actions and icons below the message listing */
@@ -3577,12 +3586,10 @@ figure.attachment_block figcaption {
 	}
 }
 
-/* Open post menus must escape the article's paint containment and cover adjacent posts.
-   :focus-within and :hover stand in for "a submenu inside this article is open",
-   which cannot be expressed without :has() because styling cannot walk up the tree. */
+/* Only lift containment when a submenu is actually open */
 #forumposts article.forumposts:has(.menulevel2.selected),
-#forumposts article.forumposts:focus-within,
-#forumposts article.forumposts:hover {
+#forumposts article.forumposts:has(.listlevel1:focus-within > .menulevel2),
+#forumposts article.forumposts:has(.no_js .listlevel1:hover > .menulevel2) {
 	position: relative;
 	z-index: 1;
 	content-visibility: visible;
@@ -6663,8 +6670,8 @@ div.labels {
 	}
 
 	.profileblock_left {
+		display: block;
 		overflow: visible;
-		flex-direction: column;
 	}
 
 	#basicinfo, #detailedinfo {

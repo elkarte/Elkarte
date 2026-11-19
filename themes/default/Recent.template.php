@@ -81,7 +81,8 @@ function template_unread()
 							', $context['unread_header_title'], '
 						</h2>';
 
-		if ($context['showSort'])
+		// Placeholder, this is not set anywhere ATM.
+		if (!empty($context['showSort']))
 		{
 			echo '	
 						<div id="unread_sort" class="flow_flex">

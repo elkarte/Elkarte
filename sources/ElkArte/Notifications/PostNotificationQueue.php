@@ -36,7 +36,7 @@ class PostNotificationQueue extends AbstractModel
 	public const TYPE_TOPIC = 'topic';
 
 	/** Default seconds a new job waits before it can run, so a "quick" edit of the post is what gets sent */
-	public const GRACE_SECONDS = 180;
+	public const GRACE_SECONDS = 300;
 
 	/** How many times a job may be claimed before it is dropped */
 	public const MAX_ATTEMPTS = 5;

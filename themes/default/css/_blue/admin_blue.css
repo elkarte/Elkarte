@@ -146,7 +146,7 @@ ul.package_section {
 #manage_boards li:nth-child(even) > li:nth-child(odd),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) {
-	background: var(--contrast_text_compliment);
+	background: var(--contrast_text_complement);
 }
 
 #manage_boards li:nth-child(odd),
@@ -221,7 +221,7 @@ ul.package_section {
 .theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
-	background: #FEFEFE;
+	background: var(--primary_content_background);
 }
 
 .theme_options .content:nth-child(odd) {
@@ -236,8 +236,8 @@ ul.package_section {
 ------------------------------------------------- */
 
 .ui-dialog {
-	border-color: #999999;
-	background-color: #F4F4F4;
+	border-color: var(--dialog_border);
+	background-color: var(--dialog_background);
 	box-shadow: 0 0 16px var(--opacity30);
 }
 

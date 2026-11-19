@@ -67,7 +67,7 @@
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 var(--contrast_text_compliment);
+	text-shadow: -1px 1px 0 var(--contrast_text_complement);
 }
 
 /* Styles for subsection headers */
@@ -269,10 +269,6 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 @media screen and (max-width: 33.750em) {
 	.topic_listing > li {
-		box-shadow: -3px 3px 6px var(--contrast_text_compliment);
-	}
-
-	.forumposts .windowbg, .forumposts .windowbg2 {
-		box-shadow: -3px 3px 6px var(--box_shadow);
+		box-shadow: -3px 3px 6px var(--contrast_text_complement);
 	}
 }

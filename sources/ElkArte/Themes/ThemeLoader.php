@@ -774,9 +774,14 @@ class ThemeLoader
 			$this->theme->loadThemeVariant();
 		}
 
-		// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
+		// Use the variant logo when available, otherwise use the standard logo location.
+		$logo = $context['theme_variant_url'] . 'logo.png';
+		if (!is_file($settings['theme_dir'] . '/images/' . $logo))
+		{
+			$logo = 'logos/logo.png';
+		}
 		$context['header_logo_url_html_safe'] = empty($settings['header_logo_url'])
-			? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo.png'
+			? $settings['images_url'] . '/' . $logo
 			: Util::htmlspecialchars($settings['header_logo_url']);
 
 		// RTL languages require an additional stylesheet.

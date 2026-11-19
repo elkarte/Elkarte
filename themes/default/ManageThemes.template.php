@@ -555,23 +555,28 @@ function template_set_settings()
 					<dt id="dt_', $setting['id'], '">
 						<label for="', $setting['id'], '">', $setting['label'], '</label>';
 
+			// If the description is an array, then we have a list of information to display.
 			if (isset($setting['description']))
 			{
 				if (is_array($setting['description']))
 				{
-					echo '
-						<div class="smalltext">', $setting['description']['main'], '
-							<dl>';
-					foreach ($setting['description']['options'] as $option)
+					if (!empty($setting['description']['main']))
 					{
 						echo '
-								<dt><strong>', $txt[$option[0]], '</strong></dt>
-								<dd>', $txt[$option[1]], '</dd>';
+						<br /><div class="smalltext">', $setting['description']['main'], '</div>';
 					}
 
 					echo '
-							</dl>
-						</div>';
+						<ul>';
+
+					foreach ($setting['description']['options'] as $option)
+					{
+						echo '
+							<li class="smalltext"><em> • ', $txt[$option[0]], '</em> ', $txt[$option[1]], '</li><br />';
+					}
+
+					echo '
+						</ul>';
 				}
 				else
 				{

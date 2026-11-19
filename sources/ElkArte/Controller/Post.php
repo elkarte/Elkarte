@@ -194,7 +194,8 @@ class Post extends AbstractController
 			$payload['language'] = $this->user->language;
 
 			// Hold the job back for a short grace period, the text is read when the job runs so quick edits are included
-			$delay = (int) ($modSettings['deferred_post_notifications_delay'] ?? PostNotificationQueue::GRACE_SECONDS);
+			$grace_seconds = (int) ($modSettings['edit_wait_time'] ?? 0) ?: PostNotificationQueue::GRACE_SECONDS;
+			$delay = (int) ($modSettings['deferred_post_notifications_delay'] ?? $grace_seconds);
 
 			if ((new PostNotificationQueue())->enqueue($type, $topic, $msg, $this->user->id, $payload, max(0, $delay)) > 0)
 			{

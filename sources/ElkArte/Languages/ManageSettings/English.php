@@ -194,11 +194,6 @@ $txt['hcaptcha_verification'] = 'Verification hCaptcha';
 $txt['hcaptcha_site_key'] = 'hCaptcha Site Key';
 $txt['hcaptcha_secret_key'] = 'hCaptcha Secret Key';
 
-$txt['keycaptcha_desc'] = 'To enable KeyCAPTHCA on your forum you must create a <a href="https://keycaptcha.com">KeyCAPTCHA.com API</a> for your site.';
-$txt['keycaptcha_enable'] = 'Enable KeyCaptcha verification';
-$txt['keycaptcha_verification'] = 'Verification KeyCaptcha';
-$txt['keycaptcha_secret_key'] = 'KeyCaptcha Private key';
-
 $txt['turnstile_desc'] = 'To enable Turnstile on your forum you must create a <a href="https://www.cloudflare.com/products/turnstile/">Turnstile API</a> for your site.';
 $txt['turnstile_language'] = 'Enter language code, leave empty to for automatic detection';
 $txt['turnstile_language_desc'] = 'Find <a href="https://developers.cloudflare.com/turnstile/reference/supported-languages/">language codes here</a>';
