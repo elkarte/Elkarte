@@ -108,11 +108,17 @@ class Mail extends BaseMail
 	 * @param string $subject - email subject as prepared by buildEmail()
 	 * @param string $message - email body as processed by buildEmail()
 	 * @param string|null $message_id = null - if specified, it will be used as local part of the Message-ID header.
-	 * @return bool whether the email was accepted properly.
+	 * @return bool whether the email was accepted properly.  Always true when mail is disabled.
 	 * @package Mail
 	 */
 	public function sendMail($to, $subject, $headers, $message, $message_id = null): bool
 	{
+		// A global off switch: report success without touching a transport.
+		if (self::isMailDisabled())
+		{
+			return true;
+		}
+
 		$message_id = $this->setMessageType($message_id);
 
 		$to = is_array($to) ? $to : [$to];

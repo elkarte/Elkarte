@@ -19,6 +19,12 @@ function template_mail_queue()
 {
 	global $context, $txt;
 
+	if (!empty($context['mail_disabled']))
+	{
+		echo '
+		<div class="infobox">', $txt['mail_disabled_notice'], '</div>';
+	}
+
 	echo '
 	<div id="manage_mail">
 		<div id="mailqueue_stats">
@@ -52,14 +58,26 @@ function template_mail_test()
 		if ($context['result'] === 'fail')
 		{
 			$result_txt = sprintf($txt['mail_test_fail'], $scripturl . '?action=admin;area=logs;sa=errorlog;desc');
+			$result_class = 'errorbox';
+		}
+		elseif ($context['result'] === 'disabled')
+		{
+			$result_txt = $txt['mail_test_disabled'];
+			$result_class = 'warningbox';
 		}
 		else
 		{
 			$result_txt = $txt['mail_test_pass'];
+			$result_class = 'infobox';
 		}
 
 		echo '
-		<div class="', $context['result'] === 'pass' ? 'infobox' : 'errorbox', '">', $result_txt, '</div>';
+		<div class="', $result_class, '">', $result_txt, '</div>';
+	}
+	elseif (!empty($context['mail_disabled']))
+	{
+		echo '
+		<div class="warningbox">', $txt['mail_test_disabled'], '</div>';
 	}
 
 	echo '

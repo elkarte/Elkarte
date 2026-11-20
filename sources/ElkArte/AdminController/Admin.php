@@ -187,7 +187,7 @@ class Admin extends AbstractController
 						],
 					],
 					'mailqueue' => [
-						'label' => $txt['mailqueue_title'],
+						'label' => $txt['email_title'],
 						'controller' => ManageMail::class,
 						'function' => 'action_index',
 						'class' => 'i-envelope-blank i-admin',

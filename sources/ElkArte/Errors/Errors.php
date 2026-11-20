@@ -24,6 +24,7 @@ use ElkArte\Database\QueryInterface;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Loader;
+use ElkArte\Mail\BaseMail;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserInfo;
@@ -481,7 +482,7 @@ class Errors extends AbstractModel
 		}
 
 		// Perhaps we want to notify by mail that a _db error occurred.
-		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
+		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send) && !BaseMail::isMailDisabled())
 		{
 			// Try using shared memory if possible.
 			$cache->put('db_last_error', time(), 600);

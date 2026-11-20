@@ -415,4 +415,106 @@ class MailTest extends ElkArteCommonSetupTest
 		// With default PHP mail or mock, queue reduction executes
 		$this->assertTrue($result);
 	}
+
+	public function testDisabledMailTypeSuppressesBuildAndQueue()
+	{
+		global $modSettings;
+
+		$originalMailType = $modSettings['mail_type'] ?? null;
+		$modSettings['mail_type'] = BaseMail::MAIL_TYPE_NONE;
+		$modSettings['mail_queue'] = 1;
+
+		try
+		{
+			$sendMail = new BuildMail();
+			$result = $sendMail->buildEmail(
+				'disabled@example.com',
+				'Should not be queued',
+				'This message must not be built or queued.',
+				null,
+				'm900',
+				false
+			);
+
+			AddMailQueue(true);
+
+			$this->assertTrue($result);
+			$this->assertSame(0, (int) list_getMailQueueSize());
+		}
+		finally
+		{
+			$this->restoreMailType($originalMailType);
+		}
+	}
+
+	public function testDisabledMailTypeLeavesQueuedMailUntouched()
+	{
+		global $modSettings;
+
+		$originalMailType = $modSettings['mail_type'] ?? null;
+
+		try
+		{
+			$modSettings['mail_type'] = '0';
+			$modSettings['mail_queue'] = 1;
+
+			$sendMail = new BuildMail();
+			$sendMail->buildEmail(
+				'queued@example.com',
+				'Queued before disabling',
+				'This message should wait in the queue.',
+				null,
+				'm901',
+				false
+			);
+			AddMailQueue(true);
+
+			$this->assertSame(1, (int) list_getMailQueueSize());
+
+			$modSettings['mail_type'] = BaseMail::MAIL_TYPE_NONE;
+
+			$queueMail = new QueueMail();
+			$result = $queueMail->reduceMailQueue(10, true, true);
+
+			$this->assertFalse($result);
+			$this->assertSame(1, (int) list_getMailQueueSize());
+		}
+		finally
+		{
+			$this->restoreMailType($originalMailType);
+		}
+	}
+
+	public function testMailSendIsSuppressedWhenDisabled()
+	{
+		global $modSettings;
+
+		$originalMailType = $modSettings['mail_type'] ?? null;
+		$modSettings['mail_type'] = BaseMail::MAIL_TYPE_NONE;
+
+		try
+		{
+			$mail = new Mail();
+
+			$this->assertTrue($mail->sendMail('disabled@example.com', 'Suppressed', '', 'Nothing should be delivered.'));
+		}
+		finally
+		{
+			$this->restoreMailType($originalMailType);
+		}
+	}
+
+	private function restoreMailType($value): void
+	{
+		global $modSettings;
+
+		if ($value === null)
+		{
+			unset($modSettings['mail_type']);
+		}
+		else
+		{
+			$modSettings['mail_type'] = $value;
+		}
+	}
 }

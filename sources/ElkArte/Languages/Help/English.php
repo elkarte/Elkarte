@@ -310,6 +310,7 @@ $helptxt['mail_type'] = 'Select the method ElkArte uses to send outgoing forum e
 	<ul class="normallist">
 		<li><strong>PHP:</strong> Uses PHP\'s internal <code>mail()</code> function and your web server\'s local mail transfer agent (Sendmail/Postfix on Linux, or <code>php.ini</code> configuration on Windows). This requires no additional credentials, but does not support SMTP authentication, custom ports, or STARTTLS through the forum.</li>
 		<li><strong>SMTP:</strong> Connects directly to a remote or local SMTP mail server (such as Gmail, SendGrid, Amazon SES, Mailgun, or an internal relay). Select this option if your mail provider requires authentication (username/password), custom ports (e.g. 587 or 465), or encryption (STARTTLS / TLS / SSL).</li>
+		<li><strong>Disable outgoing email:</strong> Turns off all outgoing forum email. Notifications, registrations, digests, and the test email are suppressed without being treated as failures. Anything already in the mail queue is left there undelivered until you select PHP or SMTP again.</li>
 	</ul>';
 $helptxt['smtp_starttls'] = '<strong>STARTTLS</strong> upgrades an unencrypted connection to a secure TLS-encrypted connection during the SMTP handshake:
 	<ul class="normallist">

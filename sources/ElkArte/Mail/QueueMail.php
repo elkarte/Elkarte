@@ -28,12 +28,18 @@ class QueueMail
 	 * @param int|bool $batch_size = false the number to send each loop
 	 * @param bool $override_limit = false bypassing our limit flag
 	 * @param bool $force_send = false
-	 * @return bool
+	 * @return bool False when nothing was sent, including when mail is disabled.
 	 * @package Mail
 	 */
 	public function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false): bool
 	{
 		global $modSettings;
+
+		// If mail is disabled, leave the queue intact for a future re-enable.
+		if (BaseMail::isMailDisabled())
+		{
+			return false;
+		}
 
 		// Do we have another script to send out the queue?
 		if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
