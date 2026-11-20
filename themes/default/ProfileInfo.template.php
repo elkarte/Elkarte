@@ -1085,33 +1085,39 @@ function template_profile_block_buddies()
 {
 	global $context, $scripturl, $txt, $modSettings;
 
-	// Set the div height to about 4 lines of buddies w/avatars
-	if (isset($context['buddies']))
-	{
-		$div_height = 120 + (4 * max(empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], 65));
-	}
-
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{
 		echo '
 		<h2 class="category_header hdicon i-users">
 			<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
-		</h2>
-		<div class="flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px;"' : ''), '>
+		</h2>';
+
+		if (empty($context['buddies']))
+		{
+			echo '
+			<div class="infobox">
+				', $txt['profile_buddies_no'], '
+			</div>';
+
+			return;
+		}
+
+		// Allow room for about four lines of buddies with avatars.
+		$div_height = 120 + (4 * max((int) ($modSettings['avatar_max_height'] ?? 0), 65));
+
+		echo '
+		<div class="flow_auto" style="max-height: ', $div_height, 'px;">
 			<div class="attachments">';
 
-		// Now show them all
-		if (isset($context['buddies']))
+		foreach ($context['buddies'] as $data)
 		{
-			foreach ($context['buddies'] as $data)
-			{
-				echo '
+			echo '
 				<div class="attachment">
 					<div class="generic_border centertext">
 						', $data['avatar']['image'], '<br />
 						<a href="', getUrl('profile', ['action' => 'profile', 'u' => $data['id'], 'name' => $data['name']]), '">', $data['name'], '</a>
 						<br />
-						', template_member_online($data), '<em><span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em>
+						', template_member_online($data), '<em><span class="smalltext"> ', $data['online']['label'], '</span></em>
 						<div class="contact">';
 
 				// Only show the email address fully if it's not hidden - and we reveal the email.
@@ -1144,15 +1150,6 @@ function template_profile_block_buddies()
 				echo '
 						</div>
 					</div>
-				</div>';
-			}
-		}
-		// Buddyless how sad :'(
-		else
-		{
-			echo '
-				<div class="infobox">
-					', $txt['profile_buddies_no'], '
 				</div>';
 		}
 
