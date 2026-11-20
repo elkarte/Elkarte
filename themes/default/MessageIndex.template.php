@@ -166,7 +166,7 @@ function template_topic_listing()
 
 		echo '
 		<main>
-		<ul class="topic_listing" id="messageindex">';
+		<ul class="topic_listing board_topic_listing" id="messageindex">';
 
 		// No topics.... just say, "sorry bub".
 		if (empty($context['topics']))

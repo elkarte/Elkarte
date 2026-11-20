@@ -10,7 +10,7 @@
  */
 
 /**
- * This file contains javascript utility functions
+ * This file contains JavaScript utility functions
  */
 
 var elk_formSubmitted = false,
@@ -111,6 +111,7 @@ function getXMLDocument (sUrl, funcCallback)
 		return fetchDocument(sUrl, funcCallback, 'xml');
 	}
 
+	// Fallback to XMLHttpRequest for older browsers
 	let oMyDoc = new XMLHttpRequest(),
 		bAsync = typeof (funcCallback) !== 'undefined',
 		oCaller = this;

@@ -19,7 +19,7 @@ $mtitle = 'Maintenance Mode';
  * Description of why the forum is in maintenance mode.
  * @global string $mmessage
  */
-$mmessage = 'Hey folks! ... We\’re doing a bit of maintenance to keep things running smoothly. The forum will be back up soon, thanks for hanging tight with us';
+$mmessage = 'Hey folks! ... We&#039;re doing a bit of maintenance to keep things running smoothly. The forum will be back up soon, thanks for hanging tight with us';
 
 ########## Forum Info ##########
 /**
