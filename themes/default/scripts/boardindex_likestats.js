@@ -81,9 +81,9 @@
 			return;
 		}
 
-		const url = elk_prepareScriptUrl(elk_scripturl)
-			+ 'action=likes;sa=likestats;area=indexstats;api=json;'
-			+ elk_session_var + '=' + elk_session_id;
+		const url = elk_prepareScriptUrl(elk_scripturl) +
+			'action=likes;sa=likestats;area=indexstats;api=json;' +
+			elk_session_var + '=' + elk_session_id;
 
 		fetch(url, {
 			method: 'POST',
