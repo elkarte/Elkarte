@@ -12,6 +12,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
 use ElkArte\Helper\Util;
 use ElkArte\MembersList;
 use ElkArte\User;
@@ -580,17 +581,61 @@ function messageLikeCount($message)
  *
  * @param int $limit the number of top-liked messages to fetch
  * @param bool $with_avatar whether to process avatar information
+ * @param bool $summary return only the fields needed by the board index
  *
  * @return array
  * @package Likes
  */
-function dbMostLikedMessage($limit = 10, $with_avatar = true)
+function dbMostLikedMessage($limit = 10, $with_avatar = true, $summary = false)
 {
 	global $txt;
 
 	$db = database();
 
-	// Most liked Message
+	// The board index only needs a handful of fields, so skip all of the
+	// avatar, BBC, preview and like processing done for the full stats page.
+	if ($summary)
+	{
+		$items = [];
+		$db->fetchQuery('
+			SELECT
+				lp.id_msg, lp.like_count,
+				m.id_topic, m.subject
+			FROM (
+				SELECT
+					COUNT(lp.id_msg) AS like_count, lp.id_msg
+				FROM {db_prefix}message_likes AS lp
+				GROUP BY lp.id_msg
+				ORDER BY like_count DESC
+				LIMIT {int:limit}
+			) AS lp
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+			WHERE {query_wanna_see_board}
+			ORDER BY lp.like_count DESC
+			LIMIT {int:limit}',
+			['limit' => $limit]
+		)->fetch_callback(
+			function ($row) use (&$items) {
+				$subject = censor($row['subject']);
+				$items[] = [
+					'id_msg' => (int) $row['id_msg'],
+					'id_topic' => (int) $row['id_topic'],
+					'subject' => $subject,
+					'like_count' => (int) $row['like_count'],
+					'href' => getUrl('topic', [
+						'topic' => $row['id_topic'],
+						'subject' => $subject,
+						'start' => 'msg' . $row['id_msg'],
+					]) . '#msg' . $row['id_msg'],
+				];
+			}
+		);
+
+		return $items;
+	}
+
+	// Full Most liked Message stats for the likes stats page
 	$mostLikedMessages = [];
 	$bbc_parser = ParserWrapper::instance();
 	$db->fetchQuery('
@@ -797,18 +842,19 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5, $with_avatar = true)
  * they can see
  * @param int $limit - Optional, number of topics to return (default 10).
  * @param bool $with_avatar - Optional, whether to process avatar information (default true).
+ * @param bool $summary return only the fields needed by the board index
  *
  * @return array
  * @package Likes
  *
  */
-function dbMostLikedTopic($board = null, $limit = 10, $with_avatar = true)
+function dbMostLikedTopic($board = null, $limit = 10, $with_avatar = true, $summary = false)
 {
 	global $txt;
 
 	$db = database();
 
-	// First, find candidate topics by num_likes
+	// First, find all candidate topics by num_likes
 	$candidate_topics = [];
 	$db->fetchQuery('
 		SELECT 
@@ -837,11 +883,11 @@ function dbMostLikedTopic($board = null, $limit = 10, $with_avatar = true)
 		];
 	}
 
-	// Calculate distinct likers and like counts only for candidate topics
+	// Calculate distinct likers and like counts only for the candidate topics
 	$mostLikedTopics = [];
 	$db->fetchQuery('
 		SELECT
-			t.id_topic, t.num_replies, t.id_board,
+			t.id_topic, t.num_replies, t.id_board, t.id_first_msg,
 			COUNT(lp.id_msg) AS like_count,
 			COUNT(DISTINCT lp.id_member) AS distinct_likers,
 			COUNT(DISTINCT m.id_msg) AS num_messages_liked
@@ -849,7 +895,7 @@ function dbMostLikedTopic($board = null, $limit = 10, $with_avatar = true)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
 			INNER JOIN {db_prefix}message_likes AS lp ON (lp.id_msg = m.id_msg)
 		WHERE t.id_topic IN ({array_int:candidate_topics})
-		GROUP BY t.id_topic, t.num_replies, t.id_board
+		GROUP BY t.id_topic, t.num_replies, t.id_board, t.id_first_msg
 		ORDER BY distinct_likers DESC',
 		[
 			'candidate_topics' => $candidate_topics,
@@ -886,12 +932,43 @@ function dbMostLikedTopic($board = null, $limit = 10, $with_avatar = true)
 	// Fetch some sample posts for each of the top X topics in a single query
 	if (!empty($mostLikedTopics))
 	{
-		$topic_ids = array_column($mostLikedTopics, 'id_topic');
-		$batchMessages = dbMostLikedMessagesByTopic($topic_ids, 5, $with_avatar);
-
-		foreach ($mostLikedTopics as $key => $topic)
+		if ($summary)
 		{
-			$mostLikedTopics[$key]['msg_data'] = $batchMessages[$topic['id_topic']] ?? [];
+			// The board index only shows the topic title, so there is no need to
+			// walk every like in the topic just to parse a message preview that is not used.
+			$subjects = [];
+			$db->fetchQuery('
+				SELECT 
+					id_msg, subject
+				FROM {db_prefix}messages
+				WHERE id_msg IN ({array_int:messages})',
+				['messages' => array_column($mostLikedTopics, 'id_first_msg')]
+			)->fetch_callback(
+				function ($row) use (&$subjects) {
+					$subjects[(int) $row['id_msg']] = censor($row['subject']);
+				}
+			);
+
+			foreach ($mostLikedTopics as $key => $topic)
+			{
+				$subject = $subjects[$topic['id_first_msg']] ?? '';
+				$mostLikedTopics[$key] = [
+					'id_topic' => (int) $topic['id_topic'],
+					'subject' => $subject,
+					'like_count' => (int) $topic['like_count'],
+					'href' => getUrl('topic', ['topic' => $topic['id_topic'], 'subject' => $subject]),
+				];
+			}
+		}
+		else
+		{
+			$topic_ids = array_column($mostLikedTopics, 'id_topic');
+			$batchMessages = dbMostLikedMessagesByTopic($topic_ids, 5, $with_avatar);
+
+			foreach ($mostLikedTopics as $key => $topic)
+			{
+				$mostLikedTopics[$key]['msg_data'] = $batchMessages[$topic['id_topic']] ?? [];
+			}
 		}
 	}
 
@@ -924,17 +1001,56 @@ function sort_by_relevance($a, $b)
  *
  * @param int $limit the number of top-liked boards to fetch
  * @param bool $with_avatar whether to process avatar information
+ * @param bool $summary return only the fields needed by the board index
  *
  * @return array
  * @package Likes
  */
-function dbMostLikedBoard($limit = 3, $with_avatar = true)
+function dbMostLikedBoard($limit = 3, $with_avatar = true, $summary = false)
 {
 	global $txt;
 
 	$db = database();
 
-	// Most liked board
+	// The board index shows only the board name and its like count.
+	if ($summary)
+	{
+		$boards = [];
+		$db->fetchQuery('
+			SELECT
+				b.id_board, b.name, tc.like_count
+			FROM {db_prefix}boards AS b
+			INNER JOIN (
+				SELECT
+					m.id_board,
+					COUNT(m.id_board) AS like_count
+				FROM {db_prefix}message_likes AS lp
+					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
+					INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+				WHERE {query_wanna_see_board}
+				GROUP BY m.id_board
+				ORDER BY like_count DESC
+				LIMIT {int:limit}
+			) AS tc ON (tc.id_board = b.id_board)
+			ORDER BY tc.like_count DESC
+			LIMIT {int:limit}',
+			['limit' => $limit]
+		)->fetch_callback(
+			function ($row) use (&$boards) {
+				$name = censor($row['name']);
+				$boards[] = [
+					'id_board' => (int) $row['id_board'],
+					'name' => $name,
+					'like_count' => (int) $row['like_count'],
+					'href' => getUrl('board', ['board' => $row['id_board'], 'name' => $name]),
+				];
+			}
+		);
+
+		return $boards;
+	}
+
+	// Most liked board.  The full stats page pulls a sample topic for each board (expensive
 	$mostLikedBoards = [];
 	$db->fetchQuery('
 		SELECT
@@ -977,6 +1093,88 @@ function dbMostLikedBoard($limit = 3, $with_avatar = true)
 	}
 
 	return $mostLikedBoards;
+}
+
+/**
+ * Loads the compact like statistics used by the board index.
+ *
+ * A single cache entry holds all three lists.  The entry has a soft expiry
+ * (refresh_after) and a longer hard expiry.  Callers always get back the last
+ * good payload, while an ajax request regenerates it when it has gone stale.
+ * A short-lived lock keeps concurrent requests from all rebuilding the same data.
+ *
+ * @param string $user_key hash of the user's board visibility query
+ * @param bool $regenerate true when called from the background ajax refresh
+ *
+ * @return array {data: array, deferred: bool, refresh: bool}
+ * @package Likes
+ */
+function cache_getBoardIndexLikeStats($user_key, $regenerate = false)
+{
+	$cache = Cache::instance();
+	$key = 'ic_likestats:' . $user_key;
+	$lock_key = $key . '_lock';
+	$soft_ttl = 1800;
+	$hard_ttl = 86400;
+	$lock_ttl = 60;
+
+	$payload = $cache->get($key, $hard_ttl);
+	$stale = empty($payload['refresh_after']) || $payload['refresh_after'] <= time();
+
+	if (!$regenerate)
+	{
+		if (empty($payload['data']))
+		{
+			return ['data' => [], 'deferred' => true, 'refresh' => false];
+		}
+
+		return ['data' => $payload['data'], 'deferred' => false, 'refresh' => $stale];
+	}
+
+	// Another request got here first and already refreshed the data.
+	if (!empty($payload['data']) && !$stale)
+	{
+		return ['data' => $payload['data'], 'deferred' => false, 'refresh' => false];
+	}
+
+	// Only one refresh per permission group at a time.  Everyone else keeps
+	// showing whatever is already cached (or the loading placeholder).
+	if ($cache->get($lock_key, $lock_ttl) !== null)
+	{
+		return [
+			'data' => $payload['data'] ?? [],
+			'deferred' => empty($payload['data']),
+			'refresh' => false,
+		];
+	}
+
+	$token = md5(uniqid('', true));
+	$cache->put($lock_key, $token, $lock_ttl);
+
+	try
+	{
+		$data = [
+			'topics' => dbMostLikedTopic(null, 5, false, true),
+			'boards' => dbMostLikedBoard(3, false, true),
+			'messages' => dbMostLikedMessage(5, false, true),
+		];
+		$payload = [
+			'generated' => time(),
+			'refresh_after' => time() + $soft_ttl,
+			'data' => $data,
+		];
+		$cache->put($key, $payload, $hard_ttl);
+	}
+	finally
+	{
+		// Do not clear a lock that another request may have taken over.
+		if ($cache->get($lock_key, $lock_ttl) === $token)
+		{
+			$cache->remove($lock_key);
+		}
+	}
+
+	return ['data' => $payload['data'], 'deferred' => false, 'refresh' => false];
 }
 
 /**

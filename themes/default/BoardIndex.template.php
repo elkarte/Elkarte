@@ -12,6 +12,8 @@
  *
  */
 
+use ElkArte\Helper\Util;
+
 /**
  * Loads the template used to display boards
  */
@@ -336,62 +338,74 @@ function template_ic_show_likestats()
 	global $context, $txt;
 
 	echo '
-			<li class="basic_row">
+			<li class="basic_row" id="likestats_block">
 				<h3 class="ic_section_header">
 					<a href="', getUrl('action', ['action' => 'likes', 'sa' => 'likestats']), '">
 						<i class="icon i-thumbup"></i>', $txt['like_post_stats'], '
 					</a>
-				</h3>';
+				</h3>
+				<div class="likestats_content" id="likestats_content">';
 
-	if (!empty($context['likestats']['topics']) && empty($context['likestats']['topics']['noDataMessage']))
+	// If the like data for the IC is still being generated, show a loading message.
+	if (!empty($context['likestats']['deferred']))
 	{
 		echo '
-				<p class="inline">
-					<span class="event bbc_strong">', $txt['like_post_tab_mlt'], ':</span> ';
-
-		$topics = [];
-		foreach ($context['likestats']['topics'] as $topic)
-		{
-			$topics[] = '<a href="' . getUrl('topic', ['topic' => $topic['id_topic'], 'subject' => $topic['msg_data'][0]['subject']]) . '">' . $topic['msg_data'][0]['subject'] . '</a> (' . $topic['like_count'] . ')';
-		}
-
-		echo implode(', ', $topics), '
-				</p>';
+					<p class="inline likestats_loading">&hellip;</p>';
 	}
-
-	if (!empty($context['likestats']['messages']) && empty($context['likestats']['messages']['noDataMessage']))
+	// There is data to show in the IC like stats.
+	else
 	{
-		echo '
-				<p class="inline">
-					<span class="event bbc_strong">', $txt['like_post_tab_mlm'], ':</span> ';
-
-		$messages = [];
-		foreach ($context['likestats']['messages'] as $msg)
+		if (!empty($context['likestats']['topics']) && empty($context['likestats']['topics']['noDataMessage']))
 		{
-			$messages[] = '<a href="' . getUrl('topic', ['topic' => $msg['id_topic'], 'subject' => $msg['subject'], 'start' => 'msg' . $msg['id_msg']]) . '#msg' . $msg['id_msg'] . '">' . $msg['subject'] . '</a> (' . $msg['like_count'] . ')';
+			echo '
+					<p class="inline">
+						<span class="event bbc_strong">', $txt['like_post_tab_mlt'], ':</span> ';
+
+			$topics = [];
+			foreach ($context['likestats']['topics'] as $topic)
+			{
+				$topics[] = '<a href="' . $topic['href'] . '">' . Util::htmlspecialchars($topic['subject']) . '</a> (' . $topic['like_count'] . ')';
+			}
+
+			echo implode(', ', $topics), '
+					</p>';
 		}
 
-		echo implode(', ', $messages), '
-				</p>';
-	}
-
-	if (!empty($context['likestats']['boards']) && empty($context['likestats']['boards']['noDataMessage']))
-	{
-		echo '
-				<p class="inline">
-					<span class="event bbc_strong">', $txt['like_post_tab_mlb'], ':</span> ';
-
-		$boards = [];
-		foreach ($context['likestats']['boards'] as $board)
+		if (!empty($context['likestats']['messages']) && empty($context['likestats']['messages']['noDataMessage']))
 		{
-			$boards[] = '<a href="' . getUrl('board', ['board' => $board['id_board'], 'name' => $board['name']]) . '">' . $board['name'] . '</a> (' . $board['like_count'] . ')';
+			echo '
+					<p class="inline">
+						<span class="event bbc_strong">', $txt['like_post_tab_mlm'], ':</span> ';
+
+			$messages = [];
+			foreach ($context['likestats']['messages'] as $msg)
+			{
+				$messages[] = '<a href="' . $msg['href'] . '">' . Util::htmlspecialchars($msg['subject']) . '</a> (' . $msg['like_count'] . ')';
+			}
+
+			echo implode(', ', $messages), '
+					</p>';
 		}
 
-		echo implode(', ', $boards), '
-				</p>';
+		if (!empty($context['likestats']['boards']) && empty($context['likestats']['boards']['noDataMessage']))
+		{
+			echo '
+					<p class="inline">
+						<span class="event bbc_strong">', $txt['like_post_tab_mlb'], ':</span> ';
+
+			$boards = [];
+			foreach ($context['likestats']['boards'] as $board)
+			{
+				$boards[] = '<a href="' . $board['href'] . '">' . Util::htmlspecialchars($board['name']) . '</a> (' . $board['like_count'] . ')';
+			}
+
+			echo implode(', ', $boards), '
+					</p>';
+		}
 	}
 
 	echo '
+				</div>
 			</li>';
 }
 
