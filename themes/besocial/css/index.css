@@ -4770,6 +4770,7 @@ ul.cf_icons li:not(:first-child)::before {
 	position: relative;
 	overflow: auto;
 	max-height: 30rem;
+	border-top: 3px solid;
 }
 
 #recentposts {

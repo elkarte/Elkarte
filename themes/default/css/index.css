@@ -2831,6 +2831,7 @@ button[type="submit"].quick_quote_button.hide {
 	display: flex;
 	align-items: center;
 	opacity: .85;
+	gap: .3rem;
 }
 
 .topic_listing > li > .topic_avatar {
@@ -4907,6 +4908,7 @@ ul.cf_icons li:not(:first-child)::before {
 	position: relative;
 	overflow: auto;
 	max-height: 30rem;
+	border-top: 3px solid;
 }
 
 #recentposts {
