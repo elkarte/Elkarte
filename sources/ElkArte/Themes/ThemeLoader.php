@@ -172,9 +172,8 @@ class ThemeLoader
 	 *  - Board
 	 *  - Forum default
 	 *
-	 * In addition, the ID is verified against a comma-separated list of
-	 * known good themes. This check is skipped if the user is an admin.
-	 *
+	 * The priority will be request/session/member choice first, followed by board choice, and finally the
+	 * forum default. The ID is also verified against a list of known good themes, unless the user is an admin.
 	 * @return void Theme ID to load
 	 */
 	private function getThemeId(): void
@@ -186,15 +185,17 @@ class ThemeLoader
 		{
 			$this->_chooseTheme();
 		}
-		// The board specified the theme.
-		elseif (!empty($board_info['theme']))
+
+		// No theme chosen yet (e.g. a member following "Forum Default"),
+		// so fall through to the board theme and then the forum default.
+		if (empty($this->id) && !empty($board_info['theme']))
 		{
 			$this->id = $board_info['theme'];
 		}
-		// The theme is the forum's default.
-		else
+
+		if (empty($this->id))
 		{
-			$this->id = $modSettings['theme_guests'];
+			$this->id = (int) $modSettings['theme_guests'];
 		}
 
 		// Whatever we found, make sure it's valid
