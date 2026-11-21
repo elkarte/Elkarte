@@ -1953,9 +1953,11 @@ function pbe_load_html($email_message, &$html)
 {
 	// un_htmlspecialchars areas outside code blocks
 	$preparse = PreparseCode::instance('');
+	$preparse->code_blocks = [];
 	$text = $preparse->tokenizeCodeBlocks($email_message->body, true);
 	$text = un_htmlspecialchars($text);
 	$text = $preparse->restoreCodeBlocks($text);
+	$preparse->code_blocks = [];
 
 	// If we are dealing with tables ....
 	if (preg_match('~<table.*?>~i', $text))

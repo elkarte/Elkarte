@@ -99,6 +99,25 @@ class Likes extends AbstractController
 	}
 
 	/**
+	 * Liking a post via ajax
+	 *
+	 * Calls the standard like method and then the api return method
+	 */
+	public function action_likepost_api(): void
+	{
+		global $txt;
+
+		// An error if not possible to like.
+		if (!$this->_doLikePost('+', 'likemsg') && empty($this->_likes_response))
+		{
+			Txt::load('Errors');
+			$this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
+		}
+
+		$this->likeResponse();
+	}
+
+	/**
 	 * Actually perform the "like" operation.
 	 *
 	 * Fills $_likes_response that can be used by likeResponse() to
@@ -196,25 +215,6 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * Liking a post via ajax
-	 *
-	 * Calls the standard like method and then the api return method
-	 */
-	public function action_likepost_api(): void
-	{
-		global $txt;
-
-		// An error if not possible to like.
-		if (!$this->_doLikePost('+', 'likemsg') && empty($this->_likes_response))
-		{
-			Txt::load('Errors');
-			$this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
-		}
-
-		$this->likeResponse();
-	}
-
-	/**
 	 * When liking / unliking via ajax, clears the templates and returns a JSON
 	 * response to the page
 	 */
@@ -246,25 +246,6 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * Unliking a post via ajax
-	 *
-	 * Calls the standard unlike method and then the api return method
-	 */
-	public function action_unlikepost_api(): void
-	{
-		global $txt;
-
-		// An error if not possible to like.
-		if (!$this->_doLikePost('-', 'rlikemsg') && empty($this->_likes_response))
-		{
-			Txt::load('Errors');
-			$this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
-		}
-
-		$this->likeResponse();
-	}
-
-	/**
 	 * Unlikes a post that you previously liked ... no negatives though, hurts feelings :'(
 	 *
 	 * - It redirects back to the referrer afterward.
@@ -291,6 +272,25 @@ class Likes extends AbstractController
 		{
 			redirectexit('action=profile;area=showlikes;sa=given;u=' . $this->user->id);
 		}
+	}
+
+	/**
+	 * Unliking a post via ajax
+	 *
+	 * Calls the standard unlike method and then the api return method
+	 */
+	public function action_unlikepost_api(): void
+	{
+		global $txt;
+
+		// An error if not possible to like.
+		if (!$this->_doLikePost('-', 'rlikemsg') && empty($this->_likes_response))
+		{
+			Txt::load('Errors');
+			$this->_likes_response = ['result' => false, 'data' => $txt['like_unlike_error']];
+		}
+
+		$this->likeResponse();
 	}
 
 	/**
@@ -663,42 +663,6 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * Like stats controller function, used by API calls.
-	 *
-	 * What it does:
-	 *
-	 * - Validates whether user is allowed to see stats or not.
-	 * - Decides which tab data to fetch and show to user.
-	 */
-	public function action_likestats_api(): void
-	{
-		global $context;
-
-		checkSession('get');
-		session_write_close();
-
-		Txt::load('LikePosts');
-
-		$subActions = [
-			'messagestats' => [$this, 'action_messageStats'],
-			'topicstats' => [$this, 'action_topicStats'],
-			'boardstats' => [$this, 'action_boardStats'],
-			'mostlikesreceiveduserstats' => [$this, 'action_mostLikesReceivedUserStats'],
-			'mostlikesgivenuserstats' => [$this, 'action_mostLikesGivenUserStats'],
-		];
-
-		// Set up the action controller
-		$action = new Action('likesstats');
-
-		// Pick the correct sub-action, call integrate_sa_likesstats
-		$subAction = $action->initialize($subActions, 'messagestats', 'area');
-		$context['sub_action'] = $subAction;
-
-		// Call the right function for this sub-action.
-		$action->dispatch($subAction);
-	}
-
-	/**
 	 * Like stats controller function.
 	 *
 	 * What it does:
@@ -759,6 +723,43 @@ class Likes extends AbstractController
 			],
 		];
 		$context['sub_template'] = 'lp_stats';
+	}
+
+	/**
+	 * Like stats controller function, used by API calls.
+	 *
+	 * What it does:
+	 *
+	 * - Validates whether user is allowed to see stats or not.
+	 * - Decides which tab data to fetch and show to user.
+	 */
+	public function action_likestats_api(): void
+	{
+		global $context;
+
+		checkSession('get');
+		session_write_close();
+
+		Txt::load('LikePosts');
+
+		$subActions = [
+			'messagestats' => [$this, 'action_messageStats'],
+			'topicstats' => [$this, 'action_topicStats'],
+			'boardstats' => [$this, 'action_boardStats'],
+			'indexstats' => [$this, 'action_indexStats'],
+			'mostlikesreceiveduserstats' => [$this, 'action_mostLikesReceivedUserStats'],
+			'mostlikesgivenuserstats' => [$this, 'action_mostLikesGivenUserStats'],
+		];
+
+		// Set up the action controller
+		$action = new Action('likesstats');
+
+		// Pick the correct sub-action, call integrate_sa_likesstats
+		$subAction = $action->initialize($subActions, 'messagestats', 'area');
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -854,6 +855,32 @@ class Likes extends AbstractController
 		else
 		{
 			$this->_likes_response = ['result' => false, 'error' => $txt['like_post_error_something_wrong']];
+		}
+
+		$this->likeResponse();
+	}
+
+	/**
+	 * Fetches compact like stats used by the board index Info Center.
+	 *
+	 * Called in the background when the cached board index is stale or
+	 * when there is no data.  Never called during page generation,
+	 * so a cold cache cannot stall the board index.
+	 */
+	public function action_indexStats(): void
+	{
+		global $txt;
+
+		$key = md5($this->user->query_wanna_see_board ?? '');
+		$stats = cache_getBoardIndexLikeStats($key, true);
+
+		if (!empty($stats['data']))
+		{
+			$this->_likes_response = ['result' => true, 'data' => $stats['data']];
+		}
+		else
+		{
+			$this->_likes_response = ['result' => false, 'error' => $txt['like_post_error_no_data']];
 		}
 
 		$this->likeResponse();

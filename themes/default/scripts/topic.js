@@ -485,6 +485,18 @@ QuickModify.prototype.onMessageReceived = function(XMLDoc) {
 	return true;
 };
 
+// Hide the default icon again after editing.
+QuickModify.prototype.hideDefaultIcon = function() {
+	if (this.opt.sIconHide && this.oMsgIcon !== null)
+	{
+		let oCurrentMsgIcon = this.oMsgIcon.querySelector('img');
+		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.includes(this.opt.sIconHide))
+		{
+			this.oMsgIcon.style.display = 'none';
+		}
+	}
+};
+
 // Function in case the user presses cancel (or other circumstances cause it).
 QuickModify.prototype.modifyCancel = function() {
 	// Roll back the HTML to its original state.
@@ -500,16 +512,7 @@ QuickModify.prototype.modifyCancel = function() {
 		}
 	}
 
-	// Hide the message icon if we are doing that
-	if (this.opt.sIconHide)
-	{
-		let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace('msg_', ''));
-
-		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
-		{
-			this.oMsgIcon.style.display = 'none';
-		}
-	}
+	this.hideDefaultIcon();
 
 	// No longer in edit mode, that's right.
 	this.bInEditMode = false;
@@ -655,15 +658,7 @@ QuickModify.prototype.onModifyDone = function(XMLDoc) {
 			modified_element.style.display = 'block';
 		}
 
-		// Hide the icon if we were told to
-		if (this.opt.sIconHide !== null)
-		{
-			let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace('msg_', ''));
-			if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
-			{
-				this.oMsgIcon.style.display = 'none';
-			}
-		}
+		this.hideDefaultIcon();
 
 		// Re embed any video links if the feature is available
 		if (typeof $.fn.linkifyvideo === 'function')

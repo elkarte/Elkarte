@@ -667,7 +667,6 @@ sceditor.formats.bbcode
 				};
 
 			params(['width', 'height', 'align', 'type']);
-			a_attribs = attribs;
 			if (typeof attrs.align !== 'undefined')
 			{
 				align = ' class="img_bbc float' + attrs.align + '"';

@@ -6,6 +6,8 @@ $txt['mail_settings'] = 'Mail Settings';
 
 $txt['mail_type'] = 'Mail type';
 $txt['mail_type_default'] = '(PHP default)';
+$txt['mail_type_none'] = '(Disable outgoing email)';
+$txt['mail_disabled_notice'] = 'Outgoing email is currently disabled. No email will be sent, and messages already in the queue will remain there until email is re-enabled.';
 $txt['smtp_host'] = 'SMTP server';
 $txt['smtp_client'] = 'SMTP client';
 $txt['smtp_port'] = 'SMTP port';
@@ -17,6 +19,7 @@ $txt['smtp_password'] = 'SMTP password';
 $txt['mail_test'] = 'Test Email';
 $txt['mail_test_fail'] = 'Email Failure';
 $txt['mail_test_pass'] = 'Email Sent';
+$txt['mail_test_disabled'] = 'Outgoing email is disabled, so no test message was sent.';
 $txt['mail_test_header'] = 'Test Sending Email';
 $txt['mail_send_to'] = 'Send To';
 $txt['mail_send_desc'] = 'From this area you can send Email, from this site, to ensure your mail settings are valid/correct.<br />The default to email address is yours, but you can email to a testing service (such as www.mail-tester.com) to validate compliance with DMARC, DKIM, SPF, rDNS, etc).';

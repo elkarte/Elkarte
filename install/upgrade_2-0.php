@@ -761,7 +761,6 @@ class UpgradeInstructions_upgrade_2_0
 					// knownThemes = default + beSocial only; enforce system-wide theme defaults
 					updateSettings(array(
 						'knownThemes' => '1,' . $this->beSocialId,
-						'theme_default' => '1',
 						'theme_guests' => '1',
 					));
 				}
@@ -1270,6 +1269,219 @@ class UpgradeInstructions_upgrade_2_0
 						array(),
 						'exists'
 					);
+				}
+			)
+		);
+	}
+
+	public function refresh_calendar_holidays_title()
+	{
+		return 'Refreshing calendar holidays...';
+	}
+
+	public function refresh_calendar_holidays()
+	{
+		return array(
+			array(
+				'debug_title' => 'Removing pre-2024 year-specific holiday rows...',
+				'function' => function () {
+					$this->db->query('', '
+						DELETE FROM {db_prefix}calendar_holidays
+						WHERE title IN ({array_string:year_specific_holidays})
+							AND event_date < {date:min_event_date}',
+						array(
+							'year_specific_holidays' => array(
+								'MLK Jr. Day',
+								"Presidents' Day",
+								'Columbus Day',
+								"Mother's Day",
+								"Father's Day",
+								'Summer Solstice',
+								'Vernal Equinox',
+								'Winter Solstice',
+								'Autumnal Equinox',
+								'Thanksgiving',
+								'Memorial Day',
+								'Labor Day',
+							),
+							'min_event_date' => '2024-01-01',
+						)
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Refreshing default holiday rows...',
+				'function' => function () {
+					$default_holidays = array(
+						array("New Year's", '0004-01-01'),
+						array('Christmas', '0004-12-25'),
+						array("Valentine's Day", '0004-02-14'),
+						array("St. Patrick's Day", '0004-03-17'),
+						array("St. Andrew's Day", '0004-11-30'),
+						array('April Fools', '0004-04-01'),
+						array('Earth Day', '0004-04-22'),
+						array('United Nations Day', '0004-10-24'),
+						array('Halloween', '0004-10-31'),
+						array('Cinco de Mayo', '0004-05-05'),
+						array('Flag Day', '0004-06-14'),
+						array('Veterans Day', '0004-11-11'),
+						array('Groundhog Day', '0004-02-02'),
+						array('D-Day', '0004-06-06'),
+						array('American Independence Day', '0004-07-04'),
+						array('Canada Day', '0004-07-01'),
+						array('Juneteenth', '0004-06-19'),
+						array('Boxing Day', '0004-12-26'),
+						array('MLK Jr. Day', '2024-01-15'),
+						array('MLK Jr. Day', '2025-01-20'),
+						array('MLK Jr. Day', '2026-01-19'),
+						array('MLK Jr. Day', '2027-01-18'),
+						array('MLK Jr. Day', '2028-01-17'),
+						array('MLK Jr. Day', '2029-01-15'),
+						array('MLK Jr. Day', '2030-01-21'),
+						array('MLK Jr. Day', '2031-01-20'),
+						array('MLK Jr. Day', '2032-01-19'),
+						array("Presidents' Day", '2024-02-19'),
+						array("Presidents' Day", '2025-02-17'),
+						array("Presidents' Day", '2026-02-16'),
+						array("Presidents' Day", '2027-02-15'),
+						array("Presidents' Day", '2028-02-21'),
+						array("Presidents' Day", '2029-02-19'),
+						array("Presidents' Day", '2030-02-18'),
+						array("Presidents' Day", '2031-02-17'),
+						array("Presidents' Day", '2032-02-16'),
+						array('Columbus Day', '2024-10-14'),
+						array('Columbus Day', '2025-10-13'),
+						array('Columbus Day', '2026-10-12'),
+						array('Columbus Day', '2027-10-11'),
+						array('Columbus Day', '2028-10-09'),
+						array('Columbus Day', '2029-10-08'),
+						array('Columbus Day', '2030-10-14'),
+						array('Columbus Day', '2031-10-13'),
+						array('Columbus Day', '2032-10-11'),
+						array("Mother's Day", '2024-05-12'),
+						array("Mother's Day", '2025-05-11'),
+						array("Mother's Day", '2026-05-10'),
+						array("Mother's Day", '2027-05-09'),
+						array("Mother's Day", '2028-05-14'),
+						array("Mother's Day", '2029-05-13'),
+						array("Mother's Day", '2030-05-12'),
+						array("Mother's Day", '2031-05-11'),
+						array("Mother's Day", '2032-05-09'),
+						array("Father's Day", '2024-06-16'),
+						array("Father's Day", '2025-06-15'),
+						array("Father's Day", '2026-06-21'),
+						array("Father's Day", '2027-06-20'),
+						array("Father's Day", '2028-06-18'),
+						array("Father's Day", '2029-06-17'),
+						array("Father's Day", '2030-06-16'),
+						array("Father's Day", '2031-06-15'),
+						array("Father's Day", '2032-06-20'),
+						array('Summer Solstice', '2024-06-20'),
+						array('Summer Solstice', '2025-06-21'),
+						array('Summer Solstice', '2026-06-21'),
+						array('Summer Solstice', '2027-06-21'),
+						array('Summer Solstice', '2028-06-20'),
+						array('Summer Solstice', '2029-06-21'),
+						array('Summer Solstice', '2030-06-21'),
+						array('Summer Solstice', '2031-06-21'),
+						array('Summer Solstice', '2032-06-20'),
+						array('Vernal Equinox', '2024-03-20'),
+						array('Vernal Equinox', '2025-03-20'),
+						array('Vernal Equinox', '2026-03-20'),
+						array('Vernal Equinox', '2027-03-20'),
+						array('Vernal Equinox', '2028-03-20'),
+						array('Vernal Equinox', '2029-03-20'),
+						array('Vernal Equinox', '2030-03-20'),
+						array('Vernal Equinox', '2031-03-20'),
+						array('Vernal Equinox', '2032-03-20'),
+						array('Winter Solstice', '2024-12-21'),
+						array('Winter Solstice', '2025-12-21'),
+						array('Winter Solstice', '2026-12-21'),
+						array('Winter Solstice', '2027-12-22'),
+						array('Winter Solstice', '2028-12-21'),
+						array('Winter Solstice', '2029-12-21'),
+						array('Winter Solstice', '2030-12-21'),
+						array('Winter Solstice', '2031-12-22'),
+						array('Winter Solstice', '2032-12-21'),
+						array('Autumnal Equinox', '2024-09-22'),
+						array('Autumnal Equinox', '2025-09-22'),
+						array('Autumnal Equinox', '2026-09-23'),
+						array('Autumnal Equinox', '2027-09-23'),
+						array('Autumnal Equinox', '2028-09-22'),
+						array('Autumnal Equinox', '2029-09-22'),
+						array('Autumnal Equinox', '2030-09-22'),
+						array('Autumnal Equinox', '2031-09-23'),
+						array('Autumnal Equinox', '2032-09-22'),
+						array('Thanksgiving', '2024-11-28'),
+						array('Thanksgiving', '2025-11-27'),
+						array('Thanksgiving', '2026-11-26'),
+						array('Thanksgiving', '2027-11-25'),
+						array('Thanksgiving', '2028-11-23'),
+						array('Thanksgiving', '2029-11-22'),
+						array('Thanksgiving', '2030-11-28'),
+						array('Thanksgiving', '2031-11-27'),
+						array('Thanksgiving', '2032-11-25'),
+						array('Memorial Day', '2024-05-27'),
+						array('Memorial Day', '2025-05-26'),
+						array('Memorial Day', '2026-05-25'),
+						array('Memorial Day', '2027-05-31'),
+						array('Memorial Day', '2028-05-29'),
+						array('Memorial Day', '2029-05-28'),
+						array('Memorial Day', '2030-05-27'),
+						array('Memorial Day', '2031-05-26'),
+						array('Memorial Day', '2032-05-31'),
+						array('Labor Day', '2024-09-02'),
+						array('Labor Day', '2025-09-01'),
+						array('Labor Day', '2026-09-07'),
+						array('Labor Day', '2027-09-06'),
+						array('Labor Day', '2028-09-04'),
+						array('Labor Day', '2029-09-03'),
+						array('Labor Day', '2030-09-02'),
+						array('Labor Day', '2031-09-01'),
+						array('Labor Day', '2032-09-06'),
+					);
+
+					$all_titles = array();
+					foreach ($default_holidays as $holiday)
+					{
+						$all_titles[$holiday[0]] = $holiday[0];
+					}
+
+					$existing_holidays = array();
+					$request = $this->db->query('', '
+						SELECT
+							title, event_date
+						FROM {db_prefix}calendar_holidays
+						WHERE title IN ({array_string:all_titles})',
+						array(
+							'all_titles' => array_values($all_titles),
+						)
+					);
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$existing_holidays[$row['title'] . '|' . $row['event_date']] = true;
+					}
+					$this->db->free_result($request);
+
+					$inserts = array();
+					foreach ($default_holidays as $holiday)
+					{
+						$key = $holiday[0] . '|' . $holiday[1];
+						if (!isset($existing_holidays[$key]))
+						{
+							$inserts[] = $holiday;
+						}
+					}
+
+					if (!empty($inserts))
+					{
+						$this->db->insert('ignore',
+							'{db_prefix}calendar_holidays',
+							array('title' => 'string', 'event_date' => 'date'),
+							$inserts,
+							array('id_holiday')
+						);
+					}
 				}
 			)
 		);

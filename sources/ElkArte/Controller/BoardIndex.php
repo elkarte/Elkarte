@@ -64,6 +64,39 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
+	 * Collapse or expand a category
+	 *
+	 * - accessed by ?action=collapse
+	 */
+	public function action_collapse(): void
+	{
+		global $context;
+
+		// Just in case, no need, no need.
+		$context['robot_no_index'] = true;
+
+		checkSession('request');
+
+		if (!$this->_req->hasQuery('sa'))
+		{
+			throw new Exception('no_access', false);
+		}
+
+		// Check if the input values are correct.
+		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
+		if ($this->_req->hasQuery('c') && in_array($sa, ['expand', 'collapse', 'toggle']))
+		{
+			// And collapse/expand/toggle the category.
+			require_once(SUBSDIR . '/Categories.subs.php');
+			$c = $this->_req->getQuery('c', 'intval', 0);
+			collapseCategories([$c], $sa, [$this->user->id]);
+		}
+
+		// And go back to the board index.
+		$this->action_boardindex();
+	}
+
+	/**
 	 * This function shows the board index.
 	 *
 	 * What it does:
@@ -193,94 +226,63 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Collapse or expand a category
-	 *
-	 * - accessed by ?action=collapse
-	 */
-	public function action_collapse(): void
-	{
-		global $context;
-
-		// Just in case, no need, no need.
-		$context['robot_no_index'] = true;
-
-		checkSession('request');
-
-		if (!$this->_req->hasQuery('sa'))
-		{
-			throw new Exception('no_access', false);
-		}
-
-		// Check if the input values are correct.
-		$sa = $this->_req->getQuery('sa', 'trim|strval', '');
-		if ($this->_req->hasQuery('c') && in_array($sa, ['expand', 'collapse', 'toggle']))
-		{
-			// And collapse/expand/toggle the category.
-			require_once(SUBSDIR . '/Categories.subs.php');
-			$c = $this->_req->getQuery('c', 'intval', 0);
-			collapseCategories([$c], $sa, [$this->user->id]);
-		}
-
-		// And go back to the board index.
-		$this->action_boardindex();
-	}
-
-	/**
 	 * Retrieves and prepares like statistics data for topics, boards, and messages,
 	 * and configures the context for display in the information center.
 	 *
-	 * The method populates the provided context with like statistics retrieved
-	 * from the cache or database and determines whether the like statistics
-	 * should be shown in the information center.
+	 * The method populates the provided context with like statistics from a
+	 * single cached payload and determines whether the block should be shown.
 	 *
-	 * @param bool $with_avatar whether to process avatar information
+	 * Stale data is delivered immediately; regeneration happens in the background.
+	 *
+	 * @param bool $with_avatar ignored; the board index uses the compact lists
 	 */
 	public function getLikeStatsContext($with_avatar = false)
 	{
-		global $context;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 		Txt::load('LikePosts');
 
+		// The board index never uses avatars; it only needs the compact lists.
+		// Cache lookup is non-blocking: old/stale data is delivered immediately and
+		// refreshed by an ajax request after the page has been displayed.
+		$key = md5($this->user->query_wanna_see_board ?? '');
+		$stats = cache_getBoardIndexLikeStats($key);
+
 		$context['likestats'] = [
-			'topics' => [],
-			'boards' => [],
-			'messages' => [],
+			'topics' => $stats['data']['topics'] ?? [],
+			'boards' => $stats['data']['boards'] ?? [],
+			'messages' => $stats['data']['messages'] ?? [],
+			'show' => false,
+			'deferred' => $stats['deferred'],
+			'refresh' => $stats['refresh'],
 		];
 
-		// Use a unique key based on the user's view permissions to cache the like statistics for topics, boards, and messages.
-		$key = md5($this->user->query_wanna_see_board ?? '') . ($with_avatar ? '_avatar' : '');
-		if (Cache::instance()->getVar($context['likestats']['topics'], 'ic_likestats_topic:' . $key, 1740) === false)
+		foreach (['topics', 'boards', 'messages'] as $type)
 		{
-			$context['likestats']['topics'] = dbMostLikedTopic(null, 5, $with_avatar);
-			Cache::instance()->put('ic_likestats_topic:' . $key, $context['likestats']['topics'], 1740);
-		}
-
-		if (Cache::instance()->getVar($context['likestats']['boards'], 'ic_likestats_board:' . $key, 3600) === false)
-		{
-			$context['likestats']['boards'] = dbMostLikedBoard(3, $with_avatar);
-			Cache::instance()->put('ic_likestats_board:' . $key, $context['likestats']['boards'], 3600);
-		}
-
-		if (Cache::instance()->getVar($context['likestats']['messages'], 'ic_likestats_message:' . $key, 1800) === false)
-		{
-			$context['likestats']['messages'] = dbMostLikedMessage(5, $with_avatar);
-			Cache::instance()->put('ic_likestats_message:' . $key, $context['likestats']['messages'], 1800);
-		}
-
-		$context['likestats']['show'] = false;
-		foreach (['topics', 'boards', 'messages'] as $key)
-		{
-			if (!empty($context['likestats'][$key]) && empty($context['likestats'][$key]['noDataMessage']))
+			if (!empty($context['likestats'][$type]) && empty($context['likestats'][$type]['noDataMessage']))
 			{
 				$context['likestats']['show'] = true;
 				break;
 			}
 		}
 
-		if ($context['likestats']['show'])
+		// A stale cache still gets the block, with a placeholder that the ajax
+		// request fills in once the data has been generated.
+		if ($context['likestats']['show'] || $context['likestats']['deferred'])
 		{
 			$context['info_center_callbacks'][] = 'show_likestats';
+		}
+
+		if ($context['likestats']['refresh'] || $context['likestats']['deferred'])
+		{
+			loadJavascriptFile('boardindex_likestats.js');
+			theme()->addJavascriptVar(['elk_likestats_refresh' => 'true']);
+			theme()->addJavascriptVar([
+				'elk_likestats_label_topics' => $txt['like_post_tab_mlt'],
+				'elk_likestats_label_messages' => $txt['like_post_tab_mlm'],
+				'elk_likestats_label_boards' => $txt['like_post_tab_mlb'],
+			], true);
 		}
 	}
 }

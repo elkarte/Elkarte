@@ -1267,6 +1267,10 @@ a.bbc_link {
 	max-height: 250px;
 }
 
+#logo[width][height] {
+	height: auto;
+}
+
 /* Main forum area. */
 #wrapper {
 	margin-top: 1.6rem;
@@ -2463,6 +2467,7 @@ button[type="submit"].quick_quote_button.hide {
 .category_boards .board_stats {
 	font-size: var(--font14);
 	display: grid;
+	align-content: start;
 	justify-content: center;
 	grid-column: stats;
 	grid-row-start: primary;
@@ -2506,11 +2511,11 @@ button[type="submit"].quick_quote_button.hide {
 	font-size: var(--font14);
 }
 
-.board_avatar, .topic_avatar {
-	padding-top: .4rem;
+.board_avatar {
+	padding-top: .8rem;
 }
 
-.board_avatar .avatar, .topic_avatar .avatar {
+.board_avatar .avatar {
 	width: 5rem;
 	max-height: 5rem;
 	object-fit: scale-down;
@@ -2747,7 +2752,7 @@ button[type="submit"].quick_quote_button.hide {
 	display: grid;
 	border: 1px solid;
 	border-bottom: 0;
-	grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_avatar] 5rem [topic_latest] 25rem [topic_stats] 15rem [topic_moderation] 7.5rem [col-end];
+	grid-template-columns: [topic_icon] 5rem [topic_info] minmax(0, 1fr) [topic_avatar] 6rem [topic_latest] 25rem [topic_stats] 15rem [topic_moderation] 7.5rem [col-end];
 	grid-template-rows: auto;
 }
 
@@ -2808,9 +2813,11 @@ button[type="submit"].quick_quote_button.hide {
 /* Container, holds topic name, starter, small page links and locked/sticky */
 .topic_info {
 	height: 100%;
-	padding: .6rem 1.2rem .6rem 1.2rem;
+	min-height: 6rem;
+	padding: .6rem .2rem;
 	border-right: 1px solid;
 	grid-column-start: topic_info;
+	padding-block: 1rem;
 }
 
 .topic_name h4 {
@@ -2824,11 +2831,19 @@ button[type="submit"].quick_quote_button.hide {
 	display: flex;
 	align-items: center;
 	opacity: .85;
+	gap: .3rem;
 }
 
 .topic_listing > li > .topic_avatar {
 	flex-shrink: 0;
 	grid-column-start: topic_avatar;
+}
+
+.topic_avatar .avatar {
+	width: 6rem;
+	max-height: 6rem;
+	object-fit: scale-down;
+	padding-top: .4rem;
 }
 
 /* Container, Holds last poster and time, link to end */
@@ -4893,6 +4908,7 @@ ul.cf_icons li:not(:first-child)::before {
 	position: relative;
 	overflow: auto;
 	max-height: 30rem;
+	border-top: 3px solid;
 }
 
 #recentposts {

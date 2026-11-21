@@ -16,8 +16,10 @@
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
+use ElkArte\Errors;
 use ElkArte\Helper\FileFunctions;
 use ElkArte\Helper\Util;
+use ErrorException;
 
 /**
  * Class File
@@ -572,11 +574,38 @@ class File extends Db
 				}
 			}
 
-			$opcache = trim((string) ini_get('opcache.restrict_api'));
-			if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-				($opcache === '' || stripos(rtrim(BOARDDIR, '/\\') . '/', rtrim($opcache, '/\\') . '/') === 0))
+			if (function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN))
 			{
-				opcache_invalidate(BOARDDIR . '/Settings.php', true);
+				$details = sprintf(
+					'opcache.restrict_api: "%s", SCRIPT_FILENAME: "%s", BOARDDIR: "%s"',
+					(string) ini_get('opcache.restrict_api'),
+					$_SERVER['SCRIPT_FILENAME'] ?? '(unavailable)',
+					BOARDDIR
+				);
+
+				$failure = 'opcache_invalidate() returned false.';
+
+				set_error_handler(static function (int $severity, string $message, string $file, int $line): never {
+					throw new ErrorException($message, 0, $severity, $file, $line);
+				}, E_WARNING);
+
+				try
+				{
+					if (opcache_invalidate(BOARDDIR . '/Settings.php', true))
+					{
+						return;
+					}
+				}
+				catch (ErrorException $e)
+				{
+					$failure = $e->getMessage();
+				}
+				finally
+				{
+					restore_error_handler();
+				}
+
+				Errors::instance()->log_error('Warning: ' . $failure . ' (' . $details . ')', 'general', __FILE__, __LINE__);
 			}
 		}
 	}

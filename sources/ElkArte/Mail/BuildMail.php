@@ -50,12 +50,18 @@ class BuildMail extends BaseMail
 	 * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we share a
 	 * users display name
 	 * @param int|null $reference - The parent topic id for use in a References header
-	 * @return bool If the email was accepted properly.
+	 * @return bool If the email was accepted properly.  Always true when mail is disabled.
 	 * @package Mail
 	 */
 	public function buildEmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $is_private = false, $from_wrapper = null, $reference = null): bool
 	{
 		global $modSettings;
+
+		// Mail type "none" is a global off switch: build nothing, queue nothing, send nothing.
+		if (self::isMailDisabled())
+		{
+			return true;
+		}
 
 		$priority = (int) $priority;
 

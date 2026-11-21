@@ -1324,8 +1324,12 @@ class ProfileInfo extends AbstractController
 		foreach ($this->user->buddies as $buddy)
 		{
 			$member = MembersList::get($buddy);
-			$member->loadContext();
+			if ($member->isEmpty())
+			{
+				continue;
+			}
 
+			$member->loadContext();
 			$context['buddies'][$buddy] = $member;
 		}
 	}

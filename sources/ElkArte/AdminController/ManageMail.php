@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Loader;
 use ElkArte\Languages\Txt;
+use ElkArte\Mail\BaseMail;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 
@@ -153,6 +154,11 @@ class ManageMail extends AbstractController
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue', 'sa' => 'settings', 'save']);
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
+		if (BaseMail::isMailDisabled())
+		{
+			$context['settings_message'] = $txt['mail_disabled_notice'];
+		}
+
 		// Prepare the config form
 		$settingsForm->prepare();
 
@@ -173,14 +179,29 @@ class ManageMail extends AbstractController
 
 		theme()->addInlineJavascript($javascript . '
 		};
-		
+
 		function fetch_birthday_preview()
 		{
 			let index = document.getElementById(\'birthday_email\').value;
 
 			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
 			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
-		}', true);
+		}
+
+		function toggleMailFields()
+		{
+			let disabled = document.getElementById(\'mail_type\').value === \'none\';
+
+			[\'smtp_host\', \'smtp_client\', \'smtp_port\', \'smtp_starttls\', \'smtp_ssl_verify\', \'smtp_username\', \'smtp_password\', \'smtp_password_confirm\'].forEach(function (id) {
+				let field = document.getElementById(id);
+				if (field)
+				{
+					field.disabled = disabled;
+				}
+			});
+		}
+
+		toggleMailFields();', true);
 	}
 
 	/**
@@ -226,7 +247,7 @@ class ManageMail extends AbstractController
 			['int', 'mail_batch_size'],
 			'',
 			// SMTP stuff.
-			['select', 'mail_type', [$txt['mail_type_default'], 'SMTP']],
+			['select', 'mail_type', [$txt['mail_type_default'], 'SMTP', 'none' => $txt['mail_type_none']], 'javascript' => 'onchange="toggleMailFields()"'],
 			['text', 'smtp_host'],
 			['text', 'smtp_client'],
 			['text', 'smtp_port'],
@@ -335,6 +356,8 @@ class ManageMail extends AbstractController
 	public function action_browse(): void
 	{
 		global $context, $txt;
+
+		$context['mail_disabled'] = BaseMail::isMailDisabled();
 
 		require_once(SUBSDIR . '/Mail.subs.php');
 		theme()->getTemplates()->load('ManageMail');
@@ -468,6 +491,8 @@ class ManageMail extends AbstractController
 	{
 		global $context, $txt;
 
+		$context['mail_disabled'] = BaseMail::isMailDisabled();
+
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		theme()->getTemplates()->load('ManageMail');
@@ -478,6 +503,11 @@ class ManageMail extends AbstractController
 		{
 			checkSession();
 			validateToken('admin-mailtest');
+
+			if ($context['mail_disabled'])
+			{
+				redirectexit('action=admin;area=mailqueue;sa=test;result=disabled');
+			}
 
 			$sendTo = $this->_req->getPost('send_to', 'trim');
 			$subject = $this->_req->getPost('subject', 'Util::htmlspecialchars', '');
@@ -500,5 +530,11 @@ class ManageMail extends AbstractController
 		createToken('admin-mailtest');
 
 		$context['result'] = $this->_req->getQuery('result', 'trim', '');
+
+		// A stale pass/fail result must not be shown once mail is turned off.
+		if ($context['mail_disabled'])
+		{
+			$context['result'] = 'disabled';
+		}
 	}
 }

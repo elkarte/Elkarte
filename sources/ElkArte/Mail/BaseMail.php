@@ -18,6 +18,9 @@ namespace ElkArte\Mail;
  */
 abstract class BaseMail
 {
+	/** @var string Value of mail_type that disables all outgoing email */
+	public const MAIL_TYPE_NONE = 'none';
+
 	/** @var bool If to use PBE/Mailist processing */
 	public $mailList = false;
 
@@ -68,13 +71,31 @@ abstract class BaseMail
 	}
 
 	/**
+	 * Returns true when the admin has selected the "disable outgoing email" mail type.
+	 */
+	public static function isMailDisabled(): bool
+	{
+		global $modSettings;
+
+		return ($modSettings['mail_type'] ?? '') === self::MAIL_TYPE_NONE;
+	}
+
+	/**
 	 * Sets if we use php mail or smtp mail transport
 	 */
 	public function setMailTransport(): void
 	{
 		global $modSettings;
 
-		$this->useSendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] === '';
+		// With mail disabled, never select SMTP; the send methods bail out before transport anyway.
+		if (self::isMailDisabled())
+		{
+			$this->useSendmail = true;
+
+			return;
+		}
+
+		$this->useSendmail = empty($modSettings['mail_type']) || ($modSettings['smtp_host'] ?? '') === '';
 	}
 
 	/**

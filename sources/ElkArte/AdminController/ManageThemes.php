@@ -1035,8 +1035,6 @@ class ManageThemes extends AbstractController
 		$themePicked = $this->_req->getQuery('th', 'intval');
 		$variant = $this->_req->getQuery('vrt', 'Util::htmlspecialchars');
 
-		$context['default_theme_id'] = $modSettings['theme_default'];
-
 		$_SESSION['theme'] = 0;
 
 		if (isset($id))
@@ -1064,13 +1062,16 @@ class ManageThemes extends AbstractController
 		{
 			checkSession('get');
 
+			// Theme 0 is "Forum Default"; any variant belongs to the theme it resolves to.
+			$variantTheme = $themePicked === 0 ? (int) $modSettings['theme_guests'] : $themePicked;
+
 			// If changing members or guests - and there's a variant - assume changing the default variant.
 			if (!empty($variant) && ($u === 0 || $u === -1))
 			{
-				updateThemeOptions([$themePicked, 0, 'default_variant', $variant]);
+				updateThemeOptions([$variantTheme, 0, 'default_variant', $variant]);
 
 				// Make it obvious that it's changed
-				Cache::instance()->remove('theme_settings-' . $themePicked);
+				Cache::instance()->remove('theme_settings-' . $variantTheme);
 			}
 
 			// For everyone.
@@ -1082,7 +1083,7 @@ class ManageThemes extends AbstractController
 				// Remove any custom variants.
 				if (!empty($variant))
 				{
-					deleteVariants($themePicked);
+					deleteVariants($variantTheme);
 				}
 
 				redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
@@ -1090,7 +1091,11 @@ class ManageThemes extends AbstractController
 			// Change the default/guest theme.
 			elseif ($u === -1)
 			{
-				updateSettings(['theme_guests' => $themePicked]);
+				// "Forum Default" is not a theme id, so leave the current default alone.
+				if ($themePicked !== 0)
+				{
+					updateSettings(['theme_guests' => $themePicked]);
+				}
 
 				redirectexit('action=admin;area=themes;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}

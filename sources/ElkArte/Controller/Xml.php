@@ -128,7 +128,7 @@ class Xml extends AbstractController
 		session_write_close();
 
 		// Only load images
-		$allowedTypes = ['jpeg', 'jpg', 'gif', 'png', 'bmp'];
+		$allowedTypes = ['jpeg', 'jpg', 'gif', 'png', 'bmp', 'svg', 'webp'];
 		$context['membergroup_icons'] = [];
 		$directory = $settings['theme_dir'] . '/images/group_icons';
 		$icons = [];

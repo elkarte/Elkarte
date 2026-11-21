@@ -277,7 +277,7 @@ $txt['moderation_log_desc'] = 'Lists moderation activities that have been perfor
 $txt['spider_log_desc'] = 'Review the entries related to search engine spider activity on your forum.';
 $txt['pruning_log_desc'] = 'Use these tools to prune older entries in the various logs.';
 
-$txt['mailqueue_title'] = 'Mail';
+$txt['email_title'] = 'Email';
 
 $txt['db_error_send'] = 'Send emails on database connection error';
 $txt['db_persist'] = 'Use a persistent connection';

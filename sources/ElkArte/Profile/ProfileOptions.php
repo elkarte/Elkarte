@@ -543,7 +543,7 @@ class ProfileOptions extends AbstractController
 	 */
 	public function action_pick(): void
 	{
-		global $txt, $context, $modSettings, $scripturl;
+		global $txt, $context, $scripturl;
 
 		checkSession('get');
 
@@ -565,7 +565,6 @@ class ProfileOptions extends AbstractController
 			'url' => $scripturl . '?action=profile;sa=pick;u=' . $this->_memID,
 			'name' => $txt['theme_pick'],
 		];
-		$context['default_theme_id'] = $modSettings['theme_default'];
 
 		// Saving a theme/variant cause JS doesn't work - pretend it did ;)
 		if (isset($save))

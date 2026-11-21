@@ -620,6 +620,7 @@ class News extends AbstractController
 
 		// Hide code tags so they don't get messed with by the bbc parsing, we'll restore them at the end
 		$preparse = PreparseCode::instance('');
+		$preparse->code_blocks = [];
 		$message = $preparse->tokenizeCodeBlocks($message);
 
 		// Allow addons to account for their own unique bbc additions e.g., gallery's etc.
@@ -646,6 +647,7 @@ class News extends AbstractController
 
 		// Restore code blocks and convert newlines back to <br />
 		$message = $preparse->restoreCodeBlocks($message);
+		$preparse->code_blocks = [];
 		$message = str_replace("\n", '<br />', $message);
 
 		// Convert Markdown code tags to BBC code tags
