@@ -160,14 +160,25 @@ Elk_QuickQuote.prototype.setButtonPosition = function(event, button) {
 		buttonBottom = clickCoords.bottom + button.offsetHeight,
 		windowBottom = window.scrollY + window.innerHeight;
 
+	// The button is absolutely positioned, so its coordinates are relative to
+	// its containing block, not the page.  getEventPosition returns page-relative
+	// values, so translate them into the containing block's coordinate space.
+	// Posts may establish a containing block via position: relative or via the
+	// containment applied by content-visibility: auto.
+	let pageRect = document.body.parentNode.getBoundingClientRect(),
+		parentRect = button.offsetParent ? button.offsetParent.getBoundingClientRect() : pageRect,
+		topOffset = pageRect.top - parentRect.top,
+		rightOffset = pageRect.right - parentRect.right,
+		top;
+
 	// Don't go off the bottom of the viewport
 	if (buttonBottom > windowBottom)
 	{
-		button.style.top = clickCoords.top - button.offsetHeight + 'px';
+		top = clickCoords.top - button.offsetHeight;
 	}
 	else
 	{
-		button.style.top = clickCoords.bottom + 'px';
+		top = clickCoords.bottom;
 	}
 
 	// For touch devices we need to account for selection bounding handles.  There is not a consistent
@@ -175,22 +186,25 @@ Elk_QuickQuote.prototype.setButtonPosition = function(event, button) {
 	// only available option
 	if (is_touch)
 	{
-		button.style.top = clickCoords.bottom + 25 + 'px';
+		top = clickCoords.bottom + 25;
 	}
 
+	button.style.top = Math.round(top + topOffset) + 'px';
+
 	// Don't go outside our message area
-	// @todo simplify
-	let postPos = event.currentTarget.getBoundingClientRect();
+	let postPos = event.currentTarget.getBoundingClientRect(),
+		right;
+
 	if (this.pointerDirection === 'right')
 	{
 		if (clickCoords.left - button.offsetWidth < postPos.left)
 		{
 			let shift = postPos.left - (clickCoords.left - button.offsetWidth);
-			button.style.right = Math.round(clickCoords.right - shift - 10) + 'px';
+			right = clickCoords.right - shift - 10;
 		}
 		else
 		{
-			button.style.right = clickCoords.right + 'px';
+			right = clickCoords.right;
 		}
 	}
 	else
@@ -198,13 +212,15 @@ Elk_QuickQuote.prototype.setButtonPosition = function(event, button) {
 		if (clickCoords.left + button.offsetWidth > postPos.right)
 		{
 			let shift = (clickCoords.left + button.offsetWidth) - postPos.right;
-			button.style.right = Math.round(clickCoords.right - shift - 10) + 'px';
+			right = clickCoords.right - shift - 10;
 		}
 		else
 		{
-			button.style.right = clickCoords.right - button.offsetWidth + 'px';
+			right = clickCoords.right - button.offsetWidth;
 		}
 	}
+
+	button.style.right = Math.round(right - rightOffset) + 'px';
 };
 
 /**
