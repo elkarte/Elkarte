@@ -120,6 +120,7 @@ class Emoji extends AbstractModel
 		}
 
 		// Protect code and icode blocks
+		PreparseCode::instance('')->code_blocks = [];
 		return PreparseCode::instance('')->tokenizeCodeBlocks($string);
 	}
 
@@ -131,7 +132,10 @@ class Emoji extends AbstractModel
 	 */
 	private function _restoreCodeBlocks($string): string
 	{
-		return PreparseCode::instance('')->restoreCodeBlocks($string);
+		$string = PreparseCode::instance('')->restoreCodeBlocks($string);
+		PreparseCode::instance('')->code_blocks = [];
+
+		return $string;
 	}
 
 	/**

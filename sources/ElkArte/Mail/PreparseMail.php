@@ -54,6 +54,8 @@ class PreparseMail extends BaseMail
 
 		// Protect code tags from parseBBC
 		$preparse = PreparseCode::instance('');
+		$preparse->code_blocks = [];
+
 		$message = str_replace('<br />', "\n", $message);
 		$message = $preparse->tokenizeCodeBlocks($message);
 
@@ -83,6 +85,7 @@ class PreparseMail extends BaseMail
 
 		// Restore code blocks
 		$message = $preparse->restoreCodeBlocks($message);
+		$preparse->code_blocks = [];
 		$message = str_replace("\n", '<br />', $message);
 
 		// Markdown code tags are a bit different, so convert them now
