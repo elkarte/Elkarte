@@ -2552,7 +2552,6 @@ class InstallInstructions_install_2_0
 				array('censor_proper', ''),
 				array('enablePostHTML', '0'),
 				array('theme_allow', '1'),
-				array('theme_default', '1'),
 				array('theme_guests', '1'),
 				array('xmlnews_enable', '0'),
 				array('xmlnews_limit', '10'),

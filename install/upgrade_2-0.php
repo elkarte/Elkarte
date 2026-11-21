@@ -761,7 +761,6 @@ class UpgradeInstructions_upgrade_2_0
 					// knownThemes = default + beSocial only; enforce system-wide theme defaults
 					updateSettings(array(
 						'knownThemes' => '1,' . $this->beSocialId,
-						'theme_default' => '1',
 						'theme_guests' => '1',
 					));
 				}
