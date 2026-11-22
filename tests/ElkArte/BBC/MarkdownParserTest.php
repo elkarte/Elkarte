@@ -34,6 +34,36 @@ class MarkdownParserTest extends ElkArteCommonSetupTest
 				'[b]bold[/b]',
 			),
 			array(
+				'Bold followed by punctuation',
+				'**bold**,',
+				'[b]bold[/b],',
+			),
+			array(
+				'Multiple bold spans followed by punctuation',
+				'**bold**,<br />another **bold** with **more**,',
+				'[b]bold[/b],<br />another [b]bold[/b] with [b]more[/b],',
+			),
+			array(
+				'Bold double underscore followed by punctuation',
+				'__bold__,',
+				'[b]bold[/b],',
+			),
+			array(
+				'Bold surrounded by punctuation',
+				'(**bold**)',
+				'([b]bold[/b])',
+			),
+			array(
+				'Bold is not matched inside a word',
+				'foo**bold**bar',
+				'foo**bold**bar',
+			),
+			array(
+				'Bold requires exactly two markers',
+				'***bold***',
+				'***bold***',
+			),
+			array(
 				'Italic single asterisk',
 				'*italic*',
 				'[i]italic[/i]',
@@ -44,9 +74,19 @@ class MarkdownParserTest extends ElkArteCommonSetupTest
 				'[i]italic[/i]',
 			),
 			array(
+				'Italic followed by punctuation',
+				'*italic*,',
+				'[i]italic[/i],',
+			),
+			array(
 				'Strikethrough double tilde',
 				'~~strike~~',
 				'[s]strike[/s]',
+			),
+			array(
+				'Strikethrough followed by punctuation',
+				'~~strike~~,',
+				'[s]strike[/s],',
 			),
 			array(
 				'Horizontal rule dashes',
