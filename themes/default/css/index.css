@@ -3587,29 +3587,6 @@ figure.attachment_block figcaption {
 	border: 1px solid;
 }
 
-/* Instructs the browser to skip painting for offscreen articles until the user scrolls near them */
-#forumposts article.post_wrapper {
-	content-visibility: auto;
-	contain-intrinsic-size: 0 400px;
-}
-
-/* Fallback for browsers that understand content-visibility but not :has(),
-   i.e. Chrome / Edge 85-104. Everything newer supports both. */
-@supports not selector(:has(*)) {
-	#forumposts article.post_wrapper {
-		content-visibility: visible;
-	}
-}
-
-/* Only lift containment when a submenu is actually open */
-#forumposts article.forumposts:has(.menulevel2.selected),
-#forumposts article.forumposts:has(.listlevel1:focus-within > .menulevel2),
-#forumposts article.forumposts:has(.no_js .listlevel1:hover > .menulevel2) {
-	position: relative;
-	z-index: 1;
-	content-visibility: visible;
-}
-
 /* Other Topic information */
 #whoisviewing, #redirectfrom {
 	font-size: var(--font13);
