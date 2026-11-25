@@ -248,18 +248,22 @@ class MarkdownParser
 	{
 		$md = preg_quote($md, '~');
 
-		// (^|\s|<br \/>) Group 1 match BeginOfLine or WhiteSpaceCharacter or <br />
-		// ([*]) Group 2 match a single * character
+		// A delimiter must not be adjacent to a word character or to itself.  This allows
+		// punctuation (such as a trailing comma) while preventing intraword matches and
+		// triple markers like ***text***.
+		$boundary = '[^\p{L}\p{N}_' . $md . ']';
+
+		// (^|$boundary) Group 1 matches the start of the line or a valid boundary character
+		// ([*]) Group 2 matches a single * character
 		// \2 Find results of Group 2 again
 		// (?!\2) NegativeLookahead do not find Group 2 results again e.g. *** is not valid
-		// (.+?) Group 3 Any Character, except \n, one or more times (ungreedy)
-		// \2 Find Group 2 results again
-		// \2 Find Group 2 results again
+		// (.+?) Group 3 any character, one or more times (ungreedy)
+		// \2\2 Find Group 2 results twice
 		// (?!\2) NegativeLookahead do not find Group 2 results, e.g. no ***
-		// (\s|$|<br \/>) Group 4 match WhiteSpaceCharacter or EndOfLine or <br />
-		$regex = '~(^|\s|;|<br \/>)([' . $md . '])\2(?!\2)(.+?)\2\2(?!\2)(\s|$|&|<br \/>)~sm';
+		// (?=$|$boundary) zero-width valid trailing boundary, so punctuation is preserved
+		$regex = '~(^|' . $boundary . ')([' . $md . '])\2(?!\2)(.+?)\2\2(?!\2)(?=$|' . $boundary . ')~smu';
 
-		return preg_replace($regex, '$1[' . $bbc . ']$3[/' . $bbc . ']$4', $data);
+		return preg_replace($regex, '$1[' . $bbc . ']$3[/' . $bbc . ']', $data);
 	}
 
 	/**
@@ -274,9 +278,10 @@ class MarkdownParser
 	private function tagConvert($md, $bbc, $data): string
 	{
 		$md = preg_quote($md, '~');
-		$regex = '~(^|\s|;|<br \/>)([' . $md . '])(?!\2)(.+?)\2(?!\2)(\s|$|&|<br \/>)~sm';
+		$boundary = '[^\p{L}\p{N}_' . $md . ']';
+		$regex = '~(^|' . $boundary . ')([' . $md . '])(?!\2)(.+?)\2(?!\2)(?=$|' . $boundary . ')~smu';
 
-		return preg_replace($regex, '$1[' . $bbc . ']$3[/' . $bbc . ']$4', $data);
+		return preg_replace($regex, '$1[' . $bbc . ']$3[/' . $bbc . ']', $data);
 	}
 
 	/**
